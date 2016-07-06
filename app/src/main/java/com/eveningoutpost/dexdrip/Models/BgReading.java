@@ -5,6 +5,7 @@ import android.content.Intent;
 import android.content.SharedPreferences;
 import android.preference.PreferenceManager;
 import android.provider.BaseColumns;
+import android.widget.Toast; // Code added by savek-cc
 
 import com.activeandroid.Model;
 import com.activeandroid.annotation.Column;
@@ -346,6 +347,14 @@ public class BgReading extends Model implements ShareUploadableBg{
             return bgReading;
         }
 
+        //Code added by savek-cc
+        BgReading lastReading = last();
+        if ((lastReading != null) && (lastReading.raw_data == (raw_data/1000)) && (lastReading.filtered_data == (filtered_data/1000)) && (lastReading.timestamp < (timestamp + 150000))) {
+                        Log.v(TAG, "BgReading.create: Received Duplicate Packet.  Exiting.");
+                        Toast.makeText(context, "Discarded duplicate reading", Toast.LENGTH_LONG).show();
+                        return null;
+        }
+        //end of changes
         Calibration calibration = Calibration.lastValid();
         if (calibration == null) {
             Log.d(TAG, "create: No calibration yet");
