@@ -1,0 +1,125 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string-array name="DexCollectionMethods">
+        <item>Bluetooth Wixel</item>
+        <item>xBridge Wixel</item>
+        <item>Wifi Wixel / Parakeet</item>
+        <item>Wifi Wixel + BT Wixel</item>
+        <item>Wifi Wixel + xBridge Wixel</item>
+        <item>G4 Share Receiver</item>
+        <item>G5 Transmitter (test)</item>
+        <item>LimiTTer</item>
+        <item>xDrip+ Sync Follower</item>
+        <item>LibreAlarm</item>
+    </string-array>
+
+    <string-array name="DexCollectionMethodValues">
+        <item>BluetoothWixel</item>
+        <item>DexbridgeWixel</item>
+        <item>WifiWixel</item>
+        <item>WifiBlueToothWixel</item>
+        <item>WifiDexbridgeWixel</item>
+        <item>DexcomShare</item>
+        <item>DexcomG5</item>
+        <item>LimiTTer</item>
+        <item>Follower</item>
+        <item>LibreAlarm</item>
+
+    </string-array>
+
+    <string-array name="SendToPebbleChoice">
+
+        <item>Standard Watchface (old)</item>
+        <item>Color Trend Watchface</item>
+        <item>Pebble Classic Trend Watchface</item>
+    </string-array>
+    <string-array name="SendToPebbleChoiceValues">
+
+        <item>2</item>
+        <item>3</item>
+        <item>4</item>
+    </string-array>
+
+
+    <string-array name="PebbleTrendPeriods">
+        <item>1hr</item>
+        <item>2hr</item>
+        <item>3hr</item>
+        <item>4hr</item>
+    </string-array>
+    <string-array name="PebbleTrendPeriodValues">
+        <item>1</item>
+        <item>2</item>
+        <item>3</item>
+        <item>4</item>
+    </string-array>
+
+    <string-array name="UpdateChannel">
+        <item>stable</item>
+        <item>beta</item>
+        <item>alpha</item>
+    </string-array>
+
+    <string-array name="UpdateChannelDetail">
+        <item>Stable - tried and tested versions</item>
+        <item>Beta - new features but not fully tested </item>
+        <item>Alpha - versions for early testing</item>
+    </string-array>
+
+    <string-array name="UpdateChannelE">
+        <item>stable</item>
+        <item>beta</item>
+        <item>alpha</item>
+        <item>nightly</item>
+    </string-array>
+
+    <string-array name="UpdateChannelDetailE">
+        <item>Stable - tried and tested versions</item>
+        <item>Beta - new features but not fully tested </item>
+        <item>Alpha - versions for early testing</item>
+        <item>Nightly - untested raw nightly code</item>
+    </string-array>
+
+    <string-array name="bgUnitEntries">
+        <item>mgdl</item>
+        <item>mmol</item>
+    </string-array>
+
+    <string-array name="bgUnitValues">
+        <item>mgdl</item>
+        <item>mmol</item>
+    </string-array>
+
+    <!--     make sure to keep this values in sync with AlertPlayer.getAlertProfile -->
+    <string-array name="BgAlertProfileEntries">
+        <item>High</item>
+        <item>Medium</item>
+        <item>Ascending volume</item>
+        <item>Vibrate only</item>
+        <item>Silent</item>
+    </string-array>
+
+    <string-array name="BgAlertProfileValues">
+        <item>High</item>
+        <item>medium</item>
+        <item>ascending</item>
+        <item>vibrate only</item>
+        <item>Silent</item>
+    </string-array>
+
+    <string-array name="risingEntries">
+        <item>2 mgdl (0.1 mmol)</item>
+        <item>3 mgdl (0.16 mmol)</item>
+    </string-array>
+
+    <string-array name="risingValues">
+        <item>2</item>
+        <item>3</item>
+    </string-array>
+
+    <string-array name="alertType">
+        <item>System Sound/Alarm</item>
+        <item>Custom Sound/Alarm</item>
+        <item>Default xDrip sound</item>
+    </string-array>
+</resources>

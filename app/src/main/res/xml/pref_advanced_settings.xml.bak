@@ -1,0 +1,342 @@
+<?xml version="1.0" encoding="utf-8"?>
+<PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android">
+    <PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android"
+        android:icon="@drawable/ic_watch_grey600_48dp"
+        android:key="smart_watch_options"
+        android:summary="@string/pebble_and_android_wear_options"
+        android:title="@string/smart_watch_features">
+        <PreferenceCategory
+            android:key="watch_integration"
+            android:title="@string/wear_integration">
+            <SwitchPreference
+                android:switchTextOff="@string/short_off_text_for_switches"
+                android:switchTextOn="@string/short_on_text_for_switches"
+                android:defaultValue="false"
+                android:key="wear_sync"
+                android:summary="@string/send_data_to_android_wear_watch"
+                android:title="@string/android_wear_integration" />
+        </PreferenceCategory>
+        <PreferenceCategory
+            android:key="pebble_integration"
+            android:title="@string/pebble_integration">
+            <SwitchPreference
+                android:switchTextOff="@string/short_off_text_for_switches"
+                android:switchTextOn="@string/short_on_text_for_switches"
+                android:defaultValue="false"
+                android:key="broadcast_to_pebble"
+                android:summary="@string/send_data_to_pebble_watchface"
+                android:title="@string/pebble_watch_integration" />
+            <ListPreference
+                android:defaultValue="2"
+                android:dependency="broadcast_to_pebble"
+                android:entries="@array/SendToPebbleChoice"
+                android:entryValues="@array/SendToPebbleChoiceValues"
+                android:key="broadcast_to_pebble_type"
+                android:summary="@string/standard_or_trend_pebble_watchface"
+                android:title="@string/choose_pebble_watchface"/>
+
+
+            <CheckBoxPreference
+                android:defaultValue="true"
+                android:dependency="broadcast_to_pebble"
+                android:key="pebble_display_trend"
+                android:summary="@string/pref_summary_display_trend"
+                android:title="@string/pref_pebble_display_trend"/>
+            <CheckBoxPreference
+                android:defaultValue="false"
+                android:dependency="broadcast_to_pebble"
+                android:key="pebble_filtered_line"
+                android:summary="Also show the filtered data on the trend"
+                android:title="@string/display_filtered_line"/>
+            <CheckBoxPreference
+                android:defaultValue="false"
+                android:dependency="broadcast_to_pebble"
+                android:key="pebble_tiny_dots"
+                android:summary="@string/show_tiny_dots_instead"
+                android:title="Use Tiny dot size"/>
+            <CheckBoxPreference
+                android:defaultValue="false"
+                android:dependency="broadcast_to_pebble"
+                android:key="pebble_high_line"
+                android:summary="@string/displays_the_high_line"
+                android:title="@string/pref_pebble_display_high_line"/>
+            <CheckBoxPreference
+                android:defaultValue="false"
+                android:dependency="broadcast_to_pebble"
+                android:key="pebble_low_line"
+                android:summary="@string/displays_the_low_line"
+                android:title="@string/pref_pebble_display_low_line"/>
+            <ListPreference
+                android:defaultValue="3"
+                android:dependency="broadcast_to_pebble"
+                android:entries="@array/PebbleTrendPeriods"
+                android:entryValues="@array/PebbleTrendPeriodValues"
+                android:key="pebble_trend_period"
+                android:summary="@string/set_the_trend_period_to_display"
+                android:title="@string/trend_time_period"/>
+            <CheckBoxPreference
+                android:defaultValue="true"
+                android:dependency="broadcast_to_pebble"
+                android:key="pebble_show_delta"
+                android:summary="@string/displays_the_delta_value"
+                android:title="@string/display_delta"/>
+            <CheckBoxPreference
+                android:defaultValue="false"
+                android:dependency="broadcast_to_pebble"
+                android:key="pebble_show_delta_units"
+                android:summary="@string/displays_the_delta_units"
+                android:title="@string/display_delta_units"/>
+            <CheckBoxPreference
+                android:defaultValue="true"
+                android:dependency="broadcast_to_pebble"
+                android:key="pebble_show_arrows"
+                android:summary="@string/displays_the_slope_arrows"
+                android:title="@string/display_slope_arrows"/>
+            <CheckBoxPreference
+               android:title="Vibrate on Alerts"
+               android:key="pebble_vibe_alerts"
+               android:summary="Vibrate watch on active glucose alerts"
+               android:defaultValue="false"/>
+            <CheckBoxPreference
+                android:defaultValue="false"
+                android:dependency="broadcast_to_pebble"
+                android:key="pebble_vibrate_no_signal"
+                android:summary="@string/vibrate_watch_to_alert_no_data"
+                android:title="@string/vibrate_when_missed_signal"/>
+
+            <EditTextPreference
+                android:defaultValue="99"
+                android:dependency="broadcast_to_pebble"
+                android:key="pebble_special_value"
+                android:summary="@string/special_glucose_value_to_display_message"
+                android:title="@string/special_value" />
+            <EditTextPreference
+                android:defaultValue="BAZINGA!"
+                android:dependency="broadcast_to_pebble"
+                android:key="pebble_special_text"
+                android:summary="@string/message_to_display_when_bgl_hits"
+                android:title="@string/text_to_display_when_hitting_special_value" />
+        </PreferenceCategory>
+        <PreferenceCategory
+            android:key="pebble_installers"
+            android:title="@string/install_pebble_apps">
+            <Preference
+                android:key="install_pebble_snooze_control"
+                android:summary="Attach it to a pebble button to instantly Snooze any active alert from your watch"
+                android:title="@string/install_pebble_snooze_control_app">
+            <intent
+                android:action="android.intent.action.MAIN"
+                android:targetClass="com.eveningoutpost.dexdrip.UtilityModels.pebble.watchface.InstallPebbleSnoozeControlApp"
+                android:targetPackage="@string/local_target_package" />
+            </Preference>
+        </PreferenceCategory>
+    </PreferenceScreen>
+
+    <PreferenceCategory
+        android:key="other_category"
+        android:title="@string/other_settings">
+        <SwitchPreference
+            android:switchTextOff="@string/short_off_text_for_switches"
+            android:switchTextOn="@string/short_on_text_for_switches"
+            android:defaultValue="false"
+            android:key="broadcast_data_through_intents"
+            android:summary="@string/pref_summary_broadcast_enabled"
+            android:title="@string/pref_title_broadcast_enabled" />
+        <PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android"
+            android:key="xdrip_less_common_settings"
+            android:summary="@string/debug_and_other_misc_options"
+            android:title="@string/less_common_settings">
+            <Preference
+                android:key="recent_errors"
+                android:title="@string/view_recent_errors_warnings">
+                <intent
+                    android:action="android.intent.action.MAIN"
+                    android:targetClass="com.eveningoutpost.dexdrip.ErrorsActivity"
+                    android:targetPackage="@string/local_target_package" />
+            </Preference>
+            <SwitchPreference
+                android:switchTextOff="@string/short_off_text_for_switches"
+                android:switchTextOn="@string/short_on_text_for_switches"
+                android:defaultValue="false"
+                android:key="bg_to_speech"
+                android:summary="@string/if_the_phone_has_text_to_speech"
+                android:title="@string/speak_readings" />
+            <CheckBoxPreference
+                android:defaultValue="false"
+                android:key="bg_to_speech_shortcut"
+                android:summary="Show a shortcut in the \u2630 menu to toggle Speak Readings"
+                android:title="Speak Readings Shortcut" />
+            <CheckBoxPreference
+                android:defaultValue="false"
+                android:key="excessive_wakelocks"
+                android:summary="@string/older_gratuitous_wakelocks"
+                android:title="@string/use_excessive_wakelocks" />
+            <CheckBoxPreference
+                android:defaultValue="true"
+                android:key="bluetooth_watchdog"
+                android:summary="Reset Bluetooth by turning it off and on if we don't get anything in 20 minutes"
+                android:title="Bluetooth Watchdog" />
+            <CheckBoxPreference
+                android:defaultValue="true"
+                android:key="close_gatt_on_ble_disconnect"
+                android:summary="If the bluetooth watchdog activates often then you can try unchecking this option to see if it helps"
+                android:title="@string/close_gatt_on_ble_disconnect" />
+            <CheckBoxPreference
+                android:defaultValue="true"
+                android:key="bluetooth_excessive_wakelocks"
+                android:summary="Older bluetooth wakelocks which can drain extra battery but might be needed for bluetooth reception"
+                android:title="@string/bluetooth_wakelocks" />
+            <CheckBoxPreference
+                android:defaultValue="false"
+                android:key="bluetooth_frequent_reset"
+                android:summary="Reset Bluetooth by turning it off and on every few minutes! Only select if you are testing. It may disrupt anything else using bluetooth."
+                android:title="Constantly reset bluetooth" />
+            <CheckBoxPreference
+                android:defaultValue="false"
+                android:key="aggressive_service_restart"
+                android:summary="Repeatedly restart the collection service at any hint of missing data. Enable only if you are getting data loss."
+                android:title="Aggressive service restarts" />
+            <CheckBoxPreference
+                android:defaultValue="true"
+                android:key="broadcast_data_through_intents_without_permission"
+                android:summary="Send broadcasts without locking to the older permission model"
+                android:title="@string/compatible_broadcast" />
+            <CheckBoxPreference
+                android:defaultValue="false"
+                android:dependency="engineering_mode"
+                android:key="predictive_bg"
+                android:summary="Old method - Not Recommended! Attempts to predict readings each minute based on the past few values."
+                android:title="Display Predictive Values" />
+            <CheckBoxPreference
+                android:defaultValue="false"
+                android:key="interpret_raw"
+                android:summary="If using Share, DexDrip will show values when they are normally hidden on the receiver."
+                android:title="Interpret Raw Values" />
+            <CheckBoxPreference
+                android:defaultValue="true"
+                android:key="infrequent_calibration"
+                android:summary="If needed, use calibrations from longer ago, eg if calibrations are supplied infrequently."
+                android:title="Infrequent Calibration" />
+            <CheckBoxPreference
+                android:dependency="engineering_mode"
+                android:defaultValue="false"
+                android:key="store_logs"
+                android:summary="Only enable if you are having trouble with the app."
+                android:title="Store logs for troubleshooting" />
+            <CheckBoxPreference
+                android:defaultValue="false"
+                android:key="show_data_tables"
+                android:summary="Show Calibration and BG datatables in the app drawer."
+                android:title="@string/show_datatables" />
+            <CheckBoxPreference
+                android:defaultValue="true"
+                android:key="display_bridge_battery"
+                android:summary="Choose to display the bridge battery level"
+                android:title="@string/display_bridge_battery" />
+            <CheckBoxPreference
+                android:defaultValue="false"
+                android:key="disable_battery_warning"
+                android:summary="Disable the warning for low transmitter battery state on the home screen. (Only relevant for DIY receivers.)"
+                android:title="@string/disable_battery_warning" />
+            <CheckBoxPreference
+                android:defaultValue="false"
+                android:dependency="engineering_mode"
+                android:key="engineering_mode"
+                android:summary="Allows changing the most unsafe settings which could break everything!"
+                android:title="Engineering mode" />
+            <PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android"
+                android:key="xdrip_extra_status_line"
+                android:summary="Options for the extra line"
+                android:title="@string/extra_status_line">
+                <SwitchPreference
+                    android:switchTextOff="@string/short_off_text_for_switches"
+                    android:switchTextOn="@string/short_on_text_for_switches"
+                    android:defaultValue="false"
+                    android:key="extra_status_line"
+                    android:summary="@string/additional_text_status"
+                    android:title="@string/extra_status_line" />
+                <CheckBoxPreference
+                    android:defaultValue="false"
+                    android:dependency="extra_status_line"
+                    android:key="status_line_avg"
+                    android:summary="Today's average value."
+                    android:title="@string/average" />
+                <CheckBoxPreference
+                    android:defaultValue="false"
+                    android:dependency="extra_status_line"
+                    android:key="status_line_a1c_dcct"
+                    android:summary="A1c estimation in DCCT format (%)"
+                    android:title="A1c DCCT" />
+                <CheckBoxPreference
+                    android:defaultValue="false"
+                    android:dependency="extra_status_line"
+                    android:key="status_line_a1c_ifcc"
+                    android:summary="A1c estimation in IFCC format (mmol/mol)"
+                    android:title="A1c IFCC" />
+                <CheckBoxPreference
+                    android:defaultValue="false"
+                    android:dependency="extra_status_line"
+                    android:key="status_line_in"
+                    android:summary="Percentage of values in range."
+                    android:title="@string/in_percentage" />
+                <CheckBoxPreference
+                    android:defaultValue="false"
+                    android:dependency="extra_status_line"
+                    android:key="status_line_capture_percentage"
+                    android:summary="Percentage of sensor readings received"
+                    android:title="Packet capture percentage" />
+                <CheckBoxPreference
+                    android:defaultValue="false"
+                    android:dependency="extra_status_line"
+                    android:key="status_line_high"
+                    android:summary="Percentage of values above range."
+                    android:title="@string/high_percentage" />
+                <CheckBoxPreference
+                    android:defaultValue="false"
+                    android:dependency="extra_status_line"
+                    android:key="status_line_low"
+                    android:summary="Percentage of values below range."
+                    android:title="@string/low_percentage" />
+                <CheckBoxPreference
+                    android:defaultValue="false"
+                    android:dependency="extra_status_line"
+                    android:key="status_line_time"
+                    android:summary="@string/the_current_time"
+                    android:title="@string/time" />
+                <SwitchPreference
+                    android:switchTextOff="@string/short_off_text_for_switches"
+                    android:switchTextOn="@string/short_on_text_for_switches"
+                    android:defaultValue="false"
+                    android:dependency="extra_status_line"
+                    android:key="widget_status_line"
+                    android:summary="Also show the extra status line on the widget"
+                    android:title="@string/show_on_widget" />
+                <CheckBoxPreference
+                    android:defaultValue="true"
+                    android:dependency="extra_status_line"
+                    android:key="status_line_calibration_long"
+                    android:summary="Show slope and intercept in long form."
+                    android:title="@string/calibration_data_long" />
+                <CheckBoxPreference
+                    android:defaultValue="false"
+                    android:dependency="extra_status_line"
+                    android:key="status_line_calibration_short"
+                    android:summary="Show slope and intercept in short form."
+                    android:title="@string/calibration_data_short" />
+            </PreferenceScreen>
+
+
+            <PreferenceCategory
+                android:key="community_help_category"
+                android:title="@string/help_the_community">
+                <CheckBoxPreference
+                    android:defaultValue="true"
+                    android:key="store_sensor_location"
+                    android:summary="@string/help_the_developers_improve_the_algorithm"
+                    android:title="@string/store_sensor_location_to_help" />
+            </PreferenceCategory>
+        </PreferenceScreen>
+
+    </PreferenceCategory>
+</PreferenceScreen>
+
