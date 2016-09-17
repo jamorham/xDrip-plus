@@ -30,6 +30,11 @@
             android:entryValues="@array/chart_timeframe_values"
             android:defaultValue="5" />
 
+        <CheckBoxPreference android:title="Connect to G5"
+            android:defaultValue="false"
+            android:summary="Connect directly to G5"
+            android:key="connectG5" />
+
         <CheckBoxPreference android:title="Show Ago"
             android:defaultValue="true"
             android:summary="Minutes since last reading. (Circle WF)"

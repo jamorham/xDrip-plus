@@ -1332,6 +1332,12 @@ public class G5CollectionService extends Service {
         android.util.Log.i("timestamp create", Long.toString(transmitterData.timestamp));
 
         BgReading.create(transmitterData.raw_data, filtered_data, this, transmitterData.timestamp);
+
+        Log.d("Dex raw_data ", Double.toString(transmitterData.raw_data));//KS
+        Log.d("Dex filtered_data ", Double.toString(transmitterData.filtered_data));//KS
+        Log.d("Dex sensor_battery_level ", Double.toString(transmitterData.sensor_battery_level));//KS
+        Log.d("Dex timestamp ", Double.toString(transmitterData.timestamp));//KS
+
     }
 
     @SuppressLint("GetInstance")

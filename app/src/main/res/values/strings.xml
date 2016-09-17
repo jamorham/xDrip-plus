@@ -109,6 +109,7 @@
 
     <string name="action_resend_to_watch">Resend glucose to watch</string>
     <string name="action_open_watch_setting">Open Settings on Wear</string>
+    <string name="action_sync_watch_db">Reset Wear DB</string>
 
     <string name="erase">Erase</string>
     <string name="interface_tips_from_start">All interface tips will show again from the start</string>

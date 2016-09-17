@@ -1,21 +1,27 @@
 package com.eveningoutpost.dexdrip;
 
+import android.content.Context;
 import android.graphics.Color;
 import android.view.LayoutInflater;
 
+import com.activeandroid.ActiveAndroid;
 import com.ustwo.clockwise.WatchMode;
 
-import lecho.lib.hellocharts.util.Utils;
+import lecho.lib.hellocharts.util.ChartUtils;//KS Utils;
 
 public class Home extends BaseWatchFace {
+    private static Context context;//KS
 
     @Override
     public void onCreate() {
         super.onCreate();
+        //ActiveAndroid.initialize(this);//KS
+        Home.context = getApplicationContext();//KS
         LayoutInflater inflater = (LayoutInflater) getSystemService(LAYOUT_INFLATER_SERVICE);
         layoutView = inflater.inflate(R.layout.activity_home, null);
         performViewSetup();
     }
+
 
     protected void setColorDark() {
         mTime.setTextColor(Color.WHITE);
@@ -64,9 +70,9 @@ public class Home extends BaseWatchFace {
             mRelativeLayout.setBackgroundColor(Color.WHITE);
             mLinearLayout.setBackgroundColor(Color.BLACK);
             if (sgvLevel == 1) {
-                mSgv.setTextColor(Utils.COLOR_ORANGE);
-                mDirection.setTextColor(Utils.COLOR_ORANGE);
-                mDelta.setTextColor(Utils.COLOR_ORANGE);
+                mSgv.setTextColor(ChartUtils.COLOR_ORANGE);//KS Utils
+                mDirection.setTextColor(ChartUtils.COLOR_ORANGE);
+                mDelta.setTextColor(ChartUtils.COLOR_ORANGE);
             } else if (sgvLevel == 0) {
                 mSgv.setTextColor(Color.BLACK);
                 mDirection.setTextColor(Color.BLACK);
@@ -91,7 +97,7 @@ public class Home extends BaseWatchFace {
             mRaw.setTextColor(Color.WHITE);
             mTime.setTextColor(Color.BLACK);
             if (chart != null) {
-                highColor = Utils.COLOR_ORANGE;
+                highColor = ChartUtils.COLOR_ORANGE;
                 midColor = Color.BLUE;
                 lowColor = Color.RED;
                 singleLine = false;
@@ -130,4 +136,9 @@ public class Home extends BaseWatchFace {
         }
 
     }
+
+    public static Context getAppContext() {
+        return Home.context;
+    }//KS from app / xdrip.java
+
     }
