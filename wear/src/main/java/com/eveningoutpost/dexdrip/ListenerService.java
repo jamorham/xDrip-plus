@@ -362,8 +362,8 @@ public class ListenerService extends WearableListenerService implements GoogleAp
                     .serializeSpecialFloatingPointValues()
                     .create();
             Log.d(TAG, "syncCalibrationData add Calibration Table entries count=" + entries.size());
-            if (entries.size() > 0)
-                Calibration.clear_all_existing_calibrations();
+            //if (entries.size() > 0)
+            //    Calibration.clear_all_existing_calibrations();
             Sensor sensor = Sensor.currentSensor();
             if (sensor != null) {
                 for (DataMap entry : entries) {
@@ -410,7 +410,7 @@ public class ListenerService extends WearableListenerService implements GoogleAp
 
             //KS Debug only
             List<Calibration> cals = Calibration.latest(6);//1 days worth 12 * 24hr  OR Long.MAX_VALUE for all records
-            if (!cals.isEmpty()) {
+            if (cals != null && !cals.isEmpty()) {
                 Log.d(TAG, "syncCalibrationData cals in wear db count = " + cals.size());
                 for (Calibration cal : cals) {
                     String json = cal.toS();
