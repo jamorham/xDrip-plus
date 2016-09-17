@@ -260,20 +260,19 @@ public class ListenerService extends WearableListenerService implements GoogleAp
                     intent.putExtra(WEARABLE_TREATMENT_PAYLOAD, dataMap.toBundle());
                     intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
                     getApplicationContext().startActivity(intent);
-                } else if (path.equals(WEARABLE_TOAST_NOTIFICATON))
-                {
+                } else if (path.equals(WEARABLE_TOAST_NOTIFICATON)) {
                     dataMap = DataMapItem.fromDataItem(event.getDataItem()).getDataMap();
                     Intent intent = new Intent(getApplicationContext(), Simulation.class);
                     intent.putExtra(path, dataMap.toBundle());
                     intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
                     getApplicationContext().startActivity(intent);
                 } else if (path.equals(SYNC_DB_PATH)) {//KS
-                     Log.d(TAG, "onDataChanged SYNC_DB_PATH=" + path);
-                    //BgReading.deleteAll(startTime);//KS TODO clear database
+                    Log.d(TAG, "onDataChanged SYNC_DB_PATH=" + path);
+                    //Sensor.DeleteAndInitDb(getApplicationContext());//KS TODO test
                 } else if (path.equals(WEARABLE_SENSOR_DATA_PATH)) {//KS
                     dataMap = DataMapItem.fromDataItem(event.getDataItem()).getDataMap();
                     Log.d(TAG, "onDataChanged path=" + path + " DataMap=" + dataMap);
-                    syncSensorData(dataMap);
+                    syncSensorData(dataMap, getApplicationContext());
                 } else if (path.equals(WEARABLE_CALIBRATION_DATA_PATH)) {//KS
                     dataMap = DataMapItem.fromDataItem(event.getDataItem()).getDataMap();
                     Log.d(TAG, "onDataChanged path=" + path + " DataMap=" + dataMap);
@@ -312,7 +311,7 @@ public class ListenerService extends WearableListenerService implements GoogleAp
         //Log.d(TAG, "onDataChanged prefs highMark=" + highMark + " highMark=" + lowMark);
     }
 
-    public void syncSensorData(DataMap dataMap) {//KS
+    public void syncSensorData(DataMap dataMap, Context context) {//KS
         Log.d(TAG, "syncSensorData");
         java.text.DateFormat df = new SimpleDateFormat("MM.dd.yyyy HH:mm:ss");
         Date date = new Date();
@@ -327,19 +326,20 @@ public class ListenerService extends WearableListenerService implements GoogleAp
             Log.d(TAG, "onDataChanged prefs set dex_txid=" + mPrefs.getString("dex_txid", "ABCDEF"));
 
             String uuid = dataMap.getString("uuid");
-            Log.d(TAG, "syncSensorData add Sensor  for uuid=" + uuid);
+            Log.d(TAG, "syncSensorData add Sensor for uuid=" + uuid);
             long started_at = dataMap.getLong("started_at");
             Integer latest_battery_level = dataMap.getInt("latest_battery_level");
             String sensor_location = dataMap.getString("sensor_location");
+            Sensor.InitDb(context);//ensure database has already been initialized
             if (uuid != null && !uuid.isEmpty()) {
                 date.setTime(started_at);
                 Log.d(TAG, "syncSensorData add Sensor for uuid=" + uuid + " timestamp=" + started_at + " timeString=" + df.format(date));
                 Sensor sensor = Sensor.getByUuid(uuid);
-                if (Sensor.getByUuid(uuid) == null) {
-                    Log.d(TAG, "syncSensorData Sensor create.");
+                if (sensor == null) {
+                    Log.d(TAG, "syncSensorData create new Sensor...");
                     Sensor newsensor = Sensor.create(started_at, uuid);
                     if (newsensor != null) {
-                        Log.i(TAG, "syncSensorData Created Sensor uuid=" + uuid + " started at=" + started_at);
+                        Log.i(TAG, "syncSensorData Created Sensor with uuid=" + uuid + " started at=" + started_at);
                         Sensor.updateBatteryLevel(newsensor, latest_battery_level);
                         Sensor.updateSensorLocation(sensor_location);
                     } else

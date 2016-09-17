@@ -15,7 +15,7 @@ public class Home extends BaseWatchFace {
     @Override
     public void onCreate() {
         super.onCreate();
-        ActiveAndroid.initialize(this);//KS
+        //ActiveAndroid.initialize(this);//KS
         Home.context = getApplicationContext();//KS
         LayoutInflater inflater = (LayoutInflater) getSystemService(LAYOUT_INFLATER_SERVICE);
         layoutView = inflater.inflate(R.layout.activity_home, null);

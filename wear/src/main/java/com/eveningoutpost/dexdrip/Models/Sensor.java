@@ -1,11 +1,14 @@
 package com.eveningoutpost.dexdrip.Models;
 
+import android.content.Context;
 import android.content.SharedPreferences;
 import android.database.sqlite.SQLiteException;
 import android.preference.PreferenceManager;
 import android.provider.BaseColumns;
 
+import com.activeandroid.ActiveAndroid;
 import com.activeandroid.Cache;
+import com.activeandroid.Configuration;
 import com.activeandroid.Model;
 import com.activeandroid.annotation.Column;
 import com.activeandroid.annotation.Table;
@@ -119,12 +122,49 @@ public class Sensor extends Model {
         return gson.toJson(this);
     }
 
-    public static boolean exists(String table) {//KS
+    public static void DeleteAndInitDb(Context context) {//KS
+        Configuration dbConfiguration = new Configuration.Builder(context).create();
+        try {
+            ActiveAndroid.dispose();
+            context.deleteDatabase("DexDrip.db");
+            ActiveAndroid.initialize(dbConfiguration);
+            Log.d("wearSENSOR", "DeleteAndInitDb DexDrip.db deleted and initialized.");
+        } catch (Exception e) {
+            Log.e("wearSENSOR", "DeleteAndInitDb CATCH Error.");
+        }
+    }
+
+    public static void InitDb(Context context) {//KS
+        Configuration dbConfiguration = new Configuration.Builder(context).create();
         try {
             SQLiteDatabase db = Cache.openDatabase();
-            db.rawQuery("SELECT * FROM " + table, null);
-            return true;
+            if (db != null) {
+                Log.d("wearSENSOR", "InitDb DB exists");
+            }
+            else {
+                Log.d("wearSENSOR", "InitDb DB does NOT exist. Call ActiveAndroid.initialize()");
+                ActiveAndroid.initialize(dbConfiguration);
+            }
         } catch (Exception e) {
+            Log.d("wearSENSOR", "InitDb CATCH: DB does NOT exist. Call ActiveAndroid.initialize()");
+            ActiveAndroid.initialize(dbConfiguration);
+        }
+    }
+
+    public static boolean TableExists(String table) {//KS
+        try {
+            SQLiteDatabase db = Cache.openDatabase();
+            if (db != null) {
+                db.rawQuery("SELECT * FROM " + table, null);
+                Log.d("wearSENSOR", "TableExists table does NOT exist:" + table);
+                return true;
+            }
+            else {
+                Log.d("wearSENSOR", "TableExists Cache.openDatabase() failed.");
+                return false;
+            }
+        } catch (Exception e) {
+            Log.d("wearSENSOR", "TableExists CATCH error table:" + table);
             return false;
         }
     }
@@ -181,12 +221,12 @@ public class Sensor extends Model {
 
     public static Sensor getByUuid(String xDrip_sensor_uuid) {
         if(xDrip_sensor_uuid == null) {
-            Log.e("SENSOR", "xDrip_sensor_uuid is null");
+            Log.d("wearSENSOR", "getByUuid xDrip_sensor_uuid is null");
             return null;
         }
-        Log.d("SENSOR", "xDrip_sensor_uuid is " + xDrip_sensor_uuid);
+        Log.d("wearSENSOR", "getByUuid xDrip_sensor_uuid is " + xDrip_sensor_uuid);
 
-        if (exists("Sensor")) {
+        //if (TableExists("Sensor")) {//com.eveningoutpost.dexdrip.Models.Sensor
             try {//KS
                 Sensor sensor = new Select()
                         .from(Sensor.class)
@@ -194,10 +234,11 @@ public class Sensor extends Model {
                         .executeSingle();
                 return sensor;
             } catch (Exception e) {
+                Log.d("wearSENSOR", "getByUuid CATCH Select error xDrip_sensor_uuid is " + xDrip_sensor_uuid);
                 return null;
             }
-        }
-        else return null;
+        //}
+        //else return null;
 
     }
 
