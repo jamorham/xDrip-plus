@@ -269,6 +269,7 @@ public class Home extends ActivityWithMenu {
                 intent.setAction(Settings.ACTION_REQUEST_IGNORE_BATTERY_OPTIMIZATIONS);
                 intent.setData(Uri.parse("package:" + packageName));
                 startActivity(intent);
+                JoH.static_toast_long("Select YES for best performance!");
             }
         }
 
