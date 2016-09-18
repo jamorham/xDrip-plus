@@ -117,6 +117,7 @@ public class WatchUpdaterService extends WearableListenerService implements
                         else {
                             Log.d(TAG, "syncBGData add BG; does NOT exist for uuid=" + bgData.uuid + " timestamp=" + bgData.timestamp + " timeString=" + df.format(date));
                             bgData.save();
+                            BgSendQueue.handleNewBgReading(bgReading, "create", getApplicationContext() );
                             exists = BgReading.findByUuid(bgData.uuid);
                             if (exists != null)
                                 Log.d(TAG, "BG GSON saved BG: " + exists.toS());

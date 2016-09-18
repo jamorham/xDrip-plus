@@ -90,6 +90,7 @@ public class BgSendQueue extends Model {
     }
 
     public static void handleNewBgReading(BgReading bgReading, String operation_type, Context context, boolean is_follower) {
+        Log.d("BGQueue", "handleNewBgReading");
         PowerManager powerManager = (PowerManager) context.getSystemService(Context.POWER_SERVICE);
         PowerManager.WakeLock wakeLock = powerManager.newWakeLock(PowerManager.PARTIAL_WAKE_LOCK,
                 "sendQueue");
@@ -105,8 +106,11 @@ public class BgSendQueue extends Model {
             }
 
             if (AppWidgetManager.getInstance(context).getAppWidgetIds(new ComponentName(context, xDripWidget.class)).length > 0) {
+                Log.d("BGQueue", "start WidgetUpdateService");//KS
                 context.startService(new Intent(context, WidgetUpdateService.class));
             }
+            else
+                Log.e("BGQueue", "getAppWidgetIds NOT found; can't start WidgetUpdateService");//KS
 
             if (prefs.getBoolean("broadcast_data_through_intents", false)) {
                 Log.i("SENSOR QUEUE:", "Broadcast data");

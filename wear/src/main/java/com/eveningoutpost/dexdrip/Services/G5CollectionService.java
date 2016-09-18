@@ -245,6 +245,10 @@ public class G5CollectionService extends Service {
     public void onDestroy() {
         super.onDestroy();
         stopScan();
+
+        Log.e(TAG, "onDestroy - disabling BT");//KS
+        mBluetoothAdapter.disable();//KS
+
 //        close();
 //        setRetryTimer();
 //        foregroundServiceStarter.stop();
