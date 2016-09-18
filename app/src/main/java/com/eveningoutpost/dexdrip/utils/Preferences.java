@@ -1524,6 +1524,9 @@ public class Preferences extends PreferenceActivity {
                     Log.d("Preferences", "WidgetListener getAppWidgetIds found, call start WidgetUpdateService");//KS
                     context.startService(new Intent(context, WidgetUpdateService.class));
                 }
+                else
+                    Log.e("Preferences", "WidgetListener getAppWidgetIds NOT found; can't start WidgetUpdateService");//KS
+
                 return true;
             }
         }
