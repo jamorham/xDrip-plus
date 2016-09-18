@@ -31,6 +31,7 @@ import com.eveningoutpost.dexdrip.WidgetUpdateService;
 import com.eveningoutpost.dexdrip.utils.BgToSpeech;
 import com.eveningoutpost.dexdrip.wearintegration.WatchUpdaterService;
 import com.eveningoutpost.dexdrip.xDripWidget;
+import com.eveningoutpost.dexdrip.xdrip;
 import com.google.android.gms.wearable.DataMap;
 
 import java.util.ArrayList;
@@ -105,7 +106,8 @@ public class BgSendQueue extends Model {
                 context.sendBroadcast(updateIntent);
             }
 
-            if (AppWidgetManager.getInstance(context).getAppWidgetIds(new ComponentName(context, xDripWidget.class)).length > 0) {
+            Context appContext = xdrip.getAppContext();//KS
+            if (AppWidgetManager.getInstance(context).getAppWidgetIds(new ComponentName(appContext, xDripWidget.class)).length > 0) {//KS context
                 Log.d("BGQueue", "start WidgetUpdateService");//KS
                 context.startService(new Intent(context, WidgetUpdateService.class));
             }
