@@ -10,7 +10,9 @@ import android.util.Log;
 
 import com.eveningoutpost.dexdrip.Home;
 import com.eveningoutpost.dexdrip.Models.BgReading;
+import com.eveningoutpost.dexdrip.Models.Calibration;
 import com.eveningoutpost.dexdrip.Models.JoH;
+import com.eveningoutpost.dexdrip.Models.Sensor;
 import com.eveningoutpost.dexdrip.UtilityModels.BgGraphBuilder;
 import com.eveningoutpost.dexdrip.UtilityModels.BgSendQueue;
 import com.eveningoutpost.dexdrip.UtilityModels.Constants;
@@ -24,7 +26,13 @@ import com.google.android.gms.wearable.PutDataRequest;
 import com.google.android.gms.wearable.Wearable;
 import com.google.android.gms.wearable.WearableListenerService;
 
+import com.google.gson.Gson;//KS
+import com.google.gson.GsonBuilder;
+import com.google.gson.annotations.Expose;
+import com.google.gson.internal.bind.DateTypeAdapter;
+
 import java.io.UnsupportedEncodingException;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
@@ -34,6 +42,12 @@ public class WatchUpdaterService extends WearableListenerService implements
         GoogleApiClient.OnConnectionFailedListener {
     public static final String ACTION_RESEND = WatchUpdaterService.class.getName().concat(".Resend");
     public static final String ACTION_OPEN_SETTINGS = WatchUpdaterService.class.getName().concat(".OpenSettings");
+    public static final String ACTION_SYNC_DB = WatchUpdaterService.class.getName().concat(".SyncDB");//KS
+    public static final String ACTION_SYNC_SENSOR = WatchUpdaterService.class.getName().concat(".SyncSensor");//KS
+    public static final String ACTION_SYNC_CALIBRATION = WatchUpdaterService.class.getName().concat(".SyncCalibration");//KS
+    public static final String SYNC_DB_PATH = "/syncweardb";//KS
+    public static final String WEARABLE_CALIBRATION_DATA_PATH = "/nightscout_watch_cal_data";//KS
+    public static final String WEARABLE_SENSOR_DATA_PATH = "/nightscout_watch_sensor_data";//KS
     public static final String WEARABLE_DATA_PATH = "/nightscout_watch_data";
     public static final String WEARABLE_RESEND_PATH = "/nightscout_watch_data_resend";
     public static final String WEARABLE_VOICE_PAYLOAD = "/xdrip_plus_voice_payload";
@@ -42,6 +56,7 @@ public class WatchUpdaterService extends WearableListenerService implements
     private static final String WEARABLE_TREATMENT_PAYLOAD = "/xdrip_plus_treatment_payload";
     private static final String WEARABLE_TOAST_NOTIFICATON = "/xdrip_plus_toast";
     private static final String OPEN_SETTINGS_PATH = "/openwearsettings";
+
     private static final String TAG = "jamorham watchupdater";
     private static GoogleApiClient googleApiClient;
     boolean wear_integration = false;
@@ -66,6 +81,53 @@ public class WatchUpdaterService extends WearableListenerService implements
         intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
         intent.putExtra(extra, text);
         context.startActivity(intent);
+    }
+
+    public void syncBGData(DataMap dataMap) {//KS
+        Log.d(TAG, "syncBGData");
+        java.text.DateFormat df = new SimpleDateFormat("MM.dd.yyyy HH:mm:ss");
+        Date date = new Date();
+
+        ArrayList<DataMap> entries = dataMap.getDataMapArrayList("entries");
+        Log.d(TAG, "syncBGData add BgReading Table" );
+        if (entries != null) {
+            //Gson gson = new GsonBuilder().create();
+
+            Gson gson = new GsonBuilder()
+                    .excludeFieldsWithoutExposeAnnotation()
+                    .registerTypeAdapter(Date.class, new DateTypeAdapter())
+                    .serializeSpecialFloatingPointValues()
+                    .create();
+
+            Log.d(TAG, "syncBGData add BgReading Table entries count=" + entries.size());
+            for (DataMap entry : entries) {
+                if (entry != null) {
+                    Log.d(TAG, "syncBGData add BgReading Table entry=" + entry);
+                    BgReading bgReading = new BgReading();
+                    String bgrecord = entry.getString("bgs");
+                    if (bgrecord != null) {
+                        Log.d(TAG, "syncBGData add BgReading Table bgrecord=" + bgrecord);
+                        BgReading bgData = gson.fromJson(bgrecord, BgReading.class);
+                        BgReading exists = BgReading.getForTimestamp(bgData.timestamp);
+                        BgReading uuidexists = BgReading.findByUuid(bgData.uuid);
+                        date.setTime(bgData.timestamp);
+                        if (exists != null || uuidexists != null) {
+                            Log.d(TAG, "syncBGData BG already exists for uuid=" + bgData.uuid + " timestamp=" + bgData.timestamp + " timeString=" + df.format(date));
+                        }
+                        else {
+                            Log.d(TAG, "syncBGData add BG; does NOT exist for uuid=" + bgData.uuid + " timestamp=" + bgData.timestamp + " timeString=" + df.format(date));
+                            bgData.save();
+                            BgSendQueue.handleNewBgReading(bgReading, "create", getApplicationContext() );
+                            exists = BgReading.findByUuid(bgData.uuid);
+                            if (exists != null)
+                                Log.d(TAG, "BG GSON saved BG: " + exists.toS());
+                            else
+                                Log.d(TAG, "BG GSON NOT saved Calibration");
+                        }
+                    }
+                }
+            }
+        }
     }
 
     public static void sendWearToast(String msg, int length)
@@ -135,6 +197,10 @@ public class WatchUpdaterService extends WearableListenerService implements
         pebble_integration = mPrefs.getBoolean("pebble_sync", false);
         if (wear_integration) {
             googleApiConnect();
+            Log.d(TAG, "setSettings wear_sync changed to True. Action=" + ACTION_SYNC_DB + " Path=" + SYNC_DB_PATH);//KS
+            sendNotification(SYNC_DB_PATH, "syncDB");//KS TODO Clear/Reset Wear DB tables
+            sendSensorData();//KS
+            sendWearCalibrationData();//KS
         } else {
             this.stopService(new Intent(this, WatchUpdaterService.class));
         }
@@ -175,7 +241,18 @@ public class WatchUpdaterService extends WearableListenerService implements
                 if (ACTION_RESEND.equals(action)) {
                     resendData();
                 } else if (ACTION_OPEN_SETTINGS.equals(action)) {
-                    sendNotification();
+                    sendNotification(OPEN_SETTINGS_PATH, "openSettings");//KS add args
+                } else if (ACTION_SYNC_DB.equals(action)) {//KS
+                    Log.d(TAG, "onStartCommand Action=" + ACTION_SYNC_DB + " Path=" + SYNC_DB_PATH);
+                    sendNotification(SYNC_DB_PATH, "syncDB");//KS TODO Clear/Reset Wear DB tables
+                    sendSensorData();
+                    sendWearCalibrationData();
+                } else if (ACTION_SYNC_SENSOR.equals(action)) {//KS
+                    Log.d(TAG, "onStartCommand Action=" + ACTION_SYNC_SENSOR + " Path=" + WEARABLE_SENSOR_DATA_PATH);
+                    sendSensorData();
+                } else if (ACTION_SYNC_CALIBRATION.equals(action)) {//KS
+                    Log.d(TAG, "onStartCommand Action=" + ACTION_SYNC_CALIBRATION + " Path=" + WEARABLE_CALIBRATION_DATA_PATH);
+                    sendWearCalibrationData();
                 } else {
                     sendData();
                 }
@@ -234,6 +311,14 @@ public class WatchUpdaterService extends WearableListenerService implements
                     case WEARABLE_CANCEL_TREATMENT:
                         cancelTreatment(getApplicationContext(), "");
                         break;
+                    case SYNC_DB_PATH://KS
+                        String message = new String(event.getData());
+                        DataMap dataMap = DataMap.fromByteArray(event.getData());
+                        if (dataMap != null) {
+                            Log.d(TAG, "onMessageReceived dataMap=" + dataMap);
+                            syncBGData(dataMap);
+                        }
+                        break;
                     default:
                         Log.d(TAG, "Unknown wearable path: " + event.getPath());
                         break;
@@ -277,17 +362,18 @@ public class WatchUpdaterService extends WearableListenerService implements
         }
     }
 
-    private void sendNotification() {
+    private void sendNotification(String path, String notification) {//KS add args
         if (googleApiClient.isConnected()) {
-            PutDataMapRequest dataMapRequest = PutDataMapRequest.create(OPEN_SETTINGS_PATH);
+            Log.d(TAG, "sendNotification Notification=" + notification + " Path=" + path);
+            PutDataMapRequest dataMapRequest = PutDataMapRequest.create(path);
             //unique content
             dataMapRequest.setUrgent();
             dataMapRequest.getDataMap().putDouble("timestamp", System.currentTimeMillis());
-            dataMapRequest.getDataMap().putString("openSettings", "openSettings");
+            dataMapRequest.getDataMap().putString(notification, notification);
             PutDataRequest putDataRequest = dataMapRequest.asPutDataRequest();
             Wearable.DataApi.putDataItem(googleApiClient, putDataRequest);
         } else {
-            Log.e("OpenSettings", "No connection to wearable available!");
+            Log.e(notification, "No connection to wearable available!");
         }
     }
 
@@ -309,8 +395,94 @@ public class WatchUpdaterService extends WearableListenerService implements
         dataMap.putDouble("sgvDouble", bg.calculated_value);
         dataMap.putDouble("high", inMgdl(highMark, sPrefs));
         dataMap.putDouble("low", inMgdl(lowMark, sPrefs));
+        dataMap.putString("dex_txid", sPrefs.getString("dex_txid", "ABCDEF"));//KS
+        dataMap.putString("units", sPrefs.getString("units", "mgdl"));//KS
         //TODO: Add raw again
         //dataMap.putString("rawString", threeRaw((prefs.getString("units", "mgdl").equals("mgdl"))));
+        return dataMap;
+    }
+
+    public void sendSensorData() {//KS
+        if(googleApiClient != null && !googleApiClient.isConnected() && !googleApiClient.isConnecting()) { googleApiConnect(); }
+        Sensor sensor = Sensor.currentSensor();
+        if (sensor != null) {
+            if (wear_integration) {
+                DataMap dataMap = new DataMap();
+                Log.d(TAG, "Sensor sendSensorData uuid=" + sensor.uuid + " started_at=" + sensor.started_at + " active=" + sensor.isActive() + " battery=" + sensor.latest_battery_level + " location=" + sensor.sensor_location + " stopped_at=" + sensor.stopped_at);
+                String json = sensor.toS();
+                Log.d(TAG, "dataMap sendSensorData GSON: " + json);
+                //dataMap.putString("data", json);
+
+                dataMap.putLong("time", new Date().getTime()); // MOST IMPORTANT LINE FOR TIMESTAMP
+
+                dataMap.putString("dex_txid", mPrefs.getString("dex_txid", "ABCDEF"));//KS
+                dataMap.putLong("started_at", sensor.started_at);
+                dataMap.putString("uuid", sensor.uuid);
+                dataMap.putInt("latest_battery_level", sensor.latest_battery_level);
+                dataMap.putString("sensor_location", sensor.sensor_location);
+
+                new SendToDataLayerThread(WEARABLE_SENSOR_DATA_PATH, googleApiClient).executeOnExecutor(xdrip.executor, dataMap);
+            }
+        }
+    }
+
+    private void sendWearCalibrationData() {//KS
+        if(googleApiClient != null && !googleApiClient.isConnected() && !googleApiClient.isConnecting()) { googleApiConnect(); }
+        Log.d(TAG, "sendWearCalibrationData");
+        Calibration last = Calibration.last();
+        List<Calibration> lastest = Calibration.latest(3);
+        if (lastest != null && !lastest.isEmpty()) {
+            Log.d(TAG, "sendWearCalibrationData lastest count = " + lastest.size());
+            DataMap entries = dataMap(last);
+            final ArrayList<DataMap> dataMaps = new ArrayList<>(lastest.size());
+            for (Calibration cal : lastest) {
+                dataMaps.add(dataMap(cal));
+            }
+            entries.putLong("time", new Date().getTime()); // MOST IMPORTANT LINE FOR TIMESTAMP
+            entries.putDataMapArrayList("entries", dataMaps);
+            new SendToDataLayerThread(WEARABLE_CALIBRATION_DATA_PATH, googleApiClient).executeOnExecutor(xdrip.executor, entries);
+        }
+        else
+            Log.d(TAG, "sendWearCalibrationData lastest count = 0");
+    }
+
+    private DataMap dataMap(Calibration cal) {//KS
+
+        DataMap dataMap = new DataMap();
+        String json = cal.toS();
+        Log.d(TAG, "dataMap Calibration GSON: " + json);
+
+        Sensor sensor = Sensor.currentSensor();
+        if (sensor != null) {
+            dataMap.putLong("timestamp", cal.timestamp);////Long.valueOf("1472590518540").longValue()
+            dataMap.putDouble("sensor_age_at_time_of_estimation", cal.sensor_age_at_time_of_estimation);
+            //dataMap.putString("sensor", sensor.uuid);//Sensor.currentSensor()
+            dataMap.putDouble("bg", cal.bg);
+            dataMap.putDouble("raw_value", cal.raw_value);
+            dataMap.putDouble("adjusted_raw_value", cal.adjusted_raw_value);
+            dataMap.putDouble("sensor_confidence", cal.sensor_confidence);
+            dataMap.putDouble("slope_confidence", cal.slope_confidence);
+            dataMap.putLong("raw_timestamp", cal.raw_timestamp);//Long.valueOf("1472590518540").longValue()
+            dataMap.putDouble("slope", cal.slope);
+            dataMap.putDouble("intercept", cal.intercept);
+            dataMap.putDouble("distance_from_estimate", cal.distance_from_estimate);
+            dataMap.putDouble("estimate_raw_at_time_of_calibration", cal.estimate_raw_at_time_of_calibration);
+            dataMap.putDouble("estimate_bg_at_time_of_calibration", cal.estimate_bg_at_time_of_calibration);
+            dataMap.putString("uuid", cal.uuid);
+            dataMap.putString("sensor_uuid", sensor.uuid);
+            dataMap.putBoolean("possible_bad", (cal.possible_bad != null ? cal.possible_bad : true));
+            dataMap.putBoolean("check_in", cal.check_in);
+            dataMap.putDouble("first_decay", cal.first_decay);
+            dataMap.putDouble("second_decay", cal.second_decay);
+            dataMap.putDouble("first_slope", cal.first_slope);
+            dataMap.putDouble("second_slope", cal.second_slope);
+            dataMap.putDouble("first_intercept", cal.first_intercept);
+            dataMap.putDouble("second_intercept", cal.second_intercept);
+            dataMap.putDouble("first_scale", cal.first_scale);
+            dataMap.putDouble("second_scale", cal.second_scale);
+        }
+        else
+            Log.d(TAG, "dataMap Calibration sensor does not exist.");
         return dataMap;
     }
 

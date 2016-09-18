@@ -1534,9 +1534,14 @@ public class Preferences extends PreferenceActivity {
             @Override
             public boolean onPreferenceChange(Preference preference, Object newValue) {
                 Context context = preference.getContext();
+                Log.d("Preferences", "WidgetListener call start WidgetUpdateService");//KS
                 if (AppWidgetManager.getInstance(context).getAppWidgetIds(new ComponentName(context, xDripWidget.class)).length > 0) {
+                    Log.d("Preferences", "WidgetListener getAppWidgetIds found, call start WidgetUpdateService");//KS
                     context.startService(new Intent(context, WidgetUpdateService.class));
                 }
+                else
+                    Log.e("Preferences", "WidgetListener getAppWidgetIds NOT found; can't start WidgetUpdateService");//KS
+
                 return true;
             }
         }
