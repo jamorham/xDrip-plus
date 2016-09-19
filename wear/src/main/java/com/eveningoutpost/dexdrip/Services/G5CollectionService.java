@@ -207,6 +207,7 @@ public class G5CollectionService extends Service {
                 return START_STICKY;
             } else {
                 Log.e(TAG,"jamorham service already active!");
+                keep_running = false;//KS test to stop BT upon re-connecting to phone
                 keepAlive();
                 return START_NOT_STICKY;
             }
@@ -246,15 +247,14 @@ public class G5CollectionService extends Service {
         super.onDestroy();
         stopScan();
 
-        Log.e(TAG, "onDestroy - disabling BT");//KS
-        mBluetoothAdapter.disable();//KS
+        //mBluetoothAdapter.disable();//KS
 
 //        close();
 //        setRetryTimer();
 //        foregroundServiceStarter.stop();
 //        unregisterReceiver(mPairReceiver);
 //        BgToSpeech.tearDownTTS();
-        Log.i(TAG, "SERVICE STOPPED");
+        Log.i(TAG, "onDestroy SERVICE STOPPED");
     }
 
     public synchronized void keepAlive() {
@@ -1299,7 +1299,8 @@ public class G5CollectionService extends Service {
 
     private synchronized void processNewTransmitterData(int raw_data , int filtered_data,int sensor_battery_level, long captureTime) {
 
-        TransmitterData transmitterData = TransmitterData.create(raw_data, sensor_battery_level, captureTime);
+        //TransmitterData transmitterData = TransmitterData.create(raw_data, sensor_battery_level, captureTime);
+        TransmitterData transmitterData = TransmitterData.create(raw_data, filtered_data, sensor_battery_level, captureTime);//KS
         if (transmitterData == null) {
             Log.e(TAG, "TransmitterData.create failed: Duplicate packet");
             return;

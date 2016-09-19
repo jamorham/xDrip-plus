@@ -10,10 +10,15 @@ import com.activeandroid.Model;
 import com.activeandroid.annotation.Column;
 import com.activeandroid.annotation.Table;
 import com.activeandroid.query.Select;
+import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
+import com.google.gson.annotations.Expose;
+import com.google.gson.internal.bind.DateTypeAdapter;
 
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
 import java.util.Date;
+import java.util.List;
 import java.util.UUID;
 
 /**
@@ -24,18 +29,23 @@ import java.util.UUID;
 public class TransmitterData extends Model {
     private final static String TAG = TransmitterData.class.getSimpleName();
 
+    @Expose
     @Column(name = "timestamp", index = true)
     public long timestamp;
 
+    @Expose
     @Column(name = "raw_data")
     public double raw_data;
 
+    @Expose
     @Column(name = "filtered_data")
     public double filtered_data;
 
+    @Expose
     @Column(name = "sensor_battery_level")
     public int sensor_battery_level;
 
+    @Expose
     @Column(name = "uuid", index = true)
     public String uuid;
 
@@ -138,6 +148,57 @@ public class TransmitterData extends Model {
                 .from(TransmitterData.class)
                 .orderBy("_ID desc")
                 .executeSingle();
+    }
+
+
+    public static List<TransmitterData> latestForGraphAsc(int number, long startTime) {//KS
+        return latestForGraphAsc(number, startTime, Long.MAX_VALUE);
+    }
+
+    public static List<TransmitterData> latestForGraphAsc(int number, long startTime, long endTime) {//KS
+        return new Select()
+                .from(TransmitterData.class)
+                .where("timestamp >= " + Math.max(startTime, 0))
+                .where("timestamp <= " + endTime)
+                //.where("calculated_value != 0")
+                .where("raw_data != 0")
+                .orderBy("timestamp asc")
+                .limit(number)
+                .execute();
+    }
+
+    public static TransmitterData getForTimestamp(double timestamp) {//KS
+        Sensor sensor = Sensor.currentSensor();
+        if (sensor != null) {
+            TransmitterData bgReading = new Select()
+                    .from(TransmitterData.class)
+                    .where("timestamp <= ?", (timestamp + (60 * 1000))) // 1 minute padding (should never be that far off, but why not)
+                    .orderBy("timestamp desc")
+                    .executeSingle();
+            if (bgReading != null && Math.abs(bgReading.timestamp - timestamp) < (3 * 60 * 1000)) { //cool, so was it actually within 4 minutes of that bg reading?
+                Log.i(TAG, "getForTimestamp: Found a BG timestamp match");
+                return bgReading;
+            }
+        }
+        Log.d(TAG, "getForTimestamp: No luck finding a BG timestamp match");
+        return null;
+    }
+
+    public static TransmitterData findByUuid(String uuid) {//KS
+        return new Select()
+                .from(TransmitterData.class)
+                .where("uuid = ?", uuid)
+                .executeSingle();
+    }
+
+    public String toS() {//KS
+        Gson gson = new GsonBuilder()
+                .excludeFieldsWithoutExposeAnnotation()
+                .registerTypeAdapter(Date.class, new DateTypeAdapter())
+                .serializeSpecialFloatingPointValues()
+                .create();
+
+        return gson.toJson(this);
     }
 
     /*

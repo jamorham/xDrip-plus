@@ -199,11 +199,13 @@ public class NightscoutUploader {
                 populateV1APICalibrationEntry(array, record);
             }
 
-            RequestBody body = RequestBody.create(MediaType.parse("application/json"), array.toString());
-            Response<ResponseBody> r = nightscoutService.upload(secret, body).execute();
-            if (!r.isSuccess()) throw new UploaderException(r.message(), r.code());
+            if (array != null) {//KS
+                RequestBody body = RequestBody.create(MediaType.parse("application/json"), array.toString());
+                Response<ResponseBody> r = nightscoutService.upload(secret, body).execute();
+                if (!r.isSuccess()) throw new UploaderException(r.message(), r.code());
 
-            postDeviceStatus(nightscoutService, secret);
+                postDeviceStatus(nightscoutService, secret);
+            }
         }
 
     private void populateV1APIBGEntry(JSONArray array, BgReading record) throws Exception {

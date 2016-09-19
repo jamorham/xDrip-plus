@@ -13,6 +13,7 @@ import com.eveningoutpost.dexdrip.Models.BgReading;
 import com.eveningoutpost.dexdrip.Models.Calibration;
 import com.eveningoutpost.dexdrip.Models.JoH;
 import com.eveningoutpost.dexdrip.Models.Sensor;
+import com.eveningoutpost.dexdrip.Models.TransmitterData;
 import com.eveningoutpost.dexdrip.UtilityModels.BgGraphBuilder;
 import com.eveningoutpost.dexdrip.UtilityModels.BgSendQueue;
 import com.eveningoutpost.dexdrip.UtilityModels.Constants;
@@ -46,6 +47,7 @@ public class WatchUpdaterService extends WearableListenerService implements
     public static final String ACTION_SYNC_SENSOR = WatchUpdaterService.class.getName().concat(".SyncSensor");//KS
     public static final String ACTION_SYNC_CALIBRATION = WatchUpdaterService.class.getName().concat(".SyncCalibration");//KS
     public static final String SYNC_DB_PATH = "/syncweardb";//KS
+    private static final String SYNC_BGS_PATH = "/syncwearbgs";//KS
     public static final String WEARABLE_CALIBRATION_DATA_PATH = "/nightscout_watch_cal_data";//KS
     public static final String WEARABLE_SENSOR_DATA_PATH = "/nightscout_watch_sensor_data";//KS
     public static final String WEARABLE_DATA_PATH = "/nightscout_watch_data";
@@ -81,6 +83,72 @@ public class WatchUpdaterService extends WearableListenerService implements
         intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
         intent.putExtra(extra, text);
         context.startActivity(intent);
+    }
+
+    public void syncTransmitterData(DataMap dataMap) {//KS
+        Log.d(TAG, "syncTransmitterData");
+        java.text.DateFormat df = new SimpleDateFormat("MM.dd.yyyy HH:mm:ss");
+        Date date = new Date();
+
+        ArrayList<DataMap> entries = dataMap.getDataMapArrayList("entries");
+        Log.d(TAG, "syncTransmitterData add BgReading Table" );
+        if (entries != null) {
+            //Gson gson = new GsonBuilder().create();
+
+            Gson gson = new GsonBuilder()
+                    .excludeFieldsWithoutExposeAnnotation()
+                    .registerTypeAdapter(Date.class, new DateTypeAdapter())
+                    .serializeSpecialFloatingPointValues()
+                    .create();
+
+            Log.d(TAG, "syncTransmitterData add BgReading Table entries count=" + entries.size());
+            for (DataMap entry : entries) {
+                if (entry != null) {
+                    Log.d(TAG, "syncTransmitterData add BgReading Table entry=" + entry);
+                    //TransmitterData bgData = gson.fromJson(entry.getString("bgs"), TransmitterData.class);
+                    //Log.d(TAG, "syncTransmitterData bgData=" + bgData);
+                    //TransmitterData bgReading = new TransmitterData();
+                    String bgrecord = entry.getString("bgs");
+                    if (bgrecord != null) {//for (TransmitterData bgData : bgs) {
+                        Log.d(TAG, "syncTransmitterData add TransmitterData Table bgrecord=" + bgrecord);
+                        TransmitterData bgData = gson.fromJson(bgrecord, TransmitterData.class);
+                        //TransmitterData bgData = new GsonBuilder().excludeFieldsWithoutExposeAnnotation().create().fromJson(bgrecord, TransmitterData.class);
+                        TransmitterData exists = TransmitterData.getForTimestamp(bgData.timestamp);
+                        TransmitterData uuidexists = TransmitterData.findByUuid(bgData.uuid);
+                        date.setTime(bgData.timestamp);
+                        if (exists != null || uuidexists != null) {
+                            Log.d(TAG, "syncTransmitterData BG already exists for uuid=" + bgData.uuid + " timestamp=" + bgData.timestamp + " timeString=" + df.format(date) + " raw_data=" + bgData.raw_data);
+                        } else {
+                            Log.d(TAG, "syncTransmitterData add BG; does NOT exist for uuid=" + bgData.uuid + " timestamp=" + bgData.timestamp + " timeString=" + df.format(date) + " raw_data=" + bgData.raw_data);
+                            bgData.save();
+
+                            //Check
+                            if (TransmitterData.findByUuid(bgData.uuid) != null)
+                                Log.d(TAG, "syncTransmitterData: TransmitterData was saved for uuid:" + bgData.uuid);
+                            else {
+                                Log.e(TAG, "syncTransmitterData: TransmitterData was NOT saved for uuid:" + bgData.uuid);
+                                return;
+                            }
+
+                            //KS the following is from G5CollectionService processNewTransmitterData()
+                            Sensor sensor = Sensor.currentSensor();
+                            if (sensor == null) {
+                                Log.e(TAG, "syncTransmitterData: No Active Sensor, Data only stored in Transmitter Data");
+                                return;
+                            }
+                            //TODO : LOG if unfiltered or filtered values are zero
+                            Sensor.updateBatteryLevel(sensor, bgData.sensor_battery_level);
+                            android.util.Log.i(TAG, "syncTransmitterData: BG timestamp create " + Long.toString(bgData.timestamp));
+                            BgReading bgExists = BgReading.create(bgData.raw_data, bgData.filtered_data, this, bgData.timestamp);
+                            if (bgExists != null)
+                                Log.d(TAG, "syncTransmitterData BG GSON saved BG: " + bgExists.toS());
+                            else
+                                Log.e(TAG, "syncTransmitterData BG GSON NOT saved");
+                        }
+                    }
+                }
+            }
+        }
     }
 
     public void syncBGData(DataMap dataMap) {//KS
@@ -286,8 +354,9 @@ public class WatchUpdaterService extends WearableListenerService implements
     // incoming messages from wear device
     @Override
     public void onMessageReceived(MessageEvent event) {
+        Log.d(TAG, "onMessageReceived enter");
         if (wear_integration) {
-            final PowerManager.WakeLock wl = JoH.getWakeLock("watchupdate-msgrec", 60000);
+            final PowerManager.WakeLock wl = JoH.getWakeLock("watchupdate-msgrec", 120000);//60000
             if (event != null) {
                 Log.d(TAG, "wearable event path: " + event.getPath());
                 switch (event.getPath()) {
@@ -311,12 +380,12 @@ public class WatchUpdaterService extends WearableListenerService implements
                     case WEARABLE_CANCEL_TREATMENT:
                         cancelTreatment(getApplicationContext(), "");
                         break;
-                    case SYNC_DB_PATH://KS
+                    case SYNC_BGS_PATH://KS
                         String message = new String(event.getData());
                         DataMap dataMap = DataMap.fromByteArray(event.getData());
                         if (dataMap != null) {
                             Log.d(TAG, "onMessageReceived dataMap=" + dataMap);
-                            syncBGData(dataMap);
+                            syncTransmitterData(dataMap);//syncBGData
                         }
                         break;
                     default:

@@ -3,6 +3,7 @@ package com.eveningoutpost.dexdrip;
 import com.eveningoutpost.dexdrip.Models.BgReading;//KS
 import com.eveningoutpost.dexdrip.Models.Calibration;//KS
 import com.eveningoutpost.dexdrip.Models.Sensor;//KS
+import com.eveningoutpost.dexdrip.Models.TransmitterData;
 import com.eveningoutpost.dexdrip.Services.G5CollectionService;//KS
 
 import android.Manifest;
@@ -19,10 +20,13 @@ import android.util.Log;
 
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.api.GoogleApiClient;
+import com.google.android.gms.common.api.PendingResult;
+import com.google.android.gms.common.api.ResultCallback;
 import com.google.android.gms.wearable.DataEvent;
 import com.google.android.gms.wearable.DataEventBuffer;
 import com.google.android.gms.wearable.DataMap;
 import com.google.android.gms.wearable.DataMapItem;
+import com.google.android.gms.wearable.MessageApi;
 import com.google.android.gms.wearable.Node;
 import com.google.android.gms.wearable.NodeApi;
 import com.google.android.gms.wearable.Wearable;
@@ -48,6 +52,7 @@ public class ListenerService extends WearableListenerService implements GoogleAp
     private static final String WEARABLE_RESEND_PATH = "/nightscout_watch_data_resend";
     private static final String OPEN_SETTINGS = "/openwearsettings";
     private static final String SYNC_DB_PATH = "/syncweardb";//KS
+    private static final String SYNC_BGS_PATH = "/syncwearbgs";//KS
     private static final String WEARABLE_CALIBRATION_DATA_PATH = "/nightscout_watch_cal_data";//KS
     private static final String WEARABLE_SENSOR_DATA_PATH = "/nightscout_watch_sensor_data";//KS
     private static final String ACTION_SYNC_DB = "com.eveningoutpost.dexdrip.wearintegration.SyncDB";//KS
@@ -76,6 +81,7 @@ public class ListenerService extends WearableListenerService implements GoogleAp
             mContext = context;
             path = thispath;
             payload = thispayload;
+            Sensor.InitDb(context);//ensure database has already been initialized
             Log.d(TAG, "DataRequester: " + thispath);
         }
 
@@ -98,12 +104,34 @@ public class ListenerService extends WearableListenerService implements GoogleAp
 
                         for (Node node : nodes.getNodes()) {
                             Wearable.MessageApi.sendMessage(googleApiClient, node.getId(), path, payload);
+
                             if (connectG5) {//KS
-                                DataMap datamap = getWearBGData(36);//KS resendData for last 3 hours
+                                DataMap datamap = getWearTransmitterData(36);//KS getWearBGData for last 3 hours
                                 while (datamap != null) {
-                                    Log.d(TAG, "doInBackground send getWearBGData BGs to phone");
-                                    Wearable.MessageApi.sendMessage(googleApiClient, node.getId(), SYNC_DB_PATH, datamap.toByteArray());
-                                    datamap = getWearBGData(36);
+                                    Log.d(TAG, "doInBackground send Wear Data BGs to phone at path:" + SYNC_BGS_PATH + " and node:" + node.getId());
+                                    Log.d(TAG, "doInBackground send Wear datamap:" + datamap);
+                                    //Wearable.MessageApi.sendMessage(googleApiClient, node.getId(), SYNC_BGS_PATH, datamap.toByteArray());
+
+                                    /*
+                                    PendingResult<MessageApi.SendMessageResult> result = Wearable.MessageApi.sendMessage(googleApiClient, node.getId(), SYNC_BGS_PATH, datamap.toByteArray());
+                                    result.setResultCallback(new ResultCallback<MessageApi.SendMessageResult>() {
+                                        @Override
+                                        public void onResult(MessageApi.SendMessageResult sendMessageResult) {
+                                            Log.d(TAG, "send getWearBGData BGs to phone: " + sendMessageResult.getStatus().getStatusMessage());
+                                        }
+                                    });
+                                    */
+
+                                    MessageApi.SendMessageResult result = Wearable.MessageApi.sendMessage(
+                                            googleApiClient, node.getId(), SYNC_BGS_PATH, datamap.toByteArray()).await();
+                                    if (!result.getStatus().isSuccess()) {
+                                        Log.e(TAG, "ERROR: failed to send Wear Data BGs: " + result.getStatus());
+                                    }
+                                    else
+                                        Log.d(TAG, "send  Wear Data BGs to phone: " + result.getStatus());
+
+
+                                    datamap = getWearTransmitterData(36);//getWearBGData
                                 }
                             }
                         }
@@ -123,6 +151,57 @@ public class ListenerService extends WearableListenerService implements GoogleAp
             }
             return null;
         }
+    }
+
+
+    private DataMap getWearTransmitterData(int count) {//KS
+        java.text.DateFormat df = new SimpleDateFormat("MM.dd.yyyy HH:mm:ss");
+        Date date = new Date();
+        if(googleApiClient != null && !googleApiClient.isConnected() && !googleApiClient.isConnecting()) { googleApiConnect(); }
+        long currentTime = new Date().getTime() - (60000 * 60 * 24);
+
+        date.setTime(last_send_previous);
+        Log.d(TAG, "getWearTransmitterData last_send_previous:" + df.format(date));
+
+        TransmitterData last_bg = TransmitterData.last();
+        if (last_bg != null) {
+            date.setTime(last_bg.timestamp);
+            Log.d(TAG, "getWearTransmitterData last_bg.timestamp:" + df.format(date));
+        }
+
+        if (last_bg != null && last_send_previous <= last_bg.timestamp) {//startTime
+            date.setTime(last_bg.timestamp);
+            Log.d(TAG, "getWearTransmitterData last_send_previous < last_bg.timestamp:" + df.format(date));
+            List<TransmitterData> graph_bgs = TransmitterData.latestForGraphAsc(count, last_send_previous);
+            if (!graph_bgs.isEmpty()) {
+                Log.d(TAG, "getWearTransmitterData graph_bgs count = " + graph_bgs.size());
+                DataMap entries = dataMap(last_bg);
+                final ArrayList<DataMap> dataMaps = new ArrayList<>(graph_bgs.size());
+                for (TransmitterData bg : graph_bgs) {
+                    dataMaps.add(dataMap(bg));
+                    date.setTime(bg.timestamp);
+                    Log.d(TAG, "getWearTransmitterData bg.timestamp:" + df.format(date));
+                    last_send_previous = bg.timestamp + 1;
+                    date.setTime(last_send_previous);
+                    Log.d(TAG, "getWearTransmitterData set last_send_previous:" + df.format(date));
+                    Log.d(TAG, "getWearTransmitterData bg getId:" + bg.getId() + " raw_data:" + bg.raw_data + " filtered_data:" + bg.filtered_data + " timestamp:" + bg.timestamp + " uuid:" + bg.uuid);
+                }
+                entries.putLong("time", new Date().getTime()); // MOST IMPORTANT LINE FOR TIMESTAMP
+                entries.putDataMapArrayList("entries", dataMaps);
+                return entries;
+            }
+            else
+                Log.d(TAG, "getWearTransmitterData graph_bgs count = 0");
+        }
+        return null;
+    }
+
+    private DataMap dataMap(TransmitterData bg) {//KS
+        DataMap dataMap = new DataMap();
+        String json = bg.toS();
+        Log.d(TAG, "dataMap BG GSON: " + json);
+        dataMap.putString("bgs", json);
+        return dataMap;
     }
 
     private DataMap getWearBGData(int count) {//KS
@@ -192,6 +271,54 @@ public class ListenerService extends WearableListenerService implements GoogleAp
         Wearable.MessageApi.addListener(googleApiClient, this);
     }
 
+    @Override
+    public void onPeerConnected(Node peer) {//KS test - call getWearBgData and call stopBtG5Service()??
+        super.onPeerConnected(peer);
+        String id = peer.getId();
+        String name = peer.getDisplayName();
+        Log.d(TAG, "onPeerConnected peer name & ID: " + name + "|" + id);
+        SharedPreferences sharedPrefs = PreferenceManager.getDefaultSharedPreferences(getApplicationContext());//KS
+        if (sharedPrefs.getBoolean("connectG5", false)) { //KS
+            stopBtG5Service();
+            ListenerService.requestData(this);
+
+            /*
+            NodeApi.GetConnectedNodesResult nodes =
+                    Wearable.NodeApi.getConnectedNodes(googleApiClient).await();
+            int count = nodes.getNodes().size();//KS
+            Log.d(TAG, "onPeerDisconnected NodeApi.GetConnectedNodesResult await count=" + count);//KS
+            if (count > 0) {//KS
+                for (Node node : nodes.getNodes()) {
+                    DataMap datamap = getWearTransmitterData(36);//KS getWearBGData for last 3 hours
+                    while (datamap != null) {
+                        Log.d(TAG, "doInBackground send Wear Data BGs to phone at path:" + SYNC_BGS_PATH + " and node:" + node.getId());
+                        Log.d(TAG, "doInBackground send Wear datamap:" + datamap);
+                        MessageApi.SendMessageResult result = Wearable.MessageApi.sendMessage(
+                                googleApiClient, node.getId(), SYNC_BGS_PATH, datamap.toByteArray()).await();
+                        if (!result.getStatus().isSuccess()) {
+                            Log.e(TAG, "ERROR: failed to send Wear Data BGs: " + result.getStatus());
+                        } else
+                            Log.d(TAG, "send  Wear Data BGs to phone: " + result.getStatus());
+
+                        datamap = getWearTransmitterData(36);//getWearBGData
+                    }
+                }
+            }
+            */
+        }
+    }
+
+    @Override
+    public void onPeerDisconnected(Node peer) {//KS test - call startBtG5Service() or simply wait 'til watchface.missedReadingAlert() timeout
+        super.onPeerDisconnected(peer);
+        String id = peer.getId();
+        String name = peer.getDisplayName();
+        Log.d(TAG, "onPeerDisconnected peer name & ID: " + name + "|" + id);
+        SharedPreferences sharedPrefs = PreferenceManager.getDefaultSharedPreferences(getApplicationContext());//KS
+        if (sharedPrefs.getBoolean("connectG5", false)) { //KS
+            startBtG5Service();
+        }
+    }
 
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
@@ -455,7 +582,10 @@ public class ListenerService extends WearableListenerService implements GoogleAp
 
     private void stopBtG5Service() {//KS
         Log.d(TAG, "stopBtG5Service");
-        if (mLocationPermissionApproved) {
+        SharedPreferences sharedPrefs = PreferenceManager.getDefaultSharedPreferences(getApplicationContext());//KS
+        boolean connectG5 = sharedPrefs.getBoolean("connectG5", false); //KS
+
+        if (connectG5) {
             Context myContext = getApplicationContext();
             Log.d(TAG, "stopBtG5Service call stopService");
             myContext.stopService(new Intent(myContext, G5CollectionService.class));
