@@ -107,34 +107,37 @@ public class ListenerService extends WearableListenerService implements GoogleAp
                             Wearable.MessageApi.sendMessage(googleApiClient, node.getId(), path, payload);
 
                             if (connectG5) {//KS
-                                DataMap datamap = getWearTransmitterData(36);//KS getWearBGData for last 3 hours
-                                while (datamap != null) {
+                                DataMap datamap = getWearTransmitterData(72);//KS data for last 6 hours
+                                if (datamap != null) {//while
                                     Log.d(TAG, "doInBackground send Wear Data BGs to phone at path:" + SYNC_BGS_PATH + " and node:" + node.getId());
                                     Log.d(TAG, "doInBackground send Wear datamap:" + datamap);
-                                    //Wearable.MessageApi.sendMessage(googleApiClient, node.getId(), SYNC_BGS_PATH, datamap.toByteArray());
 
-                                    /*
                                     PendingResult<MessageApi.SendMessageResult> result = Wearable.MessageApi.sendMessage(googleApiClient, node.getId(), SYNC_BGS_PATH, datamap.toByteArray());
                                     result.setResultCallback(new ResultCallback<MessageApi.SendMessageResult>() {
                                         @Override
                                         public void onResult(MessageApi.SendMessageResult sendMessageResult) {
-                                            Log.d(TAG, "send getWearBGData BGs to phone: " + sendMessageResult.getStatus().getStatusMessage());
+                                            if (!sendMessageResult.getStatus().isSuccess()) {
+                                                Log.e(TAG, "ERROR: failed to send Wear BGs to phone: " + sendMessageResult.getStatus().getStatusMessage());
+                                            }
+                                            else {
+                                                last_send_previous = last_send_sucess;
+                                                Log.i(TAG, "Sent Wear BGs to phone: " + sendMessageResult.getStatus().getStatusMessage());
+                                            }
                                         }
                                     });
-                                    */
 
+                                    /*
                                     MessageApi.SendMessageResult result = Wearable.MessageApi.sendMessage(
                                             googleApiClient, node.getId(), SYNC_BGS_PATH, datamap.toByteArray()).await();
                                     if (!result.getStatus().isSuccess()) {
-                                        Log.e(TAG, "ERROR: failed to send Wear Data BGs: " + result.getStatus());
+                                        Log.e(TAG, "ERROR: failed to send Wear BGs to phone: " + result.getStatus());
                                     }
                                     else {
                                         last_send_previous = last_send_sucess;
-                                        Log.d(TAG, "send Wear Data BGs to phone: " + result.getStatus());
+                                        Log.d(TAG, "Sent Wear BGs to phone: " + result.getStatus());
                                     }
-
-
                                     datamap = getWearTransmitterData(36);//getWearBGData
+                                    */
                                 }
                             }
                         }
