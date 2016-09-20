@@ -68,6 +68,7 @@ public class ListenerService extends WearableListenerService implements GoogleAp
     Context mContext;//KS
     public static boolean mLocationPermissionApproved;//KS
     public static long last_send_previous = 0;//KS
+    public static long last_send_sucess = 0;//KS
 
     GoogleApiClient googleApiClient;
     private static long lastRequest = 0;
@@ -127,8 +128,10 @@ public class ListenerService extends WearableListenerService implements GoogleAp
                                     if (!result.getStatus().isSuccess()) {
                                         Log.e(TAG, "ERROR: failed to send Wear Data BGs: " + result.getStatus());
                                     }
-                                    else
-                                        Log.d(TAG, "send  Wear Data BGs to phone: " + result.getStatus());
+                                    else {
+                                        last_send_previous = last_send_sucess;
+                                        Log.d(TAG, "send Wear Data BGs to phone: " + result.getStatus());
+                                    }
 
 
                                     datamap = getWearTransmitterData(36);//getWearBGData
@@ -181,9 +184,10 @@ public class ListenerService extends WearableListenerService implements GoogleAp
                     dataMaps.add(dataMap(bg));
                     date.setTime(bg.timestamp);
                     Log.d(TAG, "getWearTransmitterData bg.timestamp:" + df.format(date));
-                    last_send_previous = bg.timestamp + 1;
-                    date.setTime(last_send_previous);
-                    Log.d(TAG, "getWearTransmitterData set last_send_previous:" + df.format(date));
+                    //last_send_previous = bg.timestamp + 1;
+                    last_send_sucess = bg.timestamp + 1;
+                    date.setTime(last_send_sucess);
+                    Log.d(TAG, "getWearTransmitterData set last_send_sucess:" + df.format(date));
                     Log.d(TAG, "getWearTransmitterData bg getId:" + bg.getId() + " raw_data:" + bg.raw_data + " filtered_data:" + bg.filtered_data + " timestamp:" + bg.timestamp + " uuid:" + bg.uuid);
                 }
                 entries.putLong("time", new Date().getTime()); // MOST IMPORTANT LINE FOR TIMESTAMP
