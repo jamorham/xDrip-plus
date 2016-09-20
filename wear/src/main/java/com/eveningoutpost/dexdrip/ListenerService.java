@@ -4,6 +4,7 @@ import com.eveningoutpost.dexdrip.Models.BgReading;//KS
 import com.eveningoutpost.dexdrip.Models.Calibration;//KS
 import com.eveningoutpost.dexdrip.Models.Sensor;//KS
 import com.eveningoutpost.dexdrip.Models.TransmitterData;
+import com.eveningoutpost.dexdrip.Models.UserError;
 import com.eveningoutpost.dexdrip.Services.G5CollectionService;//KS
 
 import android.Manifest;
@@ -22,6 +23,7 @@ import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.api.GoogleApiClient;
 import com.google.android.gms.common.api.PendingResult;
 import com.google.android.gms.common.api.ResultCallback;
+import com.google.android.gms.wearable.DataApi;
 import com.google.android.gms.wearable.DataEvent;
 import com.google.android.gms.wearable.DataEventBuffer;
 import com.google.android.gms.wearable.DataMap;
@@ -29,6 +31,8 @@ import com.google.android.gms.wearable.DataMapItem;
 import com.google.android.gms.wearable.MessageApi;
 import com.google.android.gms.wearable.Node;
 import com.google.android.gms.wearable.NodeApi;
+import com.google.android.gms.wearable.PutDataMapRequest;
+import com.google.android.gms.wearable.PutDataRequest;
 import com.google.android.gms.wearable.Wearable;
 import com.google.android.gms.wearable.WearableListenerService;
 
@@ -41,6 +45,7 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import java.util.Set;
+import java.util.concurrent.TimeUnit;
 
 
 /**
@@ -55,6 +60,7 @@ public class ListenerService extends WearableListenerService implements GoogleAp
     private static final String SYNC_BGS_PATH = "/syncwearbgs";//KS
     private static final String WEARABLE_CALIBRATION_DATA_PATH = "/nightscout_watch_cal_data";//KS
     private static final String WEARABLE_SENSOR_DATA_PATH = "/nightscout_watch_sensor_data";//KS
+    public static final String DATA_ITEM_RECEIVED_PATH = "/data-item-received";//KS
     private static final String ACTION_SYNC_DB = "com.eveningoutpost.dexdrip.wearintegration.SyncDB";//KS
     private static final String ACTION_RESEND = "com.dexdrip.stephenblack.nightwatch.RESEND_DATA";
     private static final String ACTION_SENDDATA = "com.dexdrip.stephenblack.nightwatch.SEND_DATA";
@@ -107,10 +113,14 @@ public class ListenerService extends WearableListenerService implements GoogleAp
                             Wearable.MessageApi.sendMessage(googleApiClient, node.getId(), path, payload);
 
                             if (connectG5) {//KS
-                                DataMap datamap = getWearTransmitterData(72);//KS data for last 6 hours
+                                DataMap datamap = getWearTransmitterData(288);//KS 36 data for last 3 hours; 288 for 1 day
                                 if (datamap != null) {//while
                                     Log.d(TAG, "doInBackground send Wear Data BGs to phone at path:" + SYNC_BGS_PATH + " and node:" + node.getId());
                                     Log.d(TAG, "doInBackground send Wear datamap:" + datamap);
+
+                                    //onDataChanged doesn't ever get triggered on phone using putDataItem. Therefore, use MessageAPI instead.
+                                    //sendToDataLayer(SYNC_BGS_PATH, datamap, node);
+
 
                                     PendingResult<MessageApi.SendMessageResult> result = Wearable.MessageApi.sendMessage(googleApiClient, node.getId(), SYNC_BGS_PATH, datamap.toByteArray());
                                     result.setResultCallback(new ResultCallback<MessageApi.SendMessageResult>() {
@@ -120,11 +130,12 @@ public class ListenerService extends WearableListenerService implements GoogleAp
                                                 Log.e(TAG, "ERROR: failed to send Wear BGs to phone: " + sendMessageResult.getStatus().getStatusMessage());
                                             }
                                             else {
-                                                last_send_previous = last_send_sucess;
+                                                //last_send_previous = last_send_sucess; //Set this in onDataChanged event DATA_ITEM_RECEIVED_PATH
                                                 Log.i(TAG, "Sent Wear BGs to phone: " + sendMessageResult.getStatus().getStatusMessage());
                                             }
                                         }
                                     });
+
 
                                     /*
                                     MessageApi.SendMessageResult result = Wearable.MessageApi.sendMessage(
@@ -159,6 +170,40 @@ public class ListenerService extends WearableListenerService implements GoogleAp
         }
     }
 
+    private void sendToDataLayer(String path, DataMap dataMap, Node node) {//KS
+        if (googleApiClient.isConnected()) {
+            Log.d(TAG, "sendToDataLayer send to path=" + path + "node=" + node.getDisplayName());
+            Log.d(TAG, "sendToDataLayer send dataMap=" + dataMap);
+            PutDataMapRequest dataMapRequest = PutDataMapRequest.create(path);
+            dataMapRequest.setUrgent();
+            //unique content
+            //dataMapRequest.getDataMap().putDouble("timestamp", System.currentTimeMillis());
+            //dataMapRequest.getDataMap().putString(notification, notification);
+            //PutDataRequest putDataRequest = dataMapRequest.asPutDataRequest();
+            //Wearable.DataApi.putDataItem(googleApiClient, putDataRequest);
+
+            dataMapRequest.getDataMap().putAll(dataMap);
+            PutDataRequest request = dataMapRequest.asPutDataRequest();
+            DataApi.DataItemResult result = Wearable.DataApi.putDataItem(googleApiClient, request).await(15, TimeUnit.SECONDS);
+            if (result.getStatus().isSuccess()) {
+                Log.d(TAG, "sendToDataLayer sent dataMap: " + dataMap);
+                Log.d(TAG, "sendToDataLayer sent to node: " + node.getDisplayName());
+                last_send_previous = last_send_sucess;
+            } else {
+                Log.e(TAG, "sendToDataLayer ERROR: failed to send DataMap");
+                result = Wearable.DataApi.putDataItem(googleApiClient, request).await(25, TimeUnit.SECONDS);
+                if (result.getStatus().isSuccess()) {
+                    Log.d(TAG, "sendToDataLayer RETRY sent dataMap: " + dataMap);
+                    Log.d(TAG, "sendToDataLayer RETRY sent to node: " + node.getDisplayName());
+                    last_send_previous = last_send_sucess;
+                } else {
+                    Log.e(TAG, "sendToDataLayer ERROR on retry: failed to send DataMap");
+                }
+            }
+        } else {
+            Log.e(TAG, "sendToDataLayer No connection to phone available!");
+        }
+    }
 
     private DataMap getWearTransmitterData(int count) {//KS
         java.text.DateFormat df = new SimpleDateFormat("MM.dd.yyyy HH:mm:ss");
@@ -411,6 +456,21 @@ public class ListenerService extends WearableListenerService implements GoogleAp
                     dataMap = DataMapItem.fromDataItem(event.getDataItem()).getDataMap();
                     Log.d(TAG, "onDataChanged path=" + path + " DataMap=" + dataMap);
                     syncCalibrationData(dataMap);
+                } else if (path.equals(DATA_ITEM_RECEIVED_PATH)) {//KS
+                    dataMap = DataMapItem.fromDataItem(event.getDataItem()).getDataMap();
+                    Log.d(TAG, "onDataChanged path=" + path + " DataMap=" + dataMap);
+                    long timeOfLastBG = dataMap.getLong("timeOfLastBG", 0);
+                    if (timeOfLastBG > 0) {
+                        java.text.DateFormat df = new SimpleDateFormat("MM.dd.yyyy HH:mm:ss");
+                        Date date = new Date();
+                        date.setTime(last_send_previous);
+                        Log.d(TAG, "onDataChanged received from sendDataReceived current last_send_previous=" + df.format(date));
+                        date.setTime(timeOfLastBG);
+                        Log.d(TAG, "onDataChanged received from sendDataReceived timeOfLastBG=" + df.format(date) + " Path=" + path);
+                        last_send_previous = timeOfLastBG;
+                        date.setTime(last_send_previous);
+                        Log.d(TAG, "onDataChanged received from sendDataReceived update last_send_previous=" + df.format(date));
+                    }
                 }
             }
         }

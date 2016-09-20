@@ -6,6 +6,7 @@ import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.os.PowerManager;
 import android.preference.PreferenceManager;
+import android.support.v4.content.LocalBroadcastManager;
 import android.util.Log;
 
 import com.eveningoutpost.dexdrip.Home;
@@ -20,7 +21,10 @@ import com.eveningoutpost.dexdrip.UtilityModels.Constants;
 import com.eveningoutpost.dexdrip.xdrip;
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.api.GoogleApiClient;
+import com.google.android.gms.wearable.DataEvent;
+import com.google.android.gms.wearable.DataEventBuffer;
 import com.google.android.gms.wearable.DataMap;
+import com.google.android.gms.wearable.DataMapItem;
 import com.google.android.gms.wearable.MessageEvent;
 import com.google.android.gms.wearable.PutDataMapRequest;
 import com.google.android.gms.wearable.PutDataRequest;
@@ -50,6 +54,7 @@ public class WatchUpdaterService extends WearableListenerService implements
     private static final String SYNC_BGS_PATH = "/syncwearbgs";//KS
     public static final String WEARABLE_CALIBRATION_DATA_PATH = "/nightscout_watch_cal_data";//KS
     public static final String WEARABLE_SENSOR_DATA_PATH = "/nightscout_watch_sensor_data";//KS
+    public static final String DATA_ITEM_RECEIVED_PATH = "/data-item-received";//KS
     public static final String WEARABLE_DATA_PATH = "/nightscout_watch_data";
     public static final String WEARABLE_RESEND_PATH = "/nightscout_watch_data_resend";
     public static final String WEARABLE_VOICE_PAYLOAD = "/xdrip_plus_voice_payload";
@@ -85,12 +90,33 @@ public class WatchUpdaterService extends WearableListenerService implements
         context.startActivity(intent);
     }
 
+    private void sendDataReceived(String path, String notification, long timeOfLastBG) {//KS
+        java.text.DateFormat df = new SimpleDateFormat("MM.dd.yyyy HH:mm:ss");
+        Date date = new Date();
+
+        date.setTime(timeOfLastBG);
+        Log.d(TAG, "sendDataReceived timeOfLastBG=" + df.format(date) + " Path=" + path);
+        if (googleApiClient.isConnected()) {
+            //Log.d(TAG, "sendDataReceived Notification=" + notification + " Path=" + path);
+            PutDataMapRequest dataMapRequest = PutDataMapRequest.create(path);
+            dataMapRequest.setUrgent();
+            dataMapRequest.getDataMap().putDouble("timestamp", System.currentTimeMillis());
+            dataMapRequest.getDataMap().putLong("timeOfLastBG", timeOfLastBG);
+            dataMapRequest.getDataMap().putString(notification, notification);
+            PutDataRequest putDataRequest = dataMapRequest.asPutDataRequest();
+            Wearable.DataApi.putDataItem(googleApiClient, putDataRequest);
+        } else {
+            Log.e(TAG, "sendDataReceived No connection to wearable available!");
+        }
+    }
+
     public void syncTransmitterData(DataMap dataMap) {//KS
         Log.d(TAG, "syncTransmitterData");
         java.text.DateFormat df = new SimpleDateFormat("MM.dd.yyyy HH:mm:ss");
         Date date = new Date();
 
         ArrayList<DataMap> entries = dataMap.getDataMapArrayList("entries");
+        long timeOfLastBG = 0;
         Log.d(TAG, "syncTransmitterData add BgReading Table" );
         if (entries != null) {
             //Gson gson = new GsonBuilder().create();
@@ -116,6 +142,7 @@ public class WatchUpdaterService extends WearableListenerService implements
                         TransmitterData exists = TransmitterData.getForTimestamp(bgData.timestamp);
                         TransmitterData uuidexists = TransmitterData.findByUuid(bgData.uuid);
                         date.setTime(bgData.timestamp);
+                        timeOfLastBG = bgData.timestamp + 1;
                         if (exists != null || uuidexists != null) {
                             Log.d(TAG, "syncTransmitterData BG already exists for uuid=" + bgData.uuid + " timestamp=" + bgData.timestamp + " timeString=" + df.format(date) + " raw_data=" + bgData.raw_data);
                         } else {
@@ -148,6 +175,7 @@ public class WatchUpdaterService extends WearableListenerService implements
                     }
                 }
             }
+            sendDataReceived(DATA_ITEM_RECEIVED_PATH,"BGS_RECEIVED", timeOfLastBG);
         }
     }
 
@@ -349,6 +377,35 @@ public class WatchUpdaterService extends WearableListenerService implements
     @Override
     public void onConnected(Bundle connectionHint) {
         sendData();
+    }
+
+    @Override
+    public void onDataChanged(DataEventBuffer dataEvents) {//KS
+
+        DataMap dataMap;
+
+        for (DataEvent event : dataEvents) {
+
+            if (event.getType() == DataEvent.TYPE_CHANGED) {
+
+                String path = event.getDataItem().getUri().getPath();
+                String nodeId = event.getDataItem().getUri().getHost();
+                if (path.equals(SYNC_BGS_PATH)) {
+                    // Send the RPC
+                    byte[] payload = event.getDataItem().getUri().toString().getBytes();
+                    Wearable.MessageApi.sendMessage(googleApiClient, nodeId, DATA_ITEM_RECEIVED_PATH, payload);
+
+                    dataMap = DataMapItem.fromDataItem(event.getDataItem()).getDataMap();
+                    Log.d(TAG, "onDataChanged path=" + path + " DataMap=" + dataMap);
+                    //DataMap dataMap = DataMap.fromByteArray(event.getData());
+                    if (dataMap != null) {
+                        Log.d(TAG, "onDataChanged SYNC_BGS_PATH dataMap=" + dataMap);
+                        syncTransmitterData(dataMap);//syncBGData
+                    }
+
+                }
+            }
+        }
     }
 
     // incoming messages from wear device
