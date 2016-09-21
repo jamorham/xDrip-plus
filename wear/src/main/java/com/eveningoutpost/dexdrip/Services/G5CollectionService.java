@@ -207,7 +207,7 @@ public class G5CollectionService extends Service {
                 return START_STICKY;
             } else {
                 Log.e(TAG,"jamorham service already active!");
-                keep_running = false;//KS test to stop BT upon re-connecting to phone
+                keep_running = false;//KS test to stop wear BT upon re-connecting to phone
                 keepAlive();
                 return START_NOT_STICKY;
             }
@@ -246,6 +246,16 @@ public class G5CollectionService extends Service {
     public void onDestroy() {
         super.onDestroy();
         stopScan();
+
+        Log.d(TAG, "onDestroy");
+        scan_interval_timer.cancel();//KS ??
+        if (pendingIntent != null) {//KS
+            Log.d(TAG, "onDestroy stop Alarm pendingIntent");
+            AlarmManager alarm = (AlarmManager) getSystemService(ALARM_SERVICE);
+            alarm.cancel(pendingIntent);
+        }
+        //forgetDevice();//KS ??
+
 
         //mBluetoothAdapter.disable();//KS
 
@@ -565,6 +575,7 @@ public class G5CollectionService extends Service {
     }
 
     void forgetDevice() {
+        Log.d(TAG, "forgetDevice");
         Transmitter defaultTransmitter = new Transmitter(prefs.getString("dex_txid", "ABCDEF"));
         mBluetoothAdapter = mBluetoothManager.getAdapter();
         Set<BluetoothDevice> pairedDevices = mBluetoothAdapter.getBondedDevices();
