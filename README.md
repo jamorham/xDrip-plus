@@ -1,7 +1,7 @@
 # kskandispersonal/xDrip-plus
 > Added standalone mode to the Jamorham xDrip+ Wear Watchface.  This enables a standalone smartwatch to connect directly to the Dexcom G5 Transmitter.  Upon reconnecting to the smartphone, all BG readings on the smartwatch are synced back up to the smartphone and the smartphone BT connection resumes.  To enable this mode, check the connectG5 preference in xDrip Prefs on the smartphone.
 
-This feature has been tested on Sony Smartwatch 3 using the xDrip+ BigChart watchface on many long runs while not connected to my Samsung Galaxy Note 4.  Upon reestabling wear connection, my Sony Smartwatch BG data (TransmitterData.java) was sent immediately to my Note 4, and its BT connection to the Dexcom G5 resumed.  The BGs from the standalone smartwatch were reflected in the xDrip+ UI as well as my Nightscout website.  However, no testing was performed on other xDrip+ connections such as Parakeet.
+This feature has been tested on Sony Smartwatch 3 using the xDrip+ BigChart watchface on many long runs while not connected to my Samsung Galaxy Note 4.  Upon re-establishing wear connection, my Sony Smartwatch BG data (TransmitterData.java) was sent immediately to my Note 4, and its BT connection to the Dexcom G5 resumed.  The BGs from the standalone smartwatch were reflected in the xDrip+ UI as well as my Nightscout website.  However, no testing was performed on other xDrip+ connections such as Parakeet.
 
 TODO:
 * Add xDrip+ notifications on smartwatch.
