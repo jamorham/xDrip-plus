@@ -248,17 +248,15 @@ public class G5CollectionService extends Service {
         stopScan();
 
         Log.d(TAG, "onDestroy");
-        scan_interval_timer.cancel();//KS ??
-        if (pendingIntent != null) {//KS
-            Log.d(TAG, "onDestroy stop Alarm pendingIntent");
-            AlarmManager alarm = (AlarmManager) getSystemService(ALARM_SERVICE);
-            alarm.cancel(pendingIntent);
+        SharedPreferences sharedPrefs = PreferenceManager.getDefaultSharedPreferences(getApplicationContext());
+        if (!sharedPrefs.getBoolean("use_connectG5", false)) {
+            scan_interval_timer.cancel();//KS
+            if (pendingIntent != null) {//KS
+                Log.d(TAG, "onDestroy stop Alarm pendingIntent");
+                AlarmManager alarm = (AlarmManager) getSystemService(ALARM_SERVICE);
+                alarm.cancel(pendingIntent);
+            }
         }
-        //forgetDevice();//KS ??
-
-
-        //mBluetoothAdapter.disable();//KS
-
 //        close();
 //        setRetryTimer();
 //        foregroundServiceStarter.stop();

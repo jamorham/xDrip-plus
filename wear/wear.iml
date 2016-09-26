@@ -110,12 +110,11 @@
     <orderEntry type="library" exported="" name="play-services-basement-9.4.0" level="project" />
     <orderEntry type="library" exported="" name="play-services-tasks-9.4.0" level="project" />
     <orderEntry type="library" exported="" name="play-services-wearable-9.4.0" level="project" />
-    <orderEntry type="library" exported="" name="mongodb-driver-core-3.1.0-SNAPSHOT" level="project" />
     <orderEntry type="library" exported="" name="recyclerview-v7-23.0.1" level="project" />
     <orderEntry type="library" exported="" name="ActiveAndroid" level="project" />
     <orderEntry type="library" exported="" name="support-v4-23.1.1" level="project" />
-    <orderEntry type="library" exported="" name="mongodb-driver-3.1.0-SNAPSHOT" level="project" />
     <orderEntry type="library" exported="" name="bson-3.1.0-rc0" level="project" />
+    <orderEntry type="library" exported="" name="mongo-java-driver-3.4.0-SNAPSHOT" level="project" />
     <orderEntry type="library" exported="" name="wearable-1.4.0" level="project" />
     <orderEntry type="library" exported="" name="support-annotations-23.1.1" level="project" />
     <orderEntry type="library" exported="" name="appcompat-v7-23.1.1" level="project" />

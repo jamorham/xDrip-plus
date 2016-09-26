@@ -60,6 +60,7 @@ public class ListenerService extends WearableListenerService implements GoogleAp
     private static final String SYNC_BGS_PATH = "/syncwearbgs";//KS
     private static final String WEARABLE_CALIBRATION_DATA_PATH = "/nightscout_watch_cal_data";//KS
     private static final String WEARABLE_SENSOR_DATA_PATH = "/nightscout_watch_sensor_data";//KS
+    public static final String WEARABLE_PREF_DATA_PATH = "/nightscout_watch_pref_data";//KS
     public static final String DATA_ITEM_RECEIVED_PATH = "/data-item-received";//KS
     private static final String ACTION_SYNC_DB = "com.eveningoutpost.dexdrip.wearintegration.SyncDB";//KS
     private static final String ACTION_RESEND = "com.dexdrip.stephenblack.nightwatch.RESEND_DATA";
@@ -121,7 +122,6 @@ public class ListenerService extends WearableListenerService implements GoogleAp
                                     //onDataChanged doesn't ever get triggered on phone using putDataItem. Therefore, use MessageAPI instead.
                                     //sendToDataLayer(SYNC_BGS_PATH, datamap, node);
 
-
                                     PendingResult<MessageApi.SendMessageResult> result = Wearable.MessageApi.sendMessage(googleApiClient, node.getId(), SYNC_BGS_PATH, datamap.toByteArray());
                                     result.setResultCallback(new ResultCallback<MessageApi.SendMessageResult>() {
                                         @Override
@@ -135,20 +135,6 @@ public class ListenerService extends WearableListenerService implements GoogleAp
                                             }
                                         }
                                     });
-
-
-                                    /*
-                                    MessageApi.SendMessageResult result = Wearable.MessageApi.sendMessage(
-                                            googleApiClient, node.getId(), SYNC_BGS_PATH, datamap.toByteArray()).await();
-                                    if (!result.getStatus().isSuccess()) {
-                                        Log.e(TAG, "ERROR: failed to send Wear BGs to phone: " + result.getStatus());
-                                    }
-                                    else {
-                                        last_send_previous = last_send_sucess;
-                                        Log.d(TAG, "Sent Wear BGs to phone: " + result.getStatus());
-                                    }
-                                    datamap = getWearTransmitterData(36);//getWearBGData
-                                    */
                                 }
                             }
                         }
@@ -248,6 +234,16 @@ public class ListenerService extends WearableListenerService implements GoogleAp
         return null;
     }
 
+    private void sendPrefSettings() {//KS
+        DataMap dataMap = new DataMap();
+        boolean connectG5 = mPrefs.getBoolean("connectG5", false);
+        boolean use_connectG5 = mPrefs.getBoolean("use_connectG5", false);
+        Log.d(TAG, "sendPrefSettings connectG5: " + connectG5 + " use_connectG5:" + use_connectG5);
+        dataMap.putBoolean("connectG5", connectG5);
+        dataMap.putBoolean("use_connectG5", use_connectG5);
+        sendData("WEARABLE_PREF_DATA_PATH", dataMap.toByteArray());
+    }
+
     private DataMap dataMap(TransmitterData bg) {//KS
         DataMap dataMap = new DataMap();
         String json = bg.toS();
@@ -324,50 +320,26 @@ public class ListenerService extends WearableListenerService implements GoogleAp
     }
 
     @Override
-    public void onPeerConnected(Node peer) {//KS test - call getWearBgData and call stopBtG5Service()??
+    public void onPeerConnected(Node peer) {//KS
         super.onPeerConnected(peer);
         String id = peer.getId();
         String name = peer.getDisplayName();
         Log.d(TAG, "onPeerConnected peer name & ID: " + name + "|" + id);
-        SharedPreferences sharedPrefs = PreferenceManager.getDefaultSharedPreferences(getApplicationContext());//KS
-        if (sharedPrefs.getBoolean("connectG5", false)) { //KS
+        SharedPreferences sharedPrefs = PreferenceManager.getDefaultSharedPreferences(getApplicationContext());
+        if (sharedPrefs.getBoolean("connectG5", false) && !sharedPrefs.getBoolean("use_connectG5", false)) {
             stopBtG5Service();
             ListenerService.requestData(this);
-
-            /*
-            NodeApi.GetConnectedNodesResult nodes =
-                    Wearable.NodeApi.getConnectedNodes(googleApiClient).await();
-            int count = nodes.getNodes().size();//KS
-            Log.d(TAG, "onPeerDisconnected NodeApi.GetConnectedNodesResult await count=" + count);//KS
-            if (count > 0) {//KS
-                for (Node node : nodes.getNodes()) {
-                    DataMap datamap = getWearTransmitterData(36);//KS getWearBGData for last 3 hours
-                    while (datamap != null) {
-                        Log.d(TAG, "doInBackground send Wear Data BGs to phone at path:" + SYNC_BGS_PATH + " and node:" + node.getId());
-                        Log.d(TAG, "doInBackground send Wear datamap:" + datamap);
-                        MessageApi.SendMessageResult result = Wearable.MessageApi.sendMessage(
-                                googleApiClient, node.getId(), SYNC_BGS_PATH, datamap.toByteArray()).await();
-                        if (!result.getStatus().isSuccess()) {
-                            Log.e(TAG, "ERROR: failed to send Wear Data BGs: " + result.getStatus());
-                        } else
-                            Log.d(TAG, "send  Wear Data BGs to phone: " + result.getStatus());
-
-                        datamap = getWearTransmitterData(36);//getWearBGData
-                    }
-                }
-            }
-            */
         }
     }
 
     @Override
-    public void onPeerDisconnected(Node peer) {//KS test - call startBtG5Service() or simply wait 'til watchface.missedReadingAlert() timeout
+    public void onPeerDisconnected(Node peer) {//KS
         super.onPeerDisconnected(peer);
         String id = peer.getId();
         String name = peer.getDisplayName();
         Log.d(TAG, "onPeerDisconnected peer name & ID: " + name + "|" + id);
-        SharedPreferences sharedPrefs = PreferenceManager.getDefaultSharedPreferences(getApplicationContext());//KS
-        if (sharedPrefs.getBoolean("connectG5", false)) { //KS
+        SharedPreferences sharedPrefs = PreferenceManager.getDefaultSharedPreferences(getApplicationContext());
+        if (sharedPrefs.getBoolean("connectG5", false)) {
             startBtG5Service();
         }
     }
@@ -389,16 +361,11 @@ public class ListenerService extends WearableListenerService implements GoogleAp
 
     public SharedPreferences.OnSharedPreferenceChangeListener prefListener = new SharedPreferences.OnSharedPreferenceChangeListener() {//KS
         public void onSharedPreferenceChanged(SharedPreferences prefs, String key) {
-            if(key.compareTo("connectG5") == 0) {
-                Log.i("listenerService5", "connectG changed!");
-                if (!mPrefs.getBoolean("connectG5", false)) {
-                    Log.d(TAG, "connectG5 changed to false. Stop G5 Collector.");
-                    stopBtG5Service();
-                }
-                else {
-                    Log.d(TAG, "prefListener connectG5 changed to true.");
-                }
-            }
+        Log.d(TAG, "OnSharedPreferenceChangeListener entered");
+        if(key.compareTo("connectG5") == 0 || key.compareTo("use_connectG5") == 0) {
+            Log.i(TAG, "OnSharedPreferenceChangeListener connectG5 || use_connectG5 changed!");
+            processConnectG5();
+        }
         }
     };
 
@@ -427,7 +394,7 @@ public class ListenerService extends WearableListenerService implements GoogleAp
                 } else if (path.equals(WEARABLE_DATA_PATH)) {
 
                     dataMap = DataMapItem.fromDataItem(event.getDataItem()).getDataMap();
-                    setWearSharedPrefs(dataMap);//KS Set Preferences with transmitter id, etc.
+                    //setWearSharedPrefs(dataMap);//KS Set Preferences with transmitter id, etc.
 
                     Intent messageIntent = new Intent();
                     messageIntent.setAction(Intent.ACTION_SEND);
@@ -456,6 +423,10 @@ public class ListenerService extends WearableListenerService implements GoogleAp
                     dataMap = DataMapItem.fromDataItem(event.getDataItem()).getDataMap();
                     Log.d(TAG, "onDataChanged path=" + path + " DataMap=" + dataMap);
                     syncCalibrationData(dataMap);
+                } else if (path.equals(WEARABLE_PREF_DATA_PATH)) {//KS
+                    dataMap = DataMapItem.fromDataItem(event.getDataItem()).getDataMap();
+                    Log.d(TAG, "onDataChanged path=" + path + " DataMap=" + dataMap);
+                    setWearSharedPrefs(dataMap);
                 } else if (path.equals(DATA_ITEM_RECEIVED_PATH)) {//KS
                     dataMap = DataMapItem.fromDataItem(event.getDataItem()).getDataMap();
                     Log.d(TAG, "onDataChanged path=" + path + " DataMap=" + dataMap);
@@ -477,32 +448,65 @@ public class ListenerService extends WearableListenerService implements GoogleAp
     }
 
     public void setWearSharedPrefs(DataMap dataMap) {//KS
-        Log.d(TAG, "onDataChanged dataMap=" + dataMap);
+        SharedPreferences.Editor prefs = PreferenceManager.getDefaultSharedPreferences(this).edit();
+
+        Log.d(TAG, "setWearSharedPrefs dataMap=" + dataMap);
+
+        boolean connectG5 = dataMap.getBoolean("connectG5", false);
+        boolean use_connectG5 = dataMap.getBoolean("use_connectG5", false);
+        Log.d(TAG, "setWearSharedPrefs connectG5: " + connectG5 + " use_connectG5:" + use_connectG5);
+        prefs.putBoolean("connectG5", connectG5);
+        prefs.putBoolean("use_connectG5", use_connectG5);
+        prefs.commit();
 
         String dex_txid = dataMap.getString("dex_txid", "ABCDEF");//KS 4023GU
-        Log.d(TAG, "onDataChanged dataMap dex_txid=" + dex_txid);
+        Log.d(TAG, "setWearSharedPrefs dataMap dex_txid=" + dex_txid);
 
-        SharedPreferences.Editor prefs = PreferenceManager.getDefaultSharedPreferences(this).edit();
         prefs.putString("dex_txid", dex_txid);
         prefs.commit();
         String pref_txid = mPrefs.getString("dex_txid", "NOTFOUND");//KS TEST
-        Log.d(TAG, "onDataChanged prefs set dex_txid=" + pref_txid);
+        Log.d(TAG, "setWearSharedPrefs prefs set dex_txid=" + pref_txid);
 
         String units = dataMap.getString("units", "ABCDEF");//KS
-        Log.d(TAG, "onDataChanged dataMap units=" + units);
+        Log.d(TAG, "setWearSharedPrefs dataMap units=" + units);
         prefs.putString("units", units);
         prefs.commit();
-        Log.d(TAG, "onDataChanged prefs units=" + mPrefs.getString("units", ""));
+        Log.d(TAG, "setWearSharedPrefs prefs units=" + mPrefs.getString("units", ""));
 
         Double high = dataMap.getDouble("high");
         Double low = dataMap.getDouble("low");
-        Log.d(TAG, "onDataChanged dataMap highMark=" + high + " highMark=" + low);
+        Log.d(TAG, "setWearSharedPrefs dataMap highMark=" + high + " highMark=" + low);
         prefs.putString("highValue", high.toString());
+        prefs.commit();
         prefs.putString("lowValue", low.toString());
         prefs.commit();
-        //Double highMark = Double.parseDouble(mPrefs.getString("highValue", "0"));
-        //Double lowMark = Double.parseDouble(mPrefs.getString("lowValue", "0"));
-        //Log.d(TAG, "onDataChanged prefs highMark=" + highMark + " highMark=" + lowMark);
+
+        processConnectG5();
+    }
+
+    //Assumes Wear is connected to phone
+    public void processConnectG5() {//KS
+        Log.d(TAG, "processConnectG5 enter");
+        boolean connectG5 = mPrefs.getBoolean("connectG5", false);
+        boolean use_connectG5 = mPrefs.getBoolean("use_connectG5", false);
+        if (connectG5) {
+            Log.d(TAG, "processConnectG5 connectG5=true");
+            if (!use_connectG5){
+                Log.d(TAG, "processConnectG5 use_connectG5=false - stopBtG5Service and requestData");
+                stopBtG5Service();
+                ListenerService.requestData(this);
+            }
+            else {
+                Log.d(TAG, "processConnectG5 use_connectG5=true - startBtG5Service");
+                startBtG5Service();
+            }
+        }
+        else {
+            Log.d(TAG, "processConnectG5 connectG5=false - stopBtG5Service and requestData");
+            stopBtG5Service();
+            ListenerService.requestData(this);
+        }
+        sendPrefSettings();
     }
 
     public void syncSensorData(DataMap dataMap, Context context) {//KS
@@ -624,7 +628,7 @@ public class ListenerService extends WearableListenerService implements GoogleAp
         }
     }
 
-    private boolean checkLocationPermissions() {
+    private boolean checkLocationPermissions() {//KS
         Context myContext = getApplicationContext();
         mLocationPermissionApproved =
                 ActivityCompat.checkSelfPermission(
