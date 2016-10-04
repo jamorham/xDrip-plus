@@ -96,6 +96,10 @@ public class BgSendQueue extends Model {
     }
 
     public static void handleNewBgReading(BgReading bgReading, String operation_type, Context context, boolean is_follower) {
+        handleNewBgReading(bgReading, operation_type, context, is_follower, false);
+    }
+
+    public static void handleNewBgReading(BgReading bgReading, String operation_type, Context context, boolean is_follower, boolean quick) {
         PowerManager powerManager = (PowerManager) context.getSystemService(Context.POWER_SERVICE);
         PowerManager.WakeLock wakeLock = powerManager.newWakeLock(PowerManager.PARTIAL_WAKE_LOCK,
                 "sendQueue");
@@ -105,15 +109,20 @@ public class BgSendQueue extends Model {
 
             SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(context);
 
+            // all this other UI stuff probably shouldn't be here but in lieu of a better method we keep with it..
+
             //KS Following is not needed on watch
             /*
-            if (Home.activityVisible) {
-                Intent updateIntent = new Intent(Intents.ACTION_NEW_BG_ESTIMATE_NO_DATA);
-                context.sendBroadcast(updateIntent);
-            }
+            if (!quick) {
+                if (Home.activityVisible) {
+                    Intent updateIntent = new Intent(Intents.ACTION_NEW_BG_ESTIMATE_NO_DATA);
+                    context.sendBroadcast(updateIntent);
+                }
 
-            if (AppWidgetManager.getInstance(context).getAppWidgetIds(new ComponentName(context, xDripWidget.class)).length > 0) {
-                context.startService(new Intent(context, WidgetUpdateService.class));
+                Context appContext = xdrip.getAppContext();//KS
+                if (AppWidgetManager.getInstance(context).getAppWidgetIds(new ComponentName(appContext, xDripWidget.class)).length > 0) {//KS context
+                    context.startService(new Intent(context, WidgetUpdateService.class));
+                }
             }
 
             if (prefs.getBoolean("broadcast_data_through_intents", false)) {
@@ -172,14 +181,14 @@ public class BgSendQueue extends Model {
 
                 //just keep it alive for 3 more seconds to allow the watch to be updated
                 // TODO: change NightWatch to not allow the system to sleep.
-                if (prefs.getBoolean("excessive_wakelocks", false)) {
+                if ((!quick) && (prefs.getBoolean("excessive_wakelocks", false))) {
                     powerManager.newWakeLock(PowerManager.PARTIAL_WAKE_LOCK,
                             "broadcstNightWatch").acquire(3000);
                 }
             }
 
             // send to wear
-             else if (prefs.getBoolean("wear_sync", false)) {
+            if ((!quick) && (prefs.getBoolean("wear_sync", false))) {
                 context.startService(new Intent(context, WatchUpdaterService.class));
                 if (prefs.getBoolean("excessive_wakelocks", false)) {
                     powerManager.newWakeLock(PowerManager.PARTIAL_WAKE_LOCK,
@@ -189,7 +198,8 @@ public class BgSendQueue extends Model {
             }
 
             // send to pebble
-            if (prefs.getBoolean("broadcast_to_pebble", false) && (PebbleUtil.getCurrentPebbleSyncType(prefs) != 1)) {
+            if ((!quick) && (prefs.getBoolean("broadcast_to_pebble", false) )
+                    && (PebbleUtil.getCurrentPebbleSyncType(prefs) != 1)) {
                 context.startService(new Intent(context, PebbleWatchSync.class));
             }
 
@@ -197,23 +207,28 @@ public class BgSendQueue extends Model {
                 GcmActivity.syncBGReading(bgReading);
             }
 
-            if ((!is_follower) && (prefs.getBoolean("share_upload", false))) {
-                Log.d("ShareRest", "About to call ShareRest!!");
-                String receiverSn = prefs.getString("share_key", "SM00000000").toUpperCase();
-                BgUploader bgUploader = new BgUploader(context);
-                bgUploader.upload(new ShareUploadPayload(receiverSn, bgReading));
+            if ((!is_follower) && (!quick) && (prefs.getBoolean("share_upload", false))) {
+                if (JoH.ratelimit("sending-to-share-upload",10)) {
+                    Log.d("ShareRest", "About to call ShareRest!!");
+                    String receiverSn = prefs.getString("share_key", "SM00000000").toUpperCase();
+                    BgUploader bgUploader = new BgUploader(context);
+                    bgUploader.upload(new ShareUploadPayload(receiverSn, bgReading));
+                }
             }
-            context.startService(new Intent(context, SyncService.class));
+
+            if (JoH.ratelimit("start-sync-service",30)) {
+                context.startService(new Intent(context, SyncService.class));
+            }
 
             //Text to speech
             //Log.d("BgToSpeech", "gonna call speak");
-            if (prefs.getBoolean("bg_to_speech", false))
+            if ((!quick) && (prefs.getBoolean("bg_to_speech", false)))
             {
                 BgToSpeech.speak(bgReading.calculated_value, bgReading.timestamp);
             }
             */
 
-            // executing on watch; send to watchface
+            // if executing on watch; send to watchface
             if (prefs.getBoolean("connectG5", false)) {//KS
                 Log.d("BgSendQueue", "handleNewBgReading Broadcast BG data to watch");
                 resendData(context);

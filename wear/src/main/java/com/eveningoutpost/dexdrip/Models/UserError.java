@@ -36,13 +36,9 @@ public class UserError extends Model {
     //todo: rather than include multiples of the same error, should we have a "Count" and just increase that on duplicates?
     //or rather, perhaps we should group up the errors
 
-    public static String dateTimeText(long timestamp) {
-        return android.text.format.DateFormat.format("yyyy-MM-dd HH:mm:ss", timestamp).toString();
-    }
-
     public String toString()
     {
-        return severity+" ^ "+dateTimeText((long)timestamp)+" ^ "+shortError+" ^ "+message;//KS JoH.
+        return severity+" ^ "+JoH.dateTimeText((long)timestamp)+" ^ "+shortError+" ^ "+message;
     }
 
     public UserError() {}

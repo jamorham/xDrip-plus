@@ -554,7 +554,7 @@ public class WatchUpdaterService extends WearableListenerService implements
     public void onMessageReceived(MessageEvent event) {
         Log.d(TAG, "onMessageReceived enter");
         if (wear_integration) {
-            final PowerManager.WakeLock wl = JoH.getWakeLock("watchupdate-msgrec", 120000);//60000
+            final PowerManager.WakeLock wl = JoH.getWakeLock("watchupdate-msgrec", 60000);//KS test with 120000
             if (event != null) {
                 Log.d(TAG, "wearable event path: " + event.getPath());
                 switch (event.getPath()) {

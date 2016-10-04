@@ -131,7 +131,7 @@ public class BgReading extends Model implements ShareUploadableBg {
 
     @Expose
     @Column(name = "snyced")
-    public boolean synced;
+    public boolean ignoreForStats;
 
     @Expose
     @Column(name = "raw_calculated")
@@ -254,7 +254,6 @@ public class BgReading extends Model implements ShareUploadableBg {
                 }
                 bgReading.uuid = UUID.randomUUID().toString();
                 bgReading.time_since_sensor_started = bgReading.timestamp - sensor.started_at;
-                bgReading.synced = false;
                 bgReading.calculateAgeAdjustedRawValue();
                 bgReading.save();
             }
@@ -372,7 +371,6 @@ public class BgReading extends Model implements ShareUploadableBg {
             bgReading.timestamp = timestamp;
             bgReading.uuid = UUID.randomUUID().toString();
             bgReading.time_since_sensor_started = bgReading.timestamp - sensor.started_at;
-            bgReading.synced = false;
             bgReading.calibration_flag = false;
 
             bgReading.calculateAgeAdjustedRawValue();
@@ -390,7 +388,6 @@ public class BgReading extends Model implements ShareUploadableBg {
             bgReading.timestamp = timestamp;
             bgReading.uuid = UUID.randomUUID().toString();
             bgReading.time_since_sensor_started = bgReading.timestamp - sensor.started_at;
-            bgReading.synced = false;
 
             bgReading.calculateAgeAdjustedRawValue();
 
@@ -427,8 +424,8 @@ public class BgReading extends Model implements ShareUploadableBg {
             if (!quick) {
                 bgReading.perform_calculations();
                 context.startService(new Intent(context, Notifications.class));
-                BgSendQueue.handleNewBgReading(bgReading, "create", context);
             }
+            BgSendQueue.handleNewBgReading(bgReading, "create", context, Home.get_follower(), quick);
         }
 
         Log.i("BG GSON: ", bgReading.toS());
@@ -944,11 +941,12 @@ public class BgReading extends Model implements ShareUploadableBg {
     public void find_new_curve() {
         List<BgReading> last_3 = BgReading.latest(3);
         if ((last_3 != null) && (last_3.size() == 3)) {
+            BgReading latest = last_3.get(0);
             BgReading second_latest = last_3.get(1);
             BgReading third_latest = last_3.get(2);
 
-            double y3 = calculated_value;
-            double x3 = timestamp;
+            double y3 = latest.calculated_value;
+            double x3 = latest.timestamp;
             double y2 = second_latest.calculated_value;
             double x2 = second_latest.timestamp;
             double y1 = third_latest.calculated_value;
@@ -968,7 +966,7 @@ public class BgReading extends Model implements ShareUploadableBg {
                 BgReading second_latest = last_3.get(1);
 
                 double y2 = latest.calculated_value;
-                double x2 = timestamp;
+                double x2 = latest.timestamp;
                 double y1 = second_latest.calculated_value;
                 double x1 = second_latest.timestamp;
 
@@ -1006,11 +1004,13 @@ public class BgReading extends Model implements ShareUploadableBg {
     public void find_new_raw_curve() {
         List<BgReading> last_3 = BgReading.latest(3);
         if ((last_3 != null) && (last_3.size() == 3)) {
-            BgReading second_latest = last_3.get(1);
-            BgReading third_latest = last_3.get(2);
 
-            double y3 = age_adjusted_raw_value;
-            double x3 = timestamp;
+            final BgReading latest = last_3.get(0);
+            final BgReading second_latest = last_3.get(1);
+            final BgReading third_latest = last_3.get(2);
+
+            double y3 = latest.age_adjusted_raw_value;
+            double x3 = latest.timestamp;
             double y2 = second_latest.age_adjusted_raw_value;
             double x2 = second_latest.timestamp;
             double y1 = third_latest.age_adjusted_raw_value;
@@ -1027,7 +1027,7 @@ public class BgReading extends Model implements ShareUploadableBg {
             BgReading second_latest = last_3.get(1);
 
             double y2 = latest.age_adjusted_raw_value;
-            double x2 = timestamp;
+            double x2 = latest.timestamp;
             double y1 = second_latest.age_adjusted_raw_value;
             double x1 = second_latest.timestamp;
             if(y1 == y2) {

@@ -23,7 +23,7 @@ import com.eveningoutpost.dexdrip.UtilityModels.BgSendQueue;
 import com.eveningoutpost.dexdrip.UtilityModels.Constants;
 //KS import com.eveningoutpost.dexdrip.UtilityModels.Notifications;
 //KS import com.eveningoutpost.dexdrip.utils.DexCollectionType;
-//KS import com.eveningoutpost.dexdrip.xdrip;
+import com.eveningoutpost.dexdrip.xdrip;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.google.gson.annotations.Expose;
@@ -131,7 +131,7 @@ public class BgReading extends Model implements ShareUploadableBg {
 
     @Expose
     @Column(name = "snyced")
-    public boolean synced;
+    public boolean ignoreForStats;
 
     @Expose
     @Column(name = "raw_calculated")
@@ -208,7 +208,7 @@ public class BgReading extends Model implements ShareUploadableBg {
     }
 
     public static double currentSlope() {
-        return currentSlope(false);//KS Home.get_follower()
+        return currentSlope(Home.get_follower());
     }
 
     public static double currentSlope(boolean is_follower) {
@@ -254,7 +254,6 @@ public class BgReading extends Model implements ShareUploadableBg {
                 }
                 bgReading.uuid = UUID.randomUUID().toString();
                 bgReading.time_since_sensor_started = bgReading.timestamp - sensor.started_at;
-                bgReading.synced = false;
                 bgReading.calculateAgeAdjustedRawValue();
                 bgReading.save();
             }
@@ -326,7 +325,7 @@ public class BgReading extends Model implements ShareUploadableBg {
                 return bgReading;
             }
         }
-        Log.w(TAG, "getForPreciseTimestamp: No luck finding a BG timestamp match: " + JoH.dateTimeText((long) timestamp) + " precision:" + precision);//KS JoH
+        Log.w(TAG, "getForPreciseTimestamp: No luck finding a BG timestamp match: " + JoH.dateTimeText((long) timestamp) + " precision:" + precision);
         return null;
     }
 
@@ -372,7 +371,6 @@ public class BgReading extends Model implements ShareUploadableBg {
             bgReading.timestamp = timestamp;
             bgReading.uuid = UUID.randomUUID().toString();
             bgReading.time_since_sensor_started = bgReading.timestamp - sensor.started_at;
-            bgReading.synced = false;
             bgReading.calibration_flag = false;
 
             bgReading.calculateAgeAdjustedRawValue();
@@ -390,7 +388,6 @@ public class BgReading extends Model implements ShareUploadableBg {
             bgReading.timestamp = timestamp;
             bgReading.uuid = UUID.randomUUID().toString();
             bgReading.time_since_sensor_started = bgReading.timestamp - sensor.started_at;
-            bgReading.synced = false;
 
             bgReading.calculateAgeAdjustedRawValue();
 
@@ -427,8 +424,8 @@ public class BgReading extends Model implements ShareUploadableBg {
             if (!quick) {
                 bgReading.perform_calculations();
                 //KS context.startService(new Intent(context, Notifications.class));
-                BgSendQueue.handleNewBgReading(bgReading, "create", context);
             }
+            BgSendQueue.handleNewBgReading(bgReading, "create", context, Home.get_follower(), quick);
         }
 
         Log.i("BG GSON: ", bgReading.toS());
@@ -604,13 +601,13 @@ public class BgReading extends Model implements ShareUploadableBg {
 
     public static boolean last_within_millis(final long millis) {
         final BgReading reading = last();
-        return reading != null && ((JoH.tsl() - reading.timestamp) < millis);//KS JoH
+        return reading != null && ((JoH.tsl() - reading.timestamp) < millis);
     }
 
     public static BgReading last()
     {
-        return BgReading.last(false);
-    }//KS Home.get_follower()
+        return BgReading.last(Home.get_follower());
+    }
 
     public static BgReading last(boolean is_follower) {
         if (is_follower) {
@@ -655,7 +652,9 @@ public class BgReading extends Model implements ShareUploadableBg {
                 .executeSingle();
     }
 
-    public static List<BgReading> latest(int number) {return latest(number, false);}//KS Home.get_follower()
+    public static List<BgReading> latest(int number) {
+        return latest(number, Home.get_follower());
+    }
 
     public static List<BgReading> latest(int number, boolean is_follower) {
         if (is_follower) {
@@ -795,8 +794,6 @@ public class BgReading extends Model implements ShareUploadableBg {
         return estimate;
     }
 
-    //KS not used on watch
-    /*
     public static void bgReadingInsertFromJson(String json)
     {
         bgReadingInsertFromJson(json, true);
@@ -822,11 +819,8 @@ public class BgReading extends Model implements ShareUploadableBg {
             Log.e(TAG,"Got null bgr from json");
         }
     }
-    */
 
     // TODO this method shares some code with above.. merge
-    //KS not used
-    /*
     public static void bgReadingInsertFromInt(int value, long timestamp, boolean do_notification) {
         // TODO sanity check data!
 
@@ -853,7 +847,7 @@ public class BgReading extends Model implements ShareUploadableBg {
                     bgr.save();
                     bgr.find_slope();
                     if (do_notification) {
-                        xdrip.getAppContext().startService(new Intent(xdrip.getAppContext(), Notifications.class)); // alerts et al
+                        //KS xdrip.getAppContext().startService(new Intent(xdrip.getAppContext(), Notifications.class)); // alerts et al
                         BgSendQueue.handleNewBgReading(bgr, "create", xdrip.getAppContext(), true); // pebble and widget
                     }
                 } else {
@@ -866,7 +860,6 @@ public class BgReading extends Model implements ShareUploadableBg {
             Log.e(TAG,"Got null bgr from create");
         }
     }
-    */
 
 
     public static BgReading fromJSON(String json) {
@@ -880,7 +873,7 @@ public class BgReading extends Model implements ShareUploadableBg {
            return new GsonBuilder().excludeFieldsWithoutExposeAnnotation().create().fromJson(json,BgReading.class);
         } catch (Exception e) {
             Log.d(TAG, "Got exception parsing BgReading json: " + e.toString());
-            //KS Home.toaststaticnext("Error on BGReading sync, probably decryption key mismatch");
+            Home.toaststaticnext("Error on BGReading sync, probably decryption key mismatch");
             return null;
         }
     }
@@ -948,11 +941,12 @@ public class BgReading extends Model implements ShareUploadableBg {
     public void find_new_curve() {
         List<BgReading> last_3 = BgReading.latest(3);
         if ((last_3 != null) && (last_3.size() == 3)) {
+            BgReading latest = last_3.get(0);
             BgReading second_latest = last_3.get(1);
             BgReading third_latest = last_3.get(2);
 
-            double y3 = calculated_value;
-            double x3 = timestamp;
+            double y3 = latest.calculated_value;
+            double x3 = latest.timestamp;
             double y2 = second_latest.calculated_value;
             double x2 = second_latest.timestamp;
             double y1 = third_latest.calculated_value;
@@ -972,7 +966,7 @@ public class BgReading extends Model implements ShareUploadableBg {
                 BgReading second_latest = last_3.get(1);
 
                 double y2 = latest.calculated_value;
-                double x2 = timestamp;
+                double x2 = latest.timestamp;
                 double y1 = second_latest.calculated_value;
                 double x1 = second_latest.timestamp;
 
@@ -999,7 +993,7 @@ public class BgReading extends Model implements ShareUploadableBg {
 
     public void calculateAgeAdjustedRawValue(){
         final double adjust_for = AGE_ADJUSTMENT_TIME - time_since_sensor_started;
-        if ((adjust_for > 0)) {//KS && (!DexCollectionType.hasLibre())) {
+        if ((adjust_for > 0)) { //KS && (!DexCollectionType.hasLibre())) {
             age_adjusted_raw_value = ((AGE_ADJUSTMENT_FACTOR * (adjust_for / AGE_ADJUSTMENT_TIME)) * raw_data) + raw_data;
             Log.i(TAG, "calculateAgeAdjustedRawValue: RAW VALUE ADJUSTMENT FROM:" + raw_data + " TO: " + age_adjusted_raw_value);
         } else {
@@ -1010,11 +1004,13 @@ public class BgReading extends Model implements ShareUploadableBg {
     public void find_new_raw_curve() {
         List<BgReading> last_3 = BgReading.latest(3);
         if ((last_3 != null) && (last_3.size() == 3)) {
-            BgReading second_latest = last_3.get(1);
-            BgReading third_latest = last_3.get(2);
 
-            double y3 = age_adjusted_raw_value;
-            double x3 = timestamp;
+            final BgReading latest = last_3.get(0);
+            final BgReading second_latest = last_3.get(1);
+            final BgReading third_latest = last_3.get(2);
+
+            double y3 = latest.age_adjusted_raw_value;
+            double x3 = latest.timestamp;
             double y2 = second_latest.age_adjusted_raw_value;
             double x2 = second_latest.timestamp;
             double y1 = third_latest.age_adjusted_raw_value;
@@ -1031,7 +1027,7 @@ public class BgReading extends Model implements ShareUploadableBg {
             BgReading second_latest = last_3.get(1);
 
             double y2 = latest.age_adjusted_raw_value;
-            double x2 = timestamp;
+            double x2 = latest.timestamp;
             double y1 = second_latest.age_adjusted_raw_value;
             double x1 = second_latest.timestamp;
             if(y1 == y2) {
@@ -1108,7 +1104,6 @@ public class BgReading extends Model implements ShareUploadableBg {
 
     }
 
-    /* //KS only used for notifications, currently not supported on standalone watch
     public static boolean checkForPersistentHigh() {
 
         // skip if not enabled
@@ -1118,14 +1113,14 @@ public class BgReading extends Model implements ShareUploadableBg {
         List<BgReading> last = BgReading.latest(1);
         if ((last != null) && (last.size()>0)) {
 
-            final long now = tsl();//KS JoH
+            final long now = JoH.tsl();
             final long since = now - last.get(0).timestamp;
             // only process if last reading <10 mins
             if (since < 600000) {
                 // check if exceeding high
                 if (last.get(0).calculated_value >
                         Home.convertToMgDlIfMmol(
-                                tolerantParseDouble(Home.getPreferencesStringWithDefault("highValue", "170")))) {//KS JoH
+                                JoH.tolerantParseDouble(Home.getPreferencesStringWithDefault("highValue", "170")))) {
 
                     final double this_slope = last.get(0).calculated_value_slope * 60000;
                     //Log.d(TAG, "CheckForPersistentHigh: Slope: " + JoH.qs(this_slope));
@@ -1148,7 +1143,7 @@ public class BgReading extends Model implements ShareUploadableBg {
                                     return false;
                                 }
                                 Log.i(TAG, "Persistent high for: " + high_for_mins + " mins -> alerting");
-                                Notifications.persistentHighAlert(xdrip.getAppContext(), true, xdrip.getAppContext().getString(R.string.persistent_high_for_greater_than) + (int) high_for_mins + xdrip.getAppContext().getString(R.string.space_mins));
+                                //KS Notifications.persistentHighAlert(xdrip.getAppContext(), true, xdrip.getAppContext().getString(R.string.persistent_high_for_greater_than) + (int) high_for_mins + xdrip.getAppContext().getString(R.string.space_mins));
 
                             } else {
                                 Log.d(TAG, "Persistent high below time threshold at: " + high_for_mins);
@@ -1161,14 +1156,13 @@ public class BgReading extends Model implements ShareUploadableBg {
                     {
                         Log.i(TAG,"Cancelling previous persistent high as we are no longer high");
                      Home.setPreferencesLong(PERSISTENT_HIGH_SINCE, 0); // clear it
-                        Notifications.persistentHighAlert(xdrip.getAppContext(), false, ""); // cancel it
+                        //KS Notifications.persistentHighAlert(xdrip.getAppContext(), false, ""); // cancel it
                     }
                 }
             }
         }
         return false; // actually we should probably return void as we do everything inside this method
     }
-
 
     public static void checkForRisingAllert(Context context) {
         SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(context);
@@ -1199,7 +1193,7 @@ public class BgReading extends Model implements ShareUploadableBg {
         }
         Log.d(TAG_ALERT, "checkForRisingAllert will check for rate of " + friseRate);
 
-        //KS boolean riseAlert = checkForDropRiseAllert(friseRate, false);
+        boolean riseAlert = checkForDropRiseAllert(friseRate, false);
         //KS Notifications.RisingAlert(context, riseAlert);
     }
 
@@ -1234,7 +1228,7 @@ public class BgReading extends Model implements ShareUploadableBg {
         Log.i(TAG_ALERT, "checkForDropAllert will check for rate of " + fdropRate);
 
         boolean dropAlert = checkForDropRiseAllert(fdropRate, true);
-        Notifications.DropAlert(context, dropAlert);
+        //KS Notifications.DropAlert(context, dropAlert);
     }
 
     // true say, alert is on.
@@ -1290,7 +1284,6 @@ public class BgReading extends Model implements ShareUploadableBg {
         }
         return false;
     }
-    */
     /*
      * This function comes to check weather we are in a case that we have an allert but since things are
      * getting better we should not do anything. (This is only in the case that the alert was snoozed before.)
@@ -1300,7 +1293,6 @@ public class BgReading extends Model implements ShareUploadableBg {
      *  I'll start with having the same values for the high alerts.
     */
 
-    /*
     public static boolean trendingToAlertEnd(Context context, boolean above) {
         // TODO: check if we are not in an UnclerTime.
         Log.d(TAG_ALERT, "trendingToAlertEnd called");
@@ -1335,7 +1327,6 @@ public class BgReading extends Model implements ShareUploadableBg {
         return false;
 
     }
-    */
 
     // Should that be combined with noiseValue?
     private Boolean Unclear() {

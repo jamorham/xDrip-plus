@@ -11,7 +11,6 @@ import android.os.Bundle;
 import android.os.PowerManager;
 import android.preference.PreferenceManager;
 import android.provider.BaseColumns;
-import android.support.v4.content.LocalBroadcastManager;
 
 import com.activeandroid.Model;
 import com.activeandroid.annotation.Column;
@@ -21,6 +20,7 @@ import com.eveningoutpost.dexdrip.GcmActivity;
 import com.eveningoutpost.dexdrip.Home;
 import com.eveningoutpost.dexdrip.Models.BgReading;
 import com.eveningoutpost.dexdrip.Models.Calibration;
+import com.eveningoutpost.dexdrip.Models.JoH;
 import com.eveningoutpost.dexdrip.Models.UserError.Log;
 import com.eveningoutpost.dexdrip.Services.SyncService;
 import com.eveningoutpost.dexdrip.ShareModels.BgUploader;
@@ -32,10 +32,7 @@ import com.eveningoutpost.dexdrip.utils.BgToSpeech;
 import com.eveningoutpost.dexdrip.wearintegration.WatchUpdaterService;
 import com.eveningoutpost.dexdrip.xDripWidget;
 import com.eveningoutpost.dexdrip.xdrip;
-import com.google.android.gms.wearable.DataMap;
 
-import java.util.ArrayList;
-import java.util.Date;
 import java.util.List;
 
 /**
@@ -91,7 +88,10 @@ public class BgSendQueue extends Model {
     }
 
     public static void handleNewBgReading(BgReading bgReading, String operation_type, Context context, boolean is_follower) {
-        Log.d("BGQueue", "handleNewBgReading");
+        handleNewBgReading(bgReading, operation_type, context, is_follower, false);
+    }
+
+    public static void handleNewBgReading(BgReading bgReading, String operation_type, Context context, boolean is_follower, boolean quick) {
         PowerManager powerManager = (PowerManager) context.getSystemService(Context.POWER_SERVICE);
         PowerManager.WakeLock wakeLock = powerManager.newWakeLock(PowerManager.PARTIAL_WAKE_LOCK,
                 "sendQueue");
@@ -101,18 +101,19 @@ public class BgSendQueue extends Model {
 
             SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(context);
 
-            if (Home.activityVisible) {
-                Intent updateIntent = new Intent(Intents.ACTION_NEW_BG_ESTIMATE_NO_DATA);
-                context.sendBroadcast(updateIntent);
-            }
+            // all this other UI stuff probably shouldn't be here but in lieu of a better method we keep with it..
 
-            Context appContext = xdrip.getAppContext();//KS
-            if (AppWidgetManager.getInstance(context).getAppWidgetIds(new ComponentName(appContext, xDripWidget.class)).length > 0) {//KS context
-                Log.d("BGQueue", "start WidgetUpdateService");//KS
-                context.startService(new Intent(context, WidgetUpdateService.class));
+            if (!quick) {
+                if (Home.activityVisible) {
+                    Intent updateIntent = new Intent(Intents.ACTION_NEW_BG_ESTIMATE_NO_DATA);
+                    context.sendBroadcast(updateIntent);
+                }
+
+                Context appContext = xdrip.getAppContext();//KS
+                if (AppWidgetManager.getInstance(context).getAppWidgetIds(new ComponentName(appContext, xDripWidget.class)).length > 0) {//KS context
+                    context.startService(new Intent(context, WidgetUpdateService.class));
+                }
             }
-            else
-                Log.e("BGQueue", "getAppWidgetIds NOT found; can't start WidgetUpdateService");//KS
 
             if (prefs.getBoolean("broadcast_data_through_intents", false)) {
                 Log.i("SENSOR QUEUE:", "Broadcast data");
@@ -170,21 +171,14 @@ public class BgSendQueue extends Model {
 
                 //just keep it alive for 3 more seconds to allow the watch to be updated
                 // TODO: change NightWatch to not allow the system to sleep.
-                if (prefs.getBoolean("excessive_wakelocks", false)) {
+                if ((!quick) && (prefs.getBoolean("excessive_wakelocks", false))) {
                     powerManager.newWakeLock(PowerManager.PARTIAL_WAKE_LOCK,
                             "broadcstNightWatch").acquire(3000);
                 }
             }
 
-
-            // executing on watch; send to watchface
-            if (prefs.getBoolean("connectG5", false)) {//KS
-                Log.d("BgSendQueue", "handleNewBgReading Broadcast BG data to watch");
-                resendData(context);
-            }
-
             // send to wear
-            else if (prefs.getBoolean("wear_sync", false)) {
+            if ((!quick) && (prefs.getBoolean("wear_sync", false))) {
                 context.startService(new Intent(context, WatchUpdaterService.class));
                 if (prefs.getBoolean("excessive_wakelocks", false)) {
                     powerManager.newWakeLock(PowerManager.PARTIAL_WAKE_LOCK,
@@ -194,7 +188,8 @@ public class BgSendQueue extends Model {
             }
 
             // send to pebble
-            if (prefs.getBoolean("broadcast_to_pebble", false) && (PebbleUtil.getCurrentPebbleSyncType(prefs) != 1)) {
+            if ((!quick) && (prefs.getBoolean("broadcast_to_pebble", false) )
+                    && (PebbleUtil.getCurrentPebbleSyncType(prefs) != 1)) {
                 context.startService(new Intent(context, PebbleWatchSync.class));
             }
 
@@ -202,17 +197,22 @@ public class BgSendQueue extends Model {
                 GcmActivity.syncBGReading(bgReading);
             }
 
-            if ((!is_follower) && (prefs.getBoolean("share_upload", false))) {
-                Log.d("ShareRest", "About to call ShareRest!!");
-                String receiverSn = prefs.getString("share_key", "SM00000000").toUpperCase();
-                BgUploader bgUploader = new BgUploader(context);
-                bgUploader.upload(new ShareUploadPayload(receiverSn, bgReading));
+            if ((!is_follower) && (!quick) && (prefs.getBoolean("share_upload", false))) {
+                if (JoH.ratelimit("sending-to-share-upload",10)) {
+                    Log.d("ShareRest", "About to call ShareRest!!");
+                    String receiverSn = prefs.getString("share_key", "SM00000000").toUpperCase();
+                    BgUploader bgUploader = new BgUploader(context);
+                    bgUploader.upload(new ShareUploadPayload(receiverSn, bgReading));
+                }
             }
-            context.startService(new Intent(context, SyncService.class));
+
+            if (JoH.ratelimit("start-sync-service",30)) {
+                context.startService(new Intent(context, SyncService.class));
+            }
 
             //Text to speech
             //Log.d("BgToSpeech", "gonna call speak");
-            if (prefs.getBoolean("bg_to_speech", false))
+            if ((!quick) && (prefs.getBoolean("bg_to_speech", false)))
             {
                 BgToSpeech.speak(bgReading.calculated_value, bgReading.timestamp);
             }
@@ -222,90 +222,6 @@ public class BgSendQueue extends Model {
             wakeLock.release();
         }
     }
-
-    //KS start from WatchUpdaterService
-    private static void resendData(Context context) {//KS
-        long startTime = new Date().getTime() - (60000 * 60 * 24);
-        Log.d("BgSendQueue", "resendData enter");
-
-        BgReading last_bg = BgReading.last();
-        List<BgReading> graph_bgs = BgReading.latestForGraph(60, startTime);
-        BgGraphBuilder bgGraphBuilder = new BgGraphBuilder(context.getApplicationContext());
-        if (!graph_bgs.isEmpty()) {
-            Log.d("BgSendQueue", "resendData graph_bgs size=" + graph_bgs.size());
-            final ArrayList<DataMap> dataMaps = new ArrayList<>(graph_bgs.size());
-            SharedPreferences sharedPrefs = PreferenceManager.getDefaultSharedPreferences(context.getApplicationContext());
-            DataMap entries = dataMap(last_bg, sharedPrefs, bgGraphBuilder, context);
-            for (BgReading bg : graph_bgs) {
-                dataMaps.add(dataMap(bg, sharedPrefs, bgGraphBuilder, context));
-            }
-            entries.putDataMapArrayList("entries", dataMaps);
-
-            Intent messageIntent = new Intent();
-            messageIntent.setAction(Intent.ACTION_SEND);
-            messageIntent.putExtra("message", "ACTION_G5BG");
-            messageIntent.putExtra("data", entries.toBundle());
-            LocalBroadcastManager.getInstance(context).sendBroadcast(messageIntent);
-        }
-    }
-
-    private static DataMap dataMap(BgReading bg, SharedPreferences sPrefs, BgGraphBuilder bgGraphBuilder, Context context) {//KS
-        Double highMark = Double.parseDouble(sPrefs.getString("highValue", "140"));
-        Double lowMark = Double.parseDouble(sPrefs.getString("lowValue", "60"));
-        DataMap dataMap = new DataMap();
-
-        int battery = BgSendQueue.getBatteryLevel(context.getApplicationContext());
-
-        dataMap.putString("sgvString", bgGraphBuilder.unitized_string(bg.calculated_value));
-        dataMap.putString("slopeArrow", bg.slopeArrow());
-        dataMap.putDouble("timestamp", bg.timestamp); //TODO: change that to long (was like that in NW)
-        dataMap.putString("delta", bgGraphBuilder.unitizedDeltaString(true, true));
-        dataMap.putString("battery", "" + battery);
-        dataMap.putLong("sgvLevel", sgvLevel(bg.calculated_value, sPrefs, bgGraphBuilder));
-        dataMap.putInt("batteryLevel", (battery>=30)?1:0);
-        dataMap.putDouble("sgvDouble", bg.calculated_value);
-        dataMap.putDouble("high", inMgdl(highMark, sPrefs));
-        dataMap.putDouble("low", inMgdl(lowMark, sPrefs));
-        //TODO: Add raw again
-        //dataMap.putString("rawString", threeRaw((prefs.getString("units", "mgdl").equals("mgdl"))));
-        return dataMap;
-    }
-
-
-    // TODO: Integrate these helper methods into BGGraphBuilder.
-    // TODO: clean them up  (no "if(boolean){return true; else return false;").
-    // TODO: Make the needed methods in BgGraphBuilder static.
-
-    public static long sgvLevel(double sgv_double, SharedPreferences prefs, BgGraphBuilder bgGB) {//KS change to static
-        Double highMark = Double.parseDouble(prefs.getString("highValue", "140"));
-        Double lowMark = Double.parseDouble(prefs.getString("lowValue", "60"));
-        if(bgGB.unitized(sgv_double) >= highMark) {
-            return 1;
-        } else if (bgGB.unitized(sgv_double) >= lowMark) {
-            return 0;
-        } else {
-            return -1;
-        }
-    }
-
-    public static double inMgdl(double value, SharedPreferences sPrefs) {//KS change to static
-        if (!doMgdl(sPrefs)) {
-            return value * Constants.MMOLL_TO_MGDL;
-        } else {
-            return value;
-        }
-
-    }
-
-    public static boolean doMgdl(SharedPreferences sPrefs) {
-        String unit = sPrefs.getString("units", "mgdl");
-        if (unit.compareTo("mgdl") == 0) {
-            return true;
-        } else {
-            return false;
-        }
-    }
-    //KS end from WatchUpdaterService
 
     public void markMongoSuccess() {
         this.mongo_success = true;

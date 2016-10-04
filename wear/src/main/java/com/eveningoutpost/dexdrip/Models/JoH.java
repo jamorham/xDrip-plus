@@ -17,6 +17,8 @@ import android.media.RingtoneManager;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.net.Uri;
+import android.net.wifi.WifiInfo;
+import android.net.wifi.WifiManager;
 import android.os.Build;
 import android.os.Handler;
 import android.os.PowerManager;
@@ -32,9 +34,9 @@ import android.view.Surface;
 import android.widget.Toast;
 
 import com.eveningoutpost.dexdrip.Home;
-//import com.eveningoutpost.dexdrip.R;
-import com.eveningoutpost.dexdrip.xdrip;
 import com.eveningoutpost.dexdrip.R;
+import com.eveningoutpost.dexdrip.UtilityModels.PersistentStore;
+import com.eveningoutpost.dexdrip.xdrip;
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
 
@@ -69,7 +71,7 @@ public class JoH {
 
     private static double benchmark_time = 0;
     private static Map<String, Double> benchmarks = new HashMap<String, Double>();
-    private static final Map<String, Double> rateLimits = new HashMap<String, Double>();
+    private static final Map<String, Long> rateLimits = new HashMap<String, Long>();
 
     // qs = quick string conversion of double for printing
     public static String qs(double x) {
@@ -114,6 +116,24 @@ public class JoH {
         }
         return new String(hexChars);
     }
+
+    public static byte[] hexStringToByteArray(String str) {
+        try {
+            str = str.toUpperCase().trim();
+            if (str.length() == 0) return null;
+            final int len = str.length();
+            byte[] data = new byte[len / 2];
+            for (int i = 0; i < len; i += 2) {
+                data[i / 2] = (byte) ((Character.digit(str.charAt(i), 16) << 4) + Character.digit(str.charAt(i + 1), 16));
+            }
+            return data;
+        } catch (Exception e) {
+            Log.e(TAG, "Exception processing hexString: " + e);
+            return null;
+        }
+    }
+
+
 
     public static String compressString(String source) {
         try {
@@ -211,6 +231,15 @@ public class JoH {
         }
     }
 
+    public static String base64decode(String input) {
+        try {
+            return new String(Base64.decode(input.getBytes("UTF-8"), Base64.NO_WRAP), "UTF-8");
+        } catch (UnsupportedEncodingException e) {
+            Log.e(TAG, "Got unsupported encoding: " + e);
+            return "decode-error";
+        }
+    }
+
     public static String ucFirst(String input) {
         return input.substring(0, 1).toUpperCase() + input.substring(1).toLowerCase();
     }
@@ -276,27 +305,47 @@ public class JoH {
         }
     }
 
-    // return true if below rate limit
-    public static synchronized boolean ratelimit(String name, int seconds) {
+    // return true if below rate limit (persistent version)
+    public static synchronized boolean pratelimit(String name, int seconds) {
         // check if over limit
-        if ((rateLimits.containsKey(name)) && (JoH.ts() - rateLimits.get(name) < (seconds * 1000))) {
+        final long time_now = JoH.tsl();
+        final long rate_time;
+        if (!rateLimits.containsKey(name)) {
+            rate_time = PersistentStore.getLong(name); // 0 if undef
+        } else {
+            rate_time = rateLimits.get(name);
+        }
+        if ((rate_time > 0) && (time_now - rate_time) < (seconds * 1000)) {
             Log.d(TAG, name + " rate limited: " + seconds + " seconds");
             return false;
         }
         // not over limit
-        rateLimits.put(name, JoH.ts());
+        rateLimits.put(name, time_now);
+        PersistentStore.setLong(name, time_now);
+        return true;
+    }
+
+    // return true if below rate limit
+    public static synchronized boolean ratelimit(String name, int seconds) {
+        // check if over limit
+        if ((rateLimits.containsKey(name)) && (JoH.tsl() - rateLimits.get(name) < (seconds * 1000))) {
+            Log.d(TAG, name + " rate limited: " + seconds + " seconds");
+            return false;
+        }
+        // not over limit
+        rateLimits.put(name, JoH.tsl());
         return true;
     }
 
     // return true if below rate limit
     public static synchronized boolean ratelimitmilli(String name, int milliseconds) {
         // check if over limit
-        if ((rateLimits.containsKey(name)) && (JoH.ts() - rateLimits.get(name) < (milliseconds))) {
+        if ((rateLimits.containsKey(name)) && (JoH.tsl() - rateLimits.get(name) < (milliseconds))) {
             Log.d(TAG, name + " rate limited: " + milliseconds + " milliseconds");
             return false;
         }
         // not over limit
-        rateLimits.put(name, JoH.ts());
+        rateLimits.put(name, JoH.tsl());
         return true;
     }
 
@@ -309,7 +358,7 @@ public class JoH {
 
     public static String getVersionDetails() {
         try {
-            return Home.getAppContext().getPackageManager().getPackageInfo(Home.getAppContext().getPackageName(), PackageManager.GET_META_DATA).versionName;
+            return xdrip.getAppContext().getPackageManager().getPackageInfo(xdrip.getAppContext().getPackageName(), PackageManager.GET_META_DATA).versionName;
         } catch (Exception e) {
             return "Unknown version";
         }
@@ -332,7 +381,7 @@ public class JoH {
 
     public static boolean getWifiSleepPolicyNever() {
         try {
-            int policy = Settings.Global.getInt(Home.getAppContext().getContentResolver(), android.provider.Settings.Global.WIFI_SLEEP_POLICY);
+            int policy = Settings.Global.getInt(xdrip.getAppContext().getContentResolver(), android.provider.Settings.Global.WIFI_SLEEP_POLICY);
             Log.d(TAG, "Current WifiPolicy: " + ((policy == Settings.Global.WIFI_SLEEP_POLICY_NEVER) ? "Never" : Integer.toString(policy)) + " " + Settings.Global.WIFI_SLEEP_POLICY_DEFAULT + " " + Settings.Global.WIFI_SLEEP_POLICY_NEVER_WHILE_PLUGGED);
             return (policy == Settings.Global.WIFI_SLEEP_POLICY_NEVER);
         } catch (Exception e) {
@@ -386,8 +435,8 @@ public class JoH {
 
     }
 
-    public static PowerManager.WakeLock getWakeLock(Context context, final String name, int millis) {
-        final PowerManager pm = (PowerManager) context.getSystemService(Context.POWER_SERVICE);//KS xdrip.getAppContext()
+    public static PowerManager.WakeLock getWakeLock(final String name, int millis) {
+        final PowerManager pm = (PowerManager) xdrip.getAppContext().getSystemService(Context.POWER_SERVICE);
         PowerManager.WakeLock wl = pm.newWakeLock(PowerManager.PARTIAL_WAKE_LOCK, name);
         wl.acquire(millis);
         if (debug_wakelocks) Log.d(TAG, "getWakeLock: " + name + " " + wl.toString());
@@ -401,7 +450,7 @@ public class JoH {
 
     public static boolean isLANConnected() {
         final ConnectivityManager cm =
-                (ConnectivityManager) Home.getAppContext().getSystemService(Context.CONNECTIVITY_SERVICE);
+                (ConnectivityManager) xdrip.getAppContext().getSystemService(Context.CONNECTIVITY_SERVICE);
         final NetworkInfo activeNetwork = cm.getActiveNetworkInfo();
         final boolean isConnected = activeNetwork != null &&
                 activeNetwork.isConnected();
@@ -410,7 +459,7 @@ public class JoH {
 
     public static boolean isMobileDataOrEthernetConnected() {
         final ConnectivityManager cm =
-                (ConnectivityManager) Home.getAppContext().getSystemService(Context.CONNECTIVITY_SERVICE);
+                (ConnectivityManager) xdrip.getAppContext().getSystemService(Context.CONNECTIVITY_SERVICE);
         NetworkInfo activeNetwork = cm.getActiveNetworkInfo();
         final boolean isConnected = activeNetwork != null &&
                 activeNetwork.isConnected();
@@ -419,14 +468,14 @@ public class JoH {
 
     public static boolean isAnyNetworkConnected() {
         final ConnectivityManager cm =
-                (ConnectivityManager) Home.getAppContext().getSystemService(Context.CONNECTIVITY_SERVICE);
+                (ConnectivityManager) xdrip.getAppContext().getSystemService(Context.CONNECTIVITY_SERVICE);
         NetworkInfo activeNetwork = cm.getActiveNetworkInfo();
         return activeNetwork != null &&
                 activeNetwork.isConnected();
     }
 
     public static boolean isScreenOn() {
-        final PowerManager pm = (PowerManager) Home.getAppContext().getSystemService(Context.POWER_SERVICE);
+        final PowerManager pm = (PowerManager) xdrip.getAppContext().getSystemService(Context.POWER_SERVICE);
 
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
             return pm.isInteractive();
@@ -437,7 +486,7 @@ public class JoH {
 
     public static boolean isOngoingCall() {
         try {
-            AudioManager manager = (AudioManager) Home.getAppContext().getSystemService(Context.AUDIO_SERVICE);
+            AudioManager manager = (AudioManager) xdrip.getAppContext().getSystemService(Context.AUDIO_SERVICE);
             return (manager.getMode() == AudioManager.MODE_IN_CALL);
             // possibly should have MODE_IN_COMMUNICATION as well
         } catch (Exception e) {
@@ -445,13 +494,58 @@ public class JoH {
         }
     }
 
+    public static String getWifiSSID() {
+        try {
+            final WifiManager wifi_manager = (WifiManager) xdrip.getAppContext().getSystemService(Context.WIFI_SERVICE);
+            if (wifi_manager.isWifiEnabled()) {
+                final WifiInfo wifiInfo = wifi_manager.getConnectionInfo();
+                if (wifiInfo != null) {
+                    final NetworkInfo.DetailedState wifi_state = WifiInfo.getDetailedStateOf(wifiInfo.getSupplicantState());
+                    if (wifi_state == NetworkInfo.DetailedState.CONNECTED
+                            || wifi_state == NetworkInfo.DetailedState.OBTAINING_IPADDR
+                            || wifi_state == NetworkInfo.DetailedState.CAPTIVE_PORTAL_CHECK) {
+                        String ssid = wifiInfo.getSSID();
+                        if (ssid.equals("<unknown ssid>")) return null; // WifiSsid.NONE;
+                        if (ssid.charAt(0)=='"') ssid=ssid.substring(1);
+                        if (ssid.charAt(ssid.length()-1)=='"') ssid=ssid.substring(0,ssid.length()-1);
+                        return ssid;
+                    }
+                }
+            }
+        } catch (Exception e) {
+            Log.e(TAG, "Got exception in getWifiSSID: " + e);
+        }
+        return null;
+    }
+
+    public static boolean getWifiFuzzyMatch(String local, String remote) {
+        if ((local == null) || (remote == null) || (local.length() == 0) || (remote.length() == 0))
+            return false;
+        final int slen = Math.min(local.length(), remote.length());
+        final int llen = Math.max(local.length(), remote.length());
+        int matched = 0;
+        for (int i = 0; i < slen; i++) {
+            if (local.charAt(i) == (remote.charAt(i))) matched++;
+        }
+        boolean result = false;
+        if (matched == slen) result = true; // shorter string is substring
+        final double quota = (double) matched / (double) llen;
+        final int dmatch = llen - matched;
+        if (slen > 2) {
+            if (dmatch < 3) result = true;
+            if (quota > 0.80) result = true;
+        }
+        //Log.d(TAG, "l:" + local + " r:" + remote + " slen:" + slen + " llen:" + llen + " matched:" + matched + "  q:" + JoH.qs(quota, 2) + "  dm:" + dmatch + " RESULT: " + result);
+        return result;
+    }
+
     public static boolean runOnUiThread(Runnable theRunnable) {
-        final Handler mainHandler = new Handler(Home.getAppContext().getMainLooper());
+        final Handler mainHandler = new Handler(xdrip.getAppContext().getMainLooper());
         return mainHandler.post(theRunnable);
     }
 
     public static boolean runOnUiThreadDelayed(Runnable theRunnable, long delay) {
-        final Handler mainHandler = new Handler(Home.getAppContext().getMainLooper());
+        final Handler mainHandler = new Handler(xdrip.getAppContext().getMainLooper());
         return mainHandler.postDelayed(theRunnable, delay);
     }
 
@@ -465,25 +559,25 @@ public class JoH {
                         Log.i(TAG, "Displaying toast using fallback");
                     } catch (Exception e) {
                         Log.e(TAG, "Exception processing runnable toast ui thread: " + e);
-                        //KS Home.toaststatic(msg);
+                        Home.toaststatic(msg);
                     }
                 }
             })) {
                 Log.e(TAG, "Couldn't display toast via ui thread: " + msg);
-                //Home.toaststatic(msg);
+                Home.toaststatic(msg);
             }
         } catch (Exception e) {
             Log.e(TAG, "Couldn't display toast due to exception: " + msg + " e: " + e.toString());
-            //Home.toaststatic(msg);
+            Home.toaststatic(msg);
         }
     }
 
     public static void static_toast_long(final String msg) {
-        static_toast(Home.getAppContext(), msg, Toast.LENGTH_LONG);
+        static_toast(xdrip.getAppContext(), msg, Toast.LENGTH_LONG);
     }
 
     public static void static_toast_short(final String msg) {
-        static_toast(Home.getAppContext(), msg, Toast.LENGTH_SHORT);
+        static_toast(xdrip.getAppContext(), msg, Toast.LENGTH_SHORT);
     }
 
     public static void static_toast_long(Context context, final String msg) {
@@ -522,14 +616,14 @@ public class JoH {
             mBuilder.setSound(soundUri);
         }
 
-        final NotificationManager mNotifyMgr = (NotificationManager) Home.getAppContext().getSystemService(Context.NOTIFICATION_SERVICE);
+        final NotificationManager mNotifyMgr = (NotificationManager) xdrip.getAppContext().getSystemService(Context.NOTIFICATION_SERVICE);
         if (!onetime) mNotifyMgr.cancel(notificationId);
 
         mNotifyMgr.notify(notificationId, mBuilder.build());
     }
 
     private static NotificationCompat.Builder notificationBuilder(String title, String content, PendingIntent intent) {
-        return new NotificationCompat.Builder(Home.getAppContext())
+        return new NotificationCompat.Builder(xdrip.getAppContext())
                 .setSmallIcon(R.drawable.ic_action_communication_invert_colors_on)
                 .setContentTitle(title)
                 .setContentText(content)
@@ -634,7 +728,7 @@ public class JoH {
         new Thread() {
             @Override
             public void run() {
-                final PowerManager.WakeLock wl = getWakeLock(context, "restart-bluetooth", 60000);
+                final PowerManager.WakeLock wl = getWakeLock("restart-bluetooth", 60000);
                 Log.d(TAG, "Restarting bluetooth");
                 try {
                     if (startInMs > 0) {

@@ -177,7 +177,7 @@ public class G5CollectionService extends Service {
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
 
-        final PowerManager.WakeLock wl = JoH.getWakeLock(mContext, "g5-start-service", 120000);//KS
+        final PowerManager.WakeLock wl = JoH.getWakeLock("g5-start-service", 120000);
         try {
             if ((!service_running) && (keep_running)) {
                 service_running = true;
@@ -249,9 +249,9 @@ public class G5CollectionService extends Service {
 
         Log.d(TAG, "onDestroy");
         SharedPreferences sharedPrefs = PreferenceManager.getDefaultSharedPreferences(getApplicationContext());
-        if (!sharedPrefs.getBoolean("use_connectG5", false)) {
-            scan_interval_timer.cancel();//KS
-            if (pendingIntent != null) {//KS
+        if (!sharedPrefs.getBoolean("use_connectG5", false)) {//KS
+            scan_interval_timer.cancel();
+            if (pendingIntent != null) {
                 Log.d(TAG, "onDestroy stop Alarm pendingIntent");
                 AlarmManager alarm = (AlarmManager) getSystemService(ALARM_SERVICE);
                 alarm.cancel(pendingIntent);
@@ -372,7 +372,11 @@ public class G5CollectionService extends Service {
     private synchronized void stopLogic() {
         try {
             Log.e(TAG, "stopScan");
-            mLEScanner.stopScan(mScanCallback);
+            try {
+                mLEScanner.stopScan(mScanCallback);
+            } catch (NullPointerException | IllegalStateException e) {
+                Log.e(TAG, "Exception in stopLogic: " + e);
+            }
             isScanning = false;
         } catch (IllegalStateException is) {
 
@@ -573,7 +577,6 @@ public class G5CollectionService extends Service {
     }
 
     void forgetDevice() {
-        Log.d(TAG, "forgetDevice");
         Transmitter defaultTransmitter = new Transmitter(prefs.getString("dex_txid", "ABCDEF"));
         mBluetoothAdapter = mBluetoothManager.getAdapter();
         Set<BluetoothDevice> pairedDevices = mBluetoothAdapter.getBondedDevices();
@@ -670,12 +673,17 @@ public class G5CollectionService extends Service {
         if (alwaysUnbond()) {
             forgetDevice();
         }
-
-        android.util.Log.i(TAG, "Start Auth Process(fullAuthenticate)");
-        authRequest = new AuthRequestTxMessage();
-        authCharacteristic.setValue(authRequest.byteSequence);
-        android.util.Log.i(TAG, authRequest.byteSequence.toString());
-        mGatt.writeCharacteristic(authCharacteristic);
+        try {
+            android.util.Log.i(TAG, "Start Auth Process(fullAuthenticate)");
+            authRequest = new AuthRequestTxMessage();
+            if (authCharacteristic != null) {
+                authCharacteristic.setValue(authRequest.byteSequence);
+                android.util.Log.i(TAG, authRequest.byteSequence.toString());
+                mGatt.writeCharacteristic(authCharacteristic);
+            }
+        } catch (NullPointerException e) {
+            Log.e(TAG, "Got null pointer in fullAuthenticate: " + e);
+        }
     }
 
     public synchronized void authenticate() {
@@ -929,11 +937,19 @@ public class G5CollectionService extends Service {
                         android.util.Log.i(TAG, "onServicesDiscovered On Main Thread? " + isOnMainThread());
                         Log.e(TAG, "onServicesDiscovered: " + status);
                         if (status == BluetoothGatt.GATT_SUCCESS) {
-                            cgmService = mGatt.getService(BluetoothServices.CGMService);
-                            authCharacteristic = cgmService.getCharacteristic(BluetoothServices.Authentication);
-                            controlCharacteristic = cgmService.getCharacteristic(BluetoothServices.Control);
-                            commCharacteristic = cgmService.getCharacteristic(BluetoothServices.Communication);
-                            mBluetoothAdapter.cancelDiscovery();
+                            if (mGatt != null) {
+                                try {
+                                    cgmService = mGatt.getService(BluetoothServices.CGMService);
+                                    if (cgmService != null) {
+                                        authCharacteristic = cgmService.getCharacteristic(BluetoothServices.Authentication);
+                                        controlCharacteristic = cgmService.getCharacteristic(BluetoothServices.Control);
+                                        commCharacteristic = cgmService.getCharacteristic(BluetoothServices.Communication);
+                                    }
+                                } catch (NullPointerException e) {
+                                    Log.e(TAG, "Got null point exception onService Discovered");
+                                }
+                                mBluetoothAdapter.cancelDiscovery();
+                            }
 
                             //TODO : ADD option in settings!
                             if (alwaysAuthenticate() || alwaysUnbond()) {
@@ -955,11 +971,19 @@ public class G5CollectionService extends Service {
                 android.util.Log.i(TAG, "onServicesDiscovered On Main Thread? " + isOnMainThread());
                 Log.e(TAG, "onServicesDiscovered: " + status);
                 if (status == BluetoothGatt.GATT_SUCCESS) {
-                    cgmService = mGatt.getService(BluetoothServices.CGMService);
-                    authCharacteristic = cgmService.getCharacteristic(BluetoothServices.Authentication);
-                    controlCharacteristic = cgmService.getCharacteristic(BluetoothServices.Control);
-                    commCharacteristic = cgmService.getCharacteristic(BluetoothServices.Communication);
-                    mBluetoothAdapter.cancelDiscovery();
+                    if (mGatt != null) {
+                        try {
+                            cgmService = mGatt.getService(BluetoothServices.CGMService);
+                            if (cgmService != null) {
+                                authCharacteristic = cgmService.getCharacteristic(BluetoothServices.Authentication);
+                                controlCharacteristic = cgmService.getCharacteristic(BluetoothServices.Control);
+                                commCharacteristic = cgmService.getCharacteristic(BluetoothServices.Communication);
+                            }
+                        } catch (NullPointerException e) {
+                            Log.e(TAG, "Got Null pointer in OnServices discovered 2");
+                        }
+                        mBluetoothAdapter.cancelDiscovery();
+                    }
 
                     //TODO : ADD option in settings!
                     if (alwaysAuthenticate() || alwaysUnbond()) {
@@ -1308,7 +1332,6 @@ public class G5CollectionService extends Service {
 
     private synchronized void processNewTransmitterData(int raw_data , int filtered_data,int sensor_battery_level, long captureTime) {
 
-        //TransmitterData transmitterData = TransmitterData.create(raw_data, sensor_battery_level, captureTime);
         TransmitterData transmitterData = TransmitterData.create(raw_data, filtered_data, sensor_battery_level, captureTime);//KS
         if (transmitterData == null) {
             Log.e(TAG, "TransmitterData.create failed: Duplicate packet");
