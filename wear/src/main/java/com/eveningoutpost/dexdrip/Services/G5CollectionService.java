@@ -177,7 +177,7 @@ public class G5CollectionService extends Service {
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
 
-        final PowerManager.WakeLock wl = JoH.getWakeLock("g5-start-service", 120000);
+        final PowerManager.WakeLock wl = JoH.getWakeLock(mContext, "g5-start-service", 120000);//KS add context
         try {
             if ((!service_running) && (keep_running)) {
                 service_running = true;

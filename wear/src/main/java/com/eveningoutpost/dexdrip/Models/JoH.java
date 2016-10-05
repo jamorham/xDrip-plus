@@ -443,6 +443,14 @@ public class JoH {
         return wl;
     }
 
+    public static PowerManager.WakeLock getWakeLock(Context context, final String name, int millis) {//KS
+        final PowerManager pm = (PowerManager) context.getSystemService(Context.POWER_SERVICE);//KS
+        PowerManager.WakeLock wl = pm.newWakeLock(PowerManager.PARTIAL_WAKE_LOCK, name);
+        wl.acquire(millis);
+        if (debug_wakelocks) Log.d(TAG, "getWakeLock: " + name + " " + wl.toString());
+        return wl;
+    }
+
     public static void releaseWakeLock(PowerManager.WakeLock wl) {
         if (debug_wakelocks) Log.d(TAG, "releaseWakeLock: " + wl.toString());
         if (wl.isHeld()) wl.release();
@@ -728,7 +736,7 @@ public class JoH {
         new Thread() {
             @Override
             public void run() {
-                final PowerManager.WakeLock wl = getWakeLock("restart-bluetooth", 60000);
+                final PowerManager.WakeLock wl = getWakeLock(context, "restart-bluetooth", 60000);//KS add context
                 Log.d(TAG, "Restarting bluetooth");
                 try {
                     if (startInMs > 0) {
