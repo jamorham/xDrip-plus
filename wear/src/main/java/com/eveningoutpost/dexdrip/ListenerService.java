@@ -46,7 +46,7 @@ import java.util.Date;
 import java.util.List;
 import java.util.Set;
 import java.util.concurrent.TimeUnit;
-
+import com.eveningoutpost.dexdrip.Home;//KS
 
 /**
  * Created by stephenblack on 12/26/14.
@@ -346,6 +346,7 @@ public class ListenerService extends WearableListenerService implements GoogleAp
 
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
+        Home.setAppContext(getApplicationContext());
         mPrefs = PreferenceManager.getDefaultSharedPreferences(getApplicationContext());//KS
         listenForChangeInSettings();//KS
         mContext = getApplicationContext();//KS
