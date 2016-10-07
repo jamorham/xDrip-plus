@@ -39,6 +39,8 @@ public class XDripOriginal extends CalibrationAbstract {
 
                 saveDataToCache(TAG, cd);
             }
+        //} else {
+        //    UserError.Log.d(TAG, "Using cached data");
         }
         return cd; // null if invalid
     }

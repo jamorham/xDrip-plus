@@ -577,7 +577,6 @@ public class Home extends ActivityWithMenu {
             updateCurrentBgInfo("approve button");
         }
         processCalibrationNoUI(myglucosenumber, mytimeoffset);
-        staticRefreshBGCharts();
     }
 
     private void processIncomingBundle(Bundle bundle) {
@@ -2097,6 +2096,16 @@ public class Home extends ActivityWithMenu {
         if (!prefs.getBoolean("wear_sync", false)) {
             menu.removeItem(R.id.action_open_watch_settings);
             menu.removeItem(R.id.action_resend_last_bg);
+            menu.removeItem(R.id.action_sync_watch_db);//KS
+        }
+        else {
+            //KS initialize wear db
+            //android.util.Log.d("onCreateOptionsMenu", "start WatchUpdaterService with ACTION_SYNC_CALIBRATION");
+            //startService(new Intent(this, WatchUpdaterService.class).setAction(WatchUpdaterService.ACTION_SYNC_CALIBRATION));
+            //android.util.Log.d("onCreateOptionsMenu", "start WatchUpdaterService with ACTION_SYNC_SENSOR");
+            //startService(new Intent(this, WatchUpdaterService.class).setAction(WatchUpdaterService.ACTION_SYNC_SENSOR));
+            Log.d(TAG, "onCreateOptionsMenu with ACTION_SYNC_DB");
+            startService(new Intent(this, WatchUpdaterService.class).setAction(WatchUpdaterService.ACTION_SYNC_DB));
         }
 
         //speak readings
@@ -2364,6 +2373,10 @@ public class Home extends ActivityWithMenu {
                 break;
             case R.id.action_open_watch_settings:
                 startService(new Intent(this, WatchUpdaterService.class).setAction(WatchUpdaterService.ACTION_OPEN_SETTINGS));
+            case R.id.action_sync_watch_db://KS
+                Log.d(TAG, "start WatchUpdaterService with ACTION_SYNC_DB");
+                startService(new Intent(this, WatchUpdaterService.class).setAction(WatchUpdaterService.ACTION_SYNC_DB));
+                break;
         }
 
         if (item.getItemId() == R.id.action_export_database) {
