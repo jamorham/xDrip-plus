@@ -128,7 +128,6 @@ public class BgReading extends Model implements ShareUploadableBg {
     @Column(name = "sensor_uuid", index = true)
     public String sensor_uuid;
 
-    // mapped to the no longer used "synced" to keep DB Scheme compatible
     @Expose
     @Column(name = "snyced")
     public boolean ignoreForStats;
@@ -715,6 +714,22 @@ public class BgReading extends Model implements ShareUploadableBg {
                 .execute();
     }
 
+    public static List<BgReading> latestForGraphAsc(int number, long startTime) {//KS
+        return latestForGraphAsc(number, startTime, Long.MAX_VALUE);
+    }
+
+    public static List<BgReading> latestForGraphAsc(int number, long startTime, long endTime) {//KS
+        return new Select()
+                .from(BgReading.class)
+                .where("timestamp >= " + Math.max(startTime, 0))
+                .where("timestamp <= " + endTime)
+                .where("calculated_value != 0")
+                .where("raw_data != 0")
+                .orderBy("timestamp asc")
+                .limit(number)
+                .execute();
+    }
+
     public static BgReading readingNearTimeStamp(double startTime) {
         final double margin = (4 * 60*1000);
         final DecimalFormat df = new DecimalFormat("#");
@@ -833,7 +848,7 @@ public class BgReading extends Model implements ShareUploadableBg {
                     bgr.find_slope();
                     if (do_notification) {
                         xdrip.getAppContext().startService(new Intent(xdrip.getAppContext(), Notifications.class)); // alerts et al
-                        BgSendQueue.handleNewBgReading(bgr, "create", xdrip.getAppContext(), true, !do_notification); // pebble and widget
+                        BgSendQueue.handleNewBgReading(bgr, "create", xdrip.getAppContext(), true); // pebble and widget
                     }
                 } else {
                     Log.d(TAG, "Ignoring duplicate bgr record due to timestamp: " + timestamp);
