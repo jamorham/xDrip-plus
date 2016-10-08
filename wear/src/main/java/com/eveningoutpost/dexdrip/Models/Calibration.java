@@ -248,7 +248,6 @@ public class Calibration extends Model {
     )
     {
         Calibration newCalibration = new Calibration();
-        //newCalibration._ID  = _ID ;
         newCalibration.timestamp  = timestamp ;
         newCalibration.sensor_age_at_time_of_estimation  = sensor_age_at_time_of_estimation ;
         newCalibration.sensor  = sensor ;

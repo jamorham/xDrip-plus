@@ -2104,8 +2104,9 @@ public class Home extends ActivityWithMenu {
             //startService(new Intent(this, WatchUpdaterService.class).setAction(WatchUpdaterService.ACTION_SYNC_CALIBRATION));
             //android.util.Log.d("onCreateOptionsMenu", "start WatchUpdaterService with ACTION_SYNC_SENSOR");
             //startService(new Intent(this, WatchUpdaterService.class).setAction(WatchUpdaterService.ACTION_SYNC_SENSOR));
-            Log.d(TAG, "onCreateOptionsMenu with ACTION_SYNC_DB");
-            startService(new Intent(this, WatchUpdaterService.class).setAction(WatchUpdaterService.ACTION_SYNC_DB));
+
+            //Log.d(TAG, "onCreateOptionsMenu with ACTION_SYNC_DB");
+            //startService(new Intent(this, WatchUpdaterService.class).setAction(WatchUpdaterService.ACTION_SYNC_DB));
         }
 
         //speak readings
