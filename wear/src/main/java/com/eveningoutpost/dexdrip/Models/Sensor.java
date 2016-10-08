@@ -127,7 +127,7 @@ public class Sensor extends Model {
         try {
             ActiveAndroid.dispose();
             context.deleteDatabase("DexDrip.db");
-            ActiveAndroid.initialize(dbConfiguration);
+            //ActiveAndroid.initialize(dbConfiguration);
             Log.d("wearSENSOR", "DeleteAndInitDb DexDrip.db deleted and initialized.");
         } catch (Exception e) {
             Log.e("wearSENSOR", "DeleteAndInitDb CATCH Error.");

@@ -58,6 +58,7 @@ public class ListenerService extends WearableListenerService implements GoogleAp
     private static final String OPEN_SETTINGS = "/openwearsettings";
     private static final String SYNC_DB_PATH = "/syncweardb";//KS
     private static final String SYNC_BGS_PATH = "/syncwearbgs";//KS
+    private static final String WEARABLE_BG_DATA_PATH = "/nightscout_watch_bg_data";//KS
     private static final String WEARABLE_CALIBRATION_DATA_PATH = "/nightscout_watch_cal_data";//KS
     private static final String WEARABLE_SENSOR_DATA_PATH = "/nightscout_watch_sensor_data";//KS
     public static final String WEARABLE_PREF_DATA_PATH = "/nightscout_watch_pref_data";//KS
@@ -98,7 +99,7 @@ public class ListenerService extends WearableListenerService implements GoogleAp
             SharedPreferences sharedPrefs = PreferenceManager.getDefaultSharedPreferences(getApplicationContext());//KS
             boolean connectG5 = sharedPrefs.getBoolean("connectG5", false); //KS
 
-            if (googleApiClient.isConnected()) {
+            if ((googleApiClient != null) && (googleApiClient.isConnected())) {
                 if (!path.equals(ACTION_RESEND) || (System.currentTimeMillis() - lastRequest > 20 * 1000)) { // enforce 20-second debounce period
                     lastRequest = System.currentTimeMillis();
 
@@ -150,7 +151,9 @@ public class ListenerService extends WearableListenerService implements GoogleAp
                 }
             } else {
                 Log.d(TAG, "Not connected for sending");
-                googleApiClient.connect();
+                if (googleApiClient != null) {
+                    googleApiClient.connect();
+                }
             }
             return null;
         }
@@ -349,7 +352,7 @@ public class ListenerService extends WearableListenerService implements GoogleAp
         Home.setAppContext(getApplicationContext());
         mPrefs = PreferenceManager.getDefaultSharedPreferences(getApplicationContext());//KS
         listenForChangeInSettings();//KS
-        processConnectG5();
+        //processConnectG5();
         sendPrefSettings();
         mContext = getApplicationContext();//KS
         if (intent != null && ACTION_RESEND.equals(intent.getAction())) {
@@ -418,7 +421,7 @@ public class ListenerService extends WearableListenerService implements GoogleAp
                     getApplicationContext().startActivity(intent);
                 } else if (path.equals(SYNC_DB_PATH)) {//KS
                     Log.d(TAG, "onDataChanged SYNC_DB_PATH=" + path);
-                    //Sensor.DeleteAndInitDb(getApplicationContext());//KS TODO test
+                    Sensor.DeleteAndInitDb(getApplicationContext());//KS TODO test
                 } else if (path.equals(WEARABLE_SENSOR_DATA_PATH)) {//KS
                     dataMap = DataMapItem.fromDataItem(event.getDataItem()).getDataMap();
                     Log.d(TAG, "onDataChanged path=" + path + " DataMap=" + dataMap);
@@ -427,6 +430,10 @@ public class ListenerService extends WearableListenerService implements GoogleAp
                     dataMap = DataMapItem.fromDataItem(event.getDataItem()).getDataMap();
                     Log.d(TAG, "onDataChanged path=" + path + " DataMap=" + dataMap);
                     syncCalibrationData(dataMap);
+                } else if (path.equals(WEARABLE_BG_DATA_PATH)) {//KS
+                    dataMap = DataMapItem.fromDataItem(event.getDataItem()).getDataMap();
+                    Log.d(TAG, "onDataChanged path=" + path + " DataMap=" + dataMap);
+                    syncBgData(dataMap);
                 } else if (path.equals(WEARABLE_PREF_DATA_PATH)) {//KS
                     dataMap = DataMapItem.fromDataItem(event.getDataItem()).getDataMap();
                     Log.d(TAG, "onDataChanged path=" + path + " DataMap=" + dataMap);
@@ -563,8 +570,6 @@ public class ListenerService extends WearableListenerService implements GoogleAp
                     .serializeSpecialFloatingPointValues()
                     .create();
             Log.d(TAG, "syncCalibrationData add Calibration Table entries count=" + entries.size());
-            //if (entries.size() > 0)
-            //    Calibration.clear_all_existing_calibrations();
             Sensor sensor = Sensor.currentSensor();
             if (sensor != null) {
                 for (DataMap entry : entries) {
@@ -572,11 +577,12 @@ public class ListenerService extends WearableListenerService implements GoogleAp
                         Log.d(TAG, "syncCalibrationData add Calibration Table entry=" + entry);
                         Calibration calibration = new Calibration();
 
-                        Calibration uuidexists = Calibration.getByTimestamp(entry.getLong("timestamp"));
+                        Calibration uuidexists = Calibration.byuuid(entry.getString("uuid"));//entry.getLong("timestamp")
                         if (uuidexists == null) {
                             date.setTime(entry.getLong("timestamp"));
                             Log.d(TAG, "syncCalibrationData create Calibration for uuid=" + entry.getString("uuid") + " timestamp=" + entry.getLong("timestamp") + " timeString=" + df.format(date));
-                            Calibration.createCalibration(entry.getDouble("adjusted_raw_value"),
+                            Calibration.createCalibration(
+                                    entry.getDouble("adjusted_raw_value"),
                                     entry.getDouble("bg"),
                                     entry.getBoolean("check_in"),
                                     entry.getDouble("distance_from_estimate"),
@@ -616,6 +622,58 @@ public class ListenerService extends WearableListenerService implements GoogleAp
                 for (Calibration cal : cals) {
                     String json = cal.toS();
                     Log.d(TAG, "syncCalibrationData cal: " + json);
+                }
+            }
+        }
+    }
+
+    public void syncBgData(DataMap dataMap) {//KS
+        Log.d(TAG, "syncBGData");
+        java.text.DateFormat df = new SimpleDateFormat("MM.dd.yyyy HH:mm:ss");
+        Date date = new Date();
+
+        ArrayList<DataMap> entries = dataMap.getDataMapArrayList("entries");
+        Log.d(TAG, "syncBGData add BgReading Table" );
+        if (entries != null) {
+
+            Gson gson = new GsonBuilder()
+                    .excludeFieldsWithoutExposeAnnotation()
+                    .registerTypeAdapter(Date.class, new DateTypeAdapter())
+                    .serializeSpecialFloatingPointValues()
+                    .create();
+
+            Log.d(TAG, "syncBGData add BgReading Table entries count=" + entries.size());
+            Sensor sensor = Sensor.currentSensor();
+            for (DataMap entry : entries) {
+                if (entry != null) {
+                    Log.d(TAG, "syncBGData add BgReading Table entry=" + entry);
+                    BgReading bgReading = new BgReading();
+                    String bgrecord = entry.getString("bgs");
+                    if (bgrecord != null) {
+                        Log.d(TAG, "syncBGData add BgReading Table bgrecord=" + bgrecord);
+                        BgReading bgData = gson.fromJson(bgrecord, BgReading.class);
+                        BgReading exists = BgReading.getForTimestamp(bgData.timestamp);
+                        BgReading uuidexists = BgReading.findByUuid(bgData.uuid);
+                        date.setTime(bgData.timestamp);
+                        if (exists != null || uuidexists != null) {
+                            Log.d(TAG, "syncBGData BG already exists for uuid=" + bgData.uuid + " timestamp=" + bgData.timestamp + " timeString=" + df.format(date));
+                        }
+                        else {
+                            Calibration calibration = Calibration.byuuid(bgData.calibration_uuid);
+                            if (sensor != null && calibration != null) {
+                                bgData.calibration = calibration;
+                                bgData.sensor = sensor;
+                                Log.d(TAG, "syncBGData add BG; does NOT exist for uuid=" + bgData.uuid + " timestamp=" + bgData.timestamp + " timeString=" + df.format(date));
+                                bgData.save();
+                                //BgSendQueue.handleNewBgReading(bgReading, "create", getApplicationContext() );
+                                exists = BgReading.findByUuid(bgData.uuid);
+                                if (exists != null)
+                                    Log.d(TAG, "syncBGData BG GSON saved BG: " + exists.toS());
+                                else
+                                    Log.d(TAG, "syncBGData BG GSON NOT saved");
+                            }
+                        }
+                    }
                 }
             }
         }
