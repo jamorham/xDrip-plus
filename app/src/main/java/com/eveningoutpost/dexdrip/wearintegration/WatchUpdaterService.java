@@ -366,12 +366,15 @@ public class WatchUpdaterService extends WearableListenerService implements
         String name = peer.getDisplayName();
         Log.d(TAG, "onPeerConnected peer name & ID: " + name + "|" + id);
         if (mPrefs.getBoolean("wear_connectG5", false)) {//watch_integration
-            Log.d(TAG, "onPeerConnected call sendSensorData for node=" + peer.getDisplayName());
+            Log.d(TAG, "onPeerConnected call initWearData for node=" + peer.getDisplayName());
             initWearData();
             //Only stop service if Phone will rely on Wear Collection Service
             if (mPrefs.getBoolean("use_wear_connectG5", false)) {
                 Log.d(TAG, "onPeerConnected use_wear_connectG5=true Phone stopBtG5Service and continue to use Wear G5 BT Collector");
                 stopBtG5Service();
+            } else {
+                Log.d(TAG, "CheckWearableConnected onPeerConnected use_wear_connectG5=false Phone startBtG5Service");
+                startBtG5Service();
             }
         }
     }
@@ -422,7 +425,7 @@ public class WatchUpdaterService extends WearableListenerService implements
                     sendNotification(OPEN_SETTINGS_PATH, "openSettings");//KS add args
                 } else if (ACTION_SYNC_DB.equals(action)) {//KS
                     Log.d(TAG, "onStartCommand Action=" + ACTION_SYNC_DB + " Path=" + SYNC_DB_PATH);
-                    sendNotification(SYNC_DB_PATH, "syncDB");//KS TODO Clear/Reset Wear DB tables
+                    sendNotification(SYNC_DB_PATH, "syncDB");
                     initWearData();
                 } else if (ACTION_SYNC_SENSOR.equals(action)) {//KS
                     Log.d(TAG, "onStartCommand Action=" + ACTION_SYNC_SENSOR + " Path=" + WEARABLE_SENSOR_DATA_PATH);
@@ -431,9 +434,11 @@ public class WatchUpdaterService extends WearableListenerService implements
                     Log.d(TAG, "onStartCommand Action=" + ACTION_SYNC_CALIBRATION + " Path=" + WEARABLE_CALIBRATION_DATA_PATH);
                     sendWearCalibrationData(sendCalibrationCount);
                 } else {
-                    sendData();
-                    sendWearBgData(1);
-                    Log.d(TAG, "onStartCommand Action=" + " Path=" + WEARABLE_BG_DATA_PATH);
+                    if (!mPrefs.getBoolean("use_wear_connectG5", false)) { //KS only send BGs if using Phone's G5 Collector Server
+                        sendData();
+                        sendWearBgData(1);
+                        Log.d(TAG, "onStartCommand Action=" + " Path=" + WEARABLE_BG_DATA_PATH);
+                    }
                 }
             } else {
                 googleApiClient.connect();
@@ -483,7 +488,7 @@ public class WatchUpdaterService extends WearableListenerService implements
                             Log.d(TAG, "CheckWearableConnected onPeerConnected peer name & ID: " + name + "|" + id);
                             SharedPreferences sharedPrefs = PreferenceManager.getDefaultSharedPreferences(getApplicationContext());
                             if (sharedPrefs.getBoolean("wear_connectG5", false)) {//watch_integration
-                                Log.d(TAG, "CheckWearableConnected onPeerConnected call sendSensorData for node=" + peer.getDisplayName());
+                                Log.d(TAG, "CheckWearableConnected onPeerConnected call initWearData for node=" + peer.getDisplayName());
                                 initWearData();
                                 //Only stop service if Phone will rely on Wear Collection Service
                                 if (sharedPrefs.getBoolean("use_wear_connectG5", false)) {
@@ -491,7 +496,7 @@ public class WatchUpdaterService extends WearableListenerService implements
                                     stopBtG5Service();
                                 }
                                 else {
-                                    Log.d(TAG, "CheckWearableConnected onPeerConnected use_wear_connectG5=true Phone startBtG5Service");
+                                    Log.d(TAG, "CheckWearableConnected onPeerConnected use_wear_connectG5=false Phone startBtG5Service");
                                     startBtG5Service();
                                 }
                             }
@@ -520,7 +525,7 @@ public class WatchUpdaterService extends WearableListenerService implements
     }
 
     @Override
-    public void onDataChanged(DataEventBuffer dataEvents) {//KS
+    public void onDataChanged(DataEventBuffer dataEvents) {//KS does not seem to get triggered; therefore use OnMessageReceived
 
         DataMap dataMap;
 

@@ -88,7 +88,7 @@ public class Sensor extends Model {
 
         Sensor sensor = getByTimestamp(started_at);
         if (sensor != null) {
-            Log.d("SENSOR", "updatinga an existing sensor");
+            Log.d("SENSOR", "updating an existing sensor");
         } else {
             Log.d("SENSOR", "creating a new sensor");
             sensor = new Sensor();
@@ -96,6 +96,23 @@ public class Sensor extends Model {
         sensor.started_at = started_at;
         sensor.stopped_at = stopped_at;
         sensor.latest_battery_level = latest_battery_level;
+        sensor.uuid = uuid;
+        sensor.save();
+    }
+
+    public static void createUpdate(long started_at, long stopped_at,  int latest_battery_level, String sensor_location, String uuid) {//KS
+
+        Sensor sensor = currentSensor();
+        if (sensor != null) {
+            Log.d("SENSOR", "updating an existing sensor");
+        } else {
+            Log.d("SENSOR", "creating a new sensor");
+            sensor = new Sensor();
+        }
+        sensor.started_at = started_at;
+        sensor.stopped_at = stopped_at;
+        sensor.latest_battery_level = latest_battery_level;
+        sensor.sensor_location = sensor_location;
         sensor.uuid = uuid;
         sensor.save();
     }
