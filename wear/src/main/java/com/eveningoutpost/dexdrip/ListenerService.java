@@ -109,11 +109,16 @@ public class ListenerService extends WearableListenerService implements GoogleAp
                     int count = nodes.getNodes().size();//KS
                     Log.d(TAG, "doInBackground connected.  NodeApi.GetConnectedNodesResult await count=" + count);//KS
                     if (count > 0) {//KS
-                        if (connectG5 && !use_connectG5)
-                            stopBtG5Service();
+                        if (connectG5) {
+                            if (use_connectG5) {
+                                startBtG5Service();
+                            }
+                            else {
+                                stopBtG5Service();
+                            }
+                        }
 
                         for (Node node : nodes.getNodes()) {
-                            Wearable.MessageApi.sendMessage(googleApiClient, node.getId(), path, payload);
 
                             if (connectG5) {//KS
                                 DataMap datamap = getWearTransmitterData(288);//KS 36 data for last 3 hours; 288 for 1 day
@@ -139,6 +144,9 @@ public class ListenerService extends WearableListenerService implements GoogleAp
                                     });
                                 }
                             }
+                            //if (!use_connectG5 && path.equals(WEARABLE_RESEND_PATH)) {//KS don't request Resend if wear collector is active
+                            Wearable.MessageApi.sendMessage(googleApiClient, node.getId(), path, payload);
+                            //}
                         }
                     }
                     else {
@@ -399,8 +407,6 @@ public class ListenerService extends WearableListenerService implements GoogleAp
                 } else if (path.equals(WEARABLE_DATA_PATH)) {
 
                     dataMap = DataMapItem.fromDataItem(event.getDataItem()).getDataMap();
-                    //setWearSharedPrefs(dataMap);//KS Set Preferences with transmitter id, etc.
-
                     Intent messageIntent = new Intent();
                     messageIntent.setAction(Intent.ACTION_SEND);
                     messageIntent.putExtra("data", dataMap.toBundle());
