@@ -525,7 +525,7 @@ public class WatchUpdaterService extends WearableListenerService implements
     }
 
     @Override
-    public void onDataChanged(DataEventBuffer dataEvents) {//KS does not seem to get triggered; therefore use OnMessageReceived
+    public void onDataChanged(DataEventBuffer dataEvents) {//KS does not seem to get triggered; therefore use OnMessageReceived instead
 
         DataMap dataMap;
 
@@ -583,18 +583,18 @@ public class WatchUpdaterService extends WearableListenerService implements
                         cancelTreatment(getApplicationContext(), "");
                         break;
                     case SYNC_BGS_PATH://KS
-                        String message = new String(event.getData());
+                        //String message = new String(event.getData());
                         DataMap dataMap = DataMap.fromByteArray(event.getData());
                         if (dataMap != null) {
                             Log.d(TAG, "onMessageReceived SYNC_BGS_PATH dataMap=" + dataMap);
-                            syncTransmitterData(dataMap);//syncBGData
+                            syncTransmitterData(dataMap);
                         }
                         break;
                     case WEARABLE_PREF_DATA_PATH:
                         dataMap = DataMap.fromByteArray(event.getData());
                         if (dataMap != null) {
                             Log.d(TAG, "onMessageReceived WEARABLE_PREF_DATA_PATH dataMap=" + dataMap);
-                            syncPrefData(dataMap);//syncBGData
+                            syncPrefData(dataMap);
                         }
                         break;
                     default:

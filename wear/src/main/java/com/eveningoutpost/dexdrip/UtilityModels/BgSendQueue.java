@@ -233,6 +233,9 @@ public class BgSendQueue extends Model {
             if (prefs.getBoolean("connectG5", false)) {//KS
                 Log.d("BgSendQueue", "handleNewBgReading Broadcast BG data to watch");
                 resendData(context);
+                if (prefs.getBoolean("use_connectG5", false)) {
+                    ListenerService.requestData(context);
+                }
             }
 
 
