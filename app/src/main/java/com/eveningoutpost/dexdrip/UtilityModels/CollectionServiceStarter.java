@@ -20,6 +20,7 @@ import com.eveningoutpost.dexdrip.Services.WifiCollectionService;
 import com.eveningoutpost.dexdrip.UtilityModels.pebble.PebbleUtil;
 import com.eveningoutpost.dexdrip.UtilityModels.pebble.PebbleWatchSync;
 import com.eveningoutpost.dexdrip.utils.DexCollectionType;
+import com.eveningoutpost.dexdrip.wearintegration.WatchUpdaterService;
 import com.eveningoutpost.dexdrip.xdrip;
 
 import java.io.IOException;
@@ -175,7 +176,13 @@ public class CollectionServiceStarter {
             stopWifWixelThread();
             stopBtShareService();
 
-            startBtG5Service();
+            if (!prefs.getBoolean("use_wear_connectG5", false)) {//KS don't start if Wear G5 Collector Service is active
+                startBtG5Service();
+            }
+            else {
+                this.mContext.startService(new Intent(context, WatchUpdaterService.class));
+            }
+
         } else if (isWifiandBTWixel(context) || isWifiandDexBridge()) {
             Log.d("DexDrip", "Starting wifi and bt wixel collector");
             stopBtWixelService();

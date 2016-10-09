@@ -98,6 +98,7 @@ public class ListenerService extends WearableListenerService implements GoogleAp
         protected Void doInBackground(Void... params) {
             SharedPreferences sharedPrefs = PreferenceManager.getDefaultSharedPreferences(getApplicationContext());//KS
             boolean connectG5 = sharedPrefs.getBoolean("connectG5", false); //KS
+            boolean use_connectG5 = sharedPrefs.getBoolean("use_connectG5", false); //KS
 
             if ((googleApiClient != null) && (googleApiClient.isConnected())) {
                 if (!path.equals(ACTION_RESEND) || (System.currentTimeMillis() - lastRequest > 20 * 1000)) { // enforce 20-second debounce period
@@ -108,7 +109,7 @@ public class ListenerService extends WearableListenerService implements GoogleAp
                     int count = nodes.getNodes().size();//KS
                     Log.d(TAG, "doInBackground connected.  NodeApi.GetConnectedNodesResult await count=" + count);//KS
                     if (count > 0) {//KS
-                        if (connectG5)
+                        if (connectG5 && !use_connectG5)
                             stopBtG5Service();
 
                         for (Node node : nodes.getNodes()) {
@@ -198,7 +199,6 @@ public class ListenerService extends WearableListenerService implements GoogleAp
         java.text.DateFormat df = new SimpleDateFormat("MM.dd.yyyy HH:mm:ss");
         Date date = new Date();
         if(googleApiClient != null && !googleApiClient.isConnected() && !googleApiClient.isConnecting()) { googleApiConnect(); }
-        long currentTime = new Date().getTime() - (60000 * 60 * 24);
 
         date.setTime(last_send_previous);
         Log.d(TAG, "getWearTransmitterData last_send_previous:" + df.format(date));
@@ -221,7 +221,6 @@ public class ListenerService extends WearableListenerService implements GoogleAp
                     dataMaps.add(dataMap(bg));
                     date.setTime(bg.timestamp);
                     Log.d(TAG, "getWearTransmitterData bg.timestamp:" + df.format(date));
-                    //last_send_previous = bg.timestamp + 1;
                     last_send_sucess = bg.timestamp + 1;
                     date.setTime(last_send_sucess);
                     Log.d(TAG, "getWearTransmitterData set last_send_sucess:" + df.format(date));
@@ -352,7 +351,6 @@ public class ListenerService extends WearableListenerService implements GoogleAp
         Home.setAppContext(getApplicationContext());
         mPrefs = PreferenceManager.getDefaultSharedPreferences(getApplicationContext());//KS
         listenForChangeInSettings();//KS
-        //processConnectG5();
         sendPrefSettings();
         mContext = getApplicationContext();//KS
         if (intent != null && ACTION_RESEND.equals(intent.getAction())) {
@@ -544,14 +542,13 @@ public class ListenerService extends WearableListenerService implements GoogleAp
                 Log.d(TAG, "syncSensorData add Sensor for uuid=" + uuid + " timestamp=" + started_at + " timeString=" + df.format(date));
                 Sensor sensor = Sensor.getByUuid(uuid);
                 if (sensor == null) {
-                    Log.d(TAG, "syncSensorData create new Sensor...");
-                    Sensor newsensor = Sensor.create(started_at, uuid);
+                    Log.d(TAG, "syncSensorData createUpdate new Sensor...");
+                    Sensor.createUpdate(started_at, 0, latest_battery_level, sensor_location, uuid);
+                    Sensor newsensor = Sensor.currentSensor();
                     if (newsensor != null) {
-                        Log.i(TAG, "syncSensorData Created Sensor with uuid=" + uuid + " started at=" + started_at);
-                        Sensor.updateBatteryLevel(newsensor, latest_battery_level);
-                        Sensor.updateSensorLocation(sensor_location);
+                        Log.i(TAG, "syncSensorData createUpdate Sensor with uuid=" + uuid + " started at=" + started_at);
                     } else
-                        Log.e(TAG, "syncSensorData Failed to create new Sensor for uuid=" + uuid);
+                        Log.e(TAG, "syncSensorData Failed to createUpdate new Sensor for uuid=" + uuid);
                 } else
                     Log.d(TAG, "syncSensorData Sensor already exists with uuid=" + uuid);
             }
