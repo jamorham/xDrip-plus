@@ -46,7 +46,6 @@ import java.util.Date;
 import java.util.List;
 import java.util.Set;
 import java.util.concurrent.TimeUnit;
-import com.eveningoutpost.dexdrip.Home;//KS
 
 /**
  * Created by stephenblack on 12/26/14.
@@ -63,7 +62,6 @@ public class ListenerService extends WearableListenerService implements GoogleAp
     private static final String WEARABLE_SENSOR_DATA_PATH = "/nightscout_watch_sensor_data";//KS
     public static final String WEARABLE_PREF_DATA_PATH = "/nightscout_watch_pref_data";//KS
     public static final String DATA_ITEM_RECEIVED_PATH = "/data-item-received";//KS
-    private static final String ACTION_SYNC_DB = "com.eveningoutpost.dexdrip.wearintegration.SyncDB";//KS
     private static final String ACTION_RESEND = "com.dexdrip.stephenblack.nightwatch.RESEND_DATA";
     private static final String ACTION_SENDDATA = "com.dexdrip.stephenblack.nightwatch.SEND_DATA";
     private static final String ACTION_RESEND_BULK = "com.dexdrip.stephenblack.nightwatch.RESEND_BULK_DATA";
@@ -245,13 +243,35 @@ public class ListenerService extends WearableListenerService implements GoogleAp
     }
 
     private void sendPrefSettings() {//KS
+
+        if(googleApiClient != null && !googleApiClient.isConnected() && !googleApiClient.isConnecting()) { googleApiConnect(); }
         DataMap dataMap = new DataMap();
         boolean connectG5 = mPrefs.getBoolean("connectG5", false);
         boolean use_connectG5 = mPrefs.getBoolean("use_connectG5", false);
         Log.d(TAG, "sendPrefSettings connectG5: " + connectG5 + " use_connectG5:" + use_connectG5);
         dataMap.putBoolean("connectG5", connectG5);
         dataMap.putBoolean("use_connectG5", use_connectG5);
-        sendData("WEARABLE_PREF_DATA_PATH", dataMap.toByteArray());
+        sendData(WEARABLE_PREF_DATA_PATH, dataMap.toByteArray());
+
+/*
+        final SharedPreferences sharedPrefs = PreferenceManager.getDefaultSharedPreferences(getApplicationContext());//KS TODO
+        new Thread(){
+            public void run(){
+                sendPrefSettingsAsync(sharedPrefs);
+            }
+        }.start();
+*/
+    }
+
+    private void sendPrefSettingsAsync(final SharedPreferences sharedPrefs) {//KS
+        final PutDataMapRequest request = PutDataMapRequest.create(WEARABLE_PREF_DATA_PATH);
+        final DataMap dataMap = request.getDataMap();
+        boolean connectG5 = sharedPrefs.getBoolean("connectG5", false);
+        boolean use_connectG5 = sharedPrefs.getBoolean("use_connectG5", false);
+        dataMap.putBoolean("connectG5", connectG5);
+        dataMap.putBoolean("use_connectG5", use_connectG5);
+        request.setUrgent();
+        Wearable.DataApi.putDataItem(googleApiClient, request.asPutDataRequest());
     }
 
     private DataMap dataMap(TransmitterData bg) {//KS
@@ -335,6 +355,7 @@ public class ListenerService extends WearableListenerService implements GoogleAp
         String id = peer.getId();
         String name = peer.getDisplayName();
         Log.d(TAG, "onPeerConnected peer name & ID: " + name + "|" + id);
+        sendPrefSettings();
         SharedPreferences sharedPrefs = PreferenceManager.getDefaultSharedPreferences(getApplicationContext());
         if (sharedPrefs.getBoolean("connectG5", false) && !sharedPrefs.getBoolean("use_connectG5", false)) {
             stopBtG5Service();
@@ -356,10 +377,11 @@ public class ListenerService extends WearableListenerService implements GoogleAp
 
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
+        Log.d(TAG, "onStartCommand entered");
         Home.setAppContext(getApplicationContext());
         mPrefs = PreferenceManager.getDefaultSharedPreferences(getApplicationContext());//KS
         listenForChangeInSettings();//KS
-        sendPrefSettings();
+        //sendPrefSettings();
         mContext = getApplicationContext();//KS
         if (intent != null && ACTION_RESEND.equals(intent.getAction())) {
             googleApiConnect();
@@ -373,12 +395,15 @@ public class ListenerService extends WearableListenerService implements GoogleAp
 
     public SharedPreferences.OnSharedPreferenceChangeListener prefListener = new SharedPreferences.OnSharedPreferenceChangeListener() {//KS
         public void onSharedPreferenceChanged(SharedPreferences prefs, String key) {
-        Log.d(TAG, "OnSharedPreferenceChangeListener entered");
-        if(key.compareTo("connectG5") == 0 || key.compareTo("use_connectG5") == 0) {
-            Log.i(TAG, "OnSharedPreferenceChangeListener connectG5 || use_connectG5 changed!");
-            processConnectG5();
-            sendPrefSettings();
-        }
+            Log.d(TAG, "OnSharedPreferenceChangeListener entered");
+            if(key.compareTo("connectG5") == 0 || key.compareTo("use_connectG5") == 0) {
+                Log.i(TAG, "OnSharedPreferenceChangeListener connectG5 || use_connectG5 changed!");
+                processConnectG5();
+                sendPrefSettings();
+            }
+            else if(key.compareTo("dex_txid") == 0){
+                processConnectG5();
+            }
         }
     };
 
@@ -441,7 +466,7 @@ public class ListenerService extends WearableListenerService implements GoogleAp
                 } else if (path.equals(WEARABLE_PREF_DATA_PATH)) {//KS
                     dataMap = DataMapItem.fromDataItem(event.getDataItem()).getDataMap();
                     Log.d(TAG, "onDataChanged path=" + path + " DataMap=" + dataMap);
-                    setWearSharedPrefs(dataMap);
+                    syncPrefData(dataMap);
                 } else if (path.equals(DATA_ITEM_RECEIVED_PATH)) {//KS
                     dataMap = DataMapItem.fromDataItem(event.getDataItem()).getDataMap();
                     Log.d(TAG, "onDataChanged path=" + path + " DataMap=" + dataMap);
@@ -462,41 +487,43 @@ public class ListenerService extends WearableListenerService implements GoogleAp
         }
     }
 
-    public void setWearSharedPrefs(DataMap dataMap) {//KS
+    public void syncPrefData(DataMap dataMap) {//KS
         SharedPreferences.Editor prefs = PreferenceManager.getDefaultSharedPreferences(this).edit();
 
-        Log.d(TAG, "setWearSharedPrefs dataMap=" + dataMap);
+        Log.d(TAG, "syncPrefData dataMap=" + dataMap);
 
         boolean connectG5 = dataMap.getBoolean("connectG5", false);
         boolean use_connectG5 = dataMap.getBoolean("use_connectG5", false);
-        Log.d(TAG, "setWearSharedPrefs connectG5: " + connectG5 + " use_connectG5:" + use_connectG5);
-        prefs.putBoolean("connectG5", connectG5);
-        prefs.putBoolean("use_connectG5", use_connectG5);
-        prefs.commit();
+
+        if (use_connectG5 != mPrefs.getBoolean("use_connectG5", false)) {
+            Log.d(TAG, "syncPrefData use_connectG5:" + use_connectG5);
+            prefs.putBoolean("use_connectG5", use_connectG5);
+        }
+        if (connectG5 != mPrefs.getBoolean("connectG5", false)) {
+            Log.d(TAG, "syncPrefData connectG5:" + use_connectG5);
+            prefs.putBoolean("connectG5", connectG5);
+        }
 
         String dex_txid = dataMap.getString("dex_txid", "ABCDEF");//KS 4023GU
-        Log.d(TAG, "setWearSharedPrefs dataMap dex_txid=" + dex_txid);
-
-        prefs.putString("dex_txid", dex_txid);
-        prefs.commit();
-        String pref_txid = mPrefs.getString("dex_txid", "NOTFOUND");//KS TEST
-        Log.d(TAG, "setWearSharedPrefs prefs set dex_txid=" + pref_txid);
+        Log.d(TAG, "syncPrefData dataMap dex_txid=" + dex_txid);
+        if (!dex_txid.equals(mPrefs.getString("dex_txid", "ABCDEF"))) {
+            Log.d(TAG, "syncPrefData dex_txid:" + dex_txid);
+            prefs.putString("dex_txid", dex_txid);
+            stopBtG5Service();
+        }
 
         String units = dataMap.getString("units", "ABCDEF");//KS
-        Log.d(TAG, "setWearSharedPrefs dataMap units=" + units);
+        Log.d(TAG, "syncPrefData dataMap units=" + units);
         prefs.putString("units", units);
-        prefs.commit();
-        Log.d(TAG, "setWearSharedPrefs prefs units=" + mPrefs.getString("units", ""));
+        Log.d(TAG, "syncPrefData prefs units=" + mPrefs.getString("units", ""));
 
         Double high = dataMap.getDouble("high");
         Double low = dataMap.getDouble("low");
-        Log.d(TAG, "setWearSharedPrefs dataMap highMark=" + high + " highMark=" + low);
+        Log.d(TAG, "syncPrefData dataMap highMark=" + high + " highMark=" + low);
         prefs.putString("highValue", high.toString());
-        prefs.commit();
         prefs.putString("lowValue", low.toString());
-        prefs.commit();
 
-        processConnectG5();
+        prefs.commit();
     }
 
     //Assumes Wear is connected to phone
@@ -530,12 +557,14 @@ public class ListenerService extends WearableListenerService implements GoogleAp
         if (dataMap != null) {
 
             //Get Transmittor ID required to connect to sensor via Bluetooth
+            /*
             String dex_txid = dataMap.getString("dex_txid", "ABCDEF");//KS 4023GU
-            Log.d(TAG, "onDataChanged dataMap dex_txid=" + dex_txid);
+            Log.d(TAG, "syncSensorData dataMap dex_txid=" + dex_txid);
             SharedPreferences.Editor prefs = PreferenceManager.getDefaultSharedPreferences(this).edit();
             prefs.putString("dex_txid", dex_txid);
             prefs.commit();
-            Log.d(TAG, "onDataChanged prefs set dex_txid=" + mPrefs.getString("dex_txid", "ABCDEF"));
+            Log.d(TAG, "syncSensorData prefs set dex_txid=" + mPrefs.getString("dex_txid", "ABCDEF"));
+            */
 
             String uuid = dataMap.getString("uuid");
             Log.d(TAG, "syncSensorData add Sensor for uuid=" + uuid);

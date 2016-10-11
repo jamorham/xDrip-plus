@@ -176,11 +176,14 @@ public class CollectionServiceStarter {
             stopWifWixelThread();
             stopBtShareService();
 
-            if (!prefs.getBoolean("use_wear_connectG5", false)) {//KS don't start if Wear G5 Collector Service is active
-                startBtG5Service();
+            if (prefs.getBoolean("wear_sync", false)) {//KS
+                this.mContext.startService(new Intent(context, WatchUpdaterService.class));
+                if (!prefs.getBoolean("use_wear_connectG5", false)) { //don't start if Wear G5 Collector Service is active
+                    startBtG5Service();
+                }
             }
             else {
-                this.mContext.startService(new Intent(context, WatchUpdaterService.class));
+                startBtG5Service();
             }
 
         } else if (isWifiandBTWixel(context) || isWifiandDexBridge()) {
