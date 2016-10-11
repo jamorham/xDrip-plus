@@ -124,7 +124,7 @@ public class StatsResult {
         return getA1cIFCC(false);
     }
 
-        public String getA1cIFCC(boolean shortVersion){
+    public String getA1cIFCC(boolean shortVersion){
         if(getTotalReadings()==0) return "A1c:?";
         return (shortVersion?"":"A1c:") + ((int) Math.round(((avg + 46.7) / 28.7 - 2.15) * 10.929));
     }
