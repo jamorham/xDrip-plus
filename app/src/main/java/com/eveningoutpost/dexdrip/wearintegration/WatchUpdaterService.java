@@ -106,7 +106,6 @@ public class WatchUpdaterService extends WearableListenerService implements
         date.setTime(timeOfLastBG);
         Log.d(TAG, "sendDataReceived timeOfLastBG=" + df.format(date) + " Path=" + path);
         if (googleApiClient.isConnected()) {
-            //Log.d(TAG, "sendDataReceived Notification=" + notification + " Path=" + path);
             PutDataMapRequest dataMapRequest = PutDataMapRequest.create(path);
             dataMapRequest.setUrgent();
             dataMapRequest.getDataMap().putDouble("timestamp", System.currentTimeMillis());
@@ -123,17 +122,47 @@ public class WatchUpdaterService extends WearableListenerService implements
         boolean connectG5 = dataMap.getBoolean("connectG5");
         boolean use_connectG5 = dataMap.getBoolean("use_connectG5");
         SharedPreferences.Editor prefs = PreferenceManager.getDefaultSharedPreferences(this).edit();
-        Log.d(TAG, "setWearSharedPrefs connectG5: " + connectG5 + " use_connectG5:" + use_connectG5);
-        prefs.putBoolean("wear_connectG5", connectG5);
-        prefs.putBoolean("wear_use_connectG5", use_connectG5);
-        prefs.commit();
+        Log.d(TAG, "syncPrefData connectG5: " + connectG5 + " use_connectG5:" + use_connectG5);
 
-        if (use_connectG5) {
-            Log.d(TAG, "setSettings use_connectG5=true - stopBtG5Service");
-            stopBtG5Service();
+        if (use_connectG5 != mPrefs.getBoolean("use_wear_connectG5", false)) {
+            prefs.putBoolean("use_wear_connectG5", use_connectG5);
+            Log.d(TAG, "syncPrefData commit use_connectG5:" + use_connectG5);
+        }
+
+        if (connectG5 != mPrefs.getBoolean("wear_connectG5", false)) {
+            prefs.putBoolean("wear_connectG5", connectG5);
+            Log.d(TAG, "syncPrefData commit connectG5: " + connectG5);
+        }
+
+        prefs.commit();
+    }
+
+    //Assumes Wear is connected to phone
+    public void processConnectG5() {//KS
+        Log.d(TAG, "processConnectG5 enter");
+        wear_integration = mPrefs.getBoolean("wear_sync", false);
+        boolean connectG5 = mPrefs.getBoolean("wear_connectG5", false);
+        boolean use_connectG5 = mPrefs.getBoolean("use_wear_connectG5", false);
+
+        if (wear_integration) {
+            if (connectG5) {
+                initWearData();
+                if (use_connectG5) {
+                    Log.d(TAG, "processConnectG5 use_connectG5=true - stopBtG5Service");
+                    stopBtG5Service();
+                }
+                else {
+                    Log.d(TAG, "processConnectG5 use_connectG5=false - startBtG5Service");
+                    startBtG5Service();
+                }
+            }
+            else {
+                Log.d(TAG, "processConnectG5 connectG5=false - startBtG5Service");
+                startBtG5Service();
+            }
         }
         else {
-            Log.d(TAG, "setSettings use_connectG5=false - startBtG5Service");
+            Log.d(TAG, "processConnectG5 wear_integration=false - startBtG5Service");
             startBtG5Service();
         }
     }
@@ -147,7 +176,6 @@ public class WatchUpdaterService extends WearableListenerService implements
         long timeOfLastBG = 0;
         Log.d(TAG, "syncTransmitterData add BgReading Table" );
         if (entries != null) {
-            //Gson gson = new GsonBuilder().create();
 
             Gson gson = new GsonBuilder()
                     .excludeFieldsWithoutExposeAnnotation()
@@ -206,54 +234,6 @@ public class WatchUpdaterService extends WearableListenerService implements
             sendDataReceived(DATA_ITEM_RECEIVED_PATH,"BGS_RECEIVED", timeOfLastBG);
         }
     }
-
-    public void syncBGData(DataMap dataMap) {//KS
-        Log.d(TAG, "syncBGData");
-        java.text.DateFormat df = new SimpleDateFormat("MM.dd.yyyy HH:mm:ss");
-        Date date = new Date();
-
-        ArrayList<DataMap> entries = dataMap.getDataMapArrayList("entries");
-        Log.d(TAG, "syncBGData add BgReading Table" );
-        if (entries != null) {
-            //Gson gson = new GsonBuilder().create();
-
-            Gson gson = new GsonBuilder()
-                    .excludeFieldsWithoutExposeAnnotation()
-                    .registerTypeAdapter(Date.class, new DateTypeAdapter())
-                    .serializeSpecialFloatingPointValues()
-                    .create();
-
-            Log.d(TAG, "syncBGData add BgReading Table entries count=" + entries.size());
-            for (DataMap entry : entries) {
-                if (entry != null) {
-                    Log.d(TAG, "syncBGData add BgReading Table entry=" + entry);
-                    BgReading bgReading = new BgReading();
-                    String bgrecord = entry.getString("bgs");
-                    if (bgrecord != null) {
-                        Log.d(TAG, "syncBGData add BgReading Table bgrecord=" + bgrecord);
-                        BgReading bgData = gson.fromJson(bgrecord, BgReading.class);
-                        BgReading exists = BgReading.getForTimestamp(bgData.timestamp);
-                        BgReading uuidexists = BgReading.findByUuid(bgData.uuid);
-                        date.setTime(bgData.timestamp);
-                        if (exists != null || uuidexists != null) {
-                            Log.d(TAG, "syncBGData BG already exists for uuid=" + bgData.uuid + " timestamp=" + bgData.timestamp + " timeString=" + df.format(date));
-                        }
-                        else {
-                            Log.d(TAG, "syncBGData add BG; does NOT exist for uuid=" + bgData.uuid + " timestamp=" + bgData.timestamp + " timeString=" + df.format(date));
-                            bgData.save();
-                            BgSendQueue.handleNewBgReading(bgReading, "create", getApplicationContext() );
-                            exists = BgReading.findByUuid(bgData.uuid);
-                            if (exists != null)
-                                Log.d(TAG, "BG GSON saved BG: " + exists.toS());
-                            else
-                                Log.d(TAG, "BG GSON NOT saved Calibration");
-                        }
-                    }
-                }
-            }
-        }
-    }
-
 
     public static void sendWearToast(String msg, int length)
     {
@@ -318,25 +298,16 @@ public class WatchUpdaterService extends WearableListenerService implements
     }
 
     public void setSettings() {
+        Log.d(TAG, "setSettings enter");
         wear_integration = mPrefs.getBoolean("wear_sync", false);
         pebble_integration = mPrefs.getBoolean("pebble_sync", false);
         boolean connectG5 = mPrefs.getBoolean("wear_connectG5", false);
         boolean use_connectG5 = mPrefs.getBoolean("use_wear_connectG5", false);
+        processConnectG5();
         if (wear_integration) {
             googleApiConnect();
             Log.d(TAG, "setSettings wear_sync changed to True.");
             sendPrefSettings();
-            if (connectG5) {
-                initWearData();
-                if (use_connectG5) {
-                    Log.d(TAG, "setSettings use_connectG5=true - stopBtG5Service");
-                    stopBtG5Service();
-                }
-                else {
-                    Log.d(TAG, "setSettings use_connectG5=false - startBtG5Service");
-                    startBtG5Service();
-                }
-            }
         } else {
             this.stopService(new Intent(this, WatchUpdaterService.class));
         }
@@ -373,7 +344,7 @@ public class WatchUpdaterService extends WearableListenerService implements
                 Log.d(TAG, "onPeerConnected use_wear_connectG5=true Phone stopBtG5Service and continue to use Wear G5 BT Collector");
                 stopBtG5Service();
             } else {
-                Log.d(TAG, "CheckWearableConnected onPeerConnected use_wear_connectG5=false Phone startBtG5Service");
+                Log.d(TAG, "onPeerConnected onPeerConnected use_wear_connectG5=false Phone startBtG5Service");
                 startBtG5Service();
             }
         }
@@ -395,7 +366,9 @@ public class WatchUpdaterService extends WearableListenerService implements
     private void startBtG5Service() {//KS
         Log.d(TAG, "startBtG5Service");
         Context myContext = getApplicationContext();
-        myContext.startService(new Intent(getApplicationContext(), G5CollectionService.class));
+        Log.d(TAG, "startBtG5Service start G5CollectionService");
+        myContext.startService(new Intent(myContext, G5CollectionService.class));
+        Log.d(TAG, "startBtG5Service AFTER startService G5CollectionService");
     }
 
     private void stopBtG5Service() {//KS
@@ -487,6 +460,7 @@ public class WatchUpdaterService extends WearableListenerService implements
                             String name = peer.getDisplayName();
                             Log.d(TAG, "CheckWearableConnected onPeerConnected peer name & ID: " + name + "|" + id);
                             SharedPreferences sharedPrefs = PreferenceManager.getDefaultSharedPreferences(getApplicationContext());
+                            sendPrefSettings();
                             if (sharedPrefs.getBoolean("wear_connectG5", false)) {//watch_integration
                                 Log.d(TAG, "CheckWearableConnected onPeerConnected call initWearData for node=" + peer.getDisplayName());
                                 initWearData();
@@ -535,19 +509,18 @@ public class WatchUpdaterService extends WearableListenerService implements
 
                 String path = event.getDataItem().getUri().getPath();
                 String nodeId = event.getDataItem().getUri().getHost();
-                if (path.equals(SYNC_BGS_PATH)) {
-                    // Send the RPC
-                    byte[] payload = event.getDataItem().getUri().toString().getBytes();
-                    Wearable.MessageApi.sendMessage(googleApiClient, nodeId, DATA_ITEM_RECEIVED_PATH, payload);
 
-                    dataMap = DataMapItem.fromDataItem(event.getDataItem()).getDataMap();
-                    Log.d(TAG, "onDataChanged path=" + path + " DataMap=" + dataMap);
-                    //DataMap dataMap = DataMap.fromByteArray(event.getData());
-                    if (dataMap != null) {
-                        Log.d(TAG, "onDataChanged SYNC_BGS_PATH dataMap=" + dataMap);
-                        syncTransmitterData(dataMap);//syncBGData
-                    }
-
+                switch (path) {
+                    case WEARABLE_PREF_DATA_PATH:
+                        dataMap = DataMapItem.fromDataItem(event.getDataItem()).getDataMap();
+                        if (dataMap != null) {
+                            Log.d(TAG, "onDataChanged WEARABLE_PREF_DATA_PATH dataMap=" + dataMap);
+                            syncPrefData(dataMap);
+                        }
+                        break;
+                    default:
+                        Log.d(TAG, "Unknown wearable path: " + path);
+                        break;
                 }
             }
         }
@@ -755,7 +728,6 @@ public class WatchUpdaterService extends WearableListenerService implements
         if (sensor != null && cal.sensor_uuid.equals(sensor.uuid)) {
             dataMap.putLong("timestamp", cal.timestamp);////Long.valueOf("1472590518540").longValue()
             dataMap.putDouble("sensor_age_at_time_of_estimation", cal.sensor_age_at_time_of_estimation);
-            //dataMap.putString("sensor", sensor.uuid);//Sensor.currentSensor()
             dataMap.putDouble("bg", cal.bg);
             dataMap.putDouble("raw_value", cal.raw_value);
             dataMap.putDouble("adjusted_raw_value", cal.adjusted_raw_value);
