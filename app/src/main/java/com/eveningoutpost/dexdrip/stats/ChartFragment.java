@@ -29,7 +29,6 @@ public class ChartFragment extends Fragment {
 
         if (chartView == null) {
             chartView = new ChartView(getActivity().getApplicationContext());
-            chartView.setTag(1);
         }
         return chartView;
     }

@@ -32,8 +32,6 @@ public class FirstPageFragment extends Fragment {
         myView = inflater.inflate(
                 R.layout.stats_general, container, false);
 
-        myView.setTag(0);
-
         (new CalculationThread(myView, getActivity().getApplicationContext())).start();
 
         return getView();

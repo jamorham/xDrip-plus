@@ -11,8 +11,6 @@ import android.graphics.Paint;
 import android.graphics.Path;
 import android.preference.PreferenceManager;
 import android.util.DisplayMetrics;
-
-import com.eveningoutpost.dexdrip.Home;
 import com.eveningoutpost.dexdrip.Models.UserError.Log;
 import android.view.View;
 
@@ -128,21 +126,13 @@ public class PercentileView extends View {
         Paint myPaint = new Paint();
         myPaint.setStyle(Paint.Style.STROKE);
         myPaint.setAntiAlias(false);
-        if (Home.getPreferencesBooleanDefaultFalse(StatsActivity.SHOW_STATISTICS_PRINT_COLOR)) {
-            myPaint.setColor(Color.BLACK);
-        } else {
-            myPaint.setColor(Color.LTGRAY);
-        }
+        myPaint.setColor(Color.LTGRAY);
         myPaint.setStrokeWidth(dp2px(1));
 
         Paint myPaintText = new Paint();
         myPaintText.setStyle(Paint.Style.STROKE);
         myPaintText.setAntiAlias(false);
-        if (Home.getPreferencesBooleanDefaultFalse(StatsActivity.SHOW_STATISTICS_PRINT_COLOR)) {
-            myPaintText.setColor(Color.BLACK);
-        } else {
-            myPaintText.setColor(Color.LTGRAY);
-        }
+        myPaintText.setColor(Color.LTGRAY);
         myPaintText.setTextSize(dp2px(10));
 
         canvas.drawLine(dpOffset, 0, dpOffset, canvas.getHeight() - dpOffset, myPaint);

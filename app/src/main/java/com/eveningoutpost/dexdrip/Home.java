@@ -160,13 +160,12 @@ public class Home extends ActivityWithMenu {
     private TextView textBloodGlucose;
     private TextView textInsulinDose;
     private TextView textTime;
-    private static final int REQ_CODE_SPEECH_INPUT = 1994;
-    private static final int REQ_CODE_SPEECH_NOTE_INPUT = 1995;
-    private static final int SHOWCASE_UNDO = 4;
-    private static final int SHOWCASE_REDO = 5;
-    private static final int SHOWCASE_NOTE_LONG = 6;
-    private static final int SHOWCASE_VARIANT = 7;
-    public static final int SHOWCASE_STATISTICS = 8;
+    private final int REQ_CODE_SPEECH_INPUT = 1994;
+    private final int REQ_CODE_SPEECH_NOTE_INPUT = 1995;
+    private final int SHOWCASE_UNDO = 4;
+    private final int SHOWCASE_REDO = 5;
+    private final int SHOWCASE_NOTE_LONG = 6;
+    private final int SHOWCASE_VARIANT = 7;
     private static double last_speech_time = 0;
     private PreviewLineChartView previewChart;
     private TextView dexbridgeBattery;
@@ -578,7 +577,6 @@ public class Home extends ActivityWithMenu {
             updateCurrentBgInfo("approve button");
         }
         processCalibrationNoUI(myglucosenumber, mytimeoffset);
-        staticRefreshBGCharts();
     }
 
     private void processIncomingBundle(Bundle bundle) {
@@ -1933,7 +1931,7 @@ public class Home extends ActivityWithMenu {
                 BgReading bgReading = BgReading.last();
                 if (bgReading != null) {
                     final boolean doMgdl = prefs.getString("units", "mgdl").equals("mgdl");
-                    extraline.append(" \u21D2 " + BgGraphBuilder.unitized_string(plugin.getGlucoseFromSensorValue(bgReading.age_adjusted_raw_value), doMgdl) + " " + BgGraphBuilder.unit(doMgdl));
+                    extraline.append(" \u21D2 " + BgGraphBuilder.unitized_string(plugin.getGlucoseFromSensorValue(bgReading.raw_data), doMgdl) + " " + BgGraphBuilder.unit(doMgdl));
                 }
             }
         }
@@ -2098,6 +2096,17 @@ public class Home extends ActivityWithMenu {
         if (!prefs.getBoolean("wear_sync", false)) {
             menu.removeItem(R.id.action_open_watch_settings);
             menu.removeItem(R.id.action_resend_last_bg);
+            menu.removeItem(R.id.action_sync_watch_db);//KS
+        }
+        else {
+            //KS initialize wear db
+            //android.util.Log.d("onCreateOptionsMenu", "start WatchUpdaterService with ACTION_SYNC_CALIBRATION");
+            //startService(new Intent(this, WatchUpdaterService.class).setAction(WatchUpdaterService.ACTION_SYNC_CALIBRATION));
+            //android.util.Log.d("onCreateOptionsMenu", "start WatchUpdaterService with ACTION_SYNC_SENSOR");
+            //startService(new Intent(this, WatchUpdaterService.class).setAction(WatchUpdaterService.ACTION_SYNC_SENSOR));
+
+            //Log.d(TAG, "onCreateOptionsMenu with ACTION_SYNC_DB");
+            //startService(new Intent(this, WatchUpdaterService.class).setAction(WatchUpdaterService.ACTION_SYNC_DB));
         }
 
         //speak readings
@@ -2365,6 +2374,10 @@ public class Home extends ActivityWithMenu {
                 break;
             case R.id.action_open_watch_settings:
                 startService(new Intent(this, WatchUpdaterService.class).setAction(WatchUpdaterService.ACTION_OPEN_SETTINGS));
+            case R.id.action_sync_watch_db://KS
+                Log.d(TAG, "start WatchUpdaterService with ACTION_SYNC_DB");
+                startService(new Intent(this, WatchUpdaterService.class).setAction(WatchUpdaterService.ACTION_SYNC_DB));
+                break;
         }
 
         if (item.getItemId() == R.id.action_export_database) {
@@ -2472,13 +2485,6 @@ public class Home extends ActivityWithMenu {
         }
         if ((prefs != null) && (prefs.getBoolean(pref, def))) return true;
         return false;
-    }
-
-    public static void togglePreferencesBoolean(final String pref) {
-        if ((prefs == null) && (xdrip.getAppContext() != null)) {
-            prefs = PreferenceManager.getDefaultSharedPreferences(xdrip.getAppContext());
-        }
-        if (prefs != null) prefs.edit().putBoolean(pref, !prefs.getBoolean(pref, false)).apply();
     }
 
     public static String getPreferencesStringDefaultBlank(final String pref) {

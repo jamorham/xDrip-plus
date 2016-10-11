@@ -231,7 +231,7 @@ public class UserError extends Model {
          * 
          */
         public static void readPreference(String extraLogs) {
-            if (extraLogs.length() > 0) UserErrorLow(TAG, "called with string " + extraLogs);
+            UserErrorLow(TAG, "called with string " +  extraLogs);
             extraTags.clear();
             
             String []tags = extraLogs.split(",");
@@ -241,7 +241,7 @@ public class UserError extends Model {
             
             // go over all tags and parse them
             for(String tag : tags) {
-                if (tag.length() > 0) parseTag(tag);
+                parseTag(tag);
             }
         }
         
