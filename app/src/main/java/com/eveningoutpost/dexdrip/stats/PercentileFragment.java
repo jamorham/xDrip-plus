@@ -29,7 +29,6 @@ public class PercentileFragment extends Fragment {
 
         if (percentileView == null) {
             percentileView = new PercentileView(getActivity().getApplicationContext());
-            percentileView.setTag(2);
         }
         return percentileView;
     }

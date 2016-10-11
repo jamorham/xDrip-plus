@@ -21,9 +21,11 @@ public class WidgetUpdateService extends Service {
 
     public static void staticRefreshWidgets()
     {
+        Log.d("WidgetUpdateService", "staticRefreshWidgets call start WidgetUpdateService");//KS
         try {
             Context context = xdrip.getAppContext();
             if (AppWidgetManager.getInstance(context).getAppWidgetIds(new ComponentName(context, xDripWidget.class)).length > 0) {
+                Log.d("WidgetUpdateService", "start WidgetUpdateService");//KS
                 context.startService(new Intent(context, WidgetUpdateService.class));
             }
         } catch (Exception e)
@@ -58,6 +60,7 @@ public class WidgetUpdateService extends Service {
         super.onCreate();
         PowerManager pm = (PowerManager) getSystemService(Service.POWER_SERVICE);
         Log.d(TAG, "onCreate");
+        Log.d("WidgetUpdateService", "onCreate");//KS
         if ((Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP && pm.isInteractive()) ||
                 (Build.VERSION.SDK_INT < Build.VERSION_CODES.LOLLIPOP && pm.isScreenOn()))
             enableClockTicks();
@@ -90,6 +93,7 @@ public class WidgetUpdateService extends Service {
 
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
+        Log.d("WidgetUpdateService", "onStartCommand");//KS
         updateCurrentBgInfo();
         return START_STICKY;
     }
