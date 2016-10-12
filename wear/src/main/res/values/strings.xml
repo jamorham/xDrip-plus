@@ -38,6 +38,7 @@
     <string name="backarrow">\u2190</string>
     <string name="call">Call</string>
     <string name="erase">Erase</string>
+
     <string name="location_permission_not_approved">&lt;br&gt;&lt;br&gt;&lt;br&gt;WatchFace requires Location permission. Click on this WatchFace or visit Settings &gt; Permissions to approve.</string>
     <string name="title_activity_location_permission">Location Permission Activity</string>
     <string name="location_permission_text">WatchFace requires Location access.</string>

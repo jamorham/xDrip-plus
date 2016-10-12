@@ -405,15 +405,6 @@ public class JoH {
         }
     }
 
-    public static void fixActionBar(AppCompatActivity context) {
-        try {
-            context.getSupportActionBar().setDisplayShowHomeEnabled(true);
-            context.getSupportActionBar().setIcon(R.drawable.ic_launcher);
-        } catch (Exception e) {
-            Log.e(TAG, "Got exception with supportactionbar: " + e.toString());
-
-        }
-    }
 
     public static HashMap<String, Object> JsonStringtoMap(String json) {
         return new Gson().fromJson(json, new TypeToken<HashMap<String, Object>>() {

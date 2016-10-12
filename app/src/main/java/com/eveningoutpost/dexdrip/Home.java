@@ -2100,16 +2100,6 @@ public class Home extends ActivityWithMenu {
             menu.removeItem(R.id.action_resend_last_bg);
             menu.removeItem(R.id.action_sync_watch_db);//KS
         }
-        else {
-            //KS initialize wear db
-            //android.util.Log.d("onCreateOptionsMenu", "start WatchUpdaterService with ACTION_SYNC_CALIBRATION");
-            //startService(new Intent(this, WatchUpdaterService.class).setAction(WatchUpdaterService.ACTION_SYNC_CALIBRATION));
-            //android.util.Log.d("onCreateOptionsMenu", "start WatchUpdaterService with ACTION_SYNC_SENSOR");
-            //startService(new Intent(this, WatchUpdaterService.class).setAction(WatchUpdaterService.ACTION_SYNC_SENSOR));
-
-            //Log.d(TAG, "onCreateOptionsMenu with ACTION_SYNC_DB");
-            //startService(new Intent(this, WatchUpdaterService.class).setAction(WatchUpdaterService.ACTION_SYNC_DB));
-        }
 
         //speak readings
         MenuItem menuItem = menu.findItem(R.id.action_toggle_speakreadings);

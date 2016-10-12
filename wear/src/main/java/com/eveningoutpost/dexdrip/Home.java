@@ -1,7 +1,6 @@
 package com.eveningoutpost.dexdrip;
 
 import android.content.Context;
-import android.content.Intent;
 import android.content.SharedPreferences;
 import android.graphics.Color;
 import android.preference.PreferenceManager;
@@ -9,12 +8,10 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.widget.Toast;
 
-import com.activeandroid.ActiveAndroid;
-import com.google.android.gms.wearable.DataMap;
-import com.google.android.gms.wearable.DataMapItem;
+import com.eveningoutpost.dexdrip.Models.UserError;
 import com.ustwo.clockwise.WatchMode;
 
-import lecho.lib.hellocharts.util.ChartUtils;//KS Utils;
+import lecho.lib.hellocharts.util.ChartUtils;
 
 public class Home extends BaseWatchFace {
     //KS the following were copied from app/home
@@ -28,7 +25,6 @@ public class Home extends BaseWatchFace {
     @Override
     public void onCreate() {
         super.onCreate();
-        //ActiveAndroid.initialize(this);//KS
 
         //KS copied from app/Home
         Home.context = getApplicationContext();
@@ -39,7 +35,6 @@ public class Home extends BaseWatchFace {
         layoutView = inflater.inflate(R.layout.activity_home, null);
         performViewSetup();
     }
-
 
     protected void setColorDark() {
         mTime.setTextColor(Color.WHITE);
@@ -88,7 +83,7 @@ public class Home extends BaseWatchFace {
             mRelativeLayout.setBackgroundColor(Color.WHITE);
             mLinearLayout.setBackgroundColor(Color.BLACK);
             if (sgvLevel == 1) {
-                mSgv.setTextColor(ChartUtils.COLOR_ORANGE);//KS Utils
+                mSgv.setTextColor(ChartUtils.COLOR_ORANGE);
                 mDirection.setTextColor(ChartUtils.COLOR_ORANGE);
                 mDelta.setTextColor(ChartUtils.COLOR_ORANGE);
             } else if (sgvLevel == 0) {
@@ -158,6 +153,7 @@ public class Home extends BaseWatchFace {
     public static Context getAppContext() {
         return Home.context;
     }//KS from app / xdrip.java
+
     public static void setAppContext(Context context) {
         Home.context = context;
     }//KS
@@ -171,7 +167,7 @@ public class Home extends BaseWatchFace {
 
     public static void toaststaticnext(final String msg) {
         nexttoast = msg;
-        Log.e(TAG,"Toast next: "+msg);
+        Log.e(TAG, "Toast next: " + msg);
     }
 
     public void toast(final String msg) {
@@ -224,6 +220,7 @@ public class Home extends BaseWatchFace {
         }
         return false;
     }
+
     public static String getPreferencesStringWithDefault(final String pref, final String def) {
         if ((prefs == null) && (Home.getAppContext() != null)) {
             prefs = PreferenceManager.getDefaultSharedPreferences(Home.getAppContext());
@@ -255,3 +252,4 @@ public class Home extends BaseWatchFace {
     }
 
 }
+

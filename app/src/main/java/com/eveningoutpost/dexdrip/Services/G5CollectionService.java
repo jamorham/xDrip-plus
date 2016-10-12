@@ -174,6 +174,7 @@ public class G5CollectionService extends Service {
                 cycleScan(0);
             }
 
+
         }
     };
 
@@ -396,7 +397,7 @@ public class G5CollectionService extends Service {
             }
             isScanning = false;
         } catch (IllegalStateException is) {
-            //
+
         }
     }
 
