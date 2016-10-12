@@ -56,7 +56,6 @@ import com.eveningoutpost.dexdrip.G5Model.Transmitter;
 import com.eveningoutpost.dexdrip.UtilityModels.CollectionServiceStarter;
 import com.eveningoutpost.dexdrip.UtilityModels.ForegroundServiceStarter;
 import com.eveningoutpost.dexdrip.utils.BgToSpeech;
-import com.eveningoutpost.dexdrip.wearintegration.WatchUpdaterService;
 import com.eveningoutpost.dexdrip.xdrip;
 
 import java.io.UnsupportedEncodingException;
@@ -397,7 +396,7 @@ public class G5CollectionService extends Service {
             }
             isScanning = false;
         } catch (IllegalStateException is) {
-
+            //
         }
     }
 

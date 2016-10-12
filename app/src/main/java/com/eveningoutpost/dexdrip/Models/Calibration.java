@@ -105,6 +105,7 @@ class TestParameters extends SlopeParameters {
 @Table(name = "Calibration", id = BaseColumns._ID)
 public class Calibration extends Model {
     private final static String TAG = Calibration.class.getSimpleName();
+    private final static double note_only_marker = 0.000001d;
 
     @Expose
     @Column(name = "timestamp", index = true)
@@ -549,7 +550,7 @@ public class Calibration extends Model {
                     calibration.sensor_confidence = Math.max(((-0.0018 * bg * bg) + (0.6657 * bg) + 36.7505) / 100, 0);
                 } else {
                     calibration.sensor_confidence = 0; // exclude from calibrations but show on graph
-                    calibration.slope_confidence = 0.000001d; // this is a bit ugly
+                    calibration.slope_confidence = note_only_marker; // this is a bit ugly
                     calibration.slope = 0;
                     calibration.intercept = 0;
                 }
@@ -928,7 +929,7 @@ public class Calibration extends Model {
                 .where("Sensor = ? ", sensor.getId())
                 .where("slope_confidence != 0")
                 .where("sensor_confidence != 0")
-                .where("( slope !=0 and intercept !=0 )")
+                .where("slope != 0")
                 .orderBy("timestamp desc")
                 .executeSingle();
     }
@@ -986,6 +987,22 @@ public class Calibration extends Model {
         return new Select()
                 .from(Calibration.class)
                 .where("Sensor = ? ", sensor.getId())
+                .orderBy("timestamp desc")
+                .limit(number)
+                .execute();
+    }
+
+    public static List<Calibration> latestValid(int number) {
+        Sensor sensor = Sensor.currentSensor();
+        if (sensor == null) {
+            return null;
+        }
+        return new Select()
+                .from(Calibration.class)
+                .where("Sensor = ? ", sensor.getId())
+                .where("slope_confidence != 0")
+                .where("sensor_confidence != 0")
+                .where("slope != 0")
                 .orderBy("timestamp desc")
                 .limit(number)
                 .execute();
@@ -1053,6 +1070,30 @@ public class Calibration extends Model {
                 .where("timestamp > " + timestamp)
                 .orderBy("timestamp desc")
                 .execute();
+    }
+
+    public boolean isNote() {
+        Calibration calibration = this;
+        if ((calibration.slope == 0)
+                && (calibration.slope_confidence == note_only_marker)
+                && (calibration.sensor_confidence == 0)
+                && (calibration.intercept == 0)) {
+            return true;
+        } else {
+            return false;
+        }
+    }
+
+    public boolean isValid() {
+        Calibration calibration = this;
+        if ((calibration.slope_confidence != 0)
+                && (calibration.sensor_confidence != 0)
+                && (calibration.slope != 0)
+                && (calibration.intercept != 0)) {
+            return true;
+        } else {
+            return false;
+        }
     }
 }
 

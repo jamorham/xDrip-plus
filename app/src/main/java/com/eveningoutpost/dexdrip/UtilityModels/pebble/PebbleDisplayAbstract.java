@@ -168,6 +168,7 @@ public abstract class PebbleDisplayAbstract implements PebbleDisplayInterface {
     }
 
 
+
     public String getBgReading() {
         return this.bgGraphBuilder.unitized_string(this.bgReading.calculated_value);
     }
