@@ -25,6 +25,12 @@ public class Home extends BaseWatchFace {
     @Override
     public void onCreate() {
         super.onCreate();
+
+        //KS copied from app/Home
+        Home.context = getApplicationContext();
+        set_is_follower();
+        prefs = PreferenceManager.getDefaultSharedPreferences(getApplicationContext());
+
         LayoutInflater inflater = (LayoutInflater) getSystemService(LAYOUT_INFLATER_SERVICE);
         layoutView = inflater.inflate(R.layout.activity_home, null);
         performViewSetup();
