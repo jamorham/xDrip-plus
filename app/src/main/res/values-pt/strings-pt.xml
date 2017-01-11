@@ -132,7 +132,7 @@
     <string name="please_wait_need_two_readings_first">Por favor aguarde, são necessárias 2 leituras do transmissor para começar.</string>
     <string name="please_enter_two_calibrations_to_get_started">Por favor introduza duas calibrações para começar!</string>
     <string name="now_pair_with_your_dexcom_share">Agora emparelhe com o seu Dexcom Share</string>
-    <string name="now_choose_start_sensor_in_settings">Agora inice o sensor nas suas definições</string>
+    <string name="now_choose_start_sensor_in_settings">Agora inicie o sensor nas suas definições</string>
     <string name="double_check_dex_receiver_serial_number">Verifique o número de serie do Dex Receiver, deve conter 10 carateres, não esqueça as letras</string>
     <string name="please_set_dex_receiver_serial_number">Por favor introduza o seu núemro de serie do Dex Receiver nas Definições da App</string>
     <string name="unfortunately_andoird_version_no_blueooth_low_energy">Infelizmente a sua versão do Android não suporta Bluetooth Low Energy</string>
@@ -276,7 +276,7 @@
     <string name="treatments_prediction_curves">Tratamentos / Curva preditiva</string>
     <string name="carbs_per_unit">HC por Uni.</string>
     <string name="everyday">Todo o dia</string>
-    <string name="insulin_sensitivity_glucose_drop_per_unit">Fator de sensibilidade à insulina: baixa de glicémia por Uni</string>
+    <string name="insulin_sensitivity_glucose_drop_per_unit">Fator de sensibilidade à insulina: baixa de glicémia por Uni.</string>
     <string name="transmitter_battery">bateria do transmissor</string>
     <string name="very_low">MUITO BAIXA</string>
     <string name="low">baixa</string>
@@ -389,7 +389,7 @@
     <string name="suppress_alerts_if_missed_readings">Suprimir alertas se leituras estão em falta</string>
     <string name="bad_noisy_value_alerts">Alerta de más leituras (noisy)</string>
     <string name="keep_snoozing_if_glucose_is_heading_in_right_direction">Continuar snooze enquanto glicémia estiver estável</string>
-    <string name="dont_alert_if_glucose_in_right_direction">Não alertar se glicémia estiver estável</string>
+    <string name="dont_alert_if_glucose_in_right_direction">Não alertar se glicémia estiver no sentido correto</string>
     <string name="calibration_request_sound">Som de Calibração Necessária</string>
     <string name="display_filtered_line">Mostrar linha filtrada</string>
     <string name="show_tiny_dots_instead">Mostrar pontos minúsculos em vez de pequenos no gráfico</string>
@@ -460,7 +460,7 @@
     <string name="show_graph_recent_average">Mostrar média recente no gráfico</string>
     <string name="show_graph_total_average">Mostrar média total no gráfico</string>
     <string name="show_momentum_working_curve">Show Momentum working curve</string>
-    <string name="show_noise_workings">Show Noise workings</string>
+    <string name="show_noise_workings">Mostrar valores irregulares (Noise)</string>
     <string name="parakeet_and_extra_features">Parakeet e funcionalidades extra de teste</string>
     <string name="insulin_duration_hours">Duração da insulina em horas</string>
     <string name="default_liver_sensitivity_ratio">Rácio de Sensibilidade do Fígado</string>
@@ -499,7 +499,7 @@
     <string name="rewrite_history">Re-escrever História</string>
     <string name="grid_time_lines_visible">Grelha de horas visível</string>
     <string name="grid_glucose_lines_visible">Grelha de glicémia visível</string>
-    <string name="useful_for_noise_and_missed_readings">Útil para valores irregulares (noise) e leituras perdidas</string>
+    <string name="useful_for_noise_and_missed_readings">Útil para valores irregulares (Noise) e leituras perdidas</string>
     <string name="the_standard_xdrip_calculated_value">Os valores calculados standard xDrip</string>
     <string name="display_ideal_glucose_target_line">Mostrar linha de glicémia ideal</string>
     <string name="display_eight_hour_average_line">Mostrar média de 8 horas</string>
@@ -508,7 +508,7 @@
     <string name="noise_model_inner_workings">Funcionamento do modelo de Noise</string>
     <string name="glucose_number_from_filtered">Valores glicémicos filtrados</string>
     <string name="if_the_phone_has_text_to_speech">Se o telefone tiver capacidade de sintetizar texto, o resultado será falado.</string>
-    <string name="upload_logs">Upload Logs</string>
+    <string name="upload_logs">Carregar Logs</string>
     <string name="short_off_text_for_switches">OFF</string>
     <string name="short_on_text_for_switches">ON</string>
     <string name="install_pebble_apps">Instalar Apps Pebble</string>
