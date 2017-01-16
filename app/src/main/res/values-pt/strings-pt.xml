@@ -222,7 +222,7 @@
     <string name="shows_a_persistent_notification">Mostra uma notificação persistente com um gráfico, visivel no ecrã de bloqueio e previne que o Android mate o serviço.</string>
     <string name="list_of_receivers">Lista de recetores</string>
     <string name="extra_tags_for_logging">Tags extra para log</string>
-    <string name="extra_tags_dialog_message">As tags introduzidas aqui serão logadas pelo xDrop. O formato é tag:nivel. O nível pode ser v,d,i. Por exemplo bgreading:i,DexCollectionService:v. Estas tags setão logadas com baixa prioridade para a lista de Erros e Eventos.</string>
+    <string name="extra_tags_dialog_message">As tags introduzidas aqui serão logadas pelo xDrip. O formato é tag:nivel. O nível pode ser v,d,i. Por exemplo bgreading:i,DexCollectionService:v. Estas tags setão logadas com baixa prioridade para a lista de Erros e Eventos.</string>
     <string name="extra_tags_dialog_title">Introduza mais tags para serem logadas</string>
     <string name="data_source_settings">Definições da Fonte de Dados</string>
     <string name="smart_watch_features">Funcionalidades Smartwatch</string>
