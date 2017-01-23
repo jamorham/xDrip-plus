@@ -1,6 +1,5 @@
 package com.eveningoutpost.dexdrip.Services;
 
-import android.app.AlarmManager;
 import android.app.IntentService;
 import android.app.PendingIntent;
 import android.content.Context;
@@ -10,15 +9,15 @@ import android.preference.PreferenceManager;
 
 import com.eveningoutpost.dexdrip.Models.JoH;
 import com.eveningoutpost.dexdrip.Models.UserError.Log;
+import com.eveningoutpost.dexdrip.UtilityModels.InfluxDBSendTask;
 import com.eveningoutpost.dexdrip.UtilityModels.MongoSendTask;
 import com.eveningoutpost.dexdrip.xdrip;
-
-import java.util.Calendar;
 
 public class SyncService extends IntentService {
     private Context mContext;
     private Boolean enableRESTUpload;
     private Boolean enableMongoUpload;
+    private Boolean enableInfluxUpload;
     private SharedPreferences prefs;
 
     public SyncService() {
@@ -32,11 +31,13 @@ public class SyncService extends IntentService {
         prefs = PreferenceManager.getDefaultSharedPreferences(mContext);
         enableRESTUpload = prefs.getBoolean("cloud_storage_api_enable", false);
         enableMongoUpload = prefs.getBoolean("cloud_storage_mongodb_enable", false);
+        enableInfluxUpload = prefs.getBoolean("cloud_storage_influxdb_enable", false);
         attemptSend();
     }
 
     public void attemptSend() {
         if (enableRESTUpload || enableMongoUpload) { syncToMongoDb(); }
+        if (enableInfluxUpload) { syncToInfluxDb(); }
         setRetryTimer();
     }
 
@@ -50,6 +51,11 @@ public class SyncService extends IntentService {
     private void syncToMongoDb() {
         // TODO does this need locking?
         MongoSendTask task = new MongoSendTask(getApplicationContext());
+        task.executeOnExecutor(xdrip.executor);
+    }
+
+    private void syncToInfluxDb() {
+        InfluxDBSendTask task = new InfluxDBSendTask(getApplicationContext());
         task.executeOnExecutor(xdrip.executor);
     }
 

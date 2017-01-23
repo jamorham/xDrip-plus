@@ -32,6 +32,9 @@ public class CalibrationSendQueue extends Model {
     @Column(name = "mongo_success", index = true)
     public boolean mongo_success;
 
+    @Column(name = "influx_success", index = true)
+    public boolean influx_success;
+
     /*
     public static List<CalibrationSendQueue> queue() {
         return new Select()
@@ -50,10 +53,26 @@ public class CalibrationSendQueue extends Model {
                 .execute();
     }
 
-    public static List<CalibrationSendQueue> cleanQueue() {
+    public static List<CalibrationSendQueue> influxQueue() {
+        return new Select()
+                .from(CalibrationSendQueue.class)
+                .where("influx_success = ?", false)
+                .orderBy("_ID desc")
+                .limit(20)
+                .execute();
+    }
+
+    public static List<CalibrationSendQueue> cleanMongoQueue() {
         return new Delete()
                 .from(CalibrationSendQueue.class)
                 .where("mongo_success = ?", true)
+                .execute();
+    }
+
+    public static List<CalibrationSendQueue> cleanInfluxQueue() {
+        return new Delete()
+                .from(CalibrationSendQueue.class)
+                .where("influx_success = ?", true)
                 .execute();
     }
 
@@ -62,6 +81,7 @@ public class CalibrationSendQueue extends Model {
         calibrationSendQueue.calibration = calibration;
         calibrationSendQueue.success = false;
         calibrationSendQueue.mongo_success = false;
+        calibrationSendQueue.influx_success = false;
         calibrationSendQueue.save();
         Log.i(TAG, "calling SensorSendQueue.SendToFollower");
         SensorSendQueue.SendToFollower(Sensor.getByUuid(calibration.sensor_uuid));
@@ -69,6 +89,11 @@ public class CalibrationSendQueue extends Model {
 
     public void markMongoSuccess() {
         mongo_success = true;
+        save();
+    }
+
+    public void markInfluxSuccess() {
+        influx_success = true;
         save();
     }
 }

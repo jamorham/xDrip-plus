@@ -53,6 +53,9 @@ public class BgSendQueue extends Model {
     @Column(name = "mongo_success", index = true)
     public boolean mongo_success;
 
+    @Column(name = "influx_success", index = true)
+    public boolean influx_success;
+
     @Column(name = "operation_type")
     public String operation_type;
 
@@ -66,6 +69,7 @@ public class BgSendQueue extends Model {
                     .execute();
         }
     */
+
     public static List<BgSendQueue> mongoQueue() {
         return new Select()
                 .from(BgSendQueue.class)
@@ -76,10 +80,28 @@ public class BgSendQueue extends Model {
                 .execute();
     }
 
-    public static List<BgSendQueue> cleanQueue() {
+    public static List<BgSendQueue> cleanMongoQueue() {
         return new Delete()
                 .from(BgSendQueue.class)
                 .where("mongo_success = ?", true)
+                .where("operation_type = ?", "create")
+                .execute();
+    }
+
+    public static List<BgSendQueue> influxQueue() {
+        return new Select()
+                .from(BgSendQueue.class)
+                .where("influx_success = ?", false)
+                .where("operation_type = ?", "create")
+                .orderBy("_ID desc")
+                .limit(30)
+                .execute();
+    }
+
+    public static List<BgSendQueue> cleanInfluxQueue() {
+        return new Delete()
+                .from(BgSendQueue.class)
+                .where("influx_success = ?", true)
                 .where("operation_type = ?", "create")
                 .execute();
     }
@@ -90,6 +112,7 @@ public class BgSendQueue extends Model {
         bgSendQueue.bgReading = bgReading;
         bgSendQueue.success = false;
         bgSendQueue.mongo_success = false;
+        bgSendQueue.influx_success = false;
         bgSendQueue.save();
         Log.d("BGQueue", "New value added to queue!");
     }
@@ -270,6 +293,11 @@ public class BgSendQueue extends Model {
 
     public void markMongoSuccess() {
         this.mongo_success = true;
+        save();
+    }
+
+    public void markInfluxSuccess() {
+        this.influx_success = true;
         save();
     }
 

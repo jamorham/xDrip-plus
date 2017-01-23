@@ -59,7 +59,7 @@ public class UploaderQueue extends Model {
     public static final long MONGO_DIRECT = 1;
     public static final long NIGHTSCOUT_RESTAPI = 1 << 1;
     public static final long TEST_OUTPUT_PLUGIN = 1 << 2;
-
+    public static final long INFLUXDB_RESTAPI = 1 << 3;
 
     public static final long DEFAULT_UPLOAD_CIRCUITS = 0;
 
@@ -131,7 +131,8 @@ public class UploaderQueue extends Model {
         final UploaderQueue result = new UploaderQueue();
         result.bitfield_wanted = DEFAULT_UPLOAD_CIRCUITS
                 | (Home.getPreferencesBooleanDefaultFalse("cloud_storage_mongodb_enable") ? MONGO_DIRECT : 0)
-                | (Home.getPreferencesBooleanDefaultFalse("cloud_storage_api_enable") ? NIGHTSCOUT_RESTAPI : 0);
+                | (Home.getPreferencesBooleanDefaultFalse("cloud_storage_api_enable") ? NIGHTSCOUT_RESTAPI : 0)
+                | (Home.getPreferencesBooleanDefaultFalse("cloud_storage_influxdb_enable") ? INFLUXDB_RESTAPI : 0);
         if (result.bitfield_wanted == 0) return null; // no queue required
         result.timestamp = JoH.tsl();
         result.reference_id = obj.getId();
