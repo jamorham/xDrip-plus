@@ -30,13 +30,6 @@ public class InfluxDBSendTask extends AsyncTask<String, Void, Void> {
     public Void doInBackground(String... urls) {
         try {
             InfluxDBUploader influxDBUploader = new InfluxDBUploader(context);
-            List<UploaderQueue> pending = UploaderQueue.getPendingbyType(
-                    Treatments.class.getSimpleName(), UploaderQueue.INFLUXDB_RESTAPI, 1);
-
-            if (!Home.getPreferencesBooleanDefaultFalse("cloud_storage_influxdb_enable") || pending.size() == 0) {
-                return null;
-            }
-
             List<BgReading> bgReadings = new ArrayList<>();
             List<Calibration> calibrations = new ArrayList<>();
 
