@@ -524,5 +524,19 @@
     <string name="split">Split</string>
     <string name="delete">Delete</string>
     <string name="title_activity_btglucose_meter">Meter Scan</string>
+    <string name="pref_summary_influxdb_enabled">If using a private InfluxDB database, this should be enabled</string>
+    <string name="pref_title_influxdb">InfluxDB</string>
+    <string name="pref_default_influxdb_uri">https://{host}:{port}/write</string>
+    <string name="pref_message_influxdb_uri">Replace example values in {}\'s with your correct values</string>
+    <string name="pref_dialog_influxdb_uri">Enter InfluxDB URI</string>
+    <string name="pref_default_influxdb_database">xdrip</string>
+    <string name="pref_message_influxdb_database">The database where to store measurements</string>
+    <string name="pref_dialog_influxdb_database">Database</string>
+    <string name="pref_default_influxdb_username">root</string>
+    <string name="pref_message_influxdb_username">Username for authentication. It is recommended to not allow usage without authentication.</string>
+    <string name="pref_dialog_influxdb_username">User</string>
+    <string name="pref_default_influxdb_password">root</string>
+    <string name="pref_message_influxdb_password">Password for authentication. It is recommended to not allow usage without authentication.</string>
+    <string name="pref_dialog_influxdb_password">Password</string>
 
 </resources>
