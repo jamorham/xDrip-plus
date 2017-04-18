@@ -47,7 +47,7 @@
             android:icon="@drawable/ic_icon">
             <meta-data
                 android:name="android.support.wearable.complications.UPDATE_PERIOD_SECONDS"
-                android:value="0" />
+                android:value="60" />
             <meta-data android:name="android.support.wearable.complications.SUPPORTED_TYPES"
                 android:value="RANGED_VALUE,SHORT_TEXT,LONG_TEXT"/>
 
