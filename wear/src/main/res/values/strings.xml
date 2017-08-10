@@ -152,6 +152,8 @@
     <string name="pref_show_animations">Show Animations</string>
     <string name="pref_summary_show_animations">Animations. (Circle WF)</string>
 
+    <string name="complications_sgv_description">Blood glucose values</string>
+
     <!-- Location Settings -->
     <string name="location_not_found_title">Location Is Not Enabled</string>
     <string name="location_not_found_message">For Bluetooth discovery to work on newer devices, location must be enabled. xDrip does not track your location and it can be disabled after pairing is successful.</string>
