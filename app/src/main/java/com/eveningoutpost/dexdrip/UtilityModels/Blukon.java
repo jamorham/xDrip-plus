@@ -29,10 +29,16 @@ public class Blukon {
 
     private static int m_nowGlucoseOffset = 0;
     private static String currentCommand = "";
+    //TO be used later
     private static enum BLUKON_STATES {
         INITIAL
     }
-    private static int m_getNowGlucoseDataIndexCommand = 0;
+    private static boolean m_getNowGlucoseDataIndexCommand = false;
+    private static boolean m_gotOneTimeUnknownCmd = false;
+    private static int GET_SENSOR_AGE_DELAY =  3 * 3600;
+    private static final String BLUKON_GETSENSORAGE_TIMER = "blukon-getSensorAge-timer";
+    private static boolean m_getNowGlucoseDataCommand = false;// to be sure we wait for a GlucoseData Block and not using another block
+    private static long m_timeLastBg = 0;
 
     public static String getPin() {
         final String thepin = Home.getPreferencesStringWithDefault(BLUKON_PIN_PREF, null);
@@ -51,8 +57,13 @@ public class Blukon {
     }
 
     public static void initialize() {
-        Home.setPreferencesInt("bridge_battery", 0); //force battery to no-value before first reading
+        Home.setPreferencesInt("bridge_battery", 100); //force battery to 100% before first reading
         Home.setPreferencesInt("nfc_sensor_age", 0); //force sensor age to no-value before first reading
+        m_gotOneTimeUnknownCmd = false;
+        JoH.clearRatelimit(BLUKON_GETSENSORAGE_TIMER);
+        m_getNowGlucoseDataCommand = false;
+        m_getNowGlucoseDataIndexCommand = false;
+        m_timeLastBg = 0;
     }
 
     public static boolean isBlukonPacket(byte[] buffer) {
@@ -64,6 +75,8 @@ public class Blukon {
         return isBlukonPacket(buffer) && getPin() != null; // TODO can't be unset yet and isn't proper subtype test yet
     }
 
+
+    // .*(dexdrip|gatt|Blukon).
     public static byte[] decodeBlukonPacket(byte[] buffer) {
         int cmdFound = 0;
 
@@ -76,14 +89,8 @@ public class Blukon {
         final String strRecCmd = CipherUtils.bytesToHex(buffer).toLowerCase();
         UserError.Log.i(TAG, "BlueCon data: " + strRecCmd);
 
-
-         /* if we find battery state set it lke this:
-             Home.setPreferencesInt("bridge_battery", ByteBuffer.wrap(buffer).get(11));
-         */
-
-
         if (strRecCmd.equalsIgnoreCase("cb010000")) {
-            UserError.Log.i(TAG, "wakeup received");
+            UserError.Log.i(TAG, "Reset currentCommand");
             currentCommand = "";
             cmdFound = 1;
         }
@@ -98,8 +105,21 @@ public class Blukon {
             if (currentCommand.startsWith("810a00")) {//ACK sent
                 //ack received
 
-                currentCommand = "010d0b00";
-                UserError.Log.i(TAG, "getUnknownCmd1: " + currentCommand);
+                //This command will be asked only one time after first connect and never again
+                //Try asking each time
+                if (m_gotOneTimeUnknownCmd == false) {
+                    currentCommand = "010d0b00";
+                    UserError.Log.i(TAG, "getUnknownCmd1: " + currentCommand);
+                } else {
+                    if (JoH.pratelimit(BLUKON_GETSENSORAGE_TIMER, GET_SENSOR_AGE_DELAY)) {
+                        currentCommand = "010d0e0127";
+                        UserError.Log.i(TAG, "getSensorAge");
+                    } else {
+                        currentCommand = "010d0e0103";
+                        m_getNowGlucoseDataIndexCommand = true;//to avoid issue when gotNowDataIndex cmd could be same as getNowGlucoseData (case block=3)
+                        UserError.Log.i(TAG, "getNowGlucoseDataIndexCommand");
+                    }
+                }
 
             } else {
                 UserError.Log.i(TAG, "Got sleep ack, resetting initialstate!");
@@ -109,35 +129,73 @@ public class Blukon {
 
         if (strRecCmd.startsWith("8b1a02")) {
             cmdFound = 1;
-            UserError.Log.e(TAG, "Got NACK");
+            UserError.Log.e(TAG, "Got NACK on cmd=" + currentCommand + " with error=" + strRecCmd.substring(6));
 
             if (strRecCmd.startsWith("8b1a020014")) {
-                UserError.Log.e(TAG, "Got error: UNKNOWN");
+                UserError.Log.e(TAG, "Timeout: please wait 5min or push button to restart!");
             }
 
+            if (strRecCmd.startsWith("8b1a02000f")) {
+                UserError.Log.e(TAG, "Libre sensor has been removed!");
+            }
+
+            if (strRecCmd.startsWith("8b1a020011")) {
+                UserError.Log.e(TAG, "Patch read error.. please check the connectivity and re-initiate...");
+            }
+
+            m_gotOneTimeUnknownCmd = false;
             currentCommand = "";
+            JoH.clearRatelimit(BLUKON_GETSENSORAGE_TIMER);// set to current time to force timer to be set back
         }
 
-        if (currentCommand == "" && strRecCmd.equalsIgnoreCase("cb010000")) {
+        if (currentCommand.equals("") && strRecCmd.equalsIgnoreCase("cb010000")) {
             cmdFound = 1;
             UserError.Log.i(TAG, "wakeup received");
 
             currentCommand = "010d0900";
             UserError.Log.i(TAG, "getPatchInfo");
 
+        } else if (currentCommand.startsWith("010d0900") /*getPatchInfo*/ && strRecCmd.startsWith("8bd9")) {
+            cmdFound = 1;
+            UserError.Log.i(TAG, "Patch Info received");
+            currentCommand = "810a00";
+            UserError.Log.i(TAG, "Send ACK");
+
         } else if (currentCommand.startsWith("010d0b00") /*getUnknownCmd1*/ && strRecCmd.startsWith("8bdb")) {
             cmdFound = 1;
-            UserError.Log.e(TAG, "gotUnknownCmd1 (010d0b00): "+strRecCmd);
+            UserError.Log.i(TAG, "gotUnknownCmd1 (010d0b00): "+strRecCmd);
+
+            if (!strRecCmd.equals("8bdb0101041711")) {
+                UserError.Log.e(TAG, "gotUnknownCmd1 (010d0b00): "+strRecCmd);
+            }
 
             currentCommand = "010d0a00";
             UserError.Log.i(TAG, "getUnknownCmd2 "+ currentCommand);
 
         } else if (currentCommand.startsWith("010d0a00") /*getUnknownCmd2*/ && strRecCmd.startsWith("8bda")) {
             cmdFound = 1;
-            UserError.Log.e(TAG, "gotUnknownCmd2 (010d0a00): "+strRecCmd);
+            UserError.Log.i(TAG, "gotUnknownCmd2 (010d0a00): "+strRecCmd);
 
-            currentCommand = "010d0e0127";
-            UserError.Log.i(TAG, "getSensorAge");
+            if (!strRecCmd.equals("8bdaaa")) {
+                UserError.Log.e(TAG, "gotUnknownCmd2 (010d0a00): "+strRecCmd);
+            }
+
+            if (strRecCmd.equals("8bda02")) {
+                UserError.Log.e(TAG, "gotUnknownCmd2: is maybe battery low????");
+            }
+
+            //saw one time:  battery status????
+
+            //try asking each time m_gotOneTimeUnknownCmd = true;
+
+            if (JoH.pratelimit(BLUKON_GETSENSORAGE_TIMER, GET_SENSOR_AGE_DELAY)) {
+                currentCommand = "010d0e0127";
+                UserError.Log.i(TAG, "getSensorAge");
+            } else {
+                currentCommand = "010d0e0103";
+                m_getNowGlucoseDataIndexCommand = true;//to avoid issue when gotNowDataIndex cmd could be same as getNowGlucoseData (case block=3)
+                UserError.Log.i(TAG, "getNowGlucoseDataIndexCommand");
+            }
 
         } else if (currentCommand.startsWith("010d0e0127") /*getSensorAge*/ && strRecCmd.startsWith("8bde")) {
             cmdFound = 1;
@@ -148,17 +206,11 @@ public class Blukon {
             if ((sensorAge > 0) && (sensorAge < 200000)) {
                 Home.setPreferencesInt("nfc_sensor_age", sensorAge);//in min
             }
-
             currentCommand = "010d0e0103";
-            m_getNowGlucoseDataIndexCommand = 1;
+            m_getNowGlucoseDataIndexCommand = true;//to avoid issue when gotNowDataIndex cmd could be same as getNowGlucoseData (case block=3)
             UserError.Log.i(TAG, "getNowGlucoseDataIndexCommand");
 
-        } else if (currentCommand.startsWith("010d0900") /*getPatchInfo*/ && strRecCmd.startsWith("8bd9")) {
-            cmdFound = 1;
-            UserError.Log.i(TAG, "Patch Info received");
-            currentCommand = "810a00";
-            UserError.Log.i(TAG, "Send ACK");
-        } else if (currentCommand.startsWith("010d0e0103") /*getNowDataIndex*/ && m_getNowGlucoseDataIndexCommand == 1 && strRecCmd.startsWith("8bde")) {
+        } else if (currentCommand.startsWith("010d0e0103") /*getNowDataIndex*/ && m_getNowGlucoseDataIndexCommand == true && strRecCmd.startsWith("8bde")) {
             cmdFound = 1;
             UserError.Log.i(TAG, "gotNowDataIndex");
 
@@ -166,36 +218,45 @@ public class Blukon {
             UserError.Log.i(TAG, "block Number is "+blockNumber);
 
             currentCommand = "010d0e010"+ Integer.toHexString(blockNumber);//getNowGlucoseData
-            m_getNowGlucoseDataIndexCommand = 0;
-
+            m_getNowGlucoseDataIndexCommand = false;
+            m_getNowGlucoseDataCommand = true;
             UserError.Log.i(TAG, "getNowGlucoseData");
 
-
-        } else if (currentCommand.startsWith("010d0e01") /*getNowGlucoseData*/ && strRecCmd.startsWith("8bde")) {
+        } else if (currentCommand.startsWith("010d0e01") /*getNowGlucoseData*/ && m_getNowGlucoseDataCommand == true && strRecCmd.startsWith("8bde")) {
             cmdFound = 1;
             int currentGlucose = nowGetGlucoseValue(buffer);
 
-            UserError.Log.i(TAG, "*****************got getNowGlucoseData = " + currentGlucose);
+            UserError.Log.i(TAG, "************got getNowGlucoseData=" + currentGlucose);
+            m_timeLastBg = JoH.tsl();
 
             processNewTransmitterData(TransmitterData.create(currentGlucose, currentGlucose, 0 /*battery level force to 0 as unknown*/, JoH.tsl()));
-
-
             currentCommand = "010c0e00";
             UserError.Log.i(TAG, "Send sleep cmd");
+            m_getNowGlucoseDataCommand = false;
 
         }  else if (strRecCmd.startsWith("cb020000")) {
+            cmdFound = 1;
             UserError.Log.e(TAG, "is bridge battery low????!");
+            Home.setPreferencesInt("bridge_battery", 50);
 
-            Home.setPreferencesInt("bridge_battery", 0);
+        } else if (strRecCmd.startsWith("cbdb0000")) {
+            cmdFound = 1;
+            UserError.Log.e(TAG, "is bridge battery really low????!");
+            Home.setPreferencesInt("bridge_battery", 25);
+
         }
+
+
 
         if (currentCommand.length() > 0 && cmdFound == 1) {
             UserError.Log.d(TAG, "Sending reply: " + currentCommand);
             return CipherUtils.hexToBytes(currentCommand);
         } else {
             if (cmdFound == 0) {
-                UserError.Log.e(TAG, "*******************************COMMAND NOT FOUND!!!!!!!!!!-> " + strRecCmd);
+                UserError.Log.e(TAG, "***COMMAND NOT FOUND! -> " + strRecCmd + " on currentCmd=" + currentCommand);
             }
+
+            currentCommand = "";
 
             return null;
         }
@@ -203,10 +264,46 @@ public class Blukon {
     }
 
 
+    /*
+
+
+in getPatchInfo: blucon answer is 20 bytes long.
+Bytes 13 - 19 (0 indexing) contains the bytes 0 ... 6 of block #0
+Bytes 6 - 12 (0 indexing) seems to be constant on different sensors
+Bytes 2 - 5 (0 indexing) are different on different sensors
+Bytes 0 - 1 (0 indexing) is the ordinary block request answer (0x8B 0xD9).
+Remark: Byte #17 (0 indexing) contains the SensorStatusByte.
+
+     switch (sensorData.sensorStatusByte)
+  {
+    case 0x01:
+      sensorData.sensorStatusString = "not yet started";
+      break;
+    case 0x02:
+      sensorData.sensorStatusString = "starting";
+      break;
+    case 0x03:
+      sensorData.sensorStatusString = "ready";
+      break;
+    case 0x04:
+      sensorData.sensorStatusString = "expired";
+      break;
+    case 0x05:
+      sensorData.sensorStatusString = "shutdown";
+      break;
+    case 0x06:
+      sensorData.sensorStatusString = "failure";
+      break;
+    default:
+      sensorData.sensorStatusString = "unknown state";
+      break;
+  }
+
+     */
 
     private static synchronized void processNewTransmitterData(TransmitterData transmitterData) {
         if (transmitterData == null) {
-            UserError.Log.e(TAG, "transmitterData is NULL");
+            UserError.Log.e(TAG, "Got duplicated data! Last BG at " + JoH.dateTimeText(m_timeLastBg));
             return;
         }
 
