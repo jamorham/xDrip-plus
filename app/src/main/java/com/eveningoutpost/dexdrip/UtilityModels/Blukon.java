@@ -39,6 +39,7 @@ public class Blukon {
     private static final String BLUKON_GETSENSORAGE_TIMER = "blukon-getSensorAge-timer";
     private static boolean m_getNowGlucoseDataCommand = false;// to be sure we wait for a GlucoseData Block and not using another block
     private static long m_timeLastBg = 0;
+    private static int m_currentBlockNumber = 0;
 
     public static String getPin() {
         final String thepin = Home.getPreferencesStringWithDefault(BLUKON_PIN_PREF, null);
@@ -63,7 +64,7 @@ public class Blukon {
         JoH.clearRatelimit(BLUKON_GETSENSORAGE_TIMER);
         m_getNowGlucoseDataCommand = false;
         m_getNowGlucoseDataIndexCommand = false;
-        m_timeLastBg = 0;
+ //       m_timeLastBg = 0;
     }
 
     public static boolean isBlukonPacket(byte[] buffer) {
@@ -215,6 +216,9 @@ public class Blukon {
             UserError.Log.i(TAG, "gotNowDataIndex");
 
             int blockNumber = blockNumberForNowGlucoseData(buffer);
+
+            m_currentBlockNumber = blockNumber;
+
             UserError.Log.i(TAG, "block Number is "+blockNumber);
 
             currentCommand = "010d0e010"+ Integer.toHexString(blockNumber);//getNowGlucoseData
@@ -224,15 +228,40 @@ public class Blukon {
 
         } else if (currentCommand.startsWith("010d0e01") /*getNowGlucoseData*/ && m_getNowGlucoseDataCommand == true && strRecCmd.startsWith("8bde")) {
             cmdFound = 1;
-            int currentGlucose = nowGetGlucoseValue(buffer);
 
-            UserError.Log.i(TAG, "************got getNowGlucoseData=" + currentGlucose);
-            m_timeLastBg = JoH.tsl();
+            UserError.Log.i(TAG, "time difference is: " + (JoH.tsl() - m_timeLastBg));
 
-            processNewTransmitterData(TransmitterData.create(currentGlucose, currentGlucose, 0 /*battery level force to 0 as unknown*/, JoH.tsl()));
-            currentCommand = "010c0e00";
-            UserError.Log.i(TAG, "Send sleep cmd");
-            m_getNowGlucoseDataCommand = false;
+            long timeToGoBack = (((JoH.tsl()-m_timeLastBg)/1000)+30)/60;
+
+            UserError.Log.i(TAG, "go back in time: "+timeToGoBack+"min, block Number is "+m_currentBlockNumber);
+
+            // if last value is missing
+            if (  (JoH.tsl()-m_timeLastBg) > 530000 ) {
+
+                int currentGlucose = nowGetGlucoseValue(buffer);
+
+                UserError.Log.i(TAG, "simulate trend backfill ------------- got getNowGlucoseData=" + currentGlucose);
+
+                processNewTransmitterData(TransmitterData.create(currentGlucose, currentGlucose, 0 /*battery level force to 0 as unknown*/, JoH.tsl()));
+
+                m_timeLastBg = JoH.tsl();
+                currentCommand = "010c0e00";
+                UserError.Log.i(TAG, "Send sleep cmd");
+                m_getNowGlucoseDataCommand = false;
+
+            }
+            else {
+
+                int currentGlucose = nowGetGlucoseValue(buffer);
+
+                UserError.Log.i(TAG, "->->->->->->->->got getNowGlucoseData=" + currentGlucose);
+
+                processNewTransmitterData(TransmitterData.create(currentGlucose, currentGlucose, 0 /*battery level force to 0 as unknown*/, JoH.tsl()));
+                m_timeLastBg = JoH.tsl();
+                currentCommand = "010c0e00";
+                UserError.Log.i(TAG, "Send sleep cmd");
+                m_getNowGlucoseDataCommand = false;
+            }
 
         }  else if (strRecCmd.startsWith("cb020000")) {
             cmdFound = 1;
