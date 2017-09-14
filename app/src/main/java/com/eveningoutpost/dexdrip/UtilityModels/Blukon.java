@@ -29,7 +29,8 @@ public class Blukon {
 
     private static int m_nowGlucoseOffset = 0;
 
-    private static int m_currentBlock = 0;
+    private static int m_currentBlockNumber = 0;
+    private static int m_currentOffset = 0;
     private static long m_timeDiffToLastReading = 0;
 
     private static String currentCommand = "";
@@ -46,7 +47,6 @@ public class Blukon {
     private static final String BLUKON_GETSENSORAGE_TIMER = "blukon-getSensorAge-timer";
     private static boolean m_getNowGlucoseDataCommand = false;// to be sure we wait for a GlucoseData Block and not using another block
     private static long m_timeLastBg = 0;
-    private static int m_currentBlockNumber = 0;
 
     public static String getPin() {
         final String thepin = Home.getPreferencesStringWithDefault(BLUKON_PIN_PREF, null);
@@ -207,6 +207,9 @@ public class Blukon {
             }
 
         } else if (currentCommand.startsWith("010d0e0127") /*getSensorAge*/ && strRecCmd.startsWith("8bde")) {
+
+//            UserError.Log.i(TAG, "------------ state getSensorAge ------------------");
+
             cmdFound = 1;
             UserError.Log.i(TAG, "SensorAge received");
 
@@ -221,65 +224,81 @@ public class Blukon {
 
         } else if (currentCommand.startsWith("010d0e0103") /*getNowDataIndex*/ && m_getNowGlucoseDataIndexCommand == true && strRecCmd.startsWith("8bde")) {
             cmdFound = 1;
-            UserError.Log.i(TAG, "gotNowDataIndex");
+            UserError.Log.i(TAG, "------------ state getNowDataIndex ------------------");
 
+            // calculate time delta to last valid BG reading
             m_timeDiffToLastReading = JoH.tsl() - m_timeLastBg;
-            UserError.Log.i(TAG, "+++++ time difference is: " + m_timeDiffToLastReading);
+            UserError.Log.i(TAG, "++++ time difference is: " + m_timeDiffToLastReading);
 
-            long timeToGoBack = m_timeDiffToLastReading/1000;
-            UserError.Log.i(TAG, "+++++ time difference is: " + timeToGoBack);
-            timeToGoBack = timeToGoBack - 300;
-            UserError.Log.i(TAG, "+++++ time difference is: " + timeToGoBack);
-            timeToGoBack = timeToGoBack + 20;
-            UserError.Log.i(TAG, "+++++ time difference is: " + timeToGoBack);
-            timeToGoBack = timeToGoBack/60;
-            UserError.Log.i(TAG, "+++++ time difference is: " + timeToGoBack);
-
-            int blockNumber = blockNumberForNowGlucoseData(buffer);
-            m_currentBlock = blockNumber;
-
-            UserError.Log.i(TAG, "+++++ go back in time: " + timeToGoBack + " min, current block Number is " + m_currentBlock);
-
+            // is time delta within the trend buffer (0...15 mins) ?
             if ( (m_timeDiffToLastReading > 530000) && (m_timeDiffToLastReading < (300000*16)) ) {
                 m_getOlderReading = true;
-                UserError.Log.i(TAG, "+++ getOlderReading = true");
-
-                int delayedBlockNumber = blockNumberForNowGlucoseDataDelayed(blockNumber, 5);
-                currentCommand = "010d0e010" + Integer.toHexString(delayedBlockNumber);//getNowGlucoseData
-                m_getNowGlucoseDataIndexCommand = false;
-                m_getNowGlucoseDataCommand = true;
-                UserError.Log.i(TAG, "++++ getNowGlucoseDataDelayed for " + m_timeDiffToLastReading + " ms, block number " + delayedBlockNumber);
+                UserError.Log.i(TAG, "++++ last BG delayed > 530 s, m_getOlderReading = true");
             }
             else {
                 m_getOlderReading = false;
-                UserError.Log.i(TAG, "++++ getOlderReading = false");
-
-                currentCommand = "010d0e010" + Integer.toHexString(blockNumber);//getNowGlucoseData
-                m_getNowGlucoseDataIndexCommand = false;
-                m_getNowGlucoseDataCommand = true;
-                UserError.Log.i(TAG, "++++ getNowGlucoseData");
             }
 
-        } else if (currentCommand.startsWith("010d0e01") /*getNowGlucoseData*/ && m_getNowGlucoseDataCommand == true && strRecCmd.startsWith("8bde")) {
-            cmdFound = 1;
+            // get index to current BG reading
+            int blockNumber = blockNumberForNowGlucoseData(buffer);
+            m_currentBlockNumber = blockNumber;
+            m_currentOffset = m_nowGlucoseOffset;
 
-            int currentGlucose = nowGetGlucoseValue(buffer);
-
-            UserError.Log.i(TAG, "~~~~~~~~~~~~~~~got getNowGlucoseData=" + currentGlucose);
-
-            m_timeLastBg = JoH.tsl();
+            // time diff must be > 5,5 min and less than the complete trend buffer
             if ( !m_getOlderReading ) {
+                currentCommand = "010d0e010" + Integer.toHexString(m_currentBlockNumber);//getNowGlucoseData
+                m_nowGlucoseOffset = m_currentOffset;
+//                UserError.Log.i(TAG, "++++ getNowGlucoseData");
+            }
+            else {
+                do { m_timeDiffToLastReading -= 300000;
+                } while ( (int)(((m_timeDiffToLastReading/1000)+30)/60) > 15 );
+                if ( (int)(((m_timeDiffToLastReading/1000)+30)/60) < 5 )
+                    m_getOlderReading = false;
+                int minutesBack = (int)((m_timeDiffToLastReading/1000)+30)/60;
+                int delayedTrendIndex = m_currentBlockNumber;
+                for ( int i = 0 ; i < minutesBack ; i++ ) {
+                    delayedTrendIndex--;
+                    if ( delayedTrendIndex < 0)
+                        delayedTrendIndex = 15;
+                }
+                UserError.Log.i(TAG, "++++ current block: " + m_currentBlockNumber + ", delayed block: " + delayedTrendIndex);
+                int delayedBlockNumber = blockNumberForNowGlucoseDataDelayed(delayedTrendIndex);
+                currentCommand = "010d0e010" + Integer.toHexString(delayedBlockNumber);//getNowGlucoseData
+            }
+            m_getNowGlucoseDataIndexCommand = false;
+            m_getNowGlucoseDataCommand = true;
+        } else if (currentCommand.startsWith("010d0e01") /*getNowGlucoseData*/ && m_getNowGlucoseDataCommand == true && strRecCmd.startsWith("8bde")) {
+            UserError.Log.i(TAG, "------------ state getNowGlucoseData ------------------");
+            cmdFound = 1;
+            int currentGlucose = nowGetGlucoseValue(buffer);
+            UserError.Log.i(TAG, "~~~~~~~~~~~~~~~got getNowGlucoseData=" + currentGlucose);
+            if ( !m_getOlderReading ) {
+                m_timeLastBg = JoH.tsl();
                 processNewTransmitterData(TransmitterData.create(currentGlucose, currentGlucose, 0 /*battery level force to 0 as unknown*/, JoH.tsl()));
                 currentCommand = "010c0e00";
                 UserError.Log.i(TAG, "++++ Send sleep cmd");
                 m_getNowGlucoseDataCommand = false;
             }
             else {
-                processNewTransmitterData(TransmitterData.create(currentGlucose, currentGlucose, 0 /*battery level force to 0 as unknown*/, JoH.tsl()-300000));
-                currentCommand = "010d0e010" + Integer.toHexString(m_currentBlock);
+                processNewTransmitterData(TransmitterData.create(currentGlucose, currentGlucose, 0 /*battery level force to 0 as unknown*/, JoH.tsl()-m_timeDiffToLastReading));
+                do { m_timeDiffToLastReading -= 300000;
+                } while ( (int)(((m_timeDiffToLastReading/1000)+30)/60) > 15 );
+                if ( (int)(((m_timeDiffToLastReading/1000)+30)/60) < 5 ) {
+                    m_getOlderReading = false;
+                    UserError.Log.i(TAG, "++++ backfilling done, m_timediffToLastReading = " + m_timeDiffToLastReading);
+                }
+                int minutesBack = (int)((m_timeDiffToLastReading/1000)+30)/60;
+                int delayedTrendIndex = m_currentBlockNumber;
+                for ( int i = 0 ; i < minutesBack ; i++ ) {
+                    delayedTrendIndex--;
+                    if ( delayedTrendIndex < 0)
+                        delayedTrendIndex = 15;
+                }
+                UserError.Log.i(TAG, "++++ current block: " + m_currentBlockNumber + ", delayed block: " + delayedTrendIndex);
+                int delayedBlockNumber = blockNumberForNowGlucoseDataDelayed(delayedTrendIndex);
+                currentCommand = "010d0e010" + Integer.toHexString(delayedBlockNumber);//getNowGlucoseData
                 UserError.Log.i(TAG, "++++ get next block: " + currentCommand);
-                m_getOlderReading = false;
-                UserError.Log.i(TAG, "+++ getOlderReading = false");
             }
 
         }  else if (strRecCmd.startsWith("cb020000")) {
@@ -399,28 +418,30 @@ Remark: Byte #17 (0 indexing) contains the SensorStatusByte.
         return (nowGlucoseIndex3);
     }
 
-    private static int blockNumberForNowGlucoseDataDelayed(int currentBlock, int delayMinutes)
+    private static int blockNumberForNowGlucoseDataDelayed(int delayedIndex)
     {
         int i;
         int ngi2;
         int ngi3;
 
-        // calculate byte offset in libre FRAM
-        ngi2 = (currentBlock * 6) + 4;
+        UserError.Log.i(TAG, "dataDelayed: delayedIndex: " + delayedIndex);
 
-        // count back the byte offset
-        for ( i = 0 ; i < delayMinutes+1 ; i++ ) {
-            ngi2 -= 6;
-            if ( ngi2 < 4 )
-                ngi2 = ngi2 + 96;
-        }
+        // calculate byte offset in libre FRAM
+        ngi2 = (delayedIndex * 6) + 4;
+
+        UserError.Log.i(TAG, "ngi2 = " + ngi2);
+
+         ngi2 -= 6;
+         if (ngi2 < 4)
+             ngi2 = ngi2 + 96;
+         UserError.Log.i(TAG, "ngi2-- = " + ngi2);
 
         // calculate the block number where to get the BG reading
         ngi3 = 3 + (ngi2/8);
 
         // calculate the offset in the block
         m_nowGlucoseOffset = ngi2 % 8;
-        UserError.Log.i(TAG, "delayed block " + ngi3 + " with Offset " + m_nowGlucoseOffset + ", delay of " + delayMinutes + " mins");
+        UserError.Log.i(TAG, "delayed block " + ngi3 + " with Offset " + m_nowGlucoseOffset);
 
         return(ngi3);
     }
@@ -449,7 +470,7 @@ Remark: Byte #17 (0 indexing) contains the SensorStatusByte.
 
         // grep 2 bytes with BG data from input bytearray, mask out 12 LSB bits and rescale for xDrip+
         rawGlucose = ((input[3 + m_nowGlucoseOffset + 1] & 0x0F) << 8) | (input[3 + m_nowGlucoseOffset] & 0xFF);
-        UserError.Log.i(TAG, "rawGlucose=" + rawGlucose);
+        UserError.Log.i(TAG, "rawGlucose=" + rawGlucose + "m_nowGlucoseOffset" + m_nowGlucoseOffset);
 
         // rescale
         curGluc = getGlucose(rawGlucose);
