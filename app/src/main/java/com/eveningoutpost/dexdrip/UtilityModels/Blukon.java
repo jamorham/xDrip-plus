@@ -29,6 +29,7 @@ public class Blukon {
 
     private static int m_nowGlucoseOffset = 0;
 
+    private static int m_currentTrendIndex;
     private static int m_currentBlockNumber = 0;
     private static int m_currentOffset = 0;
     private static long m_timeDiffToLastReading = 0;
@@ -228,10 +229,10 @@ public class Blukon {
 
             // calculate time delta to last valid BG reading
             m_timeDiffToLastReading = JoH.tsl() - m_timeLastBg;
-            UserError.Log.i(TAG, "++++ time difference is: " + m_timeDiffToLastReading);
 
+            UserError.Log.i(TAG, "++++ time difference is: " + m_timeDiffToLastReading/1000 + " s");
             // is time delta within the trend buffer (0...15 mins) ?
-            if ( (m_timeDiffToLastReading > 530000) && (m_timeDiffToLastReading < (300000*16)) ) {
+            if ( (m_timeDiffToLastReading > 530000) ) {
                 m_getOlderReading = true;
                 UserError.Log.i(TAG, "++++ last BG delayed > 530 s, m_getOlderReading = true");
             }
@@ -251,18 +252,24 @@ public class Blukon {
 //                UserError.Log.i(TAG, "++++ getNowGlucoseData");
             }
             else {
-                do { m_timeDiffToLastReading -= 300000;
+                do {
+                    m_timeDiffToLastReading -= 300000;
+                    if ( m_timeDiffToLastReading < (300000*32) )
+                        UserError.Log.i(TAG, "++++ decrement m_timeDiffToLastReading with 300 s now to" + m_timeDiffToLastReading/1000 + " s");
                 } while ( (int)(((m_timeDiffToLastReading/1000)+30)/60) > 15 );
-                if ( (int)(((m_timeDiffToLastReading/1000)+30)/60) < 5 )
+                if ( (int)(((m_timeDiffToLastReading/1000)+30)/60) < 5 ) {
+                    UserError.Log.i(TAG, "++++ m_timeDiffToLastReading < 5 min (" + m_timeDiffToLastReading/1000 + " s)");
                     m_getOlderReading = false;
+                }
                 int minutesBack = (int)((m_timeDiffToLastReading/1000)+30)/60;
-                int delayedTrendIndex = m_currentBlockNumber;
+                int delayedTrendIndex = m_currentTrendIndex;
+                UserError.Log.i(TAG, "++++ minutesBack: " + minutesBack + ", start decrementing with index " + delayedTrendIndex);
                 for ( int i = 0 ; i < minutesBack ; i++ ) {
                     delayedTrendIndex--;
                     if ( delayedTrendIndex < 0)
                         delayedTrendIndex = 15;
                 }
-                UserError.Log.i(TAG, "++++ current block: " + m_currentBlockNumber + ", delayed block: " + delayedTrendIndex);
+//                UserError.Log.i(TAG, "++++ current block: " + m_currentBlockNumber + ", delayedTrendIndex: " + delayedTrendIndex);
                 int delayedBlockNumber = blockNumberForNowGlucoseDataDelayed(delayedTrendIndex);
                 currentCommand = "010d0e010" + Integer.toHexString(delayedBlockNumber);//getNowGlucoseData
             }
@@ -275,27 +282,34 @@ public class Blukon {
             UserError.Log.i(TAG, "~~~~~~~~~~~~~~~got getNowGlucoseData=" + currentGlucose);
             if ( !m_getOlderReading ) {
                 m_timeLastBg = JoH.tsl();
+                UserError.Log.i(TAG, "++++ normal BG reading done, current time = " + m_timeLastBg/1000 + " s");
                 processNewTransmitterData(TransmitterData.create(currentGlucose, currentGlucose, 0 /*battery level force to 0 as unknown*/, JoH.tsl()));
                 currentCommand = "010c0e00";
                 UserError.Log.i(TAG, "++++ Send sleep cmd");
                 m_getNowGlucoseDataCommand = false;
             }
             else {
+                UserError.Log.i(TAG, "++++ delayed BG reading done, delta time: " + (JoH.tsl()-m_timeDiffToLastReading)/1000 + " s");
                 processNewTransmitterData(TransmitterData.create(currentGlucose, currentGlucose, 0 /*battery level force to 0 as unknown*/, JoH.tsl()-m_timeDiffToLastReading));
-                do { m_timeDiffToLastReading -= 300000;
+                do {
+                    m_timeDiffToLastReading -= 300000;
+                    if ( m_timeDiffToLastReading < (300000*32) )
+                        UserError.Log.i(TAG, "++++ decrement m_timeDiffToLastReading with 300 s now to" + m_timeDiffToLastReading/1000 + " s");
                 } while ( (int)(((m_timeDiffToLastReading/1000)+30)/60) > 15 );
                 if ( (int)(((m_timeDiffToLastReading/1000)+30)/60) < 5 ) {
+                    UserError.Log.i(TAG, "++++ backfilling done, m_timediffToLastReading = " + m_timeDiffToLastReading/1000 + " s");
+                    UserError.Log.i(TAG, "m_getOlderReading = false");
                     m_getOlderReading = false;
-                    UserError.Log.i(TAG, "++++ backfilling done, m_timediffToLastReading = " + m_timeDiffToLastReading);
                 }
                 int minutesBack = (int)((m_timeDiffToLastReading/1000)+30)/60;
-                int delayedTrendIndex = m_currentBlockNumber;
+                int delayedTrendIndex = m_currentTrendIndex;
+                UserError.Log.i(TAG, "++++ minutesBack: " + minutesBack + ", start decrementing with index " + delayedTrendIndex);
                 for ( int i = 0 ; i < minutesBack ; i++ ) {
                     delayedTrendIndex--;
                     if ( delayedTrendIndex < 0)
                         delayedTrendIndex = 15;
                 }
-                UserError.Log.i(TAG, "++++ current block: " + m_currentBlockNumber + ", delayed block: " + delayedTrendIndex);
+                UserError.Log.i(TAG, "++++ current block: " + m_currentBlockNumber + ", delayedTrendIndex: " + delayedTrendIndex);
                 int delayedBlockNumber = blockNumberForNowGlucoseDataDelayed(delayedTrendIndex);
                 currentCommand = "010d0e010" + Integer.toHexString(delayedBlockNumber);//getNowGlucoseData
                 UserError.Log.i(TAG, "++++ get next block: " + currentCommand);
@@ -398,6 +412,10 @@ Remark: Byte #17 (0 indexing) contains the SensorStatusByte.
 
         nowGlucoseIndex2 = (int) (input[5] & 0x0F);
 
+        m_currentTrendIndex = nowGlucoseIndex2;
+
+        UserError.Log.i(TAG, "++++ trend index to next reading " + nowGlucoseIndex2);
+
         // calculate byte position in sensor body
         nowGlucoseIndex2 = (nowGlucoseIndex2 * 6) + 4;
 
@@ -413,7 +431,7 @@ Remark: Byte #17 (0 indexing) contains the SensorStatusByte.
         // calculate offset of the 2 bytes in the block
         m_nowGlucoseOffset = nowGlucoseIndex2 % 8;
 
-        UserError.Log.i(TAG, "trend block " + nowGlucoseIndex3 +" with Offset " + m_nowGlucoseOffset);
+        UserError.Log.i(TAG, "++++ trend block " + nowGlucoseIndex3 +" with Offset " + m_nowGlucoseOffset);
 
         return (nowGlucoseIndex3);
     }
@@ -424,7 +442,7 @@ Remark: Byte #17 (0 indexing) contains the SensorStatusByte.
         int ngi2;
         int ngi3;
 
-        UserError.Log.i(TAG, "dataDelayed: delayedIndex: " + delayedIndex);
+        UserError.Log.i(TAG, "++++ trend index to next reading to calc delayed data: " + delayedIndex);
 
         // calculate byte offset in libre FRAM
         ngi2 = (delayedIndex * 6) + 4;
@@ -434,14 +452,14 @@ Remark: Byte #17 (0 indexing) contains the SensorStatusByte.
          ngi2 -= 6;
          if (ngi2 < 4)
              ngi2 = ngi2 + 96;
-         UserError.Log.i(TAG, "ngi2-- = " + ngi2);
+//         UserError.Log.i(TAG, "ngi2-- = " + ngi2);
 
         // calculate the block number where to get the BG reading
         ngi3 = 3 + (ngi2/8);
 
         // calculate the offset in the block
         m_nowGlucoseOffset = ngi2 % 8;
-        UserError.Log.i(TAG, "delayed block " + ngi3 + " with Offset " + m_nowGlucoseOffset);
+        UserError.Log.i(TAG, "++++ delayed block " + ngi3 + " with Offset " + m_nowGlucoseOffset);
 
         return(ngi3);
     }
