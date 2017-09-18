@@ -33,9 +33,7 @@ public class Blukon {
     private static int m_currentBlockNumber = 0;
     private static int m_currentOffset = 0;
     private static int m_minutesDiffToLastReading = 0;
-
     private static int m_minutesBack;
-    private static int m_delayedTrendIndex;
 
     private static String currentCommand = "";
     //TO be used later
@@ -255,8 +253,8 @@ public class Blukon {
             }
             else {
                 m_minutesBack = m_minutesDiffToLastReading;
-                m_delayedTrendIndex = m_currentTrendIndex;
-                UserError.Log.i(TAG, "++++ initial minutesBack: " + m_minutesBack + ", start decrementing with index " + m_delayedTrendIndex);
+                int delayedTrendIndex = m_currentTrendIndex;
+                UserError.Log.i(TAG, "++++ initial minutesBack: " + m_minutesBack + ", start decrementing with index " + delayedTrendIndex);
                 if ( m_minutesBack > 15 ) {
                     m_minutesBack = 15;
                 } else if ( m_minutesBack > 10 ) {
@@ -266,12 +264,12 @@ public class Blukon {
                 }
                 UserError.Log.i(TAG, "++++ minutesBack set to " + m_minutesBack);
                 for ( int i = 0 ; i < m_minutesBack ; i++ ) {
-                    if ( --m_delayedTrendIndex < 0)
-                       m_delayedTrendIndex = 15;
+                    if ( --delayedTrendIndex < 0)
+                       delayedTrendIndex = 15;
                 }
-                UserError.Log.i(TAG, "++++ -> m_delayedTrendIndex: " + m_delayedTrendIndex);
+                UserError.Log.i(TAG, "++++ -> m_delayedTrendIndex: " + delayedTrendIndex);
 
-                int delayedBlockNumber = blockNumberForNowGlucoseDataDelayed(m_delayedTrendIndex);
+                int delayedBlockNumber = blockNumberForNowGlucoseDataDelayed(delayedTrendIndex);
                 currentCommand = "010d0e010" + Integer.toHexString(delayedBlockNumber);//getNowGlucoseData
 /*
                 m_minutesBack -= 5;
@@ -308,13 +306,13 @@ public class Blukon {
                 }
                 UserError.Log.i(TAG, "++++ decremented to minutesBack: " + m_minutesBack);
 
-                m_delayedTrendIndex = m_currentTrendIndex;
+                int delayedTrendIndex = m_currentTrendIndex;
                 for ( int i = 0 ; i < m_minutesBack ; i++ ) {
-                    if ( --m_delayedTrendIndex < 0)
-                        m_delayedTrendIndex = 15;
+                    if ( --delayedTrendIndex < 0)
+                        delayedTrendIndex = 15;
                 }
-                UserError.Log.i(TAG, "++++ -> m_delayedTrendIndex: " + m_delayedTrendIndex);
-                int delayedBlockNumber = blockNumberForNowGlucoseDataDelayed(m_delayedTrendIndex);
+                UserError.Log.i(TAG, "++++ -> m_delayedTrendIndex: " + delayedTrendIndex);
+                int delayedBlockNumber = blockNumberForNowGlucoseDataDelayed(delayedTrendIndex);
 
                 currentCommand = "010d0e010" + Integer.toHexString(delayedBlockNumber);//getNowGlucoseData
                 UserError.Log.i(TAG, "++++ get next block: " + currentCommand);
