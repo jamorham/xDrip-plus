@@ -276,8 +276,7 @@ public class Blukon {
             else
                 timeStamp = JoH.tsl();
 */
-            long timeStamp = JoH.tsl();
-            processNewTransmitterData(TransmitterData.create(currentGlucose, currentGlucose, 0 /*battery level force to 0 as unknown*/, timeStamp));
+            processNewTransmitterData(TransmitterData.create(currentGlucose, currentGlucose, 0 /*battery level force to 0 as unknown*/, JoH.tsl()));
 
 //            if ( m_getOlderReading ) {
 /*
@@ -298,7 +297,7 @@ public class Blukon {
                 UserError.Log.i(TAG, "backfilling, get next block: " + currentCommand);
 */
 //            break;
-            }
+//            }
 //            else {
 
                 m_timeLastBg = JoH.tsl();
