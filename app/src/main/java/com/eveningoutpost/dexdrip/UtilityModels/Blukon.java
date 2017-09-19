@@ -270,9 +270,16 @@ public class Blukon {
 
             UserError.Log.i(TAG, "************got getNowGlucoseData=" + currentGlucose);
 
+            long timeStamp;
+            if ( m_getOlderReading )
+                timeStamp = JoH.tsl()-(m_minutesBack*60*1000);
+            else
+                timeStamp = JoH.tsl();
+
+            processNewTransmitterData(TransmitterData.create(currentGlucose, currentGlucose, 0 /*battery level force to 0 as unknown*/, timeStamp));
+
             if ( m_getOlderReading ) {
                 UserError.Log.i(TAG, "backfilling, process BG reading with timestamp of " + m_minutesBack + " min");
-                processNewTransmitterData(TransmitterData.create(currentGlucose, currentGlucose, 0 /*battery level force to 0 as unknown*/, JoH.tsl()-(m_minutesBack*60*1000)));
                 // @keencave - count down for next backfilling entry
                 m_minutesBack -= 5;
                 if ( m_minutesBack < 5 ) {
@@ -287,16 +294,13 @@ public class Blukon {
                 int delayedBlockNumber = blockNumberForNowGlucoseDataDelayed(delayedTrendIndex);
                 currentCommand = "010d0e010" + Integer.toHexString(delayedBlockNumber);//getNowGlucoseData
                 UserError.Log.i(TAG, "backfilling, get next block: " + currentCommand);
+            } else {
 
-                break;
+                m_timeLastBg = JoH.tsl();
+                currentCommand = "010c0e00";
+                UserError.Log.i(TAG, "Send sleep cmd");
+                m_getNowGlucoseDataCommand = false;
             }
-
-            processNewTransmitterData(TransmitterData.create(currentGlucose, currentGlucose, 0 /*battery level force to 0 as unknown*/, JoH.tsl()));
-
-            m_timeLastBg = JoH.tsl();
-            currentCommand = "010c0e00";
-            UserError.Log.i(TAG, "Send sleep cmd");
-            m_getNowGlucoseDataCommand = false;
 
         }  else if (strRecCmd.startsWith("cb020000")) {
             cmdFound = 1;
