@@ -269,16 +269,17 @@ public class Blukon {
             int currentGlucose = nowGetGlucoseValue(buffer);
 
             UserError.Log.i(TAG, "************got getNowGlucoseData=" + currentGlucose);
-
+/*
             long timeStamp;
             if ( m_getOlderReading )
                 timeStamp = JoH.tsl()-(m_minutesBack*60*1000);
             else
                 timeStamp = JoH.tsl();
-
+*/
+            long timeStamp = JoH.tsl();
             processNewTransmitterData(TransmitterData.create(currentGlucose, currentGlucose, 0 /*battery level force to 0 as unknown*/, timeStamp));
 
-            if ( m_getOlderReading ) {
+//            if ( m_getOlderReading ) {
 /*
                 UserError.Log.i(TAG, "backfilling, process BG reading with timestamp of " + m_minutesBack + " min");
                 // @keencave - count down for next backfilling entry
@@ -296,7 +297,7 @@ public class Blukon {
                 currentCommand = "010d0e010" + Integer.toHexString(delayedBlockNumber);//getNowGlucoseData
                 UserError.Log.i(TAG, "backfilling, get next block: " + currentCommand);
 */
-            break;
+//            break;
             }
 //            else {
 
