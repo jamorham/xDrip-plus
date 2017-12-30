@@ -72,6 +72,8 @@
 	<string name="pref_summary_display_trend">Visa BG-trenden på xDrip Pebbles urtavla.</string>
 	<string name="pref_pebble_display_high_line">Visa Hög line</string>
 	<string name="pref_pebble_display_low_line">Visa Låg linje</string>
+	<string name="toast_crash">Någonting har gått snett :( en rapport har skickats så att problemet kan åtgärdas.</string>
+        <string name="taskerConfigInstruction">Klicka bara på kryssikonen här för att verifeira. Du bör inte behöva ändra konfigurationssträngen.</string>
 	<string name="toast_crash">Något gick fel :( en rapport har skickats så att vi kan åtgärda problemet.</string>
 	<string name="taskerConfigInstruction">Klicka bara på kryssikonen här för att bekräfta. Du ska inte behöva ändra konfigurationssträngen.</string>
 	<string name="taskerConfiguration">Inställning av Tasker</string>
@@ -87,6 +89,7 @@
 	<string name="export_submenu">Importera / Exportera inställningar</string>
 	<string name="action_resend_to_watch">Skicka glukos till klockan igen</string>
 	<string name="action_open_watch_setting">Öppna inställningar i Wear</string>
+	<string name="action_sync_watch_db">Återställ Wear DB</string>
 	<string name="erase">Radera</string>
 	<string name="interface_tips_from_start">Tipsen i gränssnittet kommer att visas igen</string>
 	<string name="note_button">Anteckningsknapp</string>
@@ -96,6 +99,8 @@
 	<string name="undo_button">Ångra-knappen</string>
 	<string name="showcase_undo">Ångra-knappen kan gå göra åtgärder ogjorda inom simuleringar, kalibreringar och anteckningar\n\nEfter 30 minuter kommer knappen att döljas igen</string>
 	<string name="add_note">Lägg till anteckning</string>
+	<string name="blood_test">Blodprov</string>
+        <string name="share">Dela</string>
 	<string name="title_activity_profile_editor">Behandlingsprofilsredigeraren</string>
 	<string name="first_use_menu_to_scan">Börja med att söka efter din BT-enhet från menyn, eller ändra datakällan i inställningar!</string>
 	<string name="first_configure_ip_address">Ställ först in dina wifi wixel läsares ip-adresser eller parakeet-urler</string>
@@ -195,11 +200,34 @@
 	<string name="run_collector_in_foreground">Kör insamling i förgrunden</string>
 	<string name="shows_a_persistent_notification">Visar en graf på låsskärmen, vilket även förhindrar Android från att avsluta tjänsten.</string>
 	<string name="list_of_receivers">Lista över mottagare</string>
+	<string name="extra_tags_for_logging">Extra taggar för loggingen</string>
+        <string name="extra_tags_dialog_message">Taggarna som anges här kommer att loggas i xDrip. Formatet är tagg:nivå. Nivån kan vara någon av v,d,i. Till exempel bgreading:i,DexCollectionService:v. Dessa taggar kommer att loggas med låg prioritet till fel- och händelselistan.</string>
+        <string name="extra_tags_dialog_title">Enter more tags to be logged</string>
 	<string name="data_source_settings">Inställningar för datakällor</string>
 	<string name="smart_watch_features">Smartklockefunktioner</string>
 	<string name="wear_integration">Wear-integration</string>
 	<string name="send_data_to_android_wear_watch">Skicka data till Android Wears urtavla.</string>
 	<string name="android_wear_integration">Android Wear-integration</string>
+	<string name="pref_enable_wearG5">Aktivera insamlingstjänstenen för Wear</string>
+    	<string name="pref_summary_enable_wearG5">Använd Wear för insamling över blåtand när telefonen inte kan nås.</string>
+    	<string name="pref_force_wearG5">Tvinga insamlingstjänsten</string>
+    	<string name="pref_summary_force_wearG5">Tvinga telefonen att använda insamlingstjänsten</string>
+    	<string name="pref_disable_wearG5_on_lowbattery">Avaktivera tvång om batteriet är svagt</string>
+    	<string name="pref_summary_disable_wearG5_on_lowbattery">Avaktivera tvång av insamlingstjänsten för Wears batterivarning</string>
+    	<string name="pref_disable_wearG5_on_missedreadings">Avaktivera tvång vid missad avläsning</string>
+    	<string name="pref_summary_disable_wearG5_on_missedreadings">Avaktivera tvång av insamlingstjänsten inom minuter efter senaste avläsning från Wear</string>
+    	<string name="pref_disable_wearG5_on_missedreadings_level">Minuter sedan senaste avläsning från Wear</string>
+    	<string name="pref_node_wearG5">Enheten kör insamlingstjänsten (Wear Collection Service)</string>
+    	<string name="pref_summary_node_wearG5">Tvinga telefonen att använda denna insamlingstjänst</string>
+ 
+    	<string name="pref_sync_wear_logs">Synka Wears loggar</string>
+    	<string name="pref_summary_sync_wear_logs">Skicka Wear loggar till Händelsevisaren</string>
+    	<string name="pref_wear_logs_prefix">Prefix för Wears loggar</string>
+    	<string name="pref_summary_wear_logs_prefix">Prefix som används för loggar från Wear</string>
+    	<string name="pref_show_treatments">Visa behandlingar</string>
+    	<string name="pref_summary_show_treatments">Visa behanlingspunkter på grafen</string>
+    	<string name="pref_use_wear_health">Använd hälsodata från Wear</string>
+    	<string name="pref_summary_use_wear_health">Samla in och visa data från stegräknare när sådan finns</string>
 	<string name="pebble_integration">Pebble-integration</string>
 	<string name="send_data_to_pebble_watchface">Skicka data till Pebbles urtavla.</string>
 	<string name="pebble_watch_integration">Pebble Watch-integration</string>
@@ -270,6 +298,7 @@
 	<string name="set">Grupp</string>
 	<string name="disable_low_alerts">Inaktivera låga varningar</string>
 	<string name="re_enable_low_alerts">Återativera låga varningar</string>
+	<string name="alert_snoozed_by_watch">Varningen har snoozats av klockan</string>
 	<string name="disable_high_alerts">Inaktivera höga varningar</string>
 	<string name="re_enable_high_alerts">Återaktivera höga varningar</string>
 	<string name="disable_all_alerts">Inaktivera alla varningar</string>
@@ -293,6 +322,7 @@
 	<string name="enter_second_bg_value">Ange det andra BG-värdet</string>
 	<string name="language_editor">Språk</string>
 	<string name="configure_missed_readings">Hantera saknade avläsningar</string>
+	<string name="install_pebble_snooze_control_app">Installera appen Pebble Snooze Control</string>
 	<string name="install_pebble_classic_trend_watchface">Installera Grus Classic Trend Watchface</string>
 	<string name="install_pebble_trend_watchface">Installera Pebble Trend Watchface</string>
 	<string name="install_pebble_watchface">Installera Pebble Watchface</string>
@@ -369,6 +399,8 @@
 	<string name="display_slope_arrows">Visa lutningspilar</string>
 	<string name="vibrate_watch_to_alert_no_data">Vibrera klocka för att varna när vi inte får någon glukosdata</string>
 	<string name="vibrate_when_missed_signal">Vibrera vid missad signal</string>
+	<string name="vibrate_watch_to_alert_no_bluetooth">Vibrera klockan för att varna om att blåtandsanslutning har kopplats bort</string>
+        <string name="vibrate_when_no_bluetooth">Vibrera när blåtand saknas</string>
 	<string name="special_glucose_value_to_display_message">Särskilt glukosvärde för meddelandet nedan</string>
 	<string name="bluetooth_wakelocks">Bluetooth vilolägesblockering</string>
 	<string name="compatible_broadcast">Kompatibel sändning</string>
@@ -444,6 +476,7 @@
 	<string name="override_phone_silent_mode_colon">Strunta i om telefonen är i tyst läge:</string>
 	<string name="vibrate_on_alert">Vibrera vid larm</string>
 	<string name="test_alert">testlarm</string>
+	<string name="disable_alert">avaktivera larm</string>
 	<string name="save_alert">spara larm</string>
 	<string name="remove_alert">radera larm</string>
 	<string name="snooze_alert_before_it_fires">snooza innan larmet innan det aktiveras</string>
@@ -455,6 +488,7 @@
 	<string name="alert">varna</string>
 	<string name="high_alert">Högt larm</string>
 	<string name="low_alert">Lågt larm</string>
+	<string name="battery">Batteri</string>
 	<string name="xbridge_battery">xBridgebatteri</string>
 	<string name="limitter_battery">Limiterbatteri</string>
 	<string name="parakeet_battery">Parakeetbatteri</string>
