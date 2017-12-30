@@ -508,4 +508,35 @@
 	<string name="upload_logs">Ladda upp loggar</string>
 	<string name="short_off_text_for_switches">AV</string>
 	<string name="short_on_text_for_switches">PÅ</string>
+	<string name="install_pebble_apps">Installera Pebble-appar</string>
+    	<string name="sliding_24_hour_window_summary">Använd senaste 24 timmar istället för midnatt i statistiken.</string>
+	<string name="sliding_24_hour_window">Rörligt fönster</string>
+	<string name="split">Dela</string>
+    	<string name="delete">Radera</string>
+    	<string name="title_activity_btglucose_meter">Mätaravläsning</string>
+    	<string name="notify_when_wear_low_battery">Avaktiverar insamlingstjänsten för Wear eftersom Wears batteri är svagt!</string>
+    	<string name="notify_disable_wearG5_on_missedreadings">Avaktiverar insamlingstjänsten för Wear eftersom %1$d minuter har passerat utan värden från klockan!</string>
+    	<string name="format_decimal_treatments" translatable="false">#.##</string>
+    	<string name="label_show_insulin">E:%1$su</string>
+    	<string name="label_show_carbs">Kh:%1$sg</string>
+    	<string name="label_show_royceratio">Kh/I:%1$s</string>
+    	<string name="label_show_steps">Steg:%1$d</string>
+    	<string name="label_show_steps_km">km:%1$s</string>
+    	<string name="label_show_steps_mi">mi:%1$s</string>
+	
+	<string name="pref_summary_influxdb_enabled">Om en privat InfluxDB-databas används, bör detta aktiveras</string>
+  	<string name="pref_title_influxdb" translatable="false">InfluxDB</string>
+  	<string name="pref_default_influxdb_uri" translatable="false">https://{host}:{port}</string>
+   	<string name="pref_message_influxdb_uri">Ersätt värdena inom {} med dina egna</string>
+ 	<string name="pref_dialog_influxdb_uri">Ange InfluxDB URI</string>
+   	<string name="pref_default_influxdb_database" translatable="false">xdrip</string>
+   	<string name="pref_message_influxdb_database">Databasen där värden ska sparas. Kom ihåg att skapa detta på servern.</string>
+  	<string name="pref_dialog_influxdb_database">Databas</string>
+ 	<string name="pref_default_influxdb_username" translatable="false">root</string>
+ 	<string name="pref_message_influxdb_username">Användarnamn för autensiering. Det rekommenderas att ett lösenord krävs för att ansluta.</string>
+ 	<string name="pref_dialog_influxdb_username">Användare</string>
+   	<string name="pref_default_influxdb_password" translatable="false">root</string>
+  	<string name="pref_message_influxdb_password">Lösenord för autensiering. Det rekommenderas att autensiering krävs för att ansluta.</string>
+  	<string name="pref_dialog_influxdb_password">Lösenord</string>
+	
 </resources>
