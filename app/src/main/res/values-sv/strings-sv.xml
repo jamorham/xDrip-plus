@@ -654,7 +654,7 @@
     <string name="advanced_g5_settings">Avancerade G5-inställningar för udda omständigheter</string>
     <string name="g5_debug_settings">G5-avlusningsinställningar</string>
     <string name="g5_scan_constantly">Vissa enheter fungerar bättre vid kontinuerlig avläsning, andra inte. Om avläsningar är tillförlitliga när denna inställnin är avmarkerad, bör du få ut bättre batteritid. Under vanliga omständigheter bör detta vara avaktiverat.</string>
-    <string name="scan_for_g5_constantly"Sök efter G5 konstant</string>
+    <string name="scan_for_g5_constantly">Sök efter G5 konstant</string>
     <string name="g5_force_ui_thread">Detta krävs för att vissa Android-enheter ska ansluta korrekt, men kan leda till att vissa avläsningar missas när andra grafiska aktiviteter körs.</string>
     <string name="force_g5_ui_thread">Tvinga G5 till samma tråd som gränssnittet</string>
     <string name="authentificate_before_reading">Autensiera G5 innan varje avläsning</string>
