@@ -72,9 +72,9 @@
    <string name="pref_summary_display_trend">Visa BG-trenden på xDrip Pebbles urtavla.</string>
    <string name="pref_pebble_display_high_line">Visa Hög line</string>
    <string name="pref_pebble_display_low_line">Visa Låg linje</string>
-   <string name="toast_crash">Någonting har gått snett :( en rapport har skickats så att problemet kan åtgärdas.</string>
-   <string name="taskerConfigInstruction">Klicka bara på kryssikonen här för att verifeira. Du bör inte behöva ändra konfigurationssträngen.</string>
    <string name="toast_crash">Något gick fel :( en rapport har skickats så att vi kan åtgärda problemet.</string>
+
+   
    <string name="taskerConfigInstruction">Klicka bara på kryssikonen här för att bekräfta. Du ska inte behöva ändra konfigurationssträngen.</string>
    <string name="taskerConfiguration">Inställning av Tasker</string>
    <string name="finish_preferences_activity">finish_preferences_activity</string>
