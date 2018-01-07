@@ -1,10 +1,13 @@
 package com.eveningoutpost.dexdrip.UtilityModels.pebble;
 
 import android.content.Intent;
+import android.content.SharedPreferences;
+import android.os.Handler;
 
 import com.eveningoutpost.dexdrip.BestGlucose;
 import com.eveningoutpost.dexdrip.Models.BgReading;
 import com.eveningoutpost.dexdrip.Models.JoH;
+import com.eveningoutpost.dexdrip.Models.UserError;
 import com.eveningoutpost.dexdrip.Models.UserError.Log;
 import com.getpebble.android.kit.PebbleKit;
 import com.getpebble.android.kit.util.PebbleDictionary;
@@ -23,10 +26,18 @@ public class PebbleDisplayStandard extends PebbleDisplayAbstract {
 
     private static double last_time_seen = 0;
 
+    private String StatusLine="";
+
 
     @Override
     public void startDeviceCommand() {
-        sendData();
+        Handler handler = new Handler();
+        handler.postDelayed(new Runnable() {
+            public void run() {
+                sendData(); // Actions to do after 30 seconds
+            }
+        }, 20000);
+
     }
 
 
@@ -36,7 +47,14 @@ public class PebbleDisplayStandard extends PebbleDisplayAbstract {
             PebbleWatchSync.lastTransactionId = transactionId;
             Log.d(TAG, "Received Query. data: " + data.size() + ". sending ACK and data");
             PebbleKit.sendAckToPebble(this.context, transactionId);
-            sendData();
+
+            //Handler handler = new Handler();
+            //handler.postDelayed(new Runnable() {
+            //    public void run() {
+                    sendData(); // Actions to do after 30 seconds
+             //   }
+            //}, 30000);
+
         } else {
             Log.d(TAG, "receiveData: lastTransactionId is " + String.valueOf(PebbleWatchSync.lastTransactionId) + ", sending NACK");
             PebbleKit.sendNackToPebble(this.context, transactionId);
@@ -50,20 +68,27 @@ public class PebbleDisplayStandard extends PebbleDisplayAbstract {
         Date now = new Date();
         int offsetFromUTC = tz.getOffset(now.getTime());
 
+        SharedPreferences loopstatus = context.getSharedPreferences("loopstatus", 0);
+        StatusLine = loopstatus.getString("loopstatus", null);
+
         final String bgDelta = getBgDelta();
         final String bgReadingS = getBgReading();
         final String slopeOrdinal = getSlopeOrdinal();
+        final String insulinOnBoard = getIOB();
+        final String tempBasalRate = getTBR();
         //boolean no_signal;
 
         if (use_best_glucose) {
             Log.v(TAG, "buildDictionary: slopeOrdinal-" + slopeOrdinal + " bgReading-" + bgReadingS + //
                     " now-" + (int) now.getTime() / 1000 + " bgTime-" + (int) (dg.timestamp / 1000) + //
-                    " phoneTime-" + (int) (new Date().getTime() / 1000) + " getBgDelta-" + getBgDelta());
+                    " phoneTime-" + (int) (new Date().getTime() / 1000) + " getBgDelta-" + getBgDelta() + //
+                    " IOB-" + getIOB() + " TBR-" + getTBR());
             //   no_signal = (dg.mssince > Home.stale_data_millis());
         } else {
             Log.v(TAG, "buildDictionary: slopeOrdinal-" + slopeOrdinal + " bgReading-" + bgReadingS + //
                     " now-" + (int) now.getTime() / 1000 + " bgTime-" + (int) (this.bgReading.timestamp / 1000) + //
-                    " phoneTime-" + (int) (new Date().getTime() / 1000) + " getBgDelta-" + getBgDelta());
+                    " phoneTime-" + (int) (new Date().getTime() / 1000) + " getBgDelta-" + getBgDelta() + //
+                    " IOB-" + getIOB() + " TBR-" + getTBR());
             //   no_signal = ((new Date().getTime()) - Home.stale_data_millis() - this.bgReading.timestamp > 0);
         }
 
@@ -80,6 +105,9 @@ public class PebbleDisplayStandard extends PebbleDisplayAbstract {
         dictionary.addString(BG_DELTA_KEY, bgDelta);
 
         addBatteryStatusToDictionary(dictionary);
+
+        dictionary.addString(IOB_KEY, insulinOnBoard);
+        dictionary.addString(TBR_KEY, tempBasalRate);
 
         return dictionary;
     }
@@ -130,6 +158,41 @@ public class PebbleDisplayStandard extends PebbleDisplayAbstract {
             last_time_seen = JoH.ts();
         }
     }
+
+    public String getIOB() {
+        String check = StatusLine.replaceAll("[^%]", "");
+        if ( (StatusLine != null) && (check.length() > 0) ) {
+            UserError.Log.v("LOOP-STATUS-PEBBLE ", StatusLine);
+            return StatusLine.substring( (StatusLine.lastIndexOf('%')+2), (StatusLine.lastIndexOf('%')+6));
+
+        }
+        else if ( (StatusLine != null) && (check.length() == 0) ) {
+            UserError.Log.v("LOOP-STATUS-PEBBLE ", StatusLine);
+            return StatusLine.substring(0, 4);
+
+        }
+        else return "???";
+
+    }
+
+
+    public String getTBR() {
+        String check = StatusLine.replaceAll("[^%]", "");
+        if ( (StatusLine != null) && (check.length() > 0) ) {
+            int index1 = 0, index2 = 4;
+            UserError.Log.v("LOOP-STATUS-PEBBLE ", StatusLine);
+            if ( (StatusLine.lastIndexOf('%') == 3) ) index2 = 4;
+            else if ( (StatusLine.lastIndexOf('%') == 2) ) index2 = 3;
+            else if ( (StatusLine.lastIndexOf('%') == 1) ) index2 = 2;
+            return StatusLine.substring(index1, index2);
+
+        }
+        else if ( (StatusLine != null) && (check.length() == 0) )
+            return "100%";
+        else
+            return "???";
+    }
+
 
 
 }
