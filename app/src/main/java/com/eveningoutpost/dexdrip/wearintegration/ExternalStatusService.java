@@ -3,6 +3,7 @@ package com.eveningoutpost.dexdrip.wearintegration;
 import android.app.IntentService;
 import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.os.PowerManager;
 import android.preference.PreferenceManager;
 import android.support.v4.content.WakefulBroadcastReceiver;
@@ -18,6 +19,7 @@ public class ExternalStatusService extends IntentService{
     public static final String ACTION_NEW_EXTERNAL_STATUSLINE = "com.eveningoutpost.dexdrip.ExternalStatusline";
     public static final String RECEIVER_PERMISSION = "com.eveningoutpost.dexdrip.permissions.RECEIVE_EXTERNAL_STATUSLINE";
     public static final int MAX_LEN = 40;
+    public static final String LOOP_STATUS = "loopstatus";
     private final static String TAG = ExternalStatusService.class.getSimpleName();
 
     public ExternalStatusService() {
@@ -43,6 +45,11 @@ public class ExternalStatusService extends IntentService{
                     if (statusline.length() > MAX_LEN) {
                         statusline = statusline.substring(0, MAX_LEN);
                     }
+
+                    SharedPreferences loopstatus = getSharedPreferences("loopstatus", 0);
+                    SharedPreferences.Editor editor = loopstatus.edit();
+                    editor.putString ("loopstatus", statusline);
+                    editor.commit();
 
                     // send to wear
                     if (PreferenceManager.getDefaultSharedPreferences(this).getBoolean("wear_sync", false)) {
