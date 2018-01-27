@@ -18,21 +18,6 @@ public class WidgetUpdateService extends Service {
     private static final String TAG = "WidgetUpdateService";
     private static Class widgetClasses[] = { xDripWidget.class, gearWidget.class };
 
-
-    public static void staticRefreshWidgets()
-    {
-        try {
-            Context context = xdrip.getAppContext();
-            if (AppWidgetManager.getInstance(context).getAppWidgetIds(new ComponentName(context, xDripWidget.class)).length +
-                AppWidgetManager.getInstance(context).getAppWidgetIds(new ComponentName(context, gearWidget.class)).length > 0) {
-                context.startService(new Intent(context, WidgetUpdateService.class));
-            }
-        } catch (Exception e)
-        {
-            Log.e(TAG,"Got exception in staticRefreshWidgets: "+e);
-        }
-    }
-
     private BroadcastReceiver broadcastReceiver = new BroadcastReceiver() {
         @Override
         public void onReceive(Context ctx, Intent intent) {
@@ -73,6 +58,7 @@ public class WidgetUpdateService extends Service {
         Log.d(TAG, "Sending update flag to widgets");
         int ids[];
         Intent intent;
+        //iterate each widget type, get IDs of all instances, update
         for (Class widgetClass : widgetClasses) {
             ids = AppWidgetManager.getInstance(getApplication()).getAppWidgetIds(new ComponentName(getApplication(), widgetClass));
             if (ids.length > 0) {

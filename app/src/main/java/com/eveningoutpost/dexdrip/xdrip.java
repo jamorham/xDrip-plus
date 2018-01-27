@@ -2,6 +2,7 @@ package com.eveningoutpost.dexdrip;
 
 import android.app.Application;
 import android.content.Context;
+import android.content.Intent;
 import android.content.res.Configuration;
 import android.preference.PreferenceManager;
 import android.util.Log;
@@ -45,6 +46,10 @@ public class xdrip extends Application {
     public void onCreate() {
         xdrip.context = getApplicationContext();
         super.onCreate();
+
+        //start widget update service to capture time ticks
+        this.startService(new Intent(this, WidgetUpdateService.class));
+
         try {
             if (PreferenceManager.getDefaultSharedPreferences(xdrip.context).getBoolean("enable_crashlytics", true)) {
                 initCrashlytics(this);

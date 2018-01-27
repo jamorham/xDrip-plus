@@ -310,8 +310,6 @@ public class Home extends ActivityWithMenu implements ActivityCompat.OnRequestPe
 
         super.onCreate(savedInstanceState);
         setTheme(R.style.AppThemeToolBarLite); // for toolbar mode
-
-
         Injectors.getHomeShelfComponent().inject(this);
 
         set_is_follower();
