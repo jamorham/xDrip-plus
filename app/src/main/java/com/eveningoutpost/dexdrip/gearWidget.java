@@ -19,6 +19,7 @@ import com.eveningoutpost.dexdrip.UtilityModels.BgSparklineBuilder;
 import com.eveningoutpost.dexdrip.UtilityModels.ColorCache;
 import com.eveningoutpost.dexdrip.calibrations.PluggableCalibration;
 
+import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.List;
 
@@ -28,12 +29,12 @@ import java.util.List;
  */
 public class gearWidget extends AppWidgetProvider {
 
-    public static final String TAG = "xDripWidget";
+    public static final String TAG = "gearWidget";
     private static final boolean use_best_glucose = true;
 
     @Override
     public void onUpdate(Context context, AppWidgetManager appWidgetManager, int[] appWidgetIds) {
-        final PowerManager.WakeLock wl = JoH.getWakeLock("xdrip-widget-onupdate", 20000);
+        final PowerManager.WakeLock wl = JoH.getWakeLock("gear-widget-onupdate", 20000);
         final int N = appWidgetIds.length;
         for (int i = 0; i < N; i++) {
 
@@ -57,13 +58,13 @@ public class gearWidget extends AppWidgetProvider {
     }
 
     private static void updateAppWidget(Context context, AppWidgetManager appWidgetManager, int appWidgetId) {
-        RemoteViews views = new RemoteViews(context.getPackageName(), R.layout.x_drip_widget);
+        RemoteViews views = new RemoteViews(context.getPackageName(), R.layout.gear_widget);
         Log.d(TAG, "Update widget signal received");
 
         //Add behaviour: open xDrip on click
         Intent intent = new Intent(context, Home.class);
         PendingIntent pendingIntent = PendingIntent.getActivity(context, 0, intent, 0);
-        views.setOnClickPendingIntent(R.id.xDripwidget, pendingIntent);
+        views.setOnClickPendingIntent(R.id.gearWidget, pendingIntent);
         displayCurrentInfo(appWidgetManager, appWidgetId, context, views);
         try {
             appWidgetManager.updateAppWidget(appWidgetId, views);
@@ -78,8 +79,13 @@ public class gearWidget extends AppWidgetProvider {
         BgGraphBuilder bgGraphBuilder = new BgGraphBuilder(context);
         BgReading lastBgreading = BgReading.lastNoSenssor();
 
-        final boolean showLines = Home.getPreferencesBoolean("widget_range_lines", false);
-        final boolean showExstraStatus = Home.getPreferencesBoolean("extra_status_line", false) && Home.getPreferencesBoolean("widget_status_line", false);
+        //update time and date
+        SimpleDateFormat formatter = new SimpleDateFormat();
+        Date now = new Date();
+        formatter.applyPattern("h:mm a");
+        views.setTextViewText(R.id.textTime, formatter.format(now));
+        formatter.applyPattern("EEEE MMM d, YYYY");
+        views.setTextViewText(R.id.textDate, formatter.format(now));
 
         if (lastBgreading != null) {
             double estimate = 0;
@@ -89,9 +95,9 @@ public class gearWidget extends AppWidgetProvider {
                 int width = appWidgetManager.getAppWidgetOptions(appWidgetId).getInt(AppWidgetManager.OPTION_APPWIDGET_MAX_WIDTH);
                 views.setImageViewBitmap(R.id.widgetGraph, new BgSparklineBuilder(context)
                         .setBgGraphBuilder(bgGraphBuilder)
-                        //.setShowFiltered(Home.getPreferencesBooleanDefaultFalse("show_filtered_curve"))
+                        .setShowFiltered(Home.getPreferencesBooleanDefaultFalse("show_filtered_curve"))
                         .setBackgroundColor(ColorCache.getCol(ColorCache.X.color_widget_chart_background))
-                        .setHeight(height).setWidth(width).showHighLine(showLines).showLowLine(showLines).build());
+                        .setHeight(height).setWidth(width).showHighLine(true).showLowLine(true).showAxes(true).build());
 
                 final BestGlucose.DisplayGlucose dg = (use_best_glucose) ? BestGlucose.getDisplayGlucose() : null;
                 estimate = (dg != null) ? dg.mgdl : lastBgreading.calculated_value;
@@ -175,13 +181,6 @@ public class gearWidget extends AppWidgetProvider {
                     views.setTextColor(R.id.readingAge, Color.WHITE);
                 }
 
-                if(showExstraStatus) {
-                    views.setTextViewText(R.id.widgetStatusLine, Home.extraStatusLine());
-                    views.setViewVisibility(R.id.widgetStatusLine, View.VISIBLE);
-                } else {
-                    views.setTextViewText(R.id.widgetStatusLine, "");
-                    views.setViewVisibility(R.id.widgetStatusLine, View.GONE);
-                }
                 if (bgGraphBuilder.unitized(estimate) <= bgGraphBuilder.lowMark) {
                     views.setTextColor(R.id.widgetBg, Color.parseColor("#C30909"));
                     views.setTextColor(R.id.widgetDelta, Color.parseColor("#C30909"));

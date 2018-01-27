@@ -1,7 +1,7 @@
-<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:id="@+id/xDripwidget"
-    android:layout_width="wrap_content"
-    android:layout_height="wrap_content"
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/gearWidget"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
     android:background="#55212121">
 
     <ImageView
@@ -11,79 +11,95 @@
         android:contentDescription="Blood Glucose Graph"
         android:scaleType="centerInside" />
 
-    <LinearLayout
-        android:id="@+id/widgetLinear"
+    <TextView
+        android:id="@+id/textTime"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_gravity="center_vertical"
-        android:orientation="vertical"
-        android:paddingBottom="10dp"
-        android:paddingEnd="5dp"
-        android:paddingStart="5dp"
-        android:paddingTop="2dp">
+        android:layout_alignParentTop="true"
+        android:layout_centerHorizontal="true"
+        android:layout_marginTop="15dp"
+        android:text="12:08 PM"
+        android:textSize="30sp" />
+
+    <TextView
+        android:id="@+id/textDate"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/textTime"
+        android:layout_centerHorizontal="true"
+        android:text="Wednesday, September 29, 2018"
+        android:textSize="16sp" />
+
+    <LinearLayout
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_above="@+id/readingAge"
+        android:layout_alignParentBottom="false"
+        android:layout_centerHorizontal="true"
+        android:orientation="horizontal">
+
+        <TextView
+            android:id="@+id/widgetBg"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:text="110"
+            android:textColor="#ffffff"
+            android:textSize="30sp" />
+
+        <TextView
+            android:id="@+id/widgetArrow"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center_horizontal"
+            android:layout_marginTop="-5dp"
+            android:layout_weight="1"
+            android:text="→"
+            android:textColor="#ffffff"
+            android:textSize="18sp" />
+
+        <TextView
+            android:id="@+id/widgetDelta"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center_horizontal"
+            android:layout_weight="1"
+            android:text="+2 mg/dl"
+            android:textColor="#ffffff"
+            android:textSize="8sp" />
 
         <LinearLayout
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:orientation="horizontal">
-
-            <TextView
-                android:id="@+id/widgetBg"
-                android:layout_width="wrap_content"
-                android:layout_height="fill_parent"
-                android:layout_gravity="center"
-                android:layout_marginTop="-5dp"
-                android:text="---"
-                android:textColor="#ffffff"
-                android:textSize="55sp" />
-
-            <LinearLayout
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:orientation="vertical"
-                android:paddingEnd="0dp"
-                android:paddingStart="0dp">
-
-                <TextView
-                    android:id="@+id/widgetArrow"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_gravity="center_horizontal"
-                    android:layout_marginBottom="-5dp"
-                    android:layout_marginTop="-2dp"
-                    android:paddingBottom="-2dp"
-                    android:text="--"
-                    android:textColor="#ffffff"
-                    android:textSize="37sp" />
-
-                <TextView
-                    android:id="@+id/widgetDelta"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_gravity="center_horizontal"
-                    android:text="-- mgdl"
-                    android:textColor="#ffffff"
-                    android:textSize="10sp" />
-            </LinearLayout>
+            android:layout_gravity="center_vertical"
+            android:layout_marginLeft="5dp"
+            android:layout_weight="1"
+            android:orientation="vertical">
 
         </LinearLayout>
 
-        <TextView
-            android:id="@+id/readingAge"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_gravity="center_horizontal"
-            android:text="--- minutes ago"
-            android:textColor="#ffffff"
-            android:textSize="10sp" />
-
-        <TextView
-            android:id="@+id/widgetStatusLine"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_gravity="center_horizontal"
-            android:text="---"
-            android:textColor="#ffffff"
-            android:textSize="13sp" />
     </LinearLayout>
-</FrameLayout>
+
+    <TextView
+        android:id="@+id/readingAge"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentBottom="true"
+        android:layout_centerHorizontal="true"
+        android:layout_gravity="center_horizontal"
+        android:layout_marginBottom="10dp"
+        android:text="3 minutes ago"
+        android:textColor="#ffffff"
+        android:textSize="12sp" />
+
+    <TextView
+        android:id="@+id/widgetStatusLine"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center_horizontal"
+        android:text="---"
+        android:textColor="#ffffff"
+        android:textSize="13sp"
+        android:visibility="gone" />
+
+</RelativeLayout>
