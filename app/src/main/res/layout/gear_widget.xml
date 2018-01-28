@@ -11,6 +11,7 @@
         android:layout_alignParentTop="true"
         android:layout_centerHorizontal="true"
         android:layout_marginTop="10dp"
+        android:background="#40000000"
         android:text="12:08 PM"
         android:textColor="#ffffff"
         android:textSize="30sp" />
@@ -21,6 +22,7 @@
         android:layout_height="wrap_content"
         android:layout_below="@+id/textTime"
         android:layout_centerHorizontal="true"
+        android:background="#40000000"
         android:text="September 29, 2018"
         android:textColor="#ffffff"
         android:textSize="16sp" />
@@ -31,6 +33,7 @@
         android:layout_height="wrap_content"
         android:layout_below="@+id/textDate"
         android:layout_centerHorizontal="true"
+        android:background="#40000000"
         android:text="Wednesday"
         android:textColor="#ffffff"
         android:textSize="16sp" />
@@ -48,6 +51,7 @@
         android:layout_above="@+id/readingAge"
         android:layout_alignParentBottom="false"
         android:layout_centerHorizontal="true"
+        android:background="#40000000"
         android:orientation="horizontal">
 
         <TextView
