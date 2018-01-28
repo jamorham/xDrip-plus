@@ -84,8 +84,10 @@ public class gearWidget extends AppWidgetProvider {
         Date now = new Date();
         formatter.applyPattern("h:mm a");
         views.setTextViewText(R.id.textTime, formatter.format(now));
-        formatter.applyPattern("EEEE MMM d, YYYY");
+        formatter.applyPattern("MMMM dd, YYYY");
         views.setTextViewText(R.id.textDate, formatter.format(now));
+        formatter.applyPattern("EEEE");
+        views.setTextViewText(R.id.textDay, formatter.format(now));
 
         if (lastBgreading != null) {
             double estimate = 0;
