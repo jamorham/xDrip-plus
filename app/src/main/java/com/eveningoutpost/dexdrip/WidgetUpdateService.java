@@ -15,6 +15,7 @@ import com.eveningoutpost.dexdrip.Models.JoH;
 import com.eveningoutpost.dexdrip.Models.UserError.Log;
 
 public class WidgetUpdateService extends Service {
+    static Context context;
     private static final String TAG = "WidgetUpdateService";
     private static Class widgetClasses[] = { xDripWidget.class, gearWidget.class };
 
@@ -34,16 +35,17 @@ public class WidgetUpdateService extends Service {
 
     @Override
     public void onCreate() {
+        context = getApplicationContext();
         super.onCreate();
+    }
+
+    @Override
+    public int onStartCommand(Intent intent, int flags, int startId) {
         //Gear widget needs clock ticks all the time to keep time updated in widget
         Log.d(TAG, "enableClockTicks");
         IntentFilter intentFilter = new IntentFilter();
         intentFilter.addAction(Intent.ACTION_TIME_TICK);
         registerReceiver(broadcastReceiver, intentFilter);
-    }
-
-    @Override
-    public int onStartCommand(Intent intent, int flags, int startId) {
         updateCurrentBgInfo();
         return START_STICKY;
     }
@@ -54,19 +56,19 @@ public class WidgetUpdateService extends Service {
         unregisterReceiver(broadcastReceiver);
     }
 
-    public void updateCurrentBgInfo() {
+    public static void updateCurrentBgInfo() {
         Log.d(TAG, "Sending update flag to widgets");
         int ids[];
         Intent intent;
         //iterate each widget type, get IDs of all instances, update
         for (Class widgetClass : widgetClasses) {
-            ids = AppWidgetManager.getInstance(getApplication()).getAppWidgetIds(new ComponentName(getApplication(), widgetClass));
+            ids = AppWidgetManager.getInstance(context).getAppWidgetIds(new ComponentName(context, widgetClass));
             if (ids.length > 0) {
                 Log.d(TAG, "Updating " + ids.length + " " + widgetClass.getName() + " instances");
-                intent = new Intent(this, widgetClass);
+                intent = new Intent(context, widgetClass);
                 intent.setAction(AppWidgetManager.ACTION_APPWIDGET_UPDATE);
                 intent.putExtra(AppWidgetManager.EXTRA_APPWIDGET_IDS, ids);
-                sendBroadcast(intent);
+                context.sendBroadcast(intent);
             }
         }
     }
