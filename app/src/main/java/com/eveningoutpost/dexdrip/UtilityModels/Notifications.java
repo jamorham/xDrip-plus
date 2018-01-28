@@ -132,7 +132,7 @@ public class Notifications extends IntentService {
                 ActivityRecognizedService.reStartActivityRecogniser(context);
             }
 
-            ReadPerfs(context);
+            ReadPrefs(context);
             unclearReading = notificationSetter(context);
             ArmTimer(context, unclearReading);
             context.startService(new Intent(context, MissedReadingService.class));
@@ -153,7 +153,7 @@ public class Notifications extends IntentService {
     }
 
 
-    public void ReadPerfs(Context context) {
+    public void ReadPrefs(Context context) {
         mContext = context;
         prefs = PreferenceManager.getDefaultSharedPreferences(context);
         bg_notifications = prefs.getBoolean("bg_notifications", true);
@@ -182,7 +182,7 @@ public class Notifications extends IntentService {
 
 
     private void FileBasedNotifications(Context context) {
-        ReadPerfs(context);
+        ReadPrefs(context);
         Sensor sensor = Sensor.currentSensor();
 
         final BgReading bgReading = BgReading.last();
@@ -306,7 +306,7 @@ public class Notifications extends IntentService {
 
     // returns weather unclear bg reading was detected
     private boolean notificationSetter(Context context) {
-        ReadPerfs(context);
+        ReadPrefs(context);
         final long end = System.currentTimeMillis() + (60000 * 5);
         final long start = end - (60000 * 60 * 3) - (60000 * 10);
         BgGraphBuilder bgGraphBuilder = new BgGraphBuilder(context, start, end);
@@ -560,7 +560,7 @@ public class Notifications extends IntentService {
     @TargetApi(Build.VERSION_CODES.JELLY_BEAN)
     public synchronized Notification createOngoingNotification(BgGraphBuilder bgGraphBuilder, Context context) {
         mContext = context;
-        ReadPerfs(mContext);
+        ReadPrefs(mContext);
         Intent intent = new Intent(mContext, Home.class);
         List<BgReading> lastReadings = BgReading.latest(2);
         BgReading lastReading = null;
