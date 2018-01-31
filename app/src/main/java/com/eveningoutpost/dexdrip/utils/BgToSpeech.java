@@ -1,13 +1,13 @@
 package com.eveningoutpost.dexdrip.utils;
 
 import com.eveningoutpost.dexdrip.BestGlucose;
-import com.eveningoutpost.dexdrip.Home;
 import com.eveningoutpost.dexdrip.Models.BgReading;
 import com.eveningoutpost.dexdrip.Models.JoH;
 import com.eveningoutpost.dexdrip.Models.UserError;
 import com.eveningoutpost.dexdrip.Models.UserError.Log;
 import com.eveningoutpost.dexdrip.R;
 import com.eveningoutpost.dexdrip.UtilityModels.Constants;
+import com.eveningoutpost.dexdrip.UtilityModels.Pref;
 import com.eveningoutpost.dexdrip.UtilityModels.SpeechUtil;
 import com.eveningoutpost.dexdrip.xdrip;
 
@@ -30,9 +30,11 @@ public class BgToSpeech {
     private static final String TAG = "BgToSpeech";
 
     // no longer used compatibility signature
+    /*
     public static void speak(final double value, long timestamp) {
         speak(value, timestamp, null);
     }
+    */
 
     // speak a bg reading if its timestamp is current, include the delta name if preferences dictate
     public static void speak(final double value, long timestamp, String delta_name) {
@@ -43,7 +45,7 @@ public class BgToSpeech {
         }
 
         // check if speech is enabled and extra check for ongoing call
-        if (!Home.getPreferencesBooleanDefaultFalse(BG_TO_SPEECH_PREF) || JoH.isOngoingCall()) {
+        if (!Pref.getBooleanDefaultFalse(BG_TO_SPEECH_PREF) || JoH.isOngoingCall()) {
             return;
         }
 
@@ -52,7 +54,7 @@ public class BgToSpeech {
 
     // always speak the value passed
     public static void realSpeakNow(final double value, long timestamp, String delta_name) {
-        final String text_to_speak = calculateText(value, Home.getPreferencesBooleanDefaultFalse("bg_to_speech_trend") ? delta_name : null);
+        final String text_to_speak = calculateText(value, Pref.getBooleanDefaultFalse("bg_to_speech_trend") ? delta_name : null);
         UserError.Log.d(TAG, "Attempting to speak BG reading of: " + text_to_speak);
 
         SpeechUtil.say(text_to_speak);
@@ -95,8 +97,8 @@ public class BgToSpeech {
 
     private static String calculateText(double value, String delta_name) {
 
-        final boolean doMgdl = (Home.getPreferencesStringWithDefault("units", "mgdl").equals("mgdl"));
-        final boolean bg_to_speech_repeat_twice = (Home.getPreferencesBooleanDefaultFalse("bg_to_speech_repeat_twice"));
+        final boolean doMgdl = (Pref.getString("units", "mgdl").equals("mgdl"));
+        final boolean bg_to_speech_repeat_twice = (Pref.getBooleanDefaultFalse("bg_to_speech_repeat_twice"));
         String text = "";
 
         // TODO does some of this need unifying from best glucose etc?
@@ -111,18 +113,18 @@ public class BgToSpeech {
                 df.setMaximumFractionDigits(1);
                 df.setMinimumFractionDigits(1);
                 text = df.format(value * Constants.MGDL_TO_MMOLL);
-                if (delta_name != null) text += " " + mungeDeltaName(delta_name);
                 try {
                     // we check the locale but it may not actually be available if the instance isn't created yet
                     if (SpeechUtil.getLocale().getLanguage().startsWith("en")) {
                         // in case the text has a comma in current locale but TTS defaults to English
                         text = text.replace(",", ".");
                     }
-                    if (bg_to_speech_repeat_twice) text = text + TWICE_DELIMITER + text;
                 } catch (NullPointerException e) {
                     Log.e(TAG, "Null pointer for TTS in calculateText");
                 }
             }
+            if (delta_name != null) text += " " + mungeDeltaName(delta_name);
+            if (bg_to_speech_repeat_twice) text = text + TWICE_DELIMITER + text;
         } else if (value > 12) {
             text = xdrip.getAppContext().getString(R.string.low);
         } else {

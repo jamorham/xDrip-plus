@@ -1,6 +1,6 @@
 package com.eveningoutpost.dexdrip.utils;
 
-import android.app.Activity;
+import android.annotation.SuppressLint;
 import android.app.AlertDialog;
 import android.appwidget.AppWidgetManager;
 import android.content.ComponentName;
@@ -31,10 +31,8 @@ import android.text.TextUtils;
 import android.widget.BaseAdapter;
 import android.widget.Toast;
 
-import com.eveningoutpost.dexdrip.BestGlucose;
 import com.eveningoutpost.dexdrip.GcmActivity;
 import com.eveningoutpost.dexdrip.Home;
-import com.eveningoutpost.dexdrip.Models.BgReading;
 import com.eveningoutpost.dexdrip.Models.JoH;
 import com.eveningoutpost.dexdrip.Models.Profile;
 import com.eveningoutpost.dexdrip.Models.UserError.ExtraLogTags;
@@ -45,10 +43,12 @@ import com.eveningoutpost.dexdrip.ParakeetHelper;
 import com.eveningoutpost.dexdrip.R;
 import com.eveningoutpost.dexdrip.Services.ActivityRecognizedService;
 import com.eveningoutpost.dexdrip.Services.BluetoothGlucoseMeter;
+import com.eveningoutpost.dexdrip.Services.G5BaseService;
 import com.eveningoutpost.dexdrip.Services.PlusSyncService;
 import com.eveningoutpost.dexdrip.UtilityModels.CollectionServiceStarter;
 import com.eveningoutpost.dexdrip.UtilityModels.Constants;
 import com.eveningoutpost.dexdrip.UtilityModels.Experience;
+import com.eveningoutpost.dexdrip.UtilityModels.Pref;
 import com.eveningoutpost.dexdrip.UtilityModels.ShotStateStore;
 import com.eveningoutpost.dexdrip.UtilityModels.SpeechUtil;
 import com.eveningoutpost.dexdrip.UtilityModels.UpdateActivity;
@@ -63,6 +63,7 @@ import com.eveningoutpost.dexdrip.WidgetUpdateService;
 import com.eveningoutpost.dexdrip.calibrations.PluggableCalibration;
 import com.eveningoutpost.dexdrip.profileeditor.ProfileEditor;
 import com.eveningoutpost.dexdrip.wearintegration.WatchUpdaterService;
+import com.eveningoutpost.dexdrip.webservices.XdripWebService;
 import com.eveningoutpost.dexdrip.xDripWidget;
 import com.eveningoutpost.dexdrip.xdrip;
 import com.google.zxing.integration.android.IntentIntegrator;
@@ -185,7 +186,7 @@ public class Preferences extends PreferenceActivity {
                 }
                 editor.apply();
                 refreshFragments();
-                ExtraLogTags.readPreference(Home.getPreferencesStringDefaultBlank("extra_tags_for_logging"));
+                ExtraLogTags.readPreference(Pref.getStringDefaultBlank("extra_tags_for_logging"));
                 Toast.makeText(getApplicationContext(), "Loaded " + Integer.toString(changes) + " preferences from QR code", Toast.LENGTH_LONG).show();
                 PlusSyncService.clearandRestartSyncService(getApplicationContext());
                 if (prefs.getString("dex_collection_method", "").equals("Follower")) {
@@ -556,6 +557,7 @@ public class Preferences extends PreferenceActivity {
 
 
 
+        @SuppressLint("ApplySharedPref")
         @Override
         public void onCreate(Bundle savedInstanceState) {
             super.onCreate(savedInstanceState);
@@ -637,6 +639,14 @@ public class Preferences extends PreferenceActivity {
                     return true;
                 }
 
+            });
+
+            // this gets cached in a static final field at the moment so needs hard reset
+            findPreference("g5-battery-warning-level").setOnPreferenceChangeListener((preference, newValue) -> {
+                prefs.edit().putString("g5-battery-warning-level", (String) newValue).commit();
+                G5BaseService.resetTransmitterBatteryStatus();
+                SdcardImportExport.hardReset();
+                return true;
             });
 
             findPreference("use_ob1_g5_collector_service").setOnPreferenceChangeListener(new Preference.OnPreferenceChangeListener() {
@@ -789,15 +799,20 @@ public class Preferences extends PreferenceActivity {
             final PreferenceCategory displayCategory = (PreferenceCategory) findPreference("xdrip_plus_display_category");
 
 
-            findPreference("wear_sync").setOnPreferenceChangeListener(new Preference.OnPreferenceChangeListener() {
-                                                                          @Override
-                                                                          public boolean onPreferenceChange(Preference preference, Object newValue) {
-
-                                                                           WatchUpdaterService.startSelf();
-                                                                               return true;
-                                                                          }
-                                                                      }
+            // TODO build list of preferences to cause wear refresh from list
+            findPreference("wear_sync").setOnPreferenceChangeListener((preference, newValue) -> {
+                        WatchUpdaterService.startSelf();
+                        return true;
+                    }
             );
+
+            // TODO build list of preferences to cause wear refresh from list
+            findPreference("use_wear_heartrate").setOnPreferenceChangeListener((preference, newValue) -> {
+                        WatchUpdaterService.startSelf();
+                        return true;
+                    }
+            );
+
             findPreference("bluetooth_meter_enabled").setOnPreferenceChangeListener(new Preference.OnPreferenceChangeListener() {
                 @Override
                 public boolean onPreferenceChange(Preference preference, Object newValue) {
@@ -816,6 +831,11 @@ public class Preferences extends PreferenceActivity {
 
             findPreference("scan_and_pair_meter").setSummary(prefs.getString("selected_bluetooth_meter_info", ""));
 
+            findPreference("xdrip_webservice").setOnPreferenceChangeListener((preference, newValue) -> {
+                preference.getEditor().putBoolean(preference.getKey(), (boolean) newValue).apply(); // write early for method below
+                XdripWebService.immortality(); // start or stop service when preference toggled
+                return true;
+            });
 
             if (enableBF != null ) enableBF.setOnPreferenceChangeListener(new Preference.OnPreferenceChangeListener() {
                                                                               @Override
@@ -1204,7 +1224,7 @@ public class Preferences extends PreferenceActivity {
 
             // Pebble Trend -- START
 
-            int currentPebbleSync = PebbleUtil.getCurrentPebbleSyncType(this.prefs);
+            int currentPebbleSync = PebbleUtil.getCurrentPebbleSyncType();
 
             if (currentPebbleSync == 1) {
                 watchCategory.removePreference(pebbleSpecialValue);
@@ -1251,7 +1271,7 @@ public class Preferences extends PreferenceActivity {
                 public boolean onPreferenceChange(Preference preference, Object newValue) {
                     final Context context = preference.getContext();
 
-                    int oldPebbleType = PebbleUtil.getCurrentPebbleSyncType(AllPrefsFragment.this.prefs);
+                    int oldPebbleType = PebbleUtil.getCurrentPebbleSyncType();
                     int pebbleType = PebbleUtil.getCurrentPebbleSyncType(newValue);
 
                     // install watchface
@@ -1388,7 +1408,7 @@ public class Preferences extends PreferenceActivity {
                 }
             });
 
-            // TODO this attaches to the wrong named instance of use_pebble_health
+            // TODO this attaches to the wrong named instance of use_pebble_health - until restructured so that there is only one instance
             findPreference("use_pebble_health").setOnPreferenceChangeListener(new Preference.OnPreferenceChangeListener() {
                 @Override
                 public boolean onPreferenceChange(Preference preference, Object newValue) {

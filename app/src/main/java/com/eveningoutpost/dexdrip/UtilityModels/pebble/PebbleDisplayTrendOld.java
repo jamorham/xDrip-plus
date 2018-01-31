@@ -13,6 +13,7 @@ import com.eveningoutpost.dexdrip.Models.UserError.Log;
 import com.eveningoutpost.dexdrip.UtilityModels.BgGraphBuilder;
 import com.eveningoutpost.dexdrip.UtilityModels.BgSparklineBuilder;
 import com.eveningoutpost.dexdrip.UtilityModels.Constants;
+import com.eveningoutpost.dexdrip.UtilityModels.Pref;
 import com.eveningoutpost.dexdrip.UtilityModels.SimpleImageEncoder;
 import com.getpebble.android.kit.PebbleKit;
 import com.getpebble.android.kit.util.PebbleDictionary;
@@ -39,6 +40,7 @@ public class PebbleDisplayTrendOld extends PebbleDisplayAbstract {
 
     private final static String TAG = PebbleDisplayTrendOld.class.getSimpleName();
 
+  /*
     public static final int TREND_BEGIN_KEY = 7;
     public static final int TREND_DATA_KEY = 8;
     public static final int TREND_END_KEY = 9;
@@ -51,8 +53,8 @@ public class PebbleDisplayTrendOld extends PebbleDisplayAbstract {
     public static final int SYNC_KEY = 1000;
     public static final int PLATFORM_KEY = 1001;
     public static final int VERSION_KEY = 1002;
-
-    public static final int CHUNK_SIZE = 100;
+*/
+    private static final int CHUNK_SIZE = 100;
     public static final boolean d = false;
 
     private static byte last_collect_health_key_byte = 0x1A;
@@ -336,8 +338,8 @@ public class PebbleDisplayTrendOld extends PebbleDisplayAbstract {
                         .showHighLine(highLine)
                         .showLowLine(lowLine)
                        // .showAxes(true)
-                        .setTinyDots(Home.getPreferencesBooleanDefaultFalse("pebble_tiny_dots"))
-                        .setShowFiltered(Home.getPreferencesBooleanDefaultFalse("pebble_filtered_line"))
+                        .setTinyDots(Pref.getBooleanDefaultFalse("pebble_tiny_dots"))
+                        .setShowFiltered(Pref.getBooleanDefaultFalse("pebble_filtered_line"))
                                 //.setSmallDots()
                         .build();
 
