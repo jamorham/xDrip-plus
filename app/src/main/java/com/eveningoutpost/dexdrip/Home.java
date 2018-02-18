@@ -174,20 +174,23 @@ public class Home extends ActivityWithMenu implements ActivityCompat.OnRequestPe
     private static boolean is_follower = false;
     private static boolean is_follower_set = false;
     private static boolean is_holo = true;
-    private static boolean reset_viewport = false;
-    private boolean updateStuff;
+
+    //HomeCharts-related:
     private boolean updatingPreviewViewport = false;
     private boolean updatingChartViewport = false;
     private boolean screen_forced_on = false;
     public BgGraphBuilder bgGraphBuilder;
-    private Viewport tempViewport = new Viewport();
     public Viewport holdViewport = new Viewport();
+    public LineChartView chart;
+    private PreviewLineChartView previewChart;
+    private static final float DEFAULT_CHART_HOURS = 6f;
+    private static float hours = DEFAULT_CHART_HOURS;
+
     private boolean isBTShare;
     private boolean isG5Share;
     private BroadcastReceiver _broadcastReceiver;
     private BroadcastReceiver newDataReceiver;
     private BroadcastReceiver statusReceiver;
-    public LineChartView chart;
     private ImageButton btnSpeak;
     private ImageButton btnNote;
     private ImageButton btnApprove;
@@ -221,10 +224,7 @@ public class Home extends ActivityWithMenu implements ActivityCompat.OnRequestPe
     public static final int SHOWCASE_REMINDER4 = 17;
     public static final int SHOWCASE_REMINDER5 = 19;
     public static final int SHOWCASE_REMINDER6 = 20;
-    private static final float DEFAULT_CHART_HOURS = 2.5f;
     private static double last_speech_time = 0;
-    private static float hours = DEFAULT_CHART_HOURS;
-    private PreviewLineChartView previewChart;
     private Button stepsButton;
     private Button bpmButton;
     private TextView dexbridgeBattery;
@@ -485,7 +485,7 @@ public class Home extends ActivityWithMenu implements ActivityCompat.OnRequestPe
                 btnInsulinDose.setVisibility(View.INVISIBLE);
                 Treatments.create(0, thisinsulinnumber, Treatments.getTimeStampWithOffset(thistimeoffset));
                 thisinsulinnumber = 0;
-                reset_viewport = true;
+                // = true;
                 if (hideTreatmentButtonsIfAllDone()) {
                     updateCurrentBgInfo("insulin button");
                 }
@@ -498,7 +498,7 @@ public class Home extends ActivityWithMenu implements ActivityCompat.OnRequestPe
                 // proccess and approve treatment
                 textCarbohydrates.setVisibility(View.INVISIBLE);
                 btnCarbohydrates.setVisibility(View.INVISIBLE);
-                reset_viewport = true;
+                //reset_viewport = true;
                 Treatments.create(thiscarbsnumber, 0, Treatments.getTimeStampWithOffset(thistimeoffset));
                 thiscarbsnumber = 0;
                 if (hideTreatmentButtonsIfAllDone()) {
@@ -511,7 +511,7 @@ public class Home extends ActivityWithMenu implements ActivityCompat.OnRequestPe
 
             @Override
             public void onClick(View v) {
-                reset_viewport = true;
+                //reset_viewport = true;
                 processCalibration();
             }
         });
@@ -622,6 +622,7 @@ public class Home extends ActivityWithMenu implements ActivityCompat.OnRequestPe
             }
         }
 
+        setupCharts();
     }
 
     ////
@@ -1323,15 +1324,6 @@ public class Home extends ActivityWithMenu implements ActivityCompat.OnRequestPe
         } else if (get_engineering_mode() && allWords.contentEquals("enable fake data source")) {
             Pref.setString(DexCollectionType.DEX_COLLECTION_METHOD, DexCollectionType.Mock.toString());
             JoH.static_toast_long("YOU ARE NOW USING FAKE DATA!!!");
-        } else if (allWords.contentEquals("reset heart rate sync")) {
-            PersistentStore.setLong("nightscout-rest-heartrate-synced-time",0);
-            JoH.static_toast_long("Cleared heart rate sync data");
-        } else if (allWords.contentEquals("reset step count sync")) {
-            PersistentStore.setLong("nightscout-rest-steps-synced-time",0);
-            JoH.static_toast_long("Cleared step count sync data");
-        } else if (allWords.contentEquals("reset motion count sync")) {
-            PersistentStore.setLong("nightscout-rest-motion-synced-time",0);
-            JoH.static_toast_long("Cleared motion count sync data");
         } else if (allWords.contentEquals("vehicle mode test")) {
             ActivityRecognizedService.spoofActivityRecogniser(mActivity, JoH.tsl() + "^" + 0);
             staticRefreshBGCharts();
@@ -1742,7 +1734,7 @@ public class Home extends ActivityWithMenu implements ActivityCompat.OnRequestPe
     }
 
     public static void staticRefreshBGCharts(boolean override) {
-        reset_viewport = true;
+        //reset_viewport = true;
         if (activityVisible || override) {
             Intent updateIntent = new Intent(Intents.ACTION_NEW_BG_ESTIMATE_NO_DATA);
             mActivity.sendBroadcast(updateIntent);
@@ -1764,6 +1756,34 @@ public class Home extends ActivityWithMenu implements ActivityCompat.OnRequestPe
     }
 
     @Override
+    public void onPause() {
+        activityVisible = false;
+        super.onPause();
+        NFCReaderX.stopNFC(this);
+        if (_broadcastReceiver != null) {
+            try {
+                unregisterReceiver(_broadcastReceiver);
+            } catch (IllegalArgumentException e) {
+                UserError.Log.e(TAG, "_broadcast_receiver not registered", e);
+            }
+        }
+        if (newDataReceiver != null) {
+            try {
+                unregisterReceiver(newDataReceiver);
+            } catch (IllegalArgumentException e) {
+                UserError.Log.e(TAG, "newDataReceiver not registered", e);
+            }
+        }
+
+        try {
+            LocalBroadcastManager.getInstance(this).unregisterReceiver(statusReceiver);
+        } catch (Exception e) {
+            Log.e(TAG, "Exception unregistering broadcast receiver: " + e);
+        }
+
+    }
+
+    @Override
     protected void onResume() {
         xdrip.checkForcedEnglish(xdrip.getAppContext());
         super.onResume();
@@ -1774,6 +1794,7 @@ public class Home extends ActivityWithMenu implements ActivityCompat.OnRequestPe
         statusIOB = "";
         statusBWP = "";
         refreshStatusLine();
+        updateCharts();
 
         if (BgGraphBuilder.isXLargeTablet(getApplicationContext())) {
             this.currentBgValueText.setTextSize(100);
@@ -1797,20 +1818,17 @@ public class Home extends ActivityWithMenu implements ActivityCompat.OnRequestPe
         newDataReceiver = new BroadcastReceiver() {
             @Override
             public void onReceive(Context ctx, Intent intent) {
-                holdViewport.set(0, 0, 0, 0);
+                //holdViewport.set(0, 0, 0, 0);
                 updateCurrentBgInfo("new data");
                 updateHealthInfo("new_data");
             }
         };
-
 
         registerReceiver(_broadcastReceiver, new IntentFilter(Intent.ACTION_TIME_TICK));
         registerReceiver(newDataReceiver, new IntentFilter(Intents.ACTION_NEW_BG_ESTIMATE_NO_DATA));
 
         LocalBroadcastManager.getInstance(this).registerReceiver(statusReceiver,
                 new IntentFilter(Intents.HOME_STATUS_ACTION));
-
-        holdViewport.set(0, 0, 0, 0);
 
         if (invalidateMenu) {
             invalidateOptionsMenu();
@@ -1880,7 +1898,7 @@ public class Home extends ActivityWithMenu implements ActivityCompat.OnRequestPe
 
     private void setupCharts() {
         bgGraphBuilder = new BgGraphBuilder(this);
-        updateStuff = false;
+        //updateStuff = false;
         chart = (LineChartView) findViewById(R.id.chart);
 
         if (BgGraphBuilder.isXLargeTablet(getApplicationContext())) {
@@ -1889,7 +1907,7 @@ public class Home extends ActivityWithMenu implements ActivityCompat.OnRequestPe
             chart.setLayoutParams(params);
         }
         chart.setBackgroundColor(getCol(X.color_home_chart_background));
-        chart.setZoomType(ZoomType.HORIZONTAL);
+        chart.setZoomType(ZoomType.HORIZONTAL_AND_VERTICAL);        //change HORIZONTAL
 
         //Transmitter Battery Level
         final Sensor sensor = Sensor.currentSensor();
@@ -1937,14 +1955,13 @@ public class Home extends ActivityWithMenu implements ActivityCompat.OnRequestPe
         chart.setOnValueTouchListener(bgGraphBuilder.getOnValueSelectTooltipListener(mActivity));
 
         previewChart.setBackgroundColor(getCol(X.color_home_chart_background));
-        previewChart.setZoomType(ZoomType.HORIZONTAL);
+        previewChart.setZoomType(ZoomType.HORIZONTAL_AND_VERTICAL);
         previewChart.setLineChartData(bgGraphBuilder.previewLineData(chart.getLineChartData()));
+
         previewChart.setViewportCalculationEnabled(true);
-        previewChart.setViewportChangeListener(new ViewportListener());
+        previewChart.setViewportChangeListener(new previewViewportListener());
         chart.setViewportCalculationEnabled(true);
         chart.setViewportChangeListener(new ChartViewPortListener());
-        updateStuff = true;
-        setViewport();
 
         if (small_height) {
             previewChart.setVisibility(View.GONE);
@@ -1956,13 +1973,16 @@ public class Home extends ActivityWithMenu implements ActivityCompat.OnRequestPe
             holdViewport.right = moveViewPort.right + (moveViewPort.width() / 24);
             holdViewport.top = moveViewPort.top;
             holdViewport.bottom = moveViewPort.bottom;
-            chart.setCurrentViewport(holdViewport);
-            previewChart.setCurrentViewport(holdViewport);
         } else {
             previewChart.setVisibility(homeShelf.get("chart_preview") ? View.VISIBLE : View.GONE);
-            if (homeShelf.get("chart_preview") && !homeShelf.get("time_buttons"))
-                hours = DEFAULT_CHART_HOURS;
+            final Viewport moveViewPort = new Viewport(chart.getMaximumViewport());
+            float hour_width = moveViewPort.width() / 24;
+            holdViewport.left = moveViewPort.right - hour_width * hours;
+            holdViewport.right = moveViewPort.right;
+            holdViewport.top = moveViewPort.top;
+            holdViewport.bottom = moveViewPort.bottom;
         }
+        updateCharts();
 
         if (insulinset || glucoseset || carbsset || timeset) {
             if (chart != null) {
@@ -1970,44 +1990,36 @@ public class Home extends ActivityWithMenu implements ActivityCompat.OnRequestPe
                 // TODO also set buttons alpha
             }
         }
-
     }
 
-    public void setViewport() {
-        if (tempViewport.left == 0.0 || holdViewport.left == 0.0 || holdViewport.right >= (new Date().getTime())) {
-            previewChart.setCurrentViewport(bgGraphBuilder.advanceViewport(chart, previewChart, hours));
-        } else {
-            previewChart.setCurrentViewport(holdViewport);
+    private void updateCharts(){
+        chart.setCurrentViewport(holdViewport);
+        if (holdViewport.right >= (new Date().getTime())) {
+            previewChart.setCurrentViewport(bgGraphBuilder.advanceViewport(chart, previewChart, hours));    //usage of "advanceViewport" from BgGraphbuilder due to previous commit
         }
     }
 
-    @Override
-    public void onPause() {
-        activityVisible = false;
-        super.onPause();
-        NFCReaderX.stopNFC(this);
-        if (_broadcastReceiver != null) {
-            try {
-                unregisterReceiver(_broadcastReceiver);
-            } catch (IllegalArgumentException e) {
-                UserError.Log.e(TAG, "_broadcast_receiver not registered", e);
-            }
+    // set the chart viewport to whatever the button push represents
+    public void timeButtonClick(View v) {
+        switch (v.getId()) {
+            case R.id.hourbutton3:
+                hours = 3;
+                break;
+            case R.id.hourbutton6:
+                hours = 6;
+                break;
+            case R.id.hourbutton12:
+                hours = 12;
+                break;
+            case R.id.hourbutton24:
+                hours = 24;
+                break;
         }
-        if (newDataReceiver != null) {
-            try {
-                unregisterReceiver(newDataReceiver);
-            } catch (IllegalArgumentException e) {
-                UserError.Log.e(TAG, "newDataReceiver not registered", e);
-            }
-        }
-
-        try {
-            LocalBroadcastManager.getInstance(this).unregisterReceiver(statusReceiver);
-        } catch (Exception e) {
-            Log.e(TAG, "Exception unregistering broadcast receiver: " + e);
-        }
-
+        setupCharts();
     }
+
+
+
 
     private static void set_is_follower() {
         is_follower = PreferenceManager.getDefaultSharedPreferences(xdrip.getAppContext()).getString("dex_collection_method", "").equals("Follower");
@@ -2087,34 +2099,6 @@ public class Home extends ActivityWithMenu implements ActivityCompat.OnRequestPe
         staticRefreshBGCharts();
     }
 
-    // set the chart viewport to whatever the button push represents
-    public void timeButtonClick(View v) {
-        switch (v.getId()) {
-            case R.id.hourbutton3:
-                hours = 3;
-                break;
-            case R.id.hourbutton6:
-                hours = 6;
-                break;
-            case R.id.hourbutton12:
-                hours = 12;
-                break;
-            case R.id.hourbutton24:
-                hours = 24;
-                break;
-        }
-
-        final Viewport moveViewPort = new Viewport(chart.getMaximumViewport());
-        float hour_width = moveViewPort.width() / 24;
-        holdViewport.left = moveViewPort.right - hour_width * hours;
-        holdViewport.right = moveViewPort.right;
-        holdViewport.top = moveViewPort.top;
-        holdViewport.bottom = moveViewPort.bottom;
-        chart.setCurrentViewport(holdViewport);
-        previewChart.setCurrentViewport(holdViewport);
-
-
-    }
 
     private void updateHealthInfo(String caller) {
 
@@ -2146,11 +2130,6 @@ public class Home extends ActivityWithMenu implements ActivityCompat.OnRequestPe
         if (!activityVisible) {
             Log.d(TAG, "Display not visible - not updating chart");
             return;
-        }
-        if (reset_viewport) {
-            reset_viewport = false;
-            holdViewport.set(0, 0, 0, 0);
-            if (chart != null) chart.setZoomType(ZoomType.HORIZONTAL);
         }
         setupCharts();
         final TextView notificationText = (TextView) findViewById(R.id.notices);
@@ -3453,28 +3432,21 @@ public class Home extends ActivityWithMenu implements ActivityCompat.OnRequestPe
         public synchronized void onViewportChanged(Viewport newViewport) {
             if (!updatingPreviewViewport) {
                 updatingChartViewport = true;
-                previewChart.setZoomType(ZoomType.HORIZONTAL);
                 previewChart.setCurrentViewport(newViewport);
                 updatingChartViewport = false;
             }
         }
     }
 
-    public class ViewportListener implements ViewportChangeListener {
+    private class previewViewportListener implements ViewportChangeListener {
         @Override
         public synchronized void onViewportChanged(Viewport newViewport) {
             if (!updatingChartViewport) {
                 updatingPreviewViewport = true;
-                chart.setZoomType(ZoomType.HORIZONTAL);
                 chart.setCurrentViewport(newViewport);
-                tempViewport = newViewport;
                 updatingPreviewViewport = false;
             }
-            if (updateStuff) {
-                holdViewport.set(newViewport.left, newViewport.top, newViewport.right, newViewport.bottom);
-            }
         }
-
     }
 
     private View.OnClickListener makeSnackBarUriLauncher(final Uri uri, final String text) {
