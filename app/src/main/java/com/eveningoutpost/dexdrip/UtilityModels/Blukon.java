@@ -91,6 +91,8 @@ public class Blukon {
             }
         }
 
+        Log.w(TAG,"isCollecting() returns: " + m_communicationStarted);
+
         return m_communicationStarted;
     }
 
@@ -99,7 +101,7 @@ public class Blukon {
     }
 
     public static void initialize() {
-            Log.i(TAG, "initialize!");
+            Log.w(TAG, "initialize Blukon!");
             Pref.setInt("bridge_battery", 0); //force battery to no-value before first reading
             Pref.setInt("nfc_sensor_age", 0); //force sensor age to no-value before first reading
             JoH.clearRatelimit(BLUKON_GETSENSORAGE_TIMER);

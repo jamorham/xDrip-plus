@@ -152,9 +152,9 @@ public class MissedReadingService extends IntentService {
     
     // alarmIn is relative time ms
     public void setAlarm(long alarmIn, boolean force) {
-        if(!force && (alarmIn < 5 * 60 * 1000)) {
-            // No need to check more than once every 5 minutes
-            alarmIn = 5 * 60 * 1000;
+        if(!force && (alarmIn < 6 * 60 * 1000)) {
+            // No need to check more than once every 6 minutes as most CGM wake-up every 5min
+            alarmIn = 6 * 60 * 1000;
         }
 
         alarmIn = Math.max(alarmIn, 5000); // don't try to set less than 5 seconds in the future
