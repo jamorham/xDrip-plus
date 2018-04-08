@@ -44,7 +44,7 @@
    <string name="pref_title_mongodb_uri">URI</string>
    <string name="pref_dialog_mongodb_uri">URI till MongoDB"</string>
    <string name="pref_message_mongodb_uri">Ersätt exempeldatan i {} med riktiga värden</string>
-   <string name="pref_default_mongodb_uri">mongodb: // {användare}: {lösenord} @ {värd} .mongolab.com: {11111} / {databas}</string>
+   <string name="pref_default_mongodb_uri">mongodb://{användare}:{lösenord}@{värd}.mongolab.com:{11111}/{databas}</string>
    <string name="pref_title_mongodb_collection">Samlingsnamn</string>
    <string name="pref_dialog_mongodb_collection">Ange samlingsnamn</string>
    <string name="pref_message_mongodb_collection">Detta är namnet på den samling där CGM-data lagras</string>
@@ -110,7 +110,7 @@
    <string name="possible_bad_calibration">Möjligen är kalibreringskurvan skev, vänligen ta ett glas vatten, tvätta händerna och gör sedan en ny kalibrering om några minuter!</string>
    <string name="please_wait_need_two_readings_first">Var god dröj, 2 värden från sändaren behövs först.</string>
    <string name="please_enter_two_calibrations_to_get_started">Vänligen mata in två kalibreringsvärden för att komma igång!</string>
-   <string name="now_pair_with_your_dexcom_share">Para med din Dexcom Share nu</string>
+   <string name="now_pair_with_your_dexcom_share">Para ihop din Dexcom Share nu</string>
    <string name="now_choose_start_sensor_in_settings">Starta sensorn från inställningarna nu</string>
    <string name="double_check_dex_receiver_serial_number">Verifiera att ditt serienummerför Dex-mottagaren stämmer. Det bör vara 10 tecken, glöm inte bokstäverna</string>
    <string name="please_set_dex_receiver_serial_number">Skriv in Dex-mottagarens serienummer i programinställningarna</string>
@@ -129,7 +129,7 @@
    <string name="delete_this_time_block">Ta bort det här tidsblocket</string>
    <string name="cancel_do_nothing">Avbryt - gör ingenting</string>
    <string name="added">Tillagt</string>
-   <string name="checking_for_update">Söker efter uppdatering ..</string>
+   <string name="checking_for_update">Söker efter uppdateringar..</string>
    <string name="signal_missed">Signal saknas</string>
    <string name="space_minutes_ago">" minuter sedan"</string>
    <string name="space_minute_ago">" minut sedan"</string>
@@ -159,7 +159,7 @@
    <string name="xdrip_plus_sync_settings">xDrip+ synkroniseringsinställningar</string>
    <string name="xdrip_plus_update_settings">xDrip+ uppdateringsinställningar</string>
    <string name="automatic_update_check">Automatiska uppdateringskontroller</string>
-   <string name="update_channel">Programvarukanal</string>
+   <string name="update_channel">Programuppdateringskanal</string>
    <string name="send_crash_errors_to_developer">Skicka krascher och fel till utvecklare</string>
    <string name="automatic_crash_reporting">Automatisk krashrapportering</string>
    <string name="send_feedback_message">Skicka feedbackmeddelande</string>
@@ -711,11 +711,11 @@
    <string name="no_calibration_requests_charging">Avmarkera för att inte fråga om kalibreringar när enheten laddas</string>
    <string name="keep_alert_no_calibration">Förtsätt larma om kalibrering inte sker</string>
    <string name="repeat_alerts">Upprepa larm</string>
-   <string name="calibration_minutes_reraise">Antalet minuer innan samma kalibreringsförfrågan ska upprepas.</string>
+   <string name="calibration_minutes_reraise">Antal minuter innan samma kalibreringsförfrågan ska upprepas.</string>
    <string name="alert_repeat_minutes">Minuter för larmupprepning</string>
    <string name="alert_noisy_values">Larma efter x minuter av störningar</string>
    <string name="alert_snooze">Larmsnooze</string>
-   <string name="alert_minutes_reraise">Antalet mintuer innann samma larm utlöses efter snooze.</string>
+   <string name="alert_minutes_reraise">Antal minuter innan samma larm utlöses efter snooze.</string>
    <string name="reraise_before_snooze">Slå larm igen innan snoozetiden</string>
    <string name="reraise_not_snoozed_sooner">Slå larm igen om larmet inte snoozas tidigare</string>
    <string name="alert_reraise_time">Larmutlösningstid</string>
@@ -777,13 +777,13 @@
    <string name="xdrip_motion_tracking">xDrip+ rörelseavkänning</string>
    <string name="detect_motion_types">Använd sensorer för att registrera olika typer av rörelse</string>
    <string name="enable_motion_tracking">Slå på rörelseavkänning</string>
-   <string name="display_motion_types">Spara nyligen insamlade motionstyper och använ dem i diagrammet</string>
+   <string name="display_motion_types">Spara nyligen insamlade motionstyper och använd dem i diagrammet</string>
    <string name="log_and_plot_motion">Logga och markera rörelse</string>
    <string name="use_remote_motion_data">Rörelsedata tas hellre från annan enhet än denna telefon</string>
    <string name="use_remote_motion">Använd fjärrörelse</string>
    <string name="be_motion_master">Var huvudenhet för rörelsedata även om vi är en följare. Använd detta bara på en enhet!</string>
    <string name="act_as_motion_master">Agera huvudenhet för rörelser</string>
-   <string name="vehicle_motion_extras">När fordonsåkning upptäcks, slå på extra funktioner</string>
+   <string name="vehicle_motion_extras">När resa i fordon upptäcks, aktivera extra funktioner</string>
    <string name="enable_vehicle_mode">Akivera fordonsläge</string>
    <string name="increase_low_alarms_vehicle_mode">Öka ljudet på larm om låga värden under fordonsläge</string>
    <string name="raise_low_threshold">Höj gränsen för lågt</string>
@@ -791,12 +791,12 @@
    <string name="play_sound">Spela ljud</string>
    <string name="repeat_notification_every_90_minutes">Upprepa ljudet var 90 minut om fordonsläget är på</string>
    <string name="repeat_sound">Upprepa ljud</string>
-   <string name="enable_telemetry">Slå på telemetri</string>
+   <string name="enable_telemetry">Aktivera telemetri</string>
    <string name="send_data_to_developers">Skicka data till utvecklarna om framgång för olika enheter</string>
-   <string name="try_to_work_around_noisy_readings_ultrasensitive">Börja arbeta runt störningar även vid små sådanna (utvecklarläge endast)</string>
+   <string name="try_to_work_around_noisy_readings_ultrasensitive">Försök att kringgå störningar även vid mycket låga nivåer (endast utvecklarläge)</string>
    <string name="sidiary_date_title">Exportera från när?</string>
    <string name="blukon">Blucon</string>
-   <string name="use_gravity_sensor_to_rotate_items">Använd graitationssensor för att rotera saker</string>
+   <string name="use_gravity_sensor_to_rotate_items">Använd gravitationssensor för att rotera objekt</string>
    <string name="low_bridge_battery">Lågt bryggbatteri</string>
    <string name="reminders">Påminnelser</string>
 </resources>
