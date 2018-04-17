@@ -152,9 +152,17 @@ public class MissedReadingService extends IntentService {
     
     // alarmIn is relative time ms
     public void setAlarm(long alarmIn, boolean force) {
-        if(!force && (alarmIn < 5 * 60 * 1000)) {
-            // No need to check more than once every 5 minutes
-            alarmIn = 5 * 60 * 1000;
+        final SharedPreferences prefs;
+        final Context context;
+        final int bg_missed_minutes;
+
+        context = getApplicationContext();
+        prefs = PreferenceManager.getDefaultSharedPreferences(context);
+        bg_missed_minutes =  readPerfsInt(prefs, "bg_missed_minutes", 5);// No need to check more than once every 5 minutes
+
+
+        if(!force && (alarmIn < bg_missed_minutes * 60 * 1000)) {
+            alarmIn = bg_missed_minutes * 60 * 1000;
         }
 
         alarmIn = Math.max(alarmIn, 5000); // don't try to set less than 5 seconds in the future
