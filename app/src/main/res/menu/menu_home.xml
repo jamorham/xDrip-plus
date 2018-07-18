@@ -16,6 +16,14 @@
         android:onClick="showRemindersFromMenu"
         android:showAsAction="never"/>
 
+    <item android:id="@+id/showassist"
+        android:title="@string/emergency_messages"
+        android:checkable="false"
+        android:orderInCategory="1"
+        android:visible="true"
+        android:onClick="showAssistFromMenu"
+        android:showAsAction="never"/>
+
     <item android:id="@+id/export_submenu"
         android:title="@string/export_submenu"
         android:orderInCategory="1">
@@ -113,7 +121,14 @@
         android:visible="true"
         android:showAsAction="never"/>
 
-
+    <item android:id="@+id/libreLastMinutes"
+        android:title="@string/show_libre_trend"
+        android:checkable="false"
+        android:orderInCategory="1"
+        android:onClick="ShowLibreTrend"
+        android:visible="true"
+        android:showAsAction="never"/>
+    
     <item android:id="@+id/synctreatments"
         android:title="Sync Treatments"
         android:checkable="false"

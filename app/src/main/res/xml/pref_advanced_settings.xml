@@ -49,6 +49,12 @@
                 android:key="disable_wearG5_on_missedreadings_level"
                 android:summary=""
                 android:title="@string/pref_disable_wearG5_on_missedreadings_level" />
+            <CheckBoxPreference
+                android:defaultValue="false"
+                android:dependency="force_wearG5"
+                android:key="only_ever_use_wear_collector"
+                android:summary="If you plan to only use a Wear collector and never your phone."
+                android:title="Only use Wear" />
             <EditTextPreference
                 android:defaultValue=""
                 android:dependency="force_wearG5"
@@ -206,6 +212,25 @@
             </Preference>
         </PreferenceCategory>
         </PreferenceScreen>
+        <PreferenceScreen
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:title="@string/amazfit_sync_service">
+            <SwitchPreference
+                android:defaultValue="false"
+                android:disableDependentsState="false"
+                android:key="pref_amazfit_enable_key"
+                android:summary="@string/pref_amazfit_enable_summary"
+                android:title="@string/pref_amazfit_tile" />
+            <SwitchPreference
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:defaultValue="false"
+                android:dependency="pref_amazfit_enable_key"
+                android:key="pref_amazfit_alarm_enable_key"
+                android:summary="@string/pref_amazfit_alarm_enable_summary"
+                android:title="@string/pref_amazfit_alarm_tile" />
+        </PreferenceScreen>
 
     <PreferenceScreen
         icon="@drawable/ic_heart_pulse_grey600_24dp"
@@ -248,18 +273,34 @@
                 android:switchTextOff="@string/short_off_text_for_switches"
                 android:switchTextOn="@string/short_on_text_for_switches"
                 android:title="@string/speak_readings" />
+            <SeekBarPreference
+                android:key="speak_readings_change_threshold"
+                android:dependency="bg_to_speech"
+                android:title="When changes by"
+                android:summary=""
+                android:max="300"
+                android:min="0"
+                android:defaultValue="0" />
+            <SeekBarPreference
+                android:key="speak_readings_change_time"
+                android:dependency="bg_to_speech"
+                android:title="Or per number of minutes"
+                android:summary=""
+                android:max="300"
+                android:min="0"
+                android:defaultValue="0" />
             <SwitchPreference
                 android:defaultValue="false"
                 android:key="speak_alerts"
-                android:summary="Also give some spoken alert messages"
+                android:summary="@string/Speak_Alerts_Summary"
                 android:switchTextOff="@string/short_off_text_for_switches"
                 android:switchTextOn="@string/short_on_text_for_switches"
-                android:title="Speak Alerts" />
+                android:title="@string/Speak_Alerts" />
             <CheckBoxPreference
                 android:defaultValue="true"
                 android:dependency="bg_to_speech"
                 android:key="bg_to_speech_trend"
-                android:summary="Speak trend arrow name" />
+                android:summary="@string/Speak_trend_arrow_name" />
             <CheckBoxPreference
                 android:defaultValue="false"
                 android:dependency="bg_to_speech"
@@ -268,21 +309,21 @@
             <CheckBoxPreference
                 android:defaultValue="false"
                 android:key="speak_twice"
-                android:summary="Speak everything twice" />
+                android:summary="@string/Speak_everything_twice" />
             <EditTextPreference
                 android:defaultValue=""
                 android:key="speak_readings_custom_language"
                 android:summary="@string/spoken_readings_locale" />
             <SeekBarPreference
                 android:key="speech_speed"
-                android:title="Speech speed"
+                android:title="@string/Speech_speed"
                 android:summary=""
                 android:max="20"
                 android:min="2"
                 android:defaultValue="7" />
             <SeekBarPreference
                 android:key="speech_pitch"
-                android:title="Speech pitch"
+                android:title="@string/Speech_pitch"
                 android:summary=""
                 android:max="20"
                 android:min="4"
@@ -311,12 +352,26 @@
                 android:key="broadcast_data_use_best_glucose"
                 android:summary="@string/use_plugins_for_brodcast"
                 android:title="@string/send_display_glucose" />
+            <ListPreference
+                android:defaultValue="200"
+                android:dependency="broadcast_data_through_intents"
+                android:entries="@array/NoiseLevelBlock"
+                android:entryValues="@array/NoiseLevelBlockValues"
+                android:key="noise_block_level"
+                android:shouldDisableView="true"
+                android:summary="@string/level_at_which_noisy_data_should_not_be_broadcast"
+                android:title="@string/noise_blocking" />
             <CheckBoxPreference
                 android:defaultValue="true"
                 android:dependency="broadcast_data_through_intents"
                 android:key="broadcast_data_through_intents_without_permission"
                 android:summary="@string/send_broadcasts_old_permission_model"
                 android:title="@string/compatible_broadcast" />
+            <EditTextPreference
+                android:dependency="broadcast_data_through_intents"
+                android:key="local_broadcast_specific_package_destination"
+                android:title="Identify receiver"
+                android:summary="Only send to named package"/>
             <SwitchPreference
                 android:defaultValue="true"
                 android:key="accept_nsclient_treatments"
@@ -338,6 +393,18 @@
                 android:switchTextOff="@string/short_off_text_for_switches"
                 android:switchTextOn="@string/short_on_text_for_switches"
                 android:title="xDrip Web Service" />
+            <CheckBoxPreference
+                android:defaultValue="false"
+                android:dependency="xdrip_webservice"
+                android:key="xdrip_webservice_open"
+                android:summary="Accept connections from any network instead of just internally within this device. There are security implications to enabling this! Shared Secret will be required if set."
+                android:title="Open Web Service" />
+            <EditTextPreference
+                android:defaultValue=""
+                android:dependency="xdrip_webservice"
+                android:key="xdrip_webservice_secret"
+                android:summary="Shared Secret for open web service (should match your Nightcout API secret)"
+                android:title="xDrip Web Service Secret" />
         </PreferenceScreen>
         <PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android"
             android:key="xdrip_less_common_settings"
@@ -428,6 +495,12 @@
                 <CheckBoxPreference
                     android:defaultValue="false"
                     android:dependency="extra_status_line"
+                    android:key="status_line_external_status"
+                    android:summary="Display status from other apps like AndroidAPS"
+                    android:title="External Status" />
+                <CheckBoxPreference
+                    android:defaultValue="false"
+                    android:dependency="extra_status_line"
                     android:key="status_line_pump_reservoir"
                     android:summary="Display pump status information if available"
                     android:title="Pump Status" />
@@ -443,6 +516,12 @@
                     android:key="status_line_capture_percentage"
                     android:summary="@string/received_readings_percentage"
                     android:title="@string/capture_percentage" />
+                <CheckBoxPreference
+                    android:defaultValue="false"
+                    android:dependency="extra_status_line"
+                    android:key="status_line_realtime_capture_percentage"
+                    android:summary="@string/received_realtime_readings_percentage"
+                    android:title="@string/realtime_capture_percentage" />
                 <CheckBoxPreference
                     android:defaultValue="false"
                     android:dependency="extra_status_line"
@@ -554,12 +633,6 @@
                     android:key="bypass_calibration_quality_check"
                     android:summary="Allow initial calibration even if we don't have good enough data. Beware could result in inaccurate calibration!"
                     android:title="Bypass quality check" />
-                <CheckBoxPreference
-                    android:defaultValue="false"
-                    android:dependency="engineering_mode"
-                    android:key="testing_use_thirteen_bit_mask"
-                    android:summary="Testing setting for Libre"
-                    android:title="Use 13 bit ADC mask" />
 
 
             </PreferenceScreen>
@@ -585,12 +658,22 @@
                     android:summary="@string/reset_bluetooth_g5"
                     android:title="@string/g5_bluetooth_watchdog" />
                 <CheckBoxPreference
-                    android:defaultValue="true"
+                    android:defaultValue="false"
                     android:key="close_gatt_on_ble_disconnect"
                     android:summary="@string/close_gatt"
                     android:title="@string/close_gatt_on_ble_disconnect" />
                 <CheckBoxPreference
+                    android:defaultValue="false"
+                    android:key="bluetooth_use_scan"
+                    android:summary="Scan before connecting on xBridge and Libre bluetooth"
+                    android:title="Use scanning" />
+                <CheckBoxPreference
                     android:defaultValue="true"
+                    android:key="bluetooth_trust_autoconnect"
+                    android:summary="Use and trust Android bluetooth auto connect feature"
+                    android:title="Trust Auto-Connect" />
+                <CheckBoxPreference
+                    android:defaultValue="false"
                     android:key="bluetooth_excessive_wakelocks"
                     android:summary="@string/older_bluetooth_wakelocks"
                     android:title="@string/bluetooth_wakelocks" />
@@ -620,7 +703,45 @@
                     android:key="always_discover_services"
                     android:summary="Probe Bluetooth services on every connect"
                     android:title="Always discover services" />
+                <CheckBoxPreference
+                    android:defaultValue="true"
+                    android:key="blukon_unbonding"
+                    android:summary="Only suitable for phones which support automatic pairing"
+                    android:title="Allow blucon unbonding" />
             </PreferenceScreen>
+        <PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android"
+            android:key="xdrip_blueReader_advanced_settings"
+            android:summary="@string/advanced_bluereader_settings_summary"
+            android:title="@string/advanced_bluereader_settings">
+            <CheckBoxPreference
+                android:defaultValue="true"
+                android:key="blueReader_restdays_on_home"
+                android:summary="@string/bluereader_restdays_onhome_sum"
+                android:title="@string/bluereader_restdays_onhome" />
+            <SwitchPreference
+                android:defaultValue="false"
+                android:key="blueReader_turn_off"
+                android:summary="@string/bluereader_turnoff_sum"
+                android:title="@string/bluereader_turnoff" />
+            <SeekBarPreference
+                android:key="blueReader_turn_off_value"
+                android:dependency="blueReader_turn_off"
+                android:title="@string/blueReader_turnoffvalue"
+                android:summary="@string/blueReader_turnoffvalue_sum"
+                android:max="20"
+                android:min="1"
+                android:defaultValue="5" />
+            <SwitchPreference
+                android:defaultValue="false"
+                android:key="blueReader_suppressuglystatemsg"
+                android:summary="Suppress the ugly state message if Problem appears"
+                android:title="supress ugly state message" />
+            <SwitchPreference
+                android:defaultValue="false"
+                android:key="blueReader_writebatterylog"
+                android:summary="write the Battery-Information for additional analytic in a file. Please only use this, if you will be asked by a developer!"
+                android:title="Batterylog" />
+        </PreferenceScreen>
             <CheckBoxPreference
                 android:defaultValue="true"
                 android:key="aggressive_service_restart"
@@ -685,6 +806,13 @@
                 android:key="save_db_ondemand"
                 android:summary="@string/allow_daily_db_save"
                 android:title="@string/daily_save_db" />
+            <EditTextPreference
+                android:key="retention_days_bg_reading"
+                android:title="Glucose Retention"
+                android:summary="Erase data older than this many days. 0 = don't erase anything"
+                android:max="366"
+                android:numeric="integer"
+                android:defaultValue="0" />
             <PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android"
                 android:key="xdrip_other_misc_extra_screen"
                 android:summary=""
@@ -711,20 +839,34 @@
                     android:key="predictive_bg"
                     android:summary="@string/predictive_readings_old"
                     android:title="@string/display_predictive_values" />
-                
+
                 <CheckBoxPreference
                     android:defaultValue="false"
-                    android:dependency="engineering_mode"
                     android:key="external_blukon_algorithm"
                     android:summary="@string/use_external_blukon_algorithm_summary"
                     android:title="@string/use_external_blukon_algorithm" />
                 
+        	    <CheckBoxPreference
+                    android:enabled="false"
+                    android:defaultValue="false"
+                    android:dependency="external_blukon_algorithm"
+                    android:key="calibrate_external_libre_algorithm"
+                    android:summary="@string/calibrate_external_libre_algorithm_summary"
+                    android:title="@string/calibrate_external_libre_algorithm_title" />
+
+                <CheckBoxPreference
+                    android:enabled="true"
+                    android:defaultValue="false"
+                    android:key="retrieve_blukon_history"
+                    android:summary="@string/retrieve_blukon_history_summary"
+                    android:title="@string/retrieve_blukon_history_title" />
+
             </PreferenceScreen>
             <PreferenceCategory
                 android:key="community_help_category"
                 android:title="@string/help_the_community">
                 <CheckBoxPreference
-                    android:defaultValue="true"
+                    android:defaultValue="false"
                     android:key="store_sensor_location"
                     android:summary="@string/help_the_developers_improve_the_algorithm"
                     android:title="@string/store_sensor_location_to_help" />

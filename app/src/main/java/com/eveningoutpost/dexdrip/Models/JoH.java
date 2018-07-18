@@ -19,6 +19,7 @@ import android.content.Intent;
 import android.content.pm.ActivityInfo;
 import android.content.pm.PackageManager;
 import android.content.pm.Signature;
+import android.content.res.Configuration;
 import android.graphics.Bitmap;
 import android.graphics.Canvas;
 import android.graphics.Color;
@@ -36,6 +37,7 @@ import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.PowerManager;
+import android.os.SystemClock;
 import android.provider.Settings;
 import android.support.v4.app.NotificationCompat;
 import android.support.v7.app.AlertDialog;
@@ -73,6 +75,8 @@ import java.io.FileOutputStream;
 import java.io.UnsupportedEncodingException;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
+import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.net.URLEncoder;
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
@@ -84,6 +88,7 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.Locale;
 import java.util.Map;
+import java.util.Set;
 import java.util.zip.CRC32;
 import java.util.zip.Checksum;
 import java.util.zip.Deflater;
@@ -102,6 +107,7 @@ import static com.eveningoutpost.dexdrip.stats.StatsActivity.SHOW_STATISTICS_PRI
 public class JoH {
     private final static char[] hexArray = "0123456789ABCDEF".toCharArray();
     private final static String TAG = "jamorham JoH";
+    private final static int PAIRING_VARIANT_PASSKEY = 1; // hidden in api
     private final static boolean debug_wakelocks = false;
 
     private static double benchmark_time = 0;
@@ -158,10 +164,16 @@ public class JoH {
         return new Date().getTime();
     }
 
-    // TODO can we optimize this with System.currentTimeMillis ?
     public static long tsl() {
-        //return new Date().getTime();
         return System.currentTimeMillis();
+    }
+
+    public static long uptime() {
+        return SystemClock.uptimeMillis();
+    }
+
+    public static boolean upForAtLeastMins(int mins) {
+        return uptime() > Constants.MINUTE_IN_MS * mins;
     }
 
     public static long msSince(long when) {
@@ -185,6 +197,10 @@ public class JoH {
             hexChars[j * 2 + 1] = hexArray[v & 0x0F];
         }
         return new String(hexChars);
+    }
+
+    public static byte[] tolerantHexStringToByteArray(String str) {
+        return hexStringToByteArray(str.toUpperCase().replaceAll("[^A-F0-9]",""));
     }
 
     public static byte[] hexStringToByteArray(String str) {
@@ -337,6 +353,28 @@ public class JoH {
         return input.substring(0, 1).toUpperCase() + input.substring(1).toLowerCase();
     }
 
+    public static boolean isSamsung() {
+        return Build.MANUFACTURER.toLowerCase().contains("samsung");
+    }
+
+    private static final String BUGGY_SAMSUNG_ENABLED = "buggy-samsung-enabled";
+    public static void persistentBuggySamsungCheck() {
+        if (!buggy_samsung) {
+           if (JoH.isSamsung() && PersistentStore.getLong(BUGGY_SAMSUNG_ENABLED) > 4) {
+               buggy_samsung = true;
+               UserError.Log.d(TAG,"Enabling buggy samsung mode due to historical pattern");
+           }
+        }
+    }
+
+    public static void setBuggySamsungEnabled() {
+        if (!buggy_samsung) {
+            JoH.buggy_samsung = true;
+            PersistentStore.incrementLong(BUGGY_SAMSUNG_ENABLED);
+        }
+    }
+
+
     public static class DecimalKeyListener extends DigitsKeyListener {
         private final char[] acceptedCharacters =
                 new char[]{'0', '1', '2', '3', '4', '5', '6', '7', '8', '9',
@@ -398,6 +436,21 @@ public class JoH {
         }
     }
 
+    public static void dumpBundle(Bundle bundle, String tag) {
+        if (bundle != null) {
+            for (String key : bundle.keySet()) {
+                Object value = bundle.get(key);
+                if (value != null) {
+                    UserError.Log.d(tag, String.format("%s %s (%s)", key,
+                            value.toString(), value.getClass().getName()));
+                }
+            }
+        } else {
+            UserError.Log.d(tag, "Bundle is empty");
+        }
+    }
+
+
     // compare stored byte array hashes
     public static synchronized boolean differentBytes(String name, byte[] bytes) {
         final String id = "differentBytes-" + name;
@@ -427,7 +480,7 @@ public class JoH {
         } else {
             rate_time = rateLimits.get(name);
         }
-        if ((rate_time > 0) && (time_now - rate_time) < (seconds * 1000)) {
+        if ((rate_time > 0) && (time_now - rate_time) < (seconds * 1000L)) {
             Log.d(TAG, name + " rate limited: " + seconds + " seconds");
             return false;
         }
@@ -440,7 +493,7 @@ public class JoH {
     // return true if below rate limit
     public static synchronized boolean ratelimit(String name, int seconds) {
         // check if over limit
-        if ((rateLimits.containsKey(name)) && (JoH.tsl() - rateLimits.get(name) < (seconds * 1000))) {
+        if ((rateLimits.containsKey(name)) && (JoH.tsl() - rateLimits.get(name) < (seconds * 1000L))) {
             Log.d(TAG, name + " rate limited: " + seconds + " seconds");
             return false;
         }
@@ -606,6 +659,30 @@ public class JoH {
         return qs((double) t, 0) + " " + unit;
     }
 
+    public static String niceTimeScalar(double t, int digits) {
+        String unit = "second";
+        t = t / 1000;
+        if (t > 59) {
+            unit = "minute";
+            t = t / 60;
+            if (t > 59) {
+                unit = "hour";
+                t = t / 60;
+                if (t > 24) {
+                    unit = "day";
+                    t = t / 24;
+                    if (t > 28) {
+                        unit = "week";
+                        t = t / 7;
+                    }
+                }
+            }
+        }
+        if (t != 1) unit = unit + "s";
+        return qs( t, digits) + " " + unit;
+    }
+
+
     public static String niceTimeScalarNatural(long t) {
         if (t > 3000000) t = t + 10000; // round up by 10 seconds if nearly an hour
         if ((t > Constants.DAY_IN_MS) && (t < Constants.WEEK_IN_MS * 2)) {
@@ -621,6 +698,19 @@ public class JoH {
         return niceTimeScalar(t).replaceFirst("^1 ", "");
     }
 
+    public static String niceTimeScalarShort(long t) {
+        return niceTimeScalar(t).replaceFirst("([A-z]).*$", "$1");
+    }
+
+    public static String niceTimeScalarShortWithDecimalHours(long t) {
+        if (t > Constants.HOUR_IN_MS) {
+            return niceTimeScalar(t,1).replaceFirst("([A-z]).*$", "$1");
+        } else {
+            return niceTimeScalar(t).replaceFirst("([A-z]).*$", "$1");
+        }
+    }
+
+
     public static double tolerantParseDouble(String str) throws NumberFormatException {
         return Double.parseDouble(str.replace(",", "."));
 
@@ -633,7 +723,7 @@ public class JoH {
 
     public static PowerManager.WakeLock getWakeLock(final String name, int millis) {
         final PowerManager pm = (PowerManager) xdrip.getAppContext().getSystemService(Context.POWER_SERVICE);
-        PowerManager.WakeLock wl = pm.newWakeLock(PowerManager.PARTIAL_WAKE_LOCK, name);
+        final PowerManager.WakeLock wl = pm.newWakeLock(PowerManager.PARTIAL_WAKE_LOCK, name);
         wl.acquire(millis);
         if (debug_wakelocks) Log.d(TAG, "getWakeLock: " + name + " " + wl.toString());
         return wl;
@@ -642,7 +732,13 @@ public class JoH {
     public static void releaseWakeLock(PowerManager.WakeLock wl) {
         if (debug_wakelocks) Log.d(TAG, "releaseWakeLock: " + wl.toString());
         if (wl == null) return;
-        if (wl.isHeld()) wl.release();
+        if (wl.isHeld()) {
+            try {
+                wl.release();
+            } catch (Exception e) {
+                Log.e(TAG, "Error releasing wakelock: " + e);
+            }
+        }
     }
 
     public static PowerManager.WakeLock fullWakeLock(final String name, long millis) {
@@ -823,25 +919,34 @@ public class JoH {
         static_toast(context, msg, Toast.LENGTH_LONG);
     }
 
-    public static void show_ok_dialog(final Activity activity, String title, String message, final Runnable runnable) {
-        try {
-            AlertDialog.Builder builder = new AlertDialog.Builder(new ContextThemeWrapper(activity, R.style.AppTheme));
-            builder.setTitle(title);
-            builder.setMessage(message);
-            builder.setPositiveButton("OK", new DialogInterface.OnClickListener() {
-                public void onClick(DialogInterface dialog, int which) {
-                    dialog.dismiss();
-                    if (runnable != null) {
-                        runOnUiThreadDelayed(runnable, 10);
-                    }
-                }
-            });
+    public static void show_ok_dialog(final Activity activity, final String title, final String message, final Runnable runnable) {
+        runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+                try {
+                    AlertDialog.Builder builder = new AlertDialog.Builder(new ContextThemeWrapper(activity, R.style.AppTheme));
+                    builder.setTitle(title);
+                    builder.setMessage(message);
+                    builder.setPositiveButton("OK", new DialogInterface.OnClickListener() {
+                        public void onClick(DialogInterface dialog, int which) {
+                            try {
+                                dialog.dismiss();
+                            } catch (Exception e) {
+                                //
+                            }
+                            if (runnable != null) {
+                                runOnUiThreadDelayed(runnable, 10);
+                            }
+                        }
+                    });
 
-            builder.create().show();
-        } catch (Exception e) {
-            Log.wtf(TAG, "show_dialog exception: " + e);
-            static_toast_long(message);
-        }
+                    builder.create().show();
+                } catch (Exception e) {
+                    Log.wtf(TAG, "show_dialog exception: " + e);
+                    static_toast_long(message);
+                }
+            }
+        });
     }
 
     public static synchronized void playResourceAudio(int id) {
@@ -886,9 +991,23 @@ public class JoH {
         }
     }
 
+    public static void stopService(Class c) {
+        xdrip.getAppContext().stopService(new Intent(xdrip.getAppContext(), c));
+    }
+
     public static void startService(Class c) {
         xdrip.getAppContext().startService(new Intent(xdrip.getAppContext(), c));
     }
+
+    public static void startActivity(Class c) {
+        xdrip.getAppContext().startActivity(getStartActivityIntent(c));
+    }
+
+
+    public static Intent getStartActivityIntent(Class c) {
+        return new Intent(xdrip.getAppContext(), c).setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+    }
+
 
     public static void goFullScreen(boolean fullScreen, View decorView) {
 
@@ -1147,6 +1266,12 @@ public class JoH {
         }
     }
 
+    public static boolean areWeRunningOnAndroidWear() {
+        return Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT_WATCH
+                && (xdrip.getAppContext().getResources().getConfiguration().uiMode
+                & Configuration.UI_MODE_TYPE_MASK) == Configuration.UI_MODE_TYPE_WATCH;
+    }
+
     public static boolean isAirplaneModeEnabled(Context context) {
         return Settings.Global.getInt(context.getContentResolver(), Settings.Global.AIRPLANE_MODE_ON, 0) != 0;
     }
@@ -1174,12 +1299,17 @@ public class JoH {
     }
 
     @TargetApi(19)
-    public static boolean doPairingRequest(Context context, BroadcastReceiver broadcastReceiver, Intent intent, String mBluetoothDeviceAddress, String pinHint) {
+    public static boolean doPairingRequest(Context context, BroadcastReceiver broadcastReceiver, Intent intent, final String mBluetoothDeviceAddress, final String pinHint) {
         if (BluetoothDevice.ACTION_PAIRING_REQUEST.equals(intent.getAction())) {
             final BluetoothDevice device = intent.getParcelableExtra(BluetoothDevice.EXTRA_DEVICE);
             if (device != null) {
                 int type = intent.getIntExtra(BluetoothDevice.EXTRA_PAIRING_VARIANT, BluetoothDevice.ERROR);
                 if ((mBluetoothDeviceAddress != null) && (device.getAddress().equals(mBluetoothDeviceAddress))) {
+
+                    if (type == PAIRING_VARIANT_PASSKEY && pinHint != null) {
+                        return false;
+                    }
+
                     if ((type == PAIRING_VARIANT_PIN) && (pinHint != null)) {
                         device.setPin(convertPinToBytes(pinHint));
                         Log.d(TAG, "Setting pairing pin to " + pinHint);
@@ -1187,12 +1317,12 @@ public class JoH {
                     }
                     try {
                         UserError.Log.e(TAG, "Pairing type: " + type);
-                        if (type != PAIRING_VARIANT_PIN) {
+                        if (type != PAIRING_VARIANT_PIN && type != PAIRING_VARIANT_PASSKEY) {
                             device.setPairingConfirmation(true);
                             JoH.static_toast_short("xDrip Pairing");
                             broadcastReceiver.abortBroadcast();
                         } else {
-                            Log.d(TAG,"Attempting to passthrough PIN pairing");
+                            Log.d(TAG, "Attempting to passthrough PIN pairing");
                         }
 
                     } catch (Exception e) {
@@ -1322,6 +1452,39 @@ public class JoH {
         }.start();
     }
 
+
+    public static synchronized void unBond(String transmitterMAC) {
+
+        UserError.Log.d(TAG, "unBond() start");
+        if (transmitterMAC == null) return;
+        try {
+            final BluetoothAdapter mBluetoothAdapter = ((BluetoothManager) xdrip.getAppContext().getSystemService(Context.BLUETOOTH_SERVICE)).getAdapter();
+
+            final Set<BluetoothDevice> pairedDevices = mBluetoothAdapter.getBondedDevices();
+            if (pairedDevices.size() > 0) {
+                for (BluetoothDevice device : pairedDevices) {
+                    if (device.getAddress() != null) {
+                        if (device.getAddress().equals(transmitterMAC)) {
+                            try {
+                                UserError.Log.e(TAG, "removingBond: " + transmitterMAC);
+                                Method m = device.getClass().getMethod("removeBond", (Class[]) null);
+                                m.invoke(device, (Object[]) null);
+
+                            } catch (Exception e) {
+                                UserError.Log.e(TAG, e.getMessage(), e);
+                            }
+                        }
+
+                    }
+                }
+            }
+        } catch (Exception e) {
+            UserError.Log.e(TAG, "Exception during unbond! " + transmitterMAC, e);
+        }
+        UserError.Log.d(TAG, "unBond() finished");
+    }
+
+
     public static Map<String, String> bundleToMap(Bundle bundle) {
         final HashMap<String, String> map = new HashMap<>();
         for (String key : bundle.keySet()) {
@@ -1331,6 +1494,14 @@ public class JoH {
             }
         }
         return map;
+    }
+
+    public static void threadSleep(long millis) {
+        try {
+            Thread.sleep(millis);
+        } catch (InterruptedException e) {
+            //
+        }
     }
 
     public static ByteBuffer bArrayAsBuffer(byte[] bytes) {
@@ -1345,6 +1516,8 @@ public class JoH {
         crc.update(bytes);
         return crc.getValue();
     }
+
+
 
     public static byte[] bchecksum(byte[] bytes) {
         final long c = checksum(bytes);
@@ -1369,4 +1542,13 @@ public class JoH {
            return defaultVal;
        }
     }
+
+    public static double roundDouble(double value, int places) {
+        if (places < 0) throw new IllegalArgumentException("Invalid decimal places");
+        BigDecimal bd = new BigDecimal(value);
+        bd = bd.setScale(places, RoundingMode.HALF_UP);
+        return bd.doubleValue();
+    }
+    
+
 }

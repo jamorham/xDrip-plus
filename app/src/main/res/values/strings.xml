@@ -72,7 +72,7 @@
 
     <!-- Location Settings -->
     <string name="location_not_found_title">Location Is Not Enabled</string>
-    <string name="location_not_found_message">For Bluetooth discovery to work on newer devices, location must be enabled. xDrip does not track your location and it can be disabled after pairing is successful.</string>
+    <string name="location_not_found_message">For Bluetooth discovery to work on newer devices, location must be enabled. xDrip does not track your location except with the optional Emergency Message feature</string>
     <string name="location_yes">Enable</string>
 
     <!-- broadcast settings -->
@@ -87,6 +87,16 @@
     <string name="pref_summary_display_trend">Show the BG trend on the xDrip Pebble watch face.</string>
     <string name="pref_pebble_display_high_line">Display High Line</string>
     <string name="pref_pebble_display_low_line">Display Low Line</string>
+
+    <!-- Amazfit Settings -->
+    <string name="amazfit_sync_service">AmazFit Sync Service</string>
+
+    <string name="pref_amazfit_enable_summary">Enable Amazfit Data support</string>
+    <string name="pref_amazfit_enable">Enable</string>
+    <string name="pref_amazfit_tile">Amazfit Service</string>
+    <string name="pref_amazfit_alarm_enable_summary">Sends Alarms to Smartwatch and mutes Phone</string>
+    <string name="pref_amazfit_alarm_enable">Enable</string>
+    <string name="pref_amazfit_alarm_tile">Watch Alarm</string>
 
 
     <string name="toast_crash">Something went wrong :( a report has been sent to help fix the issue.</string>
@@ -157,10 +167,13 @@
     <string name="show_parakeet_map">Show Parakeet map</string>
     <string name="switch_parakeet_to_setup_mode">Switch Parakeet to Setup mode</string>
     <string name="view_events_log">View Events Log</string>
+    <string name="show_libre_trend">Show libre trend</string>
+    <string name="libre_15_minutes_graph">Libre 15 minutes graph</string>
     <string name="share_config_via_qr_code">Share config via QR code</string>
     <string name="check_for_updated_version">Check for updated version</string>
     <string name="send_feedback_to_developer">Send Feedback to developer</string>
     <string name="home_screen">Home Screen</string>
+    <string name="event_logs">Event Logs</string>
     <string name="calibration_graph">Calibration Graph</string>
     <string name="glucose_units">Glucose Units</string>
     <string name="mmol_or_mgdl_high_and_low">mmol/l or mg/dl high and low</string>
@@ -599,9 +612,13 @@
     <string name="repeatedly_restart_collection_service">Repeatedly restart the collection service at any hint of missing data. Enable only if you are getting data loss.</string>
     <string name="aggressive_service_restarts">Aggressive service restarts</string>
     <string name="predictive_readings_old">Old method - Not Recommended! Attempts to predict readings each minute based on the past few values.</string>
-    <string name="use_external_blukon_algorithm_summary">Use an out of process blukon algorithm.</string>
+    <string name="use_external_blukon_algorithm_summary">Use an out of process libre algorithm. (blukon/NFC/LibreAlarm)</string>
     <string name="display_predictive_values">Display Predictive Values</string>
-    <string name="use_external_blukon_algorithm">Out of process blukon algorithm.</string>
+    <string name="use_external_blukon_algorithm">Out of process libre algorithm.</string>
+    <string name="calibrate_external_libre_algorithm_summary">Apply xDrip calibration methods on OOP data.</string>
+    <string name="calibrate_external_libre_algorithm_title">OOP algorithm calibration.</string>
+    <string name="retrieve_blukon_history_title">Retrieve Libre history</string>
+    <string name="retrieve_blukon_history_summary">Retrieve missed history from Blukon device when reconnecting to sensor.</string>
     <string name="interpret_share_raw">If using Share, xDrip will show values when they are normally hidden on the receiver.</string>
     <string name="interpret_raw">Interpret Raw Values</string>
     <string name="use_infrequent_calibrations">If needed, use calibrations from longer ago, eg if calibrations are supplied infrequently.</string>
@@ -634,7 +651,9 @@
     <string name="show_total_insulin">Show treatment insulin total</string>
     <string name="total_insulin">Total Insulin</string>
     <string name="received_readings_percentage">Percentage of sensor readings received</string>
+    <string name="received_realtime_readings_percentage">Percentage of sensor readings received in realtime (non-backfilled). G5 Native mode ONLY</string>
     <string name="capture_percentage">Packet capture percentage</string>
+    <string name="realtime_capture_percentage">Realtime packet capture percentage</string>
     <string name="show_calibration_accuracy">Show calibration accuracy evaluation from last 3 days</string>
     <string name="accuracy_evaluation">Accuracy Evaluation</string>
     <string name="show_extra_status_on_widget">Also show the extra status line on the widget</string>
@@ -674,7 +693,7 @@
     <string name="low_level_value">Low level diagnostic/prototype value</string>
     <string name="transmitter_id">ID of your Dexcom Transmitter, eg 12AB3</string>
     <string name="advanced_g5_settings">Advanced G5 settings for rare situations</string>
-    <string name="g5_debug_settings">G5 Debug Settings</string>
+    <string name="g5_debug_settings">G5/G6 Debug Settings</string>
     <string name="g5_scan_constantly">Some devices work better when scanning constantly, others do not. If reading is reliable when this setting is not selected, you should have improved battery life. Normally best to keep this disabled</string>
     <string name="scan_for_g5_constantly">Scan for G5 constantly</string>
     <string name="g5_force_ui_thread">This is crucial for some Android devices to properly connect, but can cause missed readings when other UI intensive activities are in use.</string>
@@ -821,6 +840,7 @@
     <string name="try_to_work_around_noisy_readings_ultrasensitive">Start to work around noisy readings even on very low noise levels (engineering mode ony)</string>
     <string name="sidiary_date_title">Export starting from when?</string>
     <string name="blukon">Blucon</string>
+    <string name="tomato">Tomato</string>
     <string name="use_gravity_sensor_to_rotate_items">Use Gravity Sensor to rotate items</string>
     <string name="low_bridge_battery">Low bridge battery</string>
     <string name="reminders">Reminders</string>
@@ -851,4 +871,100 @@
     <string name="received_enough_good_data_to_calibrate">Received Enough Good Data to Calibrate</string>
     <string name="play_sound_when_ready_for_calibration">Play sound when ready for Calibration</string>
     <string name="receiving_data_from_collector">Receiving Data from %s Collector</string>
+
+    <!-- trend arrow for speak -->
+    <string name="DoubleDown">Double Down</string>
+    <string name="SingleDown">Single Down</string>
+    <string name="FortyFiveDown">Slight Down</string>
+    <string name="Flat">Flat</string>
+    <string name="FortyFiveUp">Slight Up</string>
+    <string name="SingleUp">Single Up</string>
+    <string name="DoubleUp">Double Up</string>
+
+    <string name="Speak_trend_arrow_name">Speak trend arrow name</string>
+    <string name="Speak_everything_twice">Speak everything twice</string>
+    <string name="Speech_speed">Speech speed</string>
+    <string name="Speech_pitch">Speech pitch</string>
+    <string name="Speak_Alerts">Speak Alerts</string>
+    <string name="Speak_Alerts_Summary">Also give some spoken alert messages</string>
+    <string name="advanced_bluereader_settings_summary">Advanced blueReader Settings</string>
+    <string name="advanced_bluereader_settings">blueReader Settings</string>
+    <string name="bluereader_restdays_onhome_sum">Shows the estimated rest Days for blueReader on home screen after the battery must be reload</string>
+    <string name="bluereader_restdays_onhome">Rest days on Home Screen</string>
+    <string name="bluereader_turnoff_sum">Switch the blueReader off, if the battery is less then selected value</string>
+    <string name="bluereader_turnoff">Safety switch off</string>
+    <string name="blueReader_turnoffvalue">Value in %</string>
+    <string name="blueReader_turnoffvalue_sum">where the Bluereader will be turned off</string>
+    <string name="days">days rest</string>
+    <string name="bluereaderoff">blueReader will be turn off, as the battery is lower then </string>
+    <string name="bluereader_position">check position of blueReader on the sensor, as it was not able to read!</string>
+    <string name="bluereaderuglystate">The blueReader was found in an ugly state! It will be now turn off now, and you turn it back to on (short press of the button). After that the blueReader should work as expectet!</string>
+    <string name="offical_msg">The official app</string>
+    <string name="use_conflict_msg">may try to access the transmitter device too and this can cause problems with both apps</string>
+    <string name="use_confict_msg_glimp">You can adjust Glimp Settings: options -> devices -> unselect Bluetooth option</string>
+    <string name="yes">Yes</string>
+    <string name="xdrip_compatible_features">xDrip+ %s Features</string>
+    <string name="garmin">Garmin</string>
+    <string name="fitbit">Fitbit</string>
+    <string name="enable_local_web_server_feature">Enable local web server feature for Garmin watchface?</string>
+    <string name="enable_local_web_server_feature_fitbit">Enable local web server feature for Fitbit watchface?</string>
+    <string name="set_data_source_to">Set data source to: %s ?</string>
+    <string name="are_you_sure">Are you sure?</string>
+    <string name="g4_share_receiver">G4 Share Receiver</string>
+    <string name="bluetooth_wixel">Bluetooth Wixel</string>
+    <string name="parakeet_wifi">Parakeet / Wifi</string>
+    <string name="other">Other</string>
+    <string name="which_software_is_the_wixel_running">Which software is the Wixel running?</string>
+    <string name="start_source_setup_wizard">Start Source Setup Wizard</string>
+    <string name="hour_format">%s Hour</string>
+    <string name="enter_your_transmitter_id_exactly">Enter your transmitter ID exactly as it is printed</string>
+    <string name="which_type_of_device">Which type of device?</string>
+    <string name="enable_local_broadcast">Enable local broadcast?</string>
+    <string name="broadcast_only_to">Broadcast only to?</string>
+    <string name="enable_wear_os_sync">Enable Sync to Android Wear OS?</string>
+    <string name="androidaps">AndroidAPS</string>
+    <string name="androidwear">Android Wear OS</string>
+    <string name="librealarm">LibreAlarm</string>
+    <string name="use_librealarm">Use LibreAlarm app as data source?</string>
+    <string name="noise_blocking">Noise Blocking</string>
+    <string name="level_at_which_noisy_data_should_not_be_broadcast">Level at which noisy data should not be broadcast as it could confuse receiving apps</string>
+    <string name="low_parakeet_battery">Low Parakeet battery</string>
+    <string name="glucose_units_mmol_or_mgdl">Glucose units mmol/L or mg/dL</string>
+    <string name="is_your_typical_glucose_value">Is your typical blood glucose value:  5.5 (mmol/L) or 100 (mg/dL)  Please select below</string>
+    <string name="settings_updated_to_mmol">Settings updated to mmol/L</string>
+    <string name="external_calibration_app">External Calibration App</string>
+    <string name="use_app_for_calibration">use app for calibration?</string>
+    <string name="channel_name">Foreground Service</string>
+    <string name="code_accepted">Code accepted</string>
+    <string name="invalid_or_unsupported_code">Invalid or unsupported code!</string>
+    <string name="g6_sensor_code">G6 Sensor Code</string>
+    <string name="please_enter_printed_calibration_code">Please enter the printed calibration code number, 4 digits, eg: 5678</string>
+    <string name="enable_update_checks">Enable update checks?</string>
+    <string name="you_can_easily_roll_back_dialog_msg">With xDrip you can easily roll back to previous versions just by re-running the APK installer for the old version in your Downloads folder if you don\'t like the new version.\n\nWould you like to enable update checks?</string>
+    <string name="hey_fam">Hey Fam...</string>
+    <string name="you_have_update_checks_off">You have update checks switched off!\n\nWe try to fix bugs and add new features to xDrip+ over time.\n\nEvery 60 days this reminder will appear to ask you to turn update checking on.</string>
+    <string name="update_checking_enabled">Update checking enabled!</string>
+    <string name="cancel_alarm">Cancel Alarm?</string>
+    <string name="please_confirm_to_cancel_the_alert">Please confirm to cancel the alert?</string>
+    <string name="yes_cancel">Yes Cancel</string>
+    <string name="warning_no_alert_will_be_played_in_silent_mode">Warning, no alert will be played when phone in silent/vibrate mode!!!</string>
+    <string name="automatic_message_from_xdrip">automatic message from xDrip+</string>
+    <string name="zero_zero_zero_zero">0000</string>
+    <string name="emergency_messages">Emergency Messages</string>
+    <string name="emergency_message_feature">Emergency Message Feature</string>
+    <string name="text_messages_can_be_sent_with_your_location_if_you_do_not_respond_to_alarms_this_feature_is_experimental_and_may_not_be_reliable">Text messages can be sent with your location if you do not respond to alarms. This feature is experimental and may not be reliable.</string>
+    <string name="your_name">Your name</string>
+    <string name="did_not_acknowledge_a_low_glucose_alert">%s did not acknowledge a low glucose alert for %s</string>
+    <string name="did_not_acknowledge_a_high_glucose_alert">%s did not acknowledge a high glucose alert for %s</string>
+    <string name="has_not_had_glucose_data_received_for">%s has not had glucose data received for %s</string>
+    <string name="phone_has_not_been_used_for">%s phone has not been used for %s</string>
+    <string name="is_requesting_assistance">%s is Requesting assistance</string>
+    <string name="is_testing_the_assistance_request_feature">%s is testing the assistance request feature</string>
+    <string name="emergency_message_near_format_string">%s near %s %s %s %s</string>
+    <string name="choose_when_to_send_messages">Choose when to send messages:</string>
+    <string name="low_alert_not_acknowledged">Low Alert not acknowledged</string>
+    <string name="high_alert_not_acknowledged">High Alert not acknowledged</string>
+    <string name="device_inactivity">Device inactivity</string>
+    <string name="test_message_sending">Test Message Sending</string>
+    <string name="d_selected_contacts_for_text_messages_format">%d selected contacts for text messages</string>
 </resources>

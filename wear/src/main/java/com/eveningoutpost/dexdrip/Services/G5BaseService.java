@@ -2,7 +2,10 @@ package com.eveningoutpost.dexdrip.Services;
 
 import android.app.Service;
 import android.bluetooth.BluetoothDevice;
+import android.os.PowerManager;
 
+import com.eveningoutpost.dexdrip.Models.JoH;
+import com.eveningoutpost.dexdrip.Models.UserError;
 import com.eveningoutpost.dexdrip.UtilityModels.PersistentStore;
 import com.eveningoutpost.dexdrip.UtilityModels.Pref;
 import com.google.android.gms.wearable.DataMap;
@@ -13,6 +16,11 @@ import com.google.android.gms.wearable.DataMap;
 
 public abstract class G5BaseService extends Service {
 
+
+    private final PowerManager.WakeLock wl = JoH.getWakeLock("g5-base-bt", 100);
+
+    public static final int G6_SCALING = 32;
+
     public static final String G5_FIRMWARE_MARKER = "g5-firmware-";
 
     public static final String G5_BATTERY_MARKER = "g5-battery-";
@@ -21,14 +29,21 @@ public abstract class G5BaseService extends Service {
 
     public static final String G5_BATTERY_WEARABLE_SEND = "g5-battery-wearable-send";
 
-    protected static final int LOW_BATTERY_WARNING_LEVEL = Pref.getStringToInt("g5-battery-warning-level", 300);
+    protected static final int G5_LOW_BATTERY_WARNING_DEFAULT = 300;
+    protected static final int G6_LOW_BATTERY_WARNING_DEFAULT = 290;
+    protected static int LOW_BATTERY_WARNING_LEVEL = G5_LOW_BATTERY_WARNING_DEFAULT; // updated by updateBatteryWarningLevel()
 
-    public static boolean getBatteryStatusNow = false;
+    public static volatile boolean getBatteryStatusNow = false;
+    public static volatile boolean hardResetTransmitterNow = false;
 
     protected static String lastState = "Not running";
     protected static String lastStateWatch = "Not running";
     protected static long static_last_timestamp = 0;
     protected static long static_last_timestamp_watch = 0;
+
+    static {
+        updateBatteryWarningLevel();
+    }
 
     public static void setWatchStatus(DataMap dataMap) {
         lastStateWatch = dataMap.getString("lastState", "");
@@ -76,4 +91,49 @@ public abstract class G5BaseService extends Service {
         PersistentStore.setLong(G5_BATTERY_LEVEL_MARKER + transmitterId, 0);
         PersistentStore.commit();
     }
+
+    protected static void updateBatteryWarningLevel() {
+        LOW_BATTERY_WARNING_LEVEL = Pref.getStringToInt("g5-battery-warning-level", G5_LOW_BATTERY_WARNING_DEFAULT);
+    }
+
+    protected synchronized void extendWakeLock(long ms) {
+        JoH.releaseWakeLock(wl); // lets not get too messy
+        wl.acquire(ms);
+    }
+
+    protected synchronized void releaseWakeLock() {
+        JoH.releaseWakeLock(wl);
+    }
+
+    protected static byte[] nn(final byte[] array) {
+        if (array == null) {
+            if (JoH.ratelimit("never-null", 60)) {
+                UserError.Log.wtf("NeverNullG5Base", "Attempt to pass null!!! " + JoH.backTrace());
+                return new byte[1];
+            }
+        }
+        return array;
+    }
+
+    public static boolean usingG6() {
+        return Pref.getBooleanDefaultFalse("using_g6");
+    }
+
+    public static void setG6bareBones() {
+        Pref.setBoolean("using_g6", true);
+        // TODO add initiate bonding true in case gets disabled??
+        final int battery_warning_level = Pref.getStringToInt("g5-battery-warning-level", G5_LOW_BATTERY_WARNING_DEFAULT);
+        if (battery_warning_level == G5_LOW_BATTERY_WARNING_DEFAULT) {
+            Pref.setString("g5-battery-warning-level", "" + G6_LOW_BATTERY_WARNING_DEFAULT);
+        }
+    }
+
+    public static void setG6Defaults() {
+        Pref.setBoolean("use_ob1_g5_collector_service", true);
+        Pref.setBoolean("ob1_g5_use_transmitter_alg", true);
+        Pref.setBoolean("ob1_g5_fallback_to_xdrip", false);
+        setG6bareBones();
+    }
+
+
 }

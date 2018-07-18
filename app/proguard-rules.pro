@@ -75,6 +75,7 @@
 -keep class rx.schedulers.Schedulers {
     public static ** test();
 }
+
 -keepclassmembers class rx.internal.util.unsafe.*ArrayQueue*Field* {
     long producerIndex;
     long consumerIndex;
@@ -99,11 +100,15 @@
 
 -keepclassmembers class com.eveningoutpost.dexdrip.** {
    public static boolean isRunning();
+   public static boolean isCollecting();
 }
 
 -dontnote rx.internal.util.PlatformDependent
 -dontnote rx.**
+-dontnote **rx.Observable.**
 -dontnote com.squareup.**
 
 -dontwarn java.lang.invoke.*
 -dontwarn **$$Lambda$*
+
+-dontwarn com.google.devtools.build.android.desugar.runtime.**

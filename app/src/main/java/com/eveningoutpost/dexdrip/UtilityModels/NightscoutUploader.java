@@ -15,10 +15,14 @@ import com.eveningoutpost.dexdrip.Models.BgReading;
 import com.eveningoutpost.dexdrip.Models.BloodTest;
 import com.eveningoutpost.dexdrip.Models.Calibration;
 import com.eveningoutpost.dexdrip.Models.DateUtil;
+import com.eveningoutpost.dexdrip.Models.HeartRate;
 import com.eveningoutpost.dexdrip.Models.JoH;
+import com.eveningoutpost.dexdrip.Models.StepCounter;
 import com.eveningoutpost.dexdrip.Models.Treatments;
 import com.eveningoutpost.dexdrip.Models.UserError;
 import com.eveningoutpost.dexdrip.Models.UserError.Log;
+import com.eveningoutpost.dexdrip.Services.DexCollectionService;
+import com.eveningoutpost.dexdrip.Services.ActivityRecognizedService;
 import com.eveningoutpost.dexdrip.utils.CipherUtils;
 import com.eveningoutpost.dexdrip.utils.DexCollectionType;
 import com.eveningoutpost.dexdrip.xdrip;
@@ -30,10 +34,6 @@ import com.mongodb.DBCollection;
 import com.mongodb.MongoClient;
 import com.mongodb.MongoClientURI;
 import com.mongodb.WriteConcern;
-import com.squareup.okhttp.MediaType;
-import com.squareup.okhttp.OkHttpClient;
-import com.squareup.okhttp.RequestBody;
-import com.squareup.okhttp.ResponseBody;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -54,17 +54,26 @@ import java.util.TimeZone;
 import java.util.UUID;
 import java.util.concurrent.TimeUnit;
 
-import retrofit.Call;
-import retrofit.Response;
-import retrofit.Retrofit;
-import retrofit.http.Body;
-import retrofit.http.DELETE;
-import retrofit.http.GET;
-import retrofit.http.Header;
-import retrofit.http.POST;
-import retrofit.http.PUT;
-import retrofit.http.Path;
-import retrofit.http.Query;
+import okhttp3.Interceptor;
+import okhttp3.MediaType;
+import okhttp3.OkHttpClient;
+import okhttp3.Request;
+import okhttp3.RequestBody;
+import okhttp3.ResponseBody;
+import okio.BufferedSink;
+import okio.GzipSink;
+import okio.Okio;
+import retrofit2.Call;
+import retrofit2.Response;
+import retrofit2.Retrofit;
+import retrofit2.http.Body;
+import retrofit2.http.DELETE;
+import retrofit2.http.GET;
+import retrofit2.http.Header;
+import retrofit2.http.POST;
+import retrofit2.http.PUT;
+import retrofit2.http.Path;
+import retrofit2.http.Query;
 
 import static com.eveningoutpost.dexdrip.Models.Treatments.pushTreatmentSyncToWatch;
 
@@ -82,6 +91,7 @@ public class NightscoutUploader {
         private static final int SOCKET_TIMEOUT = 60000;
         private static final int CONNECTION_TIMEOUT = 30000;
         private static final boolean d = false;
+        private static final boolean USE_GZIP = true; // conditional inside interceptor
 
         public static long last_success_time = -1;
         public static long last_exception_time = -1;
@@ -136,6 +146,9 @@ public class NightscoutUploader {
             @DELETE("treatments/{id}")
             Call<ResponseBody> deleteTreatment(@Header("api-secret") String secret, @Path("id") String id);
 
+            @POST("activity")
+            Call<ResponseBody> uploadActivity(@Header("api-secret") String secret, @Body RequestBody body);
+
         }
 
         private class UploaderException extends RuntimeException {
@@ -150,10 +163,13 @@ public class NightscoutUploader {
         public NightscoutUploader(Context context) {
             mContext = context;
             prefs = PreferenceManager.getDefaultSharedPreferences(mContext);
-            client = new OkHttpClient();
-            client.setConnectTimeout(CONNECTION_TIMEOUT, TimeUnit.MILLISECONDS);
-            client.setWriteTimeout(SOCKET_TIMEOUT, TimeUnit.MILLISECONDS);
-            client.setReadTimeout(SOCKET_TIMEOUT, TimeUnit.MILLISECONDS);
+            final OkHttpClient.Builder okHttp3Builder = new OkHttpClient.Builder();
+
+            if (USE_GZIP) okHttp3Builder.addInterceptor(new GzipRequestInterceptor());
+            okHttp3Builder.connectTimeout(CONNECTION_TIMEOUT, TimeUnit.MILLISECONDS);
+            okHttp3Builder.writeTimeout(SOCKET_TIMEOUT, TimeUnit.MILLISECONDS);
+            okHttp3Builder.readTimeout(SOCKET_TIMEOUT, TimeUnit.MILLISECONDS);
+            client = okHttp3Builder.build();
             enableRESTUpload = prefs.getBoolean("cloud_storage_api_enable", false);
             enableMongoUpload = prefs.getBoolean("cloud_storage_mongodb_enable", false);
         }
@@ -192,13 +208,14 @@ public class NightscoutUploader {
             try {
                 final Response<ResponseBody> r;
                 r = nightscoutService.getStatus(hashedSecret).execute();
-                if ((r != null) && (r.isSuccess())) {
+                if ((r != null) && (r.isSuccessful())) {
                     final String response = r.body().string();
                     if (d) Log.d(TAG, "Status Response: " + response);
                     // TODO do we need to parse json here or should we just store string?
                     final JSONObject tr = new JSONObject(response);
                     if (d) Log.d(TAG, url + " " + tr.toString());
                     PersistentStore.setString(store_marker, tr.toString());
+                    checkGzipSupport(r);
                 } else {
                     PersistentStore.setString(store_marker, "error");
                     Log.d(TAG, "Failure to get status data from: " + url + " " + ((r != null) ? r.message() : ""));
@@ -341,7 +358,7 @@ public class NightscoutUploader {
                             continue; // skip further processing of this url
                         }
 
-                        if ((r != null) && (r.isSuccess())) {
+                        if ((r != null) && (r.isSuccessful())) {
 
                             last_modified_string = r.raw().header("Last-Modified", JoH.getRFC822String(request_start));
                             final String this_etag = r.raw().header("Etag", "");
@@ -436,7 +453,7 @@ public class NightscoutUploader {
                                     // Log.d(TAG, "json processing: " + e);
                                 }
 
-                                if ((notes != null) && ((notes.equals("AndroidAPS started") || notes.equals("null") || (notes.equals("Bolus Std")))))
+                                if ((notes != null) && ((notes.startsWith("AndroidAPS started") || notes.equals("null") || (notes.equals("Bolus Std")))))
                                     notes = null;
 
                                 if ((carbs > 0) || (insulin > 0) || (notes != null)) {
@@ -448,33 +465,43 @@ public class NightscoutUploader {
                                         if (existing == null)
                                             existing = Treatments.byuuid(uuid);
                                         if ((existing == null) && (!from_xdrip)) {
-                                            // TODO check for close timestamp duplicates perhaps
-                                            Log.ueh(TAG, "New Treatment from Nightscout: Carbs: " + carbs + " Insulin: " + insulin + " timestamp: " + JoH.dateTimeText(timestamp) + ((notes != null) ? " Note: "+notes : ""));
-                                            final Treatments t;
-                                            if ((carbs > 0) || (insulin > 0)) {
-                                                t = Treatments.create(carbs, insulin, timestamp, nightscout_id);
-                                                if (notes != null) t.notes = notes;
-                                            } else {
-                                                t = Treatments.create_note(notes, timestamp, -1, nightscout_id);
-                                                if (t == null) {
-                                                    Log.d(TAG, "Create note baulked and returned null, so skipping");
-                                                    bad_uuids.add(nightscout_id);
-                                                    continue;
+                                            // check for close timestamp duplicates perhaps
+                                            existing = Treatments.byTimestamp(timestamp, 60000);
+                                            if (!((existing != null) && (JoH.roundDouble(existing.insulin, 2) == JoH.roundDouble(insulin, 2))
+                                                    && (JoH.roundDouble(existing.carbs, 2) == JoH.roundDouble(carbs, 2))
+                                                    && ((existing.notes == null && notes == null) || ((existing.notes != null) && existing.notes.equals(notes != null ? notes : "")))))
+                                            {
+
+                                                Log.ueh(TAG, "New Treatment from Nightscout: Carbs: " + carbs + " Insulin: " + insulin + " timestamp: " + JoH.dateTimeText(timestamp) + ((notes != null) ? " Note: " + notes : ""));
+                                                final Treatments t;
+                                                if ((carbs > 0) || (insulin > 0)) {
+                                                    t = Treatments.create(carbs, insulin, timestamp, nightscout_id);
+                                                    if (notes != null) t.notes = notes;
+                                                } else {
+                                                    t = Treatments.create_note(notes, timestamp, -1, nightscout_id);
+                                                    if (t == null) {
+                                                        Log.d(TAG, "Create note baulked and returned null, so skipping");
+                                                        bad_uuids.add(nightscout_id);
+                                                        continue;
+                                                    }
                                                 }
-                                            }
 
-                                            //t.uuid = nightscout_id; // replace with nightscout uuid
-                                            try {
-                                                t.enteredBy = tr.getString("enteredBy") + " " + VIA_NIGHTSCOUT_TAG;
-                                            } catch (JSONException e) {
-                                                t.enteredBy = VIA_NIGHTSCOUT_TAG;
-                                            }
+                                                //t.uuid = nightscout_id; // replace with nightscout uuid
+                                                try {
+                                                    t.enteredBy = tr.getString("enteredBy") + " " + VIA_NIGHTSCOUT_TAG;
+                                                } catch (JSONException e) {
+                                                    t.enteredBy = VIA_NIGHTSCOUT_TAG;
+                                                }
 
-                                            t.save();
-                                            // sync again!
-                                           // pushTreatmentSync(t, false);
-                                            if (Home.get_show_wear_treatments()) pushTreatmentSyncToWatch(t, true);
-                                            new_data = true;
+                                                t.save();
+                                                // sync again!
+                                                // pushTreatmentSync(t, false);
+                                                if (Home.get_show_wear_treatments())
+                                                    pushTreatmentSyncToWatch(t, true);
+                                                new_data = true;
+                                            } else {
+                                                Log.e(TAG, "Skipping treatment as it appears identical to one we already have: " + JoH.dateTimeText(timestamp) + " " + insulin + " " + carbs + " " + notes);
+                                            }
                                         } else {
                                             if (existing != null) {
                                                 if (d)
@@ -505,6 +532,7 @@ public class NightscoutUploader {
                                 }
                             }
                             PersistentStore.setString(LAST_MODIFIED_KEY, last_modified_string);
+                            checkGzipSupport(r);
                         } else {
                             Log.d(TAG, "Failed to get treatments from: " + baseURI);
                         }
@@ -586,7 +614,7 @@ public class NightscoutUploader {
         private void doLegacyRESTUploadTo(NightscoutService nightscoutService, List<BgReading> glucoseDataSets) throws Exception {
             for (BgReading record : glucoseDataSets) {
                 Response<ResponseBody> r = nightscoutService.upload(populateLegacyAPIEntry(record)).execute();
-                if (!r.isSuccess()) throw new UploaderException(r.message(), r.code());
+                if (!r.isSuccessful()) throw new UploaderException(r.message(), r.code());
 
             }
             try {
@@ -618,8 +646,8 @@ public class NightscoutUploader {
             if (array.length() > 0) {//KS
                 final RequestBody body = RequestBody.create(MediaType.parse("application/json"), array.toString());
                 final Response<ResponseBody> r = nightscoutService.upload(secret, body).execute();
-                if (!r.isSuccess()) throw new UploaderException(r.message(), r.code());
-
+                if (!r.isSuccessful()) throw new UploaderException(r.message(), r.code());
+                checkGzipSupport(r);
                 try {
                     postDeviceStatus(nightscoutService, secret);
                 } catch (Exception e) {
@@ -640,6 +668,19 @@ public class NightscoutUploader {
                     Log.wtf(TAG, msg);
                     Home.toaststaticnext(msg);
                     handleRestFailure(msg);
+                }
+            }
+            // TODO we may want to check nightscout version before trying to upload!!
+            // TODO in the future we may want to merge these in to a single post
+            if (Pref.getBooleanDefaultFalse("use_pebble_health") && (Home.get_engineering_mode())) {
+                try {
+                    postHeartRate(nightscoutService, secret);
+                    postStepsCount(nightscoutService, secret);
+                    postMotionTracking(nightscoutService, secret);
+                } catch (Exception e) {
+                  if (JoH.ratelimit("heartrate-upload-exception", 3600)) {
+                      Log.e(TAG, "Exception uploading REST API heartrate: " + e.getMessage());
+                  }
                 }
             }
         }
@@ -669,12 +710,22 @@ public class NightscoutUploader {
         Log.e(TAG, msg);
     }
 
+    private String getDeviceString(BgReading record) {
+        String withMethod = "xDrip-" + prefs.getString("dex_collection_method", "BluetoothWixel");
+        if (Pref.getBooleanDefaultFalse("nightscout_device_append_source_info") &&
+                record.source_info != null &&
+                record.source_info.length() > 0) {
+            return withMethod + " " + record.source_info;
+        }
+        return withMethod;
+    }
+
 
     private void populateV1APIBGEntry(JSONArray array, BgReading record) throws Exception {
         JSONObject json = new JSONObject();
         SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSSZ", Locale.US);
         format.setTimeZone(TimeZone.getDefault());
-        json.put("device", "xDrip-" + prefs.getString("dex_collection_method", "BluetoothWixel"));
+        json.put("device", getDeviceString(record));
         if (record != null) {//KS
             json.put("date", record.timestamp);
             json.put("dateString", format.format(record.timestamp));
@@ -703,7 +754,7 @@ public class NightscoutUploader {
             JSONObject json = new JSONObject();
             SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSSZ", Locale.US);
             format.setTimeZone(TimeZone.getDefault());
-            json.put("device", "xDrip-"+prefs.getString("dex_collection_method", "BluetoothWixel"));
+            json.put("device", getDeviceString(record));
             json.put("date", record.timestamp);
             json.put("dateString", format.format(record.timestamp));
             json.put("sgv", (int)record.calculated_value);
@@ -820,7 +871,7 @@ public class NightscoutUploader {
                                 lookup = nightscoutService.findTreatmentByUUID(apiSecret, up.reference_uuid).execute();
                             }
                             // throw an exception if we failed lookup
-                            if ((this_id == null) && (lookup != null) && !lookup.isSuccess()) {
+                            if ((this_id == null) && (lookup != null) && !lookup.isSuccessful()) {
                                 throw new UploaderException(lookup.message(), lookup.code());
                             } else {
                                 // parse the result
@@ -837,7 +888,7 @@ public class NightscoutUploader {
                                 // is the id valid now?
                                 if ((this_id != null) && (this_id.length() == 24)) {
                                     final Response<ResponseBody> r = nightscoutService.deleteTreatment(apiSecret, this_id).execute();
-                                    if (!r.isSuccess()) {
+                                    if (!r.isSuccessful()) {
                                         throw new UploaderException(r.message(), r.code());
                                     } else {
                                         up.completed(THIS_QUEUE);
@@ -863,7 +914,7 @@ public class NightscoutUploader {
                 final Response<ResponseBody> r;
                 if (apiSecret != null) {
                     r = nightscoutService.uploadTreatments(apiSecret, body).execute();
-                    if (!r.isSuccess()) {
+                    if (!r.isSuccessful()) {
                         throw new UploaderException(r.message(), r.code());
                     } else {
                         Log.d(TAG, "Success for RESTAPI treatment insert upload");
@@ -872,6 +923,7 @@ public class NightscoutUploader {
                                 up.completed(THIS_QUEUE); // approve all types for this queue
                             }
                         }
+                        checkGzipSupport(r);
                     }
                 } else {
                     Log.wtf(TAG, "Cannot upload treatments without api secret being set");
@@ -887,7 +939,7 @@ public class NightscoutUploader {
                     final Response<ResponseBody> r;
                     if (apiSecret != null) {
                         r = nightscoutService.upsertTreatments(apiSecret, body).execute();
-                        if (!r.isSuccess()) {
+                        if (!r.isSuccessful()) {
                             throw new UploaderException(r.message(), r.code());
                         } else {
                             Log.d(TAG, "Success for RESTAPI treatment upsert upload: " + match_uuid);
@@ -901,6 +953,7 @@ public class NightscoutUploader {
                                     break;
                                 }
                             }
+                            checkGzipSupport(r);
                         }
                     } else {
                         Log.wtf(TAG, "Cannot upload treatments without api secret being set");
@@ -915,6 +968,193 @@ public class NightscoutUploader {
             }
         }
     }
+
+    private static int activityErrorCount = 0;
+    private static final int MAX_ACTIVITY_RECORDS = 500;
+
+    private void postHeartRate(NightscoutService nightscoutService, String apiSecret) throws Exception {
+        Log.d(TAG, "Processing heartrate for RESTAPI");
+        if (apiSecret != null) {
+            final String STORE_COUNTER = "nightscout-rest-heartrate-synced-time";
+            final long syncedTillTime = Math.max(PersistentStore.getLong(STORE_COUNTER), JoH.tsl() - Constants.DAY_IN_MS * 7);
+            final List<HeartRate> readings = HeartRate.latestForGraph((MAX_ACTIVITY_RECORDS / Math.min(1, Math.max(activityErrorCount, MAX_ACTIVITY_RECORDS / 10))), syncedTillTime);
+            final JSONArray data = new JSONArray();
+            //final SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSSZ", Locale.US);
+            //format.setTimeZone(TimeZone.getDefault());
+            long highest_timestamp = 0;
+            if (readings.size() > 0) {
+                for (HeartRate reading : readings) {
+                    final JSONObject json = new JSONObject();
+                    json.put("type", "hr-bpm");
+                    json.put("timeStamp", reading.timestamp);
+                    //json.put("dateString", format.format(reading.timestamp));
+                    json.put("created_at", DateUtil.toISOString(reading.timestamp));
+
+                    json.put("bpm", reading.bpm);
+                    if (reading.accuracy != 1) json.put("accuracy", reading.accuracy);
+                    data.put(json);
+
+                    highest_timestamp = Math.max(highest_timestamp, reading.timestamp);
+                }
+                // send to nightscout - update counter
+
+                final RequestBody body = RequestBody.create(MediaType.parse("application/json"), data.toString());
+                Response<ResponseBody> r;
+
+                r = nightscoutService.uploadActivity(apiSecret, body).execute();
+
+                if (!r.isSuccessful()) {
+                    activityErrorCount++;
+                   if (JoH.ratelimit("heartrate-unable-upload",3600)) {
+                       UserError.Log.e(TAG, "Unable to upload heart-rate data to Nightscout - check nightscout version");
+                   }
+                    throw new UploaderException(r.message(), r.code());
+                } else {
+                    PersistentStore.setLong(STORE_COUNTER, highest_timestamp);
+                    UserError.Log.d(TAG, "Updating heartrate synced record count (success) " + JoH.dateTimeText(highest_timestamp) + " Processed: " + readings.size() + " records");
+                    checkGzipSupport(r);
+                }
+            }
+        } else {
+            UserError.Log.e(TAG, "Api secret is null");
+        }
+    }
+
+
+
+    private void postStepsCount(NightscoutService nightscoutService, String apiSecret) throws Exception {
+        Log.d(TAG, "Processing steps for RESTAPI");
+        final String STORE_COUNTER = "nightscout-rest-steps-synced-time";
+        if (apiSecret != null) {
+            final long syncedTillTime = Math.max(PersistentStore.getLong(STORE_COUNTER), JoH.tsl() - Constants.DAY_IN_MS * 7);
+            final List<StepCounter> readings = StepCounter.latestForGraph((MAX_ACTIVITY_RECORDS / Math.min(1, Math.max(activityErrorCount, MAX_ACTIVITY_RECORDS / 10))), syncedTillTime);
+            final JSONArray data = new JSONArray();
+            //final SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSSZ", Locale.US);
+            //format.setTimeZone(TimeZone.getDefault());
+            long highest_timestamp = 0;
+            if (readings.size() > 0) {
+                for (StepCounter reading : readings) {
+                    final JSONObject json = new JSONObject();
+                    json.put("type", "steps-total");
+                    json.put("timeStamp", reading.timestamp);
+                    //json.put("dateString", format.format(reading.timestamp));
+                    json.put("created_at", DateUtil.toISOString(reading.timestamp));
+
+                    json.put("steps", reading.metric);
+                    data.put(json);
+
+                    highest_timestamp = Math.max(highest_timestamp, reading.timestamp);
+                }
+                // send to nightscout - update counter
+
+                final RequestBody body = RequestBody.create(MediaType.parse("application/json"), data.toString());
+                Response<ResponseBody> r;
+
+                r = nightscoutService.uploadActivity(apiSecret, body).execute();
+
+                if (!r.isSuccessful()) {
+                    activityErrorCount++;
+                    UserError.Log.e(TAG, "Unable to upload steps data to Nightscout - check nightscout version");
+                    throw new UploaderException(r.message(), r.code());
+                } else {
+                    PersistentStore.setLong(STORE_COUNTER, highest_timestamp);
+                    UserError.Log.e(TAG, "Updating steps synced record count (success) " + JoH.dateTimeText(highest_timestamp) + " Processed: " + readings.size() + " records");
+                    checkGzipSupport(r);
+                }
+            }
+        } else {
+            UserError.Log.e(TAG, "Api secret is null");
+        }
+    }
+
+    private void postMotionTracking(NightscoutService nightscoutService, String apiSecret) throws Exception {
+        Log.d(TAG, "Processing motion tracking for RESTAPI");
+        final String STORE_COUNTER = "nightscout-rest-motion-synced-time";
+        if (apiSecret != null) {
+            final long syncedTillTime = Math.max(PersistentStore.getLong(STORE_COUNTER), JoH.tsl() - Constants.DAY_IN_MS * 7);
+            final ArrayList<ActivityRecognizedService.motionData> readings = ActivityRecognizedService.getForGraph(syncedTillTime, JoH.tsl());
+            int counter = 0;
+
+            final JSONArray data = new JSONArray();
+            //final SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSSZ", Locale.US);
+            //format.setTimeZone(TimeZone.getDefault());
+            long highest_timestamp = 0;
+            if (readings.size() > 0) {
+                for (ActivityRecognizedService.motionData reading : readings) {
+                    counter++;
+                    if (counter > (MAX_ACTIVITY_RECORDS / Math.min(1, Math.max(activityErrorCount, MAX_ACTIVITY_RECORDS / 10)))) break;
+                    final JSONObject json = new JSONObject();
+                    json.put("type", "motion-class");
+
+                    json.put("timeStamp", reading.timestamp);
+                    //json.put("dateString", format.format(reading.timestamp));
+                    json.put("created_at", DateUtil.toISOString(reading.timestamp));
+
+                    json.put("class", reading.toPrettyType());
+                    data.put(json);
+
+                    highest_timestamp = Math.max(highest_timestamp, reading.timestamp);
+                }
+                // send to nightscout - update counter
+
+                final RequestBody body = RequestBody.create(MediaType.parse("application/json"), data.toString());
+                Response<ResponseBody> r;
+
+                r = nightscoutService.uploadActivity(apiSecret, body).execute();
+
+                if (!r.isSuccessful()) {
+                    activityErrorCount++;
+                    UserError.Log.e(TAG, "Unable to upload motion data to Nightscout - check nightscout version");
+                    throw new UploaderException(r.message(), r.code());
+                } else {
+                    PersistentStore.setLong(STORE_COUNTER, highest_timestamp);
+                    UserError.Log.e(TAG, "Updating motion synced record count (success) " + JoH.dateTimeText(highest_timestamp) + " Processed: " + readings.size() + " records");
+                    checkGzipSupport(r);
+                }
+            }
+        } else {
+            UserError.Log.e(TAG, "Api secret is null");
+        }
+    }
+
+    // attempt to determine if a server supports gzip encoding based on response
+    private void checkGzipSupport(Response r) {
+        try {
+            boolean hasGzip = false;
+
+            // look for a header, doesn't normally seem to be present though
+            if (!hasGzip) {
+                try {
+                    hasGzip = r.headers().get("Accept-Encoding").contains("gzip");
+                } catch (Exception e) {
+                    //
+                }
+            }
+
+            // see if we can guess based on server name
+            if (!hasGzip) {
+                try {
+                    final String poweredby = r.headers().get("X-Powered-By");
+                    hasGzip = poweredby.contains("Express") || poweredby.contains("ASP.NET");
+                } catch (Exception e) {
+                    //
+                }
+            }
+            // TODO this currently never unsets
+            if (hasGzip) {
+                try {
+                    setSupportsGzip(r.raw().request().url().uri().getHost() + r.raw().request().url().uri().getPort(), true);
+                } catch (Exception e) {
+                    // unprocessable
+                    UserError.Log.d(TAG, "check gzip: E1 :" + e);
+                }
+            }
+        } catch (Exception e) {
+            // unprocessable
+            UserError.Log.d(TAG, "check gzip: E2 :" + e);
+        }
+    }
+
 
     private static final String LAST_NIGHTSCOUT_BATTERY_LEVEL = "last-nightscout-battery-level";
 
@@ -941,7 +1181,7 @@ public class NightscoutUploader {
                     break;
                 case "Bridge":
                     battery_level = Pref.getInt("bridge_battery", -1);
-                    battery_name = DexCollectionType.getDexCollectionType().name();
+                    battery_name = DexCollectionService.getBestLimitterHardwareName();
                     break;
                 case "Parakeet":
                     battery_level = Pref.getInt("parakeet_battery", -1);
@@ -985,12 +1225,14 @@ public class NightscoutUploader {
                     r = nightscoutService.uploadDeviceStatus(apiSecret, body).execute();
                 } else
                     r = nightscoutService.uploadDeviceStatus(body).execute();
-                if (!r.isSuccess()) throw new UploaderException(r.message(), r.code());
+                if (!r.isSuccessful()) throw new UploaderException(r.message(), r.code());
                 // } else {
                 //     UserError.Log.d(TAG, "Battery level is same as previous - not uploading: " + battery_level);
+                checkGzipSupport(r);
             }
         }
     }
+
 
         private boolean doMongoUpload(SharedPreferences prefs, List<BgReading> glucoseDataSets,
                                       List<Calibration> meterRecords,  List<Calibration> calRecords) {
@@ -1161,5 +1403,58 @@ public class NightscoutUploader {
             }
             return (int) (((float) level / (float) scale) * 100.0f);
         } else return 50;
+    }
+
+    private static boolean isLANhost(String host) {
+        return host != null && (host.startsWith("192.168.") || host.startsWith("10.") || host.startsWith("172.16."));
+    }
+
+    private static final String END_SUPPORTS_GZIP_MARKER = "ns-end-supports-gzip-";
+
+    private static boolean supportsGzip(String id) {
+        return PersistentStore.getBoolean(END_SUPPORTS_GZIP_MARKER + id);
+    }
+
+    private static void setSupportsGzip(String id, boolean value) {
+        if (supportsGzip(id) != value) {
+            UserError.Log.e(TAG, "Setting GZIP support: " + id + " " + value);
+            PersistentStore.setBoolean(END_SUPPORTS_GZIP_MARKER + id, value);
+        }
+    }
+
+    static class GzipRequestInterceptor implements Interceptor {
+        @Override
+        public okhttp3.Response intercept(Chain chain) throws IOException {
+            final Request originalRequest = chain.request();
+            if (originalRequest.body() == null
+                    || originalRequest.header("Content-Encoding") != null
+                    || !supportsGzip(originalRequest.url().uri().getHost() + originalRequest.url().uri().getPort())) {
+                return chain.proceed(originalRequest);
+            }
+
+            final Request compressedRequest = originalRequest.newBuilder()
+                    .header("Content-Encoding", "gzip")
+                    .method(originalRequest.method(), gzip(originalRequest.body()))
+                    .build();
+            return chain.proceed(compressedRequest);
+        }
+
+        private RequestBody gzip(final RequestBody body) {
+            return new RequestBody() {
+                @Override public MediaType contentType() {
+                    return body.contentType();
+                }
+
+                @Override public long contentLength() {
+                    return -1; // We don't know the compressed length in advance!
+                }
+
+                @Override public void writeTo(BufferedSink sink) throws IOException {
+                    BufferedSink gzipSink = Okio.buffer(new GzipSink(sink));
+                    body.writeTo(gzipSink);
+                    gzipSink.close();
+                }
+            };
+        }
     }
 }

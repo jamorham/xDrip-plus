@@ -5,6 +5,7 @@ import android.content.Intent;
 import android.os.PowerManager;
 
 import com.eveningoutpost.dexdrip.Home;
+import com.eveningoutpost.dexdrip.Models.BgReading;
 import com.eveningoutpost.dexdrip.Models.JoH;
 import com.eveningoutpost.dexdrip.Models.StepCounter;
 import com.eveningoutpost.dexdrip.Models.RollCall;
@@ -33,6 +34,7 @@ public class DailyIntentService extends IntentService {
 
     @Override
     protected void onHandleIntent(Intent intent) {
+        // TODO background thread
         final PowerManager.WakeLock wl = JoH.getWakeLock("DailyIntentService", 120000);
         try {
             if (JoH.pratelimit("daily-intent-service", 60000)) {
@@ -81,6 +83,16 @@ public class DailyIntentService extends IntentService {
                 } catch (Exception e) {
                     Log.e(TAG, "DailyIntentService exception on PebbleMovement ", e);
                 }
+
+                try {
+                    final int bg_retention_days = Pref.getStringToInt("retention_days_bg_reading", 0);
+                    if (bg_retention_days > 0) {
+                        BgReading.cleanup(bg_retention_days);
+                    }
+                } catch (Exception e) {
+                    Log.e(TAG,"DailyIntentService exception on BgReadings cleanup ",e);
+                }
+
                 try {
                     BluetoothGlucoseMeter.startIfNoRecentData();
                 } catch (Exception e) {
@@ -97,6 +109,7 @@ public class DailyIntentService extends IntentService {
                     Log.e(TAG, "exception on RollCall prune " + e);
                 }
                 try {
+                    Telemetry.sendFirmwareReport();
                     Telemetry.sendCaptureReport();
                 } catch (Exception e) {
                     Log.e(TAG, "Exception in Telemetry: " + e);

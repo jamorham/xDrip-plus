@@ -43,8 +43,10 @@ import com.eveningoutpost.dexdrip.ParakeetHelper;
 import com.eveningoutpost.dexdrip.R;
 import com.eveningoutpost.dexdrip.Services.ActivityRecognizedService;
 import com.eveningoutpost.dexdrip.Services.BluetoothGlucoseMeter;
+import com.eveningoutpost.dexdrip.Services.DexCollectionService;
 import com.eveningoutpost.dexdrip.Services.G5BaseService;
 import com.eveningoutpost.dexdrip.Services.PlusSyncService;
+import com.eveningoutpost.dexdrip.UtilityModels.BgGraphBuilder;
 import com.eveningoutpost.dexdrip.UtilityModels.CollectionServiceStarter;
 import com.eveningoutpost.dexdrip.UtilityModels.Constants;
 import com.eveningoutpost.dexdrip.UtilityModels.Experience;
@@ -63,6 +65,7 @@ import com.eveningoutpost.dexdrip.WidgetUpdateService;
 import com.eveningoutpost.dexdrip.calibrations.PluggableCalibration;
 import com.eveningoutpost.dexdrip.profileeditor.ProfileEditor;
 import com.eveningoutpost.dexdrip.wearintegration.WatchUpdaterService;
+import com.eveningoutpost.dexdrip.wearintegration.Amazfitservice;
 import com.eveningoutpost.dexdrip.webservices.XdripWebService;
 import com.eveningoutpost.dexdrip.xDripWidget;
 import com.eveningoutpost.dexdrip.xdrip;
@@ -448,12 +451,50 @@ public class Preferences extends PreferenceActivity {
             preference.setTitle(preference.getTitle().toString().replaceAll("  \\([a-z0-9A-Z]+\\)$", "") + "  (" + value.toString() + ")");
             if (do_update) {
                 preference.getEditor().putString(preference.getKey(), value.toString()).apply(); // update prefs now
-                UpdateActivity.last_check_time = -1;
+                UpdateActivity.last_check_time = -2;
                 UpdateActivity.checkForAnUpdate(preference.getContext());
             }
             return true;
         }
     };
+
+    private static Preference.OnPreferenceChangeListener sBindPreferenceTitleAppendToIntegerValueListener = new Preference.OnPreferenceChangeListener() {
+        @Override
+        public boolean onPreferenceChange(Preference preference, Object value) {
+
+            boolean do_update = false;
+            // detect not first run
+            if (preference.getTitle().toString().contains("(")) {
+                do_update = true;
+            }
+
+            preference.setTitle(preference.getTitle().toString().replaceAll("  \\([a-z0-9A-Z]+\\)$", "") + "  (" + value.toString() + ")");
+            if (do_update) {
+                preference.getEditor().putInt(preference.getKey(), (int)value).apply(); // update prefs now
+            }
+            return true;
+        }
+    };
+
+    private static Preference.OnPreferenceChangeListener sBindPreferenceTitleAppendToStringValueListener = new Preference.OnPreferenceChangeListener() {
+        @Override
+        public boolean onPreferenceChange(Preference preference, Object value) {
+
+            boolean do_update = false;
+            // detect not first run
+            if (preference.getTitle().toString().contains("(")) {
+                do_update = true;
+            }
+
+            preference.setTitle(preference.getTitle().toString().replaceAll("  \\([a-z0-9A-Z]+\\)$", "") + "  (" + value.toString() + ")");
+            if (do_update) {
+                preference.getEditor().putString(preference.getKey(), (String)value).apply(); // update prefs now
+            }
+            return true;
+        }
+    };
+
+
 
     private static String format_carb_ratio(String oldValue, String newValue) {
         return oldValue.replaceAll(" \\(.*\\)$", "") + "  (" + newValue + "g per Unit)";
@@ -514,6 +555,65 @@ public class Preferences extends PreferenceActivity {
             Log.e(TAG, "Got exception binding preference title: " + e.toString());
         }
     }
+
+    private static void bindPreferenceTitleAppendToStringValue(Preference preference) {
+        try {
+            preference.setOnPreferenceChangeListener(sBindPreferenceTitleAppendToStringValueListener);
+            sBindPreferenceTitleAppendToStringValueListener.onPreferenceChange(preference,
+                    PreferenceManager
+                            .getDefaultSharedPreferences(preference.getContext())
+                            .getString(preference.getKey(), ""));
+        } catch (Exception e) {
+            Log.e(TAG, "Got exception binding preference title: " + e.toString());
+        }
+    }
+
+
+    private static void bindPreferenceTitleAppendToIntegerValue(Preference preference) {
+        try {
+            preference.setOnPreferenceChangeListener(sBindPreferenceTitleAppendToIntegerValueListener);
+            sBindPreferenceTitleAppendToIntegerValueListener.onPreferenceChange(preference,
+                    PreferenceManager
+                            .getDefaultSharedPreferences(preference.getContext())
+                            .getInt(preference.getKey(), 0));
+        } catch (Exception e) {
+            Log.e(TAG, "Got exception binding preference title: " + e.toString());
+        }
+    }
+
+    private static void bindPreferenceTitleAppendToIntegerValueFromLogSlider(Preference preference, NamedSliderProcessor ref, String name, boolean unitize) {
+
+        final Preference.OnPreferenceChangeListener listener = new Preference.OnPreferenceChangeListener() {
+            @Override
+            public boolean onPreferenceChange(Preference preference, Object value) {
+
+                boolean do_update = false;
+                // detect not first run
+                if (preference.getTitle().toString().contains("(")) {
+                    do_update = true;
+                }
+                final int result = ref.interpolate(name, (int)value);
+
+                preference.setTitle(preference.getTitle().toString().replaceAll("  \\([a-z0-9A-Z \\.]+\\)$", "") + "  (" + (unitize ? BgGraphBuilder.unitized_string_static_no_interpretation_short(result) : result) + ")");
+                if (do_update) {
+                    preference.getEditor().putInt(preference.getKey(), (int) value).apply(); // update prefs now
+                }
+                return true;
+            }
+        };
+
+        try {
+            preference.setOnPreferenceChangeListener(listener);
+            listener.onPreferenceChange(preference,
+                    PreferenceManager
+                            .getDefaultSharedPreferences(preference.getContext())
+                            .getInt(preference.getKey(), 0));
+        } catch (Exception e) {
+            Log.e(TAG, "Got exception binding preference title: " + e.toString());
+        }
+    }
+
+
 
 
     private static void bindPreferenceSummaryToValueAndEnsureNumeric(Preference preference) {
@@ -720,6 +820,7 @@ public class Preferences extends PreferenceActivity {
             final Preference interpretRaw = findPreference("interpret_raw");
             final Preference bfappid = findPreference("bugfender_appid");
             final Preference nfcSettings = findPreference("xdrip_plus_nfc_settings");
+            final Preference bluereadersettings = findPreference("xdrip_blueReader_advanced_settings");
             //DexCollectionType collectionType = DexCollectionType.getType(findPreference("dex_collection_method").)
 
             final ListPreference currentCalibrationPlugin = (ListPreference)findPreference("current_calibration_plugin");
@@ -799,6 +900,25 @@ public class Preferences extends PreferenceActivity {
             final PreferenceCategory displayCategory = (PreferenceCategory) findPreference("xdrip_plus_display_category");
 
 
+            final Preference enableAmazfit = findPreference("pref_amazfit_enable_key");
+
+
+            enableAmazfit.setOnPreferenceChangeListener(new Preference.OnPreferenceChangeListener() {
+               @Override
+               public boolean onPreferenceChange(Preference preference, Object newValue) {
+                  final Context context = preference.getContext();
+                  Boolean enabled = (boolean) newValue;
+                   if (enabled==true) {
+                       context.startService(new Intent(context, Amazfitservice.class));
+
+                   }else {
+                       context.stopService(new Intent(context, Amazfitservice.class));
+                   }
+
+                return true;
+                }
+            });
+
             // TODO build list of preferences to cause wear refresh from list
             findPreference("wear_sync").setOnPreferenceChangeListener((preference, newValue) -> {
                         WatchUpdaterService.startSelf();
@@ -834,6 +954,12 @@ public class Preferences extends PreferenceActivity {
             findPreference("xdrip_webservice").setOnPreferenceChangeListener((preference, newValue) -> {
                 preference.getEditor().putBoolean(preference.getKey(), (boolean) newValue).apply(); // write early for method below
                 XdripWebService.immortality(); // start or stop service when preference toggled
+                return true;
+            });
+
+            findPreference("xdrip_webservice_open").setOnPreferenceChangeListener((preference, newValue) -> {
+                preference.getEditor().putBoolean(preference.getKey(), (boolean) newValue).apply(); // write early for method below
+                XdripWebService.settingsChanged(); // refresh
                 return true;
             });
 
@@ -1036,6 +1162,16 @@ public class Preferences extends PreferenceActivity {
                 Log.d(TAG, "Nullpointer looking for nfc_scan");
             }
 
+            try {
+                findPreference("external_blukon_algorithm").setOnPreferenceChangeListener((preference, newValue) -> {
+                    boolean isEnabled = ((Boolean) newValue).booleanValue();
+                    findPreference("retrieve_blukon_history").setEnabled(!isEnabled);
+                    return true;
+                });
+            } catch (NullPointerException e) {
+                //
+            }
+
             final boolean engineering_mode = this.prefs.getBoolean("engineering_mode",false);
 
             if (!engineering_mode) {
@@ -1084,12 +1220,25 @@ public class Preferences extends PreferenceActivity {
                 update_nfc_expiry_preferences(null);
             }
 
+            if (!DexCollectionService.getBestLimitterHardwareName().equals("BlueReader")) {
+                collectionCategory.removePreference(bluereadersettings);
+            } else {
+                findPreference("blueReader_turn_off_value").setTitle(getString(R.string.blueReader_turnoffvalue) + " (" + prefs.getInt("blueReader_turn_off_value", 5) + ")");
+
+                findPreference("blueReader_turn_off_value").setOnPreferenceChangeListener((preference, newValue) ->
+                        {
+                            prefs.edit().putInt("blueReader_turn_off_value", (Integer) newValue).commit();
+                            preference.setTitle(getString(R.string.blueReader_turnoffvalue) + " (" + newValue + ")");
+                            return true;
+                        }
+                );
+
+            }
+
             try {
 
                 try {
-                    if ((collectionType != DexCollectionType.WifiWixel)
-                            && (collectionType != DexCollectionType.WifiBlueToothWixel)
-                            && (collectionType != DexCollectionType.WifiDexBridgeWixel)) {
+                    if (!DexCollectionType.hasWifi()) {
                         final String receiversIpAddresses = this.prefs.getString("wifi_recievers_addresses", "").trim();
                         // only hide if non wifi wixel mode and value not previously set to cope with
                         // dynamic mode changes. jamorham
@@ -1114,6 +1263,12 @@ public class Preferences extends PreferenceActivity {
                 if (Build.VERSION.SDK_INT < 21) {
                     try {
                         colorScreen.removePreference(flairCategory);
+                    } catch (Exception e) { //
+                    }
+                }
+                if (Build.VERSION.SDK_INT < 23) {
+                    try {
+                        ((PreferenceGroup)findPreference("xdrip_plus_display_category")).removePreference(findPreference("xdrip_plus_number_icon"));
                     } catch (Exception e) { //
                     }
                 }
@@ -1211,7 +1366,10 @@ public class Preferences extends PreferenceActivity {
 
             bindPreferenceSummaryToValue(collectionMethod);
             bindPreferenceSummaryToValue(shareKey);
-//            bindPreferenceSummaryToValue(wifiRecievers);
+
+            final NamedSliderProcessor processor = new BgToSpeech();
+            bindPreferenceTitleAppendToIntegerValueFromLogSlider(findPreference("speak_readings_change_time"), processor, "time", false);
+            bindPreferenceTitleAppendToIntegerValueFromLogSlider(findPreference("speak_readings_change_threshold"), processor, "threshold", true);
 
             wifiRecievers.setOnPreferenceChangeListener(new Preference.OnPreferenceChangeListener() {
                 @Override
@@ -1221,6 +1379,10 @@ public class Preferences extends PreferenceActivity {
                     return true;
                 }
             });
+
+            bindPreferenceTitleAppendToStringValue(findPreference("retention_days_bg_reading"));
+
+            bindPreferenceTitleAppendToStringValue(findPreference("pendiq_pin"));
 
             // Pebble Trend -- START
 
@@ -1513,9 +1675,7 @@ public class Preferences extends PreferenceActivity {
                     }*/
 
                     // jamorham always show wifi receivers option if populated as we may switch modes dynamically
-                    if (collectionType != DexCollectionType.WifiWixel
-                            && collectionType != DexCollectionType.WifiBlueToothWixel
-                            && collectionType != DexCollectionType.WifiDexBridgeWixel) {
+                    if (!DexCollectionType.hasWifi()) {
                         String receiversIpAddresses;
                         receiversIpAddresses = AllPrefsFragment.this.prefs.getString("wifi_recievers_addresses", "");
                         if (receiversIpAddresses == null || receiversIpAddresses.trim().equals("")) {
@@ -1646,6 +1806,7 @@ public class Preferences extends PreferenceActivity {
             findPreference("status_line_low").setOnPreferenceChangeListener(new WidgetListener());
             findPreference("extra_status_line").setOnPreferenceChangeListener(new WidgetListener());
             findPreference("status_line_capture_percentage").setOnPreferenceChangeListener(new WidgetListener());
+            findPreference("status_line_realtime_capture_percentage").setOnPreferenceChangeListener(new WidgetListener());
             findPreference("extra_status_stats_24h").setOnPreferenceChangeListener(new WidgetListener());
 
         }
@@ -1765,7 +1926,6 @@ public class Preferences extends PreferenceActivity {
         }
 
         private static int pebbleType = 1;
-
         private void enablePebble(int newValueInt, boolean enabled, Context context) {
             Log.d(TAG,"enablePebble called with: "+newValueInt+" "+enabled);
             if (pebbleType == 1) {

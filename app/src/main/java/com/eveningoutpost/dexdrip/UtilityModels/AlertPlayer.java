@@ -27,6 +27,7 @@ import com.eveningoutpost.dexdrip.R;
 import com.eveningoutpost.dexdrip.Services.SnoozeOnNotificationDismissService;
 import com.eveningoutpost.dexdrip.SnoozeActivity;
 import com.eveningoutpost.dexdrip.UtilityModels.pebble.PebbleWatchSync;
+import com.eveningoutpost.dexdrip.eassist.AlertTracker;
 import com.eveningoutpost.dexdrip.wearintegration.WatchUpdaterService;
 import com.eveningoutpost.dexdrip.xdrip;
 
@@ -34,6 +35,7 @@ import java.io.IOException;
 import java.util.Date;
 
 import static com.eveningoutpost.dexdrip.Home.startWatchUpdaterService;
+import static com.eveningoutpost.dexdrip.UtilityModels.AlertPlayer.getAlertPlayerStreamType;
 
 // A helper class to create the mediaplayer on the UI thread.
 // This is needed in order for the callbackst to work.
@@ -42,7 +44,7 @@ class MediaPlayerCreaterHelper {
     private final static String TAG = AlertPlayer.class.getSimpleName();
 
     private final Object creationThreadLock = new Object();
-    boolean mplayerCreated_ = false;
+    private volatile boolean mplayerCreated_ = false;
     private volatile MediaPlayer mediaPlayer_ = null;
     
     synchronized MediaPlayer createMediaPlayer(Context ctx) {
@@ -84,7 +86,11 @@ class MediaPlayerCreaterHelper {
         }catch (InterruptedException e){
              Log.e(TAG, "Cought exception", e);
         }
-
+        try {
+            mediaPlayer_.setAudioStreamType(getAlertPlayerStreamType());
+        } catch (Exception e) {
+            UserError.Log.e(TAG, "Set mediaplayer stream type: " + e);
+        }
         return mediaPlayer_;
     }
     
@@ -98,9 +104,9 @@ public class AlertPlayer {
     private volatile static AlertPlayer alertPlayerInstance;
 
     private final static String TAG = AlertPlayer.class.getSimpleName();
-    private MediaPlayer mediaPlayer;
-    int volumeBeforeAlert = -1;
-    int volumeForThisAlert = -1;
+    private volatile MediaPlayer mediaPlayer;
+    volatile int volumeBeforeAlert = -1;
+    volatile int volumeForThisAlert = -1;
 
     final static int ALERT_PROFILE_HIGH = 1;
     final static int ALERT_PROFILE_ASCENDING = 2;
@@ -123,6 +129,10 @@ public class AlertPlayer {
         return alertPlayerInstance;
     }
 
+    public static void defaultSnooze() {
+        AlertPlayer.getPlayer().Snooze(xdrip.getAppContext(), -1);
+    }
+
     public synchronized void startAlert(Context ctx, boolean trendingToAlertEnd, AlertType newAlert, String bgValue) {
         startAlert(ctx, trendingToAlertEnd, newAlert, bgValue, Pref.getBooleanDefaultFalse("start_snoozed")); // for start snoozed by default!
     }
@@ -140,6 +150,7 @@ public class AlertPlayer {
 
         ActiveBgAlert.Create(newAlert.uuid, start_snoozed, nextAlertTime);
         if (!start_snoozed) VibrateNotifyMakeNoise(ctx, newAlert, bgValue, newAlert.override_silent_mode, 0);
+        AlertTracker.evaluate();
     }
 
     public synchronized void stopAlert(Context ctx, boolean ClearData, boolean clearIfSnoozeFinished) {
@@ -171,8 +182,11 @@ public class AlertPlayer {
         if (JoH.ratelimit("opp-snooze-check", 3)) {
             if (ActiveBgAlert.getOnly() != null) {
                 // there is an alert so do something
+                UserError.Log.ueh(TAG, "Opportunistic snooze attempted to snooze alert");
                 Snooze(xdrip.getAppContext(), -1);
-                JoH.static_toast_long("Opportunistic Snooze");
+                if (JoH.ratelimit("opportunistic-snooze-toast", 300)) {
+                    JoH.static_toast_long("Opportunistic Snooze");
+                }
             }
         }
     }
@@ -221,7 +235,15 @@ public class AlertPlayer {
         activeBgAlert.snooze(repeatTime);
     }
 
- // Check the state and alrarm if needed
+    public static int getAlertPlayerStreamType() {
+       // return AudioManager.STREAM_ALARM;
+        // FUTURE this could be from preference setting or follow override silent boolean
+        // FUTURE audio attributes can be supported in later android versions
+        return AudioManager.STREAM_MUSIC;
+    }
+
+
+    // Check the state and alrarm if needed
     public void ClockTick(Context ctx, boolean trendingToAlertEnd, String bgValue)
     {
         if (trendingToAlertEnd) {
@@ -248,6 +270,7 @@ public class AlertPlayer {
             activeBgAlert.updateNextAlertAt(nextAlertTime);
             
             VibrateNotifyMakeNoise(ctx, alert, bgValue, alert.override_silent_mode, minutesFromStartPlaying);
+            AlertTracker.evaluate();
         }
 
     }
@@ -313,16 +336,24 @@ public class AlertPlayer {
         } catch (IOException e) {
             Log.e(TAG, "Caught exception preparing meidaPlayer", e);
             return;
+        } catch (NullPointerException e) {
+            Log.e(TAG,"Possible deep error in mediaPlayer", e);
         }
 
         if (mediaPlayer != null) {
             AudioManager manager = (AudioManager) ctx.getSystemService(Context.AUDIO_SERVICE);
-            int maxVolume = manager.getStreamMaxVolume(AudioManager.STREAM_MUSIC);
-            volumeBeforeAlert = manager.getStreamVolume(AudioManager.STREAM_MUSIC);
+            int maxVolume = manager.getStreamMaxVolume(getAlertPlayerStreamType());
+            volumeBeforeAlert = manager.getStreamVolume(getAlertPlayerStreamType());
             volumeForThisAlert = (int) (maxVolume * VolumeFrac);
 
             Log.i(TAG, "before playing volumeBeforeAlert " + volumeBeforeAlert + " volumeForThisAlert " + volumeForThisAlert);
-            manager.setStreamVolume(AudioManager.STREAM_MUSIC, volumeForThisAlert, 0);
+            try {
+                manager.setStreamVolume(getAlertPlayerStreamType(), volumeForThisAlert, 0);
+            } catch (SecurityException e) {
+                if (JoH.ratelimit("sound volume error", 12000)) {
+                    UserError.Log.wtf(TAG, "This device does not allow us to modify the sound volume");
+                }
+            }
             try {
                 mediaPlayer.setOnCompletionListener(new MediaPlayer.OnCompletionListener() {
                     @Override
@@ -344,19 +375,27 @@ public class AlertPlayer {
             Log.wtf(TAG, "PlayFile: Starting an alert failed, what should we do !!!");
         }
     }
-    
-    private void revertCurrentVolume(final Context ctx) {
+
+    private synchronized void revertCurrentVolume(final Context ctx) {
         AudioManager manager = (AudioManager) ctx.getSystemService(Context.AUDIO_SERVICE);
-        int currentVolume = manager.getStreamVolume(AudioManager.STREAM_MUSIC);
+        int currentVolume = manager.getStreamVolume(getAlertPlayerStreamType());
         Log.i(TAG, "revertCurrentVolume volumeBeforeAlert " + volumeBeforeAlert + " volumeForThisAlert " + volumeForThisAlert
                 + " currentVolume " + currentVolume);
         if (volumeForThisAlert == currentVolume && (volumeBeforeAlert != -1) && (volumeForThisAlert != -1)) {
             // If the user has changed the volume, don't change it again.
-            manager.setStreamVolume(AudioManager.STREAM_MUSIC, volumeBeforeAlert, 0);
+
+            try {
+                manager.setStreamVolume(getAlertPlayerStreamType(), volumeBeforeAlert, 0);
+            } catch (SecurityException e) {
+                if (JoH.ratelimit("sound volume error", 12000)) {
+                    UserError.Log.wtf(TAG, "This device does not allow us to modify the sound volume");
+                }
+            }
+
         }
         volumeBeforeAlert = -1;
-        volumeForThisAlert = - 1;
-        
+        volumeForThisAlert = -1;
+
     }
 
     private PendingIntent notificationIntent(Context ctx, Intent intent){

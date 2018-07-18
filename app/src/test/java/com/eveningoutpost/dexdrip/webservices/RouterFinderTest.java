@@ -1,42 +1,24 @@
 package com.eveningoutpost.dexdrip.webservices;
 
-import com.eveningoutpost.dexdrip.BuildConfig;
 import com.eveningoutpost.dexdrip.ImportedLibraries.usbserial.util.HexDump;
-import com.eveningoutpost.dexdrip.xdrip;
+import com.eveningoutpost.dexdrip.RobolectricTestWithConfig;
 
-import org.junit.Before;
 import org.junit.Test;
-import org.junit.runner.RunWith;
-import org.robolectric.RobolectricTestRunner;
-import org.robolectric.RuntimeEnvironment;
-import org.robolectric.annotation.Config;
 
 import static com.google.common.truth.Truth.assertWithMessage;
 
 /**
  * Created by jamorham on 17/01/2018.
  */
-
-@RunWith(RobolectricTestRunner.class)
-
-//@Config(constants = BuildConfig.class, manifest = "../../../../app/src/test/java/com/eveningoutpost/dexdrip/TestingManifest.xml") // use this config inside android studio 3 or set Android JUnit default working directory to $MODULE_DIR$
-@Config(constants = BuildConfig.class, manifest = "../../../../../src/test/java/com/eveningoutpost/dexdrip/TestingManifest.xml")
-// use this config for CI test hosts
-
-public class RouterFinderTest {
+public class RouterFinderTest extends RobolectricTestWithConfig {
 
     private static void log(String msg) {
         System.out.println(msg);
     }
 
-    @Before
-    public void setUp() throws Exception {
-        xdrip.checkAppContext(RuntimeEnvironment.application);
-    }
-
 
     @Test
-    public void test_RouteFinder() throws Exception {
+    public void test_RouteFinder() {
 
         WebResponse response;
 

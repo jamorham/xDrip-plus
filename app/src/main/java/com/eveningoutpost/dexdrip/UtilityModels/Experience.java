@@ -1,5 +1,6 @@
 package com.eveningoutpost.dexdrip.UtilityModels;
 
+import com.eveningoutpost.dexdrip.BuildConfig;
 import com.eveningoutpost.dexdrip.Models.BgReading;
 import com.eveningoutpost.dexdrip.Models.JoH;
 import com.eveningoutpost.dexdrip.Models.UserError;
@@ -17,26 +18,36 @@ import java.util.Locale;
 public class Experience {
 
     private static final String TAG = "xdrip-Experience";
-    private static final String marker = "xdrip-plus-installed-time";
+    private static final String MARKER = "xdrip-plus-installed-time";
 
     // caches
     private static boolean got_data = false;
     private static boolean not_newbie = false;
 
+    // only call this once
     public static boolean isNewbie() {
         if (not_newbie) return false;
-        final long installed_time = Pref.getLong(marker, -1);
+        final long installed_time = Pref.getLong(MARKER, -1);
         if (installed_time > 0) {
             UserError.Log.d(TAG, "First Installed " + JoH.niceTimeSince(installed_time) + " ago");
             not_newbie = true;
             return false;
         } else {
             // probably newbie
-            Pref.setLong(marker, JoH.tsl());
+            Pref.setLong(MARKER, JoH.tsl());
             if (gotData()) return false;
             UserError.Log.d(TAG, "Looks like a Newbie");
             return true;
         }
+    }
+
+    public static boolean installedForAtLeast(long millis) {
+        final long installed_time = Pref.getLong(MARKER, -1);
+        return installed_time > 0 && (JoH.msSince(installed_time) > millis);
+    }
+
+    public static boolean ageOfThisBuildAtLeast(long millis) {
+        return JoH.msSince(BuildConfig.buildTimestamp) > millis;
     }
 
     public static boolean gotData() {

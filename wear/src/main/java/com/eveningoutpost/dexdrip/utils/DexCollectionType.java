@@ -1,5 +1,6 @@
 package com.eveningoutpost.dexdrip.utils;
 
+import com.eveningoutpost.dexdrip.G5Model.Ob1G5StateMachine;
 import com.eveningoutpost.dexdrip.Services.DexCollectionService;
 import com.eveningoutpost.dexdrip.Services.DexShareCollectionService;
 import com.eveningoutpost.dexdrip.Services.G5CollectionService;
@@ -23,9 +24,12 @@ public enum DexCollectionType {
     DexcomShare("DexcomShare"),
     DexbridgeWixel("DexbridgeWixel"),
     LimiTTer("LimiTTer"),
+    LimiTTerWifi("LimiTTerWifi"),
+    LibreWifi("LibreWifi"),
     WifiBlueToothWixel("WifiBlueToothWixel"),
     WifiWixel("WifiWixel"),
     DexcomG5("DexcomG5"),
+    DexcomG6("DexcomG6"), // currently pseudo
     WifiDexBridgeWixel("WifiDexbridgeWixel"),
     Follower("Follower"),
     LibreAlarm("LibreAlarm"),
@@ -58,14 +62,14 @@ public enum DexCollectionType {
             mapToInternalName.put(dct.internalName, dct);
         }
 
-        Collections.addAll(usesBluetooth, BluetoothWixel, DexcomShare, DexbridgeWixel, LimiTTer, WifiBlueToothWixel, DexcomG5, WifiDexBridgeWixel);
-        Collections.addAll(usesBtWixel, BluetoothWixel, LimiTTer, WifiBlueToothWixel);
-        Collections.addAll(usesWifi, WifiBlueToothWixel,WifiWixel,WifiDexBridgeWixel, Mock);
+        Collections.addAll(usesBluetooth, BluetoothWixel, DexcomShare, DexbridgeWixel, LimiTTer, WifiBlueToothWixel, DexcomG5, WifiDexBridgeWixel, LimiTTerWifi);
+        Collections.addAll(usesBtWixel, BluetoothWixel, LimiTTer, WifiBlueToothWixel, LimiTTerWifi); // Name is misleading here, should probably be using dexcollectionservice
+        Collections.addAll(usesWifi, WifiBlueToothWixel,WifiWixel,WifiDexBridgeWixel, Mock, LimiTTerWifi, LibreWifi);
         Collections.addAll(usesXbridge, DexbridgeWixel,WifiDexBridgeWixel);
         Collections.addAll(usesFiltered, DexbridgeWixel, WifiDexBridgeWixel, DexcomG5, WifiWixel, Follower, Mock); // Bluetooth and Wifi+Bluetooth need dynamic mode
-        Collections.addAll(usesLibre, LimiTTer, LibreAlarm);
-        Collections.addAll(usesBattery, BluetoothWixel, DexbridgeWixel, WifiBlueToothWixel, WifiDexBridgeWixel, Follower, LimiTTer, LibreAlarm); // parakeet separate
-        Collections.addAll(usesDexcomRaw, BluetoothWixel, DexbridgeWixel, WifiBlueToothWixel, DexcomG5, WifiDexBridgeWixel);
+        Collections.addAll(usesLibre, LimiTTer, LibreAlarm, LimiTTerWifi, LibreWifi);
+        Collections.addAll(usesBattery, BluetoothWixel, DexbridgeWixel, WifiBlueToothWixel, WifiDexBridgeWixel, Follower, LimiTTer, LibreAlarm, LimiTTerWifi, LibreWifi); // parakeet separate
+        Collections.addAll(usesDexcomRaw, BluetoothWixel, DexbridgeWixel, WifiWixel, WifiBlueToothWixel, DexcomG5, WifiDexBridgeWixel, Mock);
         Collections.addAll(usesTransmitterBattery, WifiWixel, BluetoothWixel, DexbridgeWixel, WifiBlueToothWixel, WifiDexBridgeWixel); // G4 transmitter battery
     }
 
@@ -117,7 +121,7 @@ public enum DexCollectionType {
 
     public static boolean hasDexcomRaw() { return hasDexcomRaw(getDexCollectionType()); }
 
-    public static boolean usesDexCollectionService(DexCollectionType type) { return usesBtWixel.contains(type) || usesXbridge.contains(type) || type.equals(LimiTTer); }
+    public static boolean usesDexCollectionService(DexCollectionType type) { return usesBtWixel.contains(type) || usesXbridge.contains(type) || type.equals(LimiTTer);}
 
     public static boolean usesClassicTransmitterBattery() { return usesTransmitterBattery.contains(getDexCollectionType()); }
 
@@ -135,7 +139,7 @@ public enum DexCollectionType {
     	if(collector == null) {
     		collector = DexCollectionType.getDexCollectionType();
     	}
-        return collector == DexCollectionType.LimiTTer && 
+        return hasLibre(collector) && 
                Pref.getBooleanDefaultFalse("external_blukon_algorithm");
     }
 
@@ -175,7 +179,7 @@ public enum DexCollectionType {
         }
     }
 
-    public static boolean getPhoneServiceCollectingState() {
+    public static boolean getLocalServiceCollectingState() {
         try {
             final Method method = getCollectorServiceClass().getMethod("isCollecting");
             return (boolean) method.invoke(null);
@@ -208,10 +212,19 @@ public enum DexCollectionType {
                 return "Network G4";
             case LimiTTer:
                 return DexCollectionService.getBestLimitterHardwareName();
+            case LimiTTerWifi:
+                return "Network " + DexCollectionService.getBestLimitterHardwareName();
             case WifiDexBridgeWixel:
                 return "Network G4 and xBridge";
             case WifiBlueToothWixel:
                 return "Network G4 and Classic xDrip";
+            case DexcomG5:
+                if (Ob1G5CollectionService.usingNativeMode()) {
+                    return "G5 Native";
+                }
+                return dct.name();
+            case LibreWifi:
+                return "Network libre";
 
             default:
                 return dct.name();

@@ -16,6 +16,7 @@ import android.os.AsyncTask;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
+import android.os.PowerManager;
 import android.os.Vibrator;
 import android.view.View;
 
@@ -24,9 +25,9 @@ import com.eveningoutpost.dexdrip.Models.GlucoseData;
 import com.eveningoutpost.dexdrip.Models.JoH;
 import com.eveningoutpost.dexdrip.Models.LibreBlock;
 import com.eveningoutpost.dexdrip.Models.LibreOOPAlgorithm;
-import com.eveningoutpost.dexdrip.Models.PredictionData;
 import com.eveningoutpost.dexdrip.Models.ReadingData;
 import com.eveningoutpost.dexdrip.Models.UserError.Log;
+import com.eveningoutpost.dexdrip.UtilityModels.LibreUtils;
 import com.eveningoutpost.dexdrip.UtilityModels.PersistentStore;
 import com.eveningoutpost.dexdrip.UtilityModels.Pref;
 import com.eveningoutpost.dexdrip.utils.DexCollectionType;
@@ -38,6 +39,8 @@ import java.util.concurrent.locks.ReentrantLock;
 
 // From LibreAlarm et al
 
+// TODO have we always checked checksum on this data? what about LibreAlarm path?
+
 public class NFCReaderX {
 
     private static final String TAG = "NFCReaderX";
@@ -46,7 +49,6 @@ public class NFCReaderX {
     public static boolean used_nfc_successfully = false;
     private static final int MINUTE = 60000;
     private static NfcAdapter mNfcAdapter;
-    private static ReadingData mResult = new ReadingData(PredictionData.Result.ERROR_NO_NFC);
     private static boolean foreground_enabled = false;
     private static boolean tag_discovered = false;
     private static long last_tag_discovered = -1;
@@ -211,6 +213,41 @@ public class NFCReaderX {
         }
     }
 
+    // returns true if checksum passed.
+    public static boolean HandleGoodReading(String tagId, byte[] data1, final long CaptureDateTime ) {
+
+        final boolean checksum_ok = LibreUtils.verify(data1);
+        if (!checksum_ok) {
+            return false;
+        }
+        
+        // The 4'th byte is where the sensor status is.
+        if(!LibreUtils.isSensorReady(data1[4])) {
+            Log.e(TAG, "Sensor is not ready, Ignoring reading!");
+            return true;
+        }
+
+        if (Pref.getBooleanDefaultFalse("external_blukon_algorithm")) {
+            // Save raw block record (we start from block 0)
+            LibreBlock.createAndSave(tagId, CaptureDateTime, data1, 0);
+            LibreOOPAlgorithm.SendData(data1, CaptureDateTime);
+        } else {
+            final ReadingData mResult = parseData(0, tagId, data1, CaptureDateTime);
+            new Thread() {
+                @Override
+                public void run() {
+                    final PowerManager.WakeLock wl = JoH.getWakeLock("processTransferObject", 60000);
+                    try {
+                        LibreAlarmReceiver.processReadingDataTransferObject(new ReadingData.TransferObject(1, mResult), CaptureDateTime );
+                        Home.staticRefreshBGCharts();
+                    } finally {
+                        JoH.releaseWakeLock(wl);
+                    }
+                }
+            }.start();
+        }
+        return true; // Checksum tests have passed.
+    }
 
     private static class NfcVReaderTask extends AsyncTask<Tag, Void, Tag> {
 
@@ -234,21 +271,10 @@ public class NFCReaderX {
                 if (!NFCReaderX.useNFC()) return;
                 if (succeeded) {
                     final String tagId = bytesToHexString(tag.getId());
-
-                    // Save raw block record (we start from block 0)
-                    LibreBlock.createAndSave(tagId, data, 0);
-
-                    if(Pref.getBooleanDefaultFalse("external_blukon_algorithm")) {
-                    	LibreOOPAlgorithm.SendData(data);
-                    } else {
-	                    mResult = parseData(0, tagId, data);
-	                    new Thread() {
-	                        @Override
-	                        public void run() {
-	                            LibreAlarmReceiver.processReadingDataTransferObject(new ReadingData.TransferObject(1, mResult));
-	                            Home.staticRefreshBGCharts();
-	                        }
-	                    }.start();
+                    long now = JoH.tsl();
+                    boolean checksum_ok = HandleGoodReading(tagId, data, now);
+                    if(checksum_ok == false) {
+                        Log.e(TAG, "Read data but checksum is wrong");
                     }
                 } else {
                     Log.d(TAG, "Scan did not succeed so ignoring buffer");
@@ -263,7 +289,7 @@ public class NFCReaderX {
                 Home.staticBlockUI(context, false);
             }
         }
-
+        
 
         @Override
         protected Tag doInBackground(Tag... params) {
@@ -462,8 +488,7 @@ public class NFCReaderX {
         return builder.toString();
     }
 
-    public static ReadingData parseData(int attempt, String tagId, byte[] data) {
-        long ourTime = System.currentTimeMillis();
+    public static ReadingData parseData(int attempt, String tagId, byte[] data, Long CaptureDateTime) {
 
         int indexTrend = data[26] & 0xFF;
 
@@ -471,10 +496,11 @@ public class NFCReaderX {
 
         final int sensorTime = 256 * (data[317] & 0xFF) + (data[316] & 0xFF);
 
-        long sensorStartTime = ourTime - sensorTime * MINUTE;
+        long sensorStartTime = CaptureDateTime - sensorTime * MINUTE;
 
         // option to use 13 bit mask
-        final boolean thirteen_bit_mask = Pref.getBooleanDefaultFalse("testing_use_thirteen_bit_mask");
+        //final boolean thirteen_bit_mask = Pref.getBooleanDefaultFalse("testing_use_thirteen_bit_mask");
+        final boolean thirteen_bit_mask = true;
 
         ArrayList<GlucoseData> historyList = new ArrayList<>();
 
@@ -520,7 +546,9 @@ public class NFCReaderX {
         }
 
 
-        return new ReadingData(null, trendList, historyList);
+        final ReadingData readingData = new ReadingData(null, trendList, historyList);
+        readingData.raw_data = data;
+        return readingData;
     }
 
 
@@ -627,4 +655,20 @@ public class NFCReaderX {
             }, 1000);
         }
     }
+    
+    static public ReadingData getTrend(LibreBlock libreBlock) {
+        if(libreBlock.byte_start != 0 || libreBlock.byte_end < 344) {
+            Log.i(TAG, "libreBlock exists but does not have enough data " + libreBlock.timestamp);
+            return null;
+        }
+        ReadingData result = parseData(0, "", libreBlock.blockbytes, JoH.tsl());
+        if(result.trend.size() == 0 || result.trend.get(0).glucoseLevelRaw == 0) {
+            Log.i(TAG, "libreBlock exists but no trend data exists, or first value is zero " + libreBlock.timestamp);
+            return null;
+        }
+        
+        // TODO: verify checksum
+        return result;
+    }
+    
 }

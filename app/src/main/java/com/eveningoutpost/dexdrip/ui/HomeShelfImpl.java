@@ -13,7 +13,8 @@ public class HomeShelfImpl extends BaseShelf {
         this.PREFS_PREFIX = "home-shelf-";
         map.put("time_buttons", "Time Buttons");
         map.put("chart_preview", "Chart Preview");
-
+        map.put("source_wizard", "Source Wizard");
+        map.put("graphic_trend_arrow", "Graphic Trend Arrow");
         defaults.put("chart_preview", true);
         populate();
     }

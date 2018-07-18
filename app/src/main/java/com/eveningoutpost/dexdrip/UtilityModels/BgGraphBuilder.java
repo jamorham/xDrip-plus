@@ -16,6 +16,7 @@ import android.widget.Toast;
 import com.eveningoutpost.dexdrip.AddCalibration;
 import com.eveningoutpost.dexdrip.GcmActivity;
 import com.eveningoutpost.dexdrip.Home;
+import com.eveningoutpost.dexdrip.Models.APStatus;
 import com.eveningoutpost.dexdrip.Models.BgReading;
 import com.eveningoutpost.dexdrip.Models.BloodTest;
 import com.eveningoutpost.dexdrip.Models.Calibration;
@@ -25,8 +26,9 @@ import com.eveningoutpost.dexdrip.Models.Forecast.TrendLine;
 import com.eveningoutpost.dexdrip.Models.HeartRate;
 import com.eveningoutpost.dexdrip.Models.Iob;
 import com.eveningoutpost.dexdrip.Models.JoH;
-import com.eveningoutpost.dexdrip.Models.StepCounter;
+import com.eveningoutpost.dexdrip.Models.Prediction;
 import com.eveningoutpost.dexdrip.Models.Profile;
+import com.eveningoutpost.dexdrip.Models.StepCounter;
 import com.eveningoutpost.dexdrip.Models.Treatments;
 import com.eveningoutpost.dexdrip.Models.UserError;
 import com.eveningoutpost.dexdrip.R;
@@ -36,11 +38,11 @@ import com.eveningoutpost.dexdrip.calibrations.PluggableCalibration;
 import com.eveningoutpost.dexdrip.store.FastStore;
 import com.eveningoutpost.dexdrip.store.KeyStore;
 import com.eveningoutpost.dexdrip.utils.DexCollectionType;
+import com.eveningoutpost.dexdrip.utils.LibreTrendGraph;
 import com.eveningoutpost.dexdrip.xdrip;
 import com.google.android.gms.location.DetectedActivity;
 import com.rits.cloning.Cloner;
 
-import java.lang.reflect.Field;
 import java.text.DecimalFormat;
 import java.text.DecimalFormatSymbols;
 import java.text.SimpleDateFormat;
@@ -48,6 +50,7 @@ import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.GregorianCalendar;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Locale;
 import java.util.TimeZone;
@@ -159,7 +162,8 @@ public class BgGraphBuilder {
     private final List<BgReading> bgReadings;
     private final List<Calibration> calibrations;
     private final List<BloodTest> bloodtests;
-    private final List<PointValue> inRangeValues = new ArrayList<PointValue>();
+    private final List<PointValue> inRangeValues = new ArrayList<>();
+    private final List<PointValue> backfillValues = new ArrayList<>();
     private final List<PointValue> highValues = new ArrayList<PointValue>();
     private final List<PointValue> lowValues = new ArrayList<PointValue>();
     private final List<PointValue> pluginValues = new ArrayList<PointValue>();
@@ -259,18 +263,6 @@ public class BgGraphBuilder {
             return 1;
     }
 
-    private static Object cloneObject(Object obj) {
-        try {
-            Object clone = obj.getClass().newInstance();
-            for (Field field : obj.getClass().getDeclaredFields()) {
-                field.setAccessible(true);
-                field.set(clone, field.get(obj));
-            }
-            return clone;
-        } catch (Exception e) {
-            return null;
-        }
-    }
 
     static public boolean isXLargeTablet(Context context) {
         return (context.getResources().getConfiguration().screenLayout & Configuration.SCREENLAYOUT_SIZE_MASK) >= Configuration.SCREENLAYOUT_SIZE_XLARGE;
@@ -298,6 +290,85 @@ public class BgGraphBuilder {
         }
         points.add(new PointValue(x, y));
         Log.d(TAG,"Extend line size: "+points.size());
+    }
+
+    private List<Line> predictiveLines() {
+        final List<Line> lines = new LinkedList<>();
+
+        if (Pref.getBooleanDefaultFalse("show_g_prediction")) {
+            final List<Prediction> plist = Prediction.latestForGraph(2000, loaded_start, loaded_end);
+            if (plist.size() > 0) {
+                final List<PointValue> gpoints = new ArrayList<>(plist.size());
+                final float yscale = !doMgdl ? (float) Constants.MGDL_TO_MMOLL : 1f;
+                for (Prediction p : plist) {
+                    final PointValue point = new PointValue(((float) (p.timestamp + (Constants.MINUTE_IN_MS * 10)) / FUZZER), (float) (p.glucose * yscale));
+                    switch (p.source) {
+                        case "EGlucoseRx":
+                            gpoints.add(point);
+                            break;
+
+                    }
+                }
+
+                if (gpoints.size() > 0) {
+                    lines.add(new Line(gpoints)
+                            .setHasLabels(false)
+                            .setHasPoints(true)
+                            .setHasLines(false)
+                            .setPointRadius(1)
+                            .setColor(ChartUtils.darkenColor(ChartUtils.darkenColor(getCol(X.color_predictive)))));
+                }
+            }
+        }
+
+        return lines;
+    }
+
+
+
+
+    private List<Line> basalLines() {
+        final List<Line> basalLines = new ArrayList<>();
+        if (prefs.getBoolean("show_basal_line", false)) {
+            final List<APStatus> aplist = APStatus.latestForGraph(2000, loaded_start, loaded_end);
+            final float yscale = doMgdl ? (float) Constants.MMOLL_TO_MGDL : 1f;
+            if (aplist.size() > 0) {
+                final List<PointValue> points = new ArrayList<>(aplist.size());
+
+                final float ypos = 13 * yscale; // TODO Configurable
+                int last_percent = -1;
+                float last_ypos = -1;
+
+                int count = aplist.size();
+                for (APStatus item : aplist) {
+                    if (--count == 0 || (item.basal_percent != last_percent)) {
+                        final float this_ypos = ypos - item.basal_percent / 100f;
+                        if (last_ypos >= 0) {
+                            // create square wave point
+                            points.add(new PointValue((float) item.timestamp / FUZZER, last_ypos));
+                        }
+                        points.add(new PointValue((float) item.timestamp / FUZZER, this_ypos));
+                        last_ypos = this_ypos;
+                        last_percent = item.basal_percent;
+                    }
+                }
+
+                final Line line = new Line(points);
+                line.setFilled(true);
+                line.setFillFlipped(true);
+                line.setHasGradientToTransparent(true);
+                line.setHasPoints(false);
+                line.setStrokeWidth(1);
+                line.setHasLines(true);
+                line.setPointRadius(1);
+                line.setGradientDivider(10f);
+
+                line.setColor(getCol(X.color_basal_tbr));
+                basalLines.add(line);
+            }
+        }
+
+        return basalLines;
     }
 
     // line illustrating result from step counter
@@ -552,9 +623,10 @@ public class BgGraphBuilder {
                 if (Pref.getBoolean("motion_tracking_enabled", false) && Pref.getBoolean("plot_motion", false)) {
                     lines.addAll(motionLine());
                 }
+                lines.addAll(basalLines());
                 lines.addAll(heartLines());
                 lines.addAll(stepsLines());
-
+                lines.addAll(predictiveLines());
             }
 
             Line[] calib = calibrationValuesLine();
@@ -584,6 +656,12 @@ public class BgGraphBuilder {
             lines.add(treatments[7]); // poly predict
 
 
+            if (prefs.getBoolean("show_libre_trend_line", false)) {
+                if (DexCollectionType.hasLibre()) {
+                    lines.add(LibreTrendLine());
+                }
+            }
+
             lines.add(minShowLine());
             lines.add(maxShowLine());
             lines.add(highLine());
@@ -601,6 +679,7 @@ public class BgGraphBuilder {
             }
             lines.add(rawInterpretedLine());
 
+            lines.add(backFillValuesLine());
             lines.add(inRangeValuesLine());
             lines.add(lowValuesLine());
             lines.add(highValuesLine());
@@ -662,6 +741,15 @@ public class BgGraphBuilder {
         return inRangeValuesLine;
     }
 
+    private Line backFillValuesLine() {
+        final Line line = new Line(backfillValues);
+        line.setColor(Color.parseColor("#55338833"));
+        line.setHasLines(false);
+        line.setPointRadius(pointSize + 3);
+        line.setHasPoints(true);
+        return line;
+    }
+    
     public void debugPrintPoints(List<PointValue> mypoints) {
         for (PointValue thispoint : mypoints) {
             UserError.Log.i(TAG, "Debug Points: " + thispoint.toString());
@@ -689,7 +777,7 @@ public class BgGraphBuilder {
                     if (thispoint.getX() == endmarker) {
                         thesepoints.add(thispoint);
                     }
-                    Line line = (Line) cloneObject(macroline); // aieeee
+                    Line line = (Line) JoH.cloneObject(macroline); // aieeee
                     line.setValues(thesepoints);
                     linearray.add(line);
                     thesepoints = new ArrayList<PointValue>();
@@ -927,6 +1015,7 @@ public class BgGraphBuilder {
             highValues.clear();
             lowValues.clear();
             inRangeValues.clear();
+            backfillValues.clear();
             calibrationValues.clear();
             bloodTestValues.clear();
             pluginValues.clear();
@@ -1037,6 +1126,7 @@ public class BgGraphBuilder {
             final boolean predict_lows = prefs.getBoolean("predict_lows", true);
             final boolean show_plugin = prefs.getBoolean("plugin_plot_on_graph", false);
             final boolean glucose_from_plugin = prefs.getBoolean("display_glucose_from_plugin", false);
+            final boolean illustrate_backfilled_data = prefs.getBoolean("illustrate_backfilled_data", false);
 
             if ((Home.get_follower()) && (bgReadings.size() < 3)) {
                 GcmActivity.requestBGsync();
@@ -1103,6 +1193,10 @@ public class BgGraphBuilder {
                     lowValues.add(new PointValue((float) (bgReading.timestamp / FUZZER), (float) unitized(bgReading.calculated_value)));
                 } else if (bgReading.calculated_value > 13) {
                     lowValues.add(new PointValue((float) (bgReading.timestamp / FUZZER), (float) unitized(40)));
+                }
+
+                if (illustrate_backfilled_data && bgReading.calculated_value > 13 && bgReading.calculated_value < 400 && bgReading.isBackfilled()) {
+                    backfillValues.add(bgReadingToPoint(bgReading));
                 }
 
                 avg2counter++;
@@ -1613,6 +1707,10 @@ public class BgGraphBuilder {
         }
     }
 
+    private PointValue bgReadingToPoint(BgReading bgReading) {
+        return new PointValue((float) (bgReading.timestamp / FUZZER), (float) unitized(bgReading.calculated_value));
+    }
+
     public Line avg1Line() {
         List<PointValue> myLineValues = new ArrayList<PointValue>();
         myLineValues.add(new PointValue((float) avg1startfuzzed, (float) unitized(avg1value)));
@@ -1718,6 +1816,18 @@ public class BgGraphBuilder {
         minShowLine.setHasPoints(false);
         minShowLine.setHasLines(false);
         return minShowLine;
+    }
+
+    public Line LibreTrendLine() {
+        final List<PointValue> libreTrendValues =  LibreTrendGraph.getTrendDataPoints(doMgdl, (long)(start_time * FUZZER), (long)(end_time * FUZZER));
+        final Line line = new Line(libreTrendValues);
+        line.setHasPoints(true);
+        line.setHasLines(false);
+        line.setCubic(false);
+        line.setStrokeWidth(2);
+        line.setPointRadius(1);
+        line.setColor(Color.argb(240,25,206,244)); // temporary pending preference
+        return line;
     }
 
     /////////AXIS RELATED//////////////
@@ -1850,13 +1960,30 @@ public class BgGraphBuilder {
     public static String unitized_string_static(double value) {
         return unitized_string(value, Pref.getString("units", "mgdl").equals("mgdl"));
     }
+
     public static String unitized_string_with_units_static(double value) {
         final boolean domgdl = Pref.getString("units", "mgdl").equals("mgdl");
         return unitized_string(value, domgdl)+" "+(domgdl ? "mg/dl" : "mmol/l");
     }
 
+    public static String unitized_string_with_units_static_short(double value) {
+        final boolean domgdl = Pref.getString("units", "mgdl").equals("mgdl");
+        return unitized_string(value, domgdl)+" "+(domgdl ? "mgdl" : "mmol");
+    }
+
+    public static String unitized_string_static_no_interpretation_short(double value) {
+        final boolean domgdl = Pref.getString("units", "mgdl").equals("mgdl");
+        final DecimalFormat df = new DecimalFormat("#");
+        if (domgdl) {
+            df.setMaximumFractionDigits(0);
+        } else {
+            df.setMaximumFractionDigits(1);
+        }
+        return df.format(unitized(value, domgdl)) + " " + (domgdl ? "mgdl" : "mmol");
+    }
+
     public static String unitized_string(double value, boolean doMgdl) {
-        DecimalFormat df = new DecimalFormat("#");
+        final DecimalFormat df = new DecimalFormat("#");
         if (value >= 400) {
             return "HIGH";
         } else if (value >= 40) {

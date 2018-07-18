@@ -14,6 +14,7 @@ import android.support.v4.content.LocalBroadcastManager;
 import com.activeandroid.Model;
 import com.activeandroid.annotation.Column;
 import com.activeandroid.annotation.Table;
+import com.activeandroid.query.Delete;
 import com.activeandroid.query.Select;
 import com.eveningoutpost.dexdrip.ListenerService;
 import com.eveningoutpost.dexdrip.Models.BgReading;
@@ -75,6 +76,18 @@ public class BgSendQueue extends Model {
                     .execute();
         }
     */
+
+    @Deprecated
+    public static void emptyQueue() {
+        try {
+            new Delete()
+                    .from(BgSendQueue.class)
+                    .execute();
+        } catch (Exception e) {
+            // failed
+        }
+    }
+
     public static List<BgSendQueue> mongoQueue() {
         return new Select()
                 .from(BgSendQueue.class)
@@ -103,18 +116,19 @@ public class BgSendQueue extends Model {
         handleNewBgReading(bgReading, operation_type, context, is_follower, false);
     }
 
-    public static void handleNewBgReading(BgReading bgReading, String operation_type, Context context, boolean is_follower, boolean quick) {
+    public static void handleNewBgReading(BgReading bgReading, String operation_type, final Context context, boolean is_follower, boolean quick) {
         PowerManager powerManager = (PowerManager) context.getSystemService(Context.POWER_SERVICE);
         PowerManager.WakeLock wakeLock = powerManager.newWakeLock(PowerManager.PARTIAL_WAKE_LOCK,
                 "sendQueue");
         wakeLock.acquire(120000);
         try {
 
+            Notifications.start();
             CustomComplicationProviderService.refresh();
 
             if (!is_follower) addToQueue(bgReading, operation_type);
 
-            SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(context);
+            final SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(context);
 
             // all this other UI stuff probably shouldn't be here but in lieu of a better method we keep with it..
 
@@ -236,14 +250,20 @@ public class BgSendQueue extends Model {
             */
 
             // if executing on watch; send to watchface
-            if (prefs.getBoolean("enable_wearG5", false)) {//KS
-                Log.d("BgSendQueue", "handleNewBgReading Broadcast BG data to watch");
-                resendData(context);
-                if (prefs.getBoolean("force_wearG5", false)) {
-                    //ListenerService.requestData(context);//Gets called by watchface in missedReadingAlert so not needed here
-                    ListenerService.SendData(context, ListenerService.SYNC_ALL_DATA, null);//Do not need to request data from phone using requestData which performs a resend
+            Inevitable.task("bg-send-queue", 1000, new Runnable() {
+                @Override
+                public void run() {
+                    if (prefs.getBoolean("enable_wearG5", false)) {//KS
+                        Log.d("BgSendQueue", "handleNewBgReading Broadcast BG data to watch");
+                        resendData(context);
+                        if (prefs.getBoolean("force_wearG5", false)) {
+                            //ListenerService.requestData(context);//Gets called by watchface in missedReadingAlert so not needed here
+                            ListenerService.SendData(context, ListenerService.SYNC_ALL_DATA, null);//Do not need to request data from phone using requestData which performs a resend
+                        }
+                    }
                 }
-            }
+            });
+
 
 
         } finally {

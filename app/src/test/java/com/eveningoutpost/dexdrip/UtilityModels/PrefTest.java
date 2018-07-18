@@ -1,13 +1,8 @@
 package com.eveningoutpost.dexdrip.UtilityModels;
 
-import com.eveningoutpost.dexdrip.xdrip;
+import com.eveningoutpost.dexdrip.RobolectricTestWithConfig;
 
-import org.junit.Before;
 import org.junit.Test;
-import org.junit.runner.RunWith;
-import org.robolectric.RobolectricTestRunner;
-import org.robolectric.RuntimeEnvironment;
-import org.robolectric.annotation.Config;
 
 import static org.hamcrest.Matchers.is;
 import static org.junit.Assert.assertThat;
@@ -16,18 +11,10 @@ import static org.junit.Assert.assertThat;
  * Created by jamorham on 22/01/2018.
  */
 
-
-@RunWith(RobolectricTestRunner.class)
-@Config(manifest = Config.NONE)
-public class PrefTest {
-
-    @Before
-    public void setUp() throws Exception {
-        xdrip.checkAppContext(RuntimeEnvironment.application);
-    }
+public class PrefTest extends RobolectricTestWithConfig {
 
     @Test
-    public void test_PrefTest() throws Exception {
+    public void test_PrefTest() {
 
         // test getStringToInt
 
