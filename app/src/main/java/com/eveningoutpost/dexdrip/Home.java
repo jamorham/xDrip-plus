@@ -106,6 +106,8 @@ import com.eveningoutpost.dexdrip.dagger.Injectors;
 import com.eveningoutpost.dexdrip.databinding.ActivityHomeBinding;
 import com.eveningoutpost.dexdrip.databinding.ActivityHomeShelfSettingsBinding;
 import com.eveningoutpost.dexdrip.databinding.PopupInitialStatusHelperBinding;
+import com.eveningoutpost.dexdrip.eassist.EmergencyAssistActivity;
+import com.eveningoutpost.dexdrip.insulin.pendiq.Pendiq;
 import com.eveningoutpost.dexdrip.languageeditor.LanguageEditor;
 import com.eveningoutpost.dexdrip.profileeditor.DatePickerFragment;
 import com.eveningoutpost.dexdrip.profileeditor.ProfileAdapter;
@@ -129,6 +131,7 @@ import com.eveningoutpost.dexdrip.utils.LibreTrendGraph;
 import com.eveningoutpost.dexdrip.utils.Preferences;
 import com.eveningoutpost.dexdrip.utils.SdcardImportExport;
 import com.eveningoutpost.dexdrip.wearintegration.Amazfitservice;
+import com.eveningoutpost.dexdrip.wearintegration.ExternalStatusService;
 import com.eveningoutpost.dexdrip.wearintegration.WatchUpdaterService;
 import com.github.amlcurran.showcaseview.ShowcaseView;
 import com.github.amlcurran.showcaseview.targets.Target;
@@ -139,6 +142,7 @@ import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
+import java.nio.charset.StandardCharsets;
 import java.text.DecimalFormat;
 import java.text.NumberFormat;
 import java.text.ParseException;
@@ -492,6 +496,7 @@ public class Home extends ActivityWithMenu implements ActivityCompat.OnRequestPe
                 textInsulinDose.setVisibility(View.INVISIBLE);
                 btnInsulinDose.setVisibility(View.INVISIBLE);
                 Treatments.create(0, thisinsulinnumber, Treatments.getTimeStampWithOffset(thistimeoffset));
+                Pendiq.handleTreatment(thisinsulinnumber);
                 thisinsulinnumber = 0;
                 reset_viewport = true;
                 if (hideTreatmentButtonsIfAllDone()) {
@@ -597,6 +602,8 @@ public class Home extends ActivityWithMenu implements ActivityCompat.OnRequestPe
             showcasemenu(SHOWCASE_VARIANT);
         }
 
+
+        currentBgValueText.setText(""); // clear any design prototyping default
 
         if (checkedeula && is_newbie && ((dialog == null) || !dialog.isShowing())) {
             if (!SdcardImportExport.handleBackup(this)) {
@@ -726,6 +733,8 @@ public class Home extends ActivityWithMenu implements ActivityCompat.OnRequestPe
 
     // handle sending the intent
     private void processFingerStickCalibration(final double glucosenumber, final double timeoffset, boolean dontask) {
+        JoH.clearCache();
+        UserError.Log.uel(TAG, "Processing Finger stick Calibration with values: glucose: " + glucosenumber + " timeoffset: " + timeoffset + " full auto: " + dontask);
         if (glucosenumber > 0) {
 
             if (timeoffset < 0) {
@@ -735,14 +744,21 @@ public class Home extends ActivityWithMenu implements ActivityCompat.OnRequestPe
 
             final Intent calintent = new Intent(getApplicationContext(), AddCalibration.class);
             calintent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+            calintent.putExtra("timestamp", JoH.tsl());
             calintent.putExtra("bg_string", JoH.qs(glucosenumber));
             calintent.putExtra("bg_age", Long.toString((long) (timeoffset / 1000)));
             calintent.putExtra("allow_undo", "true");
+            calintent.putExtra("cal_source", "processFingerStringCalibration");
             Log.d(TAG, "processFingerStickCalibration number: " + glucosenumber + " offset: " + timeoffset);
 
             if (dontask) {
-                Log.d(TAG, "Proceeding with calibration intent without asking");
-                startIntentThreadWithDelayedRefresh(calintent);
+                if (PersistentStore.getDouble("last-auto-calibration-value") == glucosenumber) {
+                    UserError.Log.wtf(TAG, "Rejecting auto calibration as it is the same as last: " + glucosenumber);
+                } else {
+                    PersistentStore.setDouble("last-auto-calibration-value", glucosenumber);
+                    Log.d(TAG, "Proceeding with calibration intent without asking");
+                    startIntentThreadWithDelayedRefresh(calintent);
+                }
             } else {
                 AlertDialog.Builder builder = new AlertDialog.Builder(this);
                 builder.setTitle("Use " + JoH.qs(glucosenumber, 1) + " for Calibration?");
@@ -783,9 +799,11 @@ public class Home extends ActivityWithMenu implements ActivityCompat.OnRequestPe
             final Intent calintent = new Intent(getApplicationContext(), AddCalibration.class);
 
             calintent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+            calintent.putExtra("timestamp", JoH.tsl());
             calintent.putExtra("bg_string", JoH.qs(glucosenumber));
             calintent.putExtra("bg_age", Long.toString((long) (timeoffset / 1000)));
             calintent.putExtra("allow_undo", "true");
+            calintent.putExtra("cal_source", "processCalibrationNoUi");
             Log.d(TAG, "ProcessCalibrationNoUI number: " + glucosenumber + " offset: " + timeoffset);
 
             final String calibration_type = Pref.getString("treatment_fingerstick_calibration_usage", "ask");
@@ -915,6 +933,7 @@ public class Home extends ActivityWithMenu implements ActivityCompat.OnRequestPe
                 if (exists == null) {
                     Log.d(TAG, "processAndApproveTreatment create watchkeypad Treatment carbs=" + thiscarbsnumber + " insulin=" + thisinsulinnumber + " timestamp=" + JoH.dateTimeText(time) + " uuid=" + thisuuid);
                     Treatments.create(thiscarbsnumber, thisinsulinnumber, time, thisuuid);
+                    Pendiq.handleTreatment(thisinsulinnumber);
                 } else {
                     Log.d(TAG, "processAndApproveTreatment Treatment already exists carbs=" + thiscarbsnumber + " insulin=" + thisinsulinnumber + " timestamp=" + JoH.dateTimeText(time));
                 }
@@ -922,6 +941,7 @@ public class Home extends ActivityWithMenu implements ActivityCompat.OnRequestPe
         } else {
             WatchUpdaterService.sendWearToast("Treatment processed", Toast.LENGTH_LONG);
             Treatments.create(thiscarbsnumber, thisinsulinnumber, Treatments.getTimeStampWithOffset(mytimeoffset));
+            Pendiq.handleTreatment(thisinsulinnumber);
         }
         hideAllTreatmentButtons();
 
@@ -1367,12 +1387,15 @@ public class Home extends ActivityWithMenu implements ActivityCompat.OnRequestPe
             thisuuid = (end > 0 ? allWords.substring(0, end) : "");
             allWords = allWords.substring(end + 6, allWords.length());
         }
+        byte[] RTL_BYTES = {(byte)0xE2, (byte)0x80, (byte)0x8f}; // See https://stackoverflow.com/questions/21470476/why-is-e2808f-being-added-to-my-youtube-embed-code
+       
         allWords = allWords.trim();
         allWords = allWords.replaceAll(":", "."); // fix real times
         allWords = allWords.replaceAll("(\\d)([a-zA-Z])", "$1 $2"); // fix like 22mm
         allWords = allWords.replaceAll("([0-9]\\.[0-9])([0-9][0-9])", "$1 $2"); // fix multi number order like blood 3.622 grams
+        allWords = allWords.replaceAll(new String(RTL_BYTES, StandardCharsets.UTF_8),"");
         allWords = allWords.toLowerCase();
-
+        
         Log.d(TAG, "Processing speech input allWords second: " + allWords + " UUID: " + thisuuid);
 
         if (allWords.contentEquals("delete last treatment")
@@ -1841,6 +1864,42 @@ public class Home extends ActivityWithMenu implements ActivityCompat.OnRequestPe
         updateCurrentBgInfo("generic on resume");
         updateHealthInfo("generic on resume");
 
+
+
+        if (NFCReaderX.useNFC()) {
+            NFCReaderX.doNFC(this);
+        } else {
+            NFCReaderX.disableNFC(this);
+        }
+
+        if (get_follower() || get_master()) {
+            GcmActivity.checkSync(this);
+        }
+
+        checkWifiSleepPolicy();
+
+        if (homeShelf.getDefaultFalse("source_wizard_auto")) {
+            if (Experience.gotData()) {
+                homeShelf.set("source_wizard", false);
+                homeShelf.set("source_wizard_auto", false);
+            }
+        }
+
+        HeyFamUpdateOptInDialog.heyFam(this); // remind about updates
+
+        Inevitable.task("home-resume-bg", 2000, new Runnable() {
+                    @Override
+                    public void run() {
+                        EmergencyAssistActivity.checkPermissionRemoved();
+                        NightscoutUploader.launchDownloadRest();
+                        Pendiq.immortality(); // Experimental testing phase
+                    }
+                });
+
+    }
+
+
+    private void checkWifiSleepPolicy() {
         if (!JoH.getWifiSleepPolicyNever()) {
             if (JoH.ratelimit("policy-never", 3600)) {
                 if (Pref.getLong("wifi_warning_never", 0) == 0) {
@@ -1883,28 +1942,6 @@ public class Home extends ActivityWithMenu implements ActivityCompat.OnRequestPe
                 }
             }
         }
-
-        if (NFCReaderX.useNFC()) {
-            NFCReaderX.doNFC(this);
-        } else {
-            NFCReaderX.disableNFC(this);
-        }
-
-        if (get_follower() || get_master()) {
-            GcmActivity.checkSync(this);
-        }
-
-        NightscoutUploader.launchDownloadRest();
-
-        if (homeShelf.getDefaultFalse("source_wizard_auto")) {
-            if (Experience.gotData()) {
-                homeShelf.set("source_wizard", false);
-                homeShelf.set("source_wizard_auto", false);
-            }
-        }
-
-        HeyFamUpdateOptInDialog.heyFam(this); // remind about updates
-
     }
 
     private void setupCharts() {
@@ -1920,10 +1957,12 @@ public class Home extends ActivityWithMenu implements ActivityCompat.OnRequestPe
         chart.setBackgroundColor(getCol(X.color_home_chart_background));
         chart.setZoomType(ZoomType.HORIZONTAL);
 
+        chart.getChartData().setAxisXTop(null);
+
         //Transmitter Battery Level
         final Sensor sensor = Sensor.currentSensor();
 
-        //????????? what about tomato here ?????
+        //????????? what about tomato here ????? TODO this sucks
         if (sensor != null && sensor.latest_battery_level != 0 && !DexCollectionService.getBestLimitterHardwareName().equalsIgnoreCase("BlueReader") && sensor.latest_battery_level <= Dex_Constants.TRANSMITTER_BATTERY_LOW && !Pref.getBoolean("disable_battery_warning", false)) {
             Drawable background = new Drawable() {
 
@@ -2157,6 +2196,7 @@ public class Home extends ActivityWithMenu implements ActivityCompat.OnRequestPe
         holdViewport.top = moveViewPort.top;
         holdViewport.bottom = moveViewPort.bottom;
         chart.setCurrentViewport(holdViewport);
+
         previewChart.setCurrentViewport(holdViewport);
     }
 
@@ -2293,7 +2333,7 @@ public class Home extends ActivityWithMenu implements ActivityCompat.OnRequestPe
         } else if (is_follower || collector.equals(DexCollectionType.NSEmulator)) {
             displayCurrentInfo();
             Notifications.start();
-        } else if (!alreadyDisplayedBgInfoCommon && DexCollectionType.getDexCollectionType() == DexCollectionType.LibreAlarm) {
+        } else if (!alreadyDisplayedBgInfoCommon && (DexCollectionType.getDexCollectionType() == DexCollectionType.LibreAlarm || collector == DexCollectionType.Medtrum)) {
             updateCurrentBgInfoCommon(collector, notificationText);
         }
         if (collector.equals(DexCollectionType.Disabled)) {
@@ -2810,6 +2850,7 @@ public class Home extends ActivityWithMenu implements ActivityCompat.OnRequestPe
         }
     }
 
+    // TODO EXTRACT METHOD
     @NonNull
     public static String extraStatusLine() {
 
@@ -2845,7 +2886,9 @@ public class Home extends ActivityWithMenu implements ActivityCompat.OnRequestPe
                 || Pref.getBoolean("status_line_royce_ratio", false)
                 || Pref.getBoolean("status_line_accuracy", false)
                 || Pref.getBoolean("status_line_capture_percentage", false)
-                || Pref.getBoolean("status_line_pump_reservoir", false)) {
+                || Pref.getBoolean("status_line_realtime_capture_percentage", false)
+                || Pref.getBoolean("status_line_pump_reservoir", false)
+                || Pref.getBooleanDefaultFalse("status_line_external_status")) {
 
             final StatsResult statsResult = new StatsResult(Pref.getInstance(), Pref.getBooleanDefaultFalse("extra_status_stats_24h"));
 
@@ -2894,6 +2937,11 @@ public class Home extends ActivityWithMenu implements ActivityCompat.OnRequestPe
                 if (extraline.length() != 0) extraline.append(' ');
                 extraline.append(statsResult.getCapturePercentage(false));
             }
+            if (Pref.getBoolean("status_line_realtime_capture_percentage", false) &&
+                    statsResult.canShowRealtimeCapture()) {
+                if (extraline.length() != 0) extraline.append(' ');
+                extraline.append(statsResult.getRealtimeCapturePercentage(false));
+            }
             if (Pref.getBoolean("status_line_accuracy", false)) {
                 final long accuracy_period = DAY_IN_MS * 3;
                 if (extraline.length() != 0) extraline.append(' ');
@@ -2911,6 +2959,11 @@ public class Home extends ActivityWithMenu implements ActivityCompat.OnRequestPe
                 extraline.append(PumpStatus.getBolusIoBString());
                 extraline.append(PumpStatus.getReservoirString());
                 extraline.append(PumpStatus.getBatteryString());
+            }
+
+            if (Pref.getBooleanDefaultFalse("status_line_external_status")) {
+                if (extraline.length() != 0) extraline.append(' ');
+                extraline.append(ExternalStatusService.getLastStatusLine());
             }
 
         }
@@ -3284,6 +3337,10 @@ public class Home extends ActivityWithMenu implements ActivityCompat.OnRequestPe
 
     public void showRemindersFromMenu(MenuItem myitem) {
         startActivity(new Intent(getApplicationContext(), Reminders.class));
+    }
+
+    public void showAssistFromMenu(MenuItem myitem) {
+        startActivity(new Intent(getApplicationContext(), EmergencyAssistActivity.class));
     }
 
 

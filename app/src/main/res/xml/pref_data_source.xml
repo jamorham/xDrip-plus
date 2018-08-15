@@ -88,6 +88,11 @@
             android:summary="@string/transmitter_id"
             android:title="@string/dexcom_transmitter_id" />
 
+        <CheckBoxPreference
+            android:key="medtrum_use_native"
+            android:defaultValue="true"
+            android:summary="Use transmitter calibration instead of xDrip for primary"
+            android:title="Medtrum Native" />
 
         <PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android"
             android:key="xdrip_plus_g5_extra_settings"
@@ -147,6 +152,13 @@
                 android:dependency="use_ob1_g5_collector_service"
                 android:summary="OB1 collector can unbond if it thinks the encryption has failed. If you get problems with it unpairing then disable this option. If you then totally lose connection, make sure this is enabled."
                 android:title="Allow OB1 unbonding"
+                />
+            <CheckBoxPreference
+                android:defaultValue="true"
+                android:key="ob1_initiate_bonding_flag"
+                android:dependency="use_ob1_g5_collector_service"
+                android:summary="OB1 collector can initiate bonding."
+                android:title="Allow OB1 initiate bonding"
                 />
             <CheckBoxPreference
                 android:defaultValue="false"

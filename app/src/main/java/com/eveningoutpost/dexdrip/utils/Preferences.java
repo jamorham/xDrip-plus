@@ -64,8 +64,8 @@ import com.eveningoutpost.dexdrip.UtilityModels.pebble.watchface.InstallPebbleWa
 import com.eveningoutpost.dexdrip.WidgetUpdateService;
 import com.eveningoutpost.dexdrip.calibrations.PluggableCalibration;
 import com.eveningoutpost.dexdrip.profileeditor.ProfileEditor;
-import com.eveningoutpost.dexdrip.wearintegration.WatchUpdaterService;
 import com.eveningoutpost.dexdrip.wearintegration.Amazfitservice;
+import com.eveningoutpost.dexdrip.wearintegration.WatchUpdaterService;
 import com.eveningoutpost.dexdrip.webservices.XdripWebService;
 import com.eveningoutpost.dexdrip.xDripWidget;
 import com.eveningoutpost.dexdrip.xdrip;
@@ -1116,6 +1116,14 @@ public class Preferences extends PreferenceActivity {
                 this.prefs.edit().putBoolean("calibration_notifications", false).apply();
             }
 
+            if (collectionType != DexCollectionType.Medtrum) {
+                try {
+                    collectionCategory.removePreference(findPreference("medtrum_use_native"));
+                } catch (Exception e) {
+                    //
+                }
+            }
+
             try {
                 findPreference("nfc_scan_homescreen").setOnPreferenceChangeListener(new Preference.OnPreferenceChangeListener() {
                     @Override
@@ -1381,6 +1389,8 @@ public class Preferences extends PreferenceActivity {
             });
 
             bindPreferenceTitleAppendToStringValue(findPreference("retention_days_bg_reading"));
+
+            bindPreferenceTitleAppendToStringValue(findPreference("pendiq_pin"));
 
             // Pebble Trend -- START
 
@@ -1804,6 +1814,7 @@ public class Preferences extends PreferenceActivity {
             findPreference("status_line_low").setOnPreferenceChangeListener(new WidgetListener());
             findPreference("extra_status_line").setOnPreferenceChangeListener(new WidgetListener());
             findPreference("status_line_capture_percentage").setOnPreferenceChangeListener(new WidgetListener());
+            findPreference("status_line_realtime_capture_percentage").setOnPreferenceChangeListener(new WidgetListener());
             findPreference("extra_status_stats_24h").setOnPreferenceChangeListener(new WidgetListener());
 
         }

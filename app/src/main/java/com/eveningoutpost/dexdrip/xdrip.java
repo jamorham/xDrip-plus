@@ -20,6 +20,7 @@ import com.eveningoutpost.dexdrip.UtilityModels.CollectionServiceStarter;
 import com.eveningoutpost.dexdrip.UtilityModels.IdempotentMigrations;
 import com.eveningoutpost.dexdrip.UtilityModels.PlusAsyncExecutor;
 import com.eveningoutpost.dexdrip.UtilityModels.Pref;
+import com.eveningoutpost.dexdrip.UtilityModels.VersionTracker;
 import com.eveningoutpost.dexdrip.calibrations.PluggableCalibration;
 import com.eveningoutpost.dexdrip.webservices.XdripWebService;
 
@@ -78,13 +79,15 @@ public class xdrip extends Application {
             MissedReadingService.delayedLaunch();
             NFCReaderX.handleHomeScreenScanPreference(getApplicationContext());
             AlertType.fromSettings(getApplicationContext());
-            new CollectionServiceStarter(getApplicationContext()).start(getApplicationContext());
+            //new CollectionServiceStarter(getApplicationContext()).start(getApplicationContext());
+            CollectionServiceStarter.restartCollectionServiceBackground();
             PlusSyncService.startSyncService(context, "xdrip.java");
             if (Pref.getBoolean("motion_tracking_enabled", false)) {
                 ActivityRecognizedService.startActivityRecogniser(getApplicationContext());
             }
             BluetoothGlucoseMeter.startIfEnabled();
             XdripWebService.immortality();
+            VersionTracker.updatePhone();
 
         } else {
             Log.d(TAG, "Detected running test mode, holding back on background processes");
@@ -181,5 +184,14 @@ public class xdrip extends Application {
             Log.d(TAG, "Already set to locale: " + forced_language);
         }
     }
+
+    public static String gs(int id) {
+        return getAppContext().getString(id);
+    }
+
+    public static String gs(int id, String... args) {
+        return getAppContext().getString(id, (Object[]) args);
+    }
+
     //}
 }

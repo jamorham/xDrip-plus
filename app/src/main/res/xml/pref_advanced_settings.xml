@@ -495,6 +495,12 @@
                 <CheckBoxPreference
                     android:defaultValue="false"
                     android:dependency="extra_status_line"
+                    android:key="status_line_external_status"
+                    android:summary="Display status from other apps like AndroidAPS"
+                    android:title="External Status" />
+                <CheckBoxPreference
+                    android:defaultValue="false"
+                    android:dependency="extra_status_line"
                     android:key="status_line_pump_reservoir"
                     android:summary="Display pump status information if available"
                     android:title="Pump Status" />
@@ -510,6 +516,12 @@
                     android:key="status_line_capture_percentage"
                     android:summary="@string/received_readings_percentage"
                     android:title="@string/capture_percentage" />
+                <CheckBoxPreference
+                    android:defaultValue="false"
+                    android:dependency="extra_status_line"
+                    android:key="status_line_realtime_capture_percentage"
+                    android:summary="@string/received_realtime_readings_percentage"
+                    android:title="@string/realtime_capture_percentage" />
                 <CheckBoxPreference
                     android:defaultValue="false"
                     android:dependency="extra_status_line"
@@ -650,6 +662,11 @@
                     android:key="close_gatt_on_ble_disconnect"
                     android:summary="@string/close_gatt"
                     android:title="@string/close_gatt_on_ble_disconnect" />
+                <CheckBoxPreference
+                    android:defaultValue="false"
+                    android:key="bluetooth_use_scan"
+                    android:summary="Scan before connecting on xBridge and Libre bluetooth"
+                    android:title="Use scanning" />
                 <CheckBoxPreference
                     android:defaultValue="true"
                     android:key="bluetooth_trust_autoconnect"
@@ -829,7 +846,7 @@
                     android:summary="@string/use_external_blukon_algorithm_summary"
                     android:title="@string/use_external_blukon_algorithm" />
                 
-        	    <CheckBoxPreference
+                <CheckBoxPreference
                     android:enabled="false"
                     android:defaultValue="false"
                     android:dependency="external_blukon_algorithm"
@@ -844,12 +861,19 @@
                     android:summary="@string/retrieve_blukon_history_summary"
                     android:title="@string/retrieve_blukon_history_title" />
 
+                <CheckBoxPreference
+                    android:defaultValue="false"
+                    android:dependency="allow_testing_with_dead_sensor"
+                    android:key="allow_testing_with_dead_sensor"
+                    android:summary="allow testing with dead sensor"
+                    android:title="NOT FOR PRODUCTION USE" />
+
             </PreferenceScreen>
             <PreferenceCategory
                 android:key="community_help_category"
                 android:title="@string/help_the_community">
                 <CheckBoxPreference
-                    android:defaultValue="true"
+                    android:defaultValue="false"
                     android:key="store_sensor_location"
                     android:summary="@string/help_the_developers_improve_the_algorithm"
                     android:title="@string/store_sensor_location_to_help" />

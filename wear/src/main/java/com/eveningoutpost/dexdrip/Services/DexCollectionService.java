@@ -68,6 +68,7 @@ import com.eveningoutpost.dexdrip.utils.BtCallBack;
 import com.eveningoutpost.dexdrip.utils.CheckBridgeBattery;
 import com.eveningoutpost.dexdrip.utils.DexCollectionType;
 import com.eveningoutpost.dexdrip.utils.DisconnectReceiver;
+import com.eveningoutpost.dexdrip.utils.bt.ScanMeister;
 import com.eveningoutpost.dexdrip.xdrip;
 import com.google.android.gms.wearable.DataMap;
 import com.rits.cloning.Cloner;
@@ -80,11 +81,13 @@ import java.util.List;
 import java.util.Set;
 import java.util.UUID;
 
+import static android.bluetooth.BluetoothDevice.TRANSPORT_LE;
 import static com.eveningoutpost.dexdrip.G5Model.BluetoothServices.getStatusName;
+import static com.eveningoutpost.dexdrip.Models.JoH.convertPinToBytes;
 import static com.eveningoutpost.dexdrip.UtilityModels.BgGraphBuilder.DEXCOM_PERIOD;
 
 @TargetApi(Build.VERSION_CODES.KITKAT)
-public class DexCollectionService extends Service implements BtCallBack{
+public class DexCollectionService extends Service implements BtCallBack {
     public static final String LIMITTER_NAME = "LimiTTer";
     private final static String TAG = DexCollectionService.class.getSimpleName();
     private static final boolean d = false;
@@ -159,6 +162,7 @@ public class DexCollectionService extends Service implements BtCallBack{
     public DexCollectionService dexCollectionService;
     long lastPacketTime;
     private SharedPreferences prefs;
+    private static volatile ScanMeister scanMeister;
     private BluetoothAdapter mBluetoothAdapter;
     private String mDeviceAddress;
     private volatile long delay_offset = 0;
@@ -167,12 +171,16 @@ public class DexCollectionService extends Service implements BtCallBack{
         @Override
         public void onReceive(Context context, Intent intent) {
             Log.d(TAG, "Received pairing request");
-            JoH.doPairingRequest(context, this, intent, mDeviceAddress, DEFAULT_BT_PIN);
+            if (!JoH.doPairingRequest(context, this, intent, mDeviceAddress, DEFAULT_BT_PIN)) {
+                UserError.Log.d(TAG, "Pairing request marked as failed, reducing settings to avoid auto-pairing");
+                Pref.setBoolean("blukon_unbonding", false);
+                unRegisterPairingReceiver();
+            }
         }
     };
     private ForegroundServiceStarter foregroundServiceStarter;
     private volatile int mConnectionState = BluetoothProfile.STATE_DISCONNECTING;
-    private volatile BluetoothDevice device;
+    private static volatile BluetoothDevice device;
     private static volatile BluetoothGattCharacteristic mCharacteristic;
     // Experimental support for rfduino from Tomasz Stachowicz
     private static volatile BluetoothGattCharacteristic mCharacteristicSend;
@@ -200,6 +208,7 @@ public class DexCollectionService extends Service implements BtCallBack{
 
     private synchronized void handleConnectedStateChange() {
         mConnectionState = STATE_CONNECTED;
+        scanMeister.stop();
         if ((servicesDiscovered == DISCOVERED.NULL) || Pref.getBoolean("always_discover_services", true)) {
             Log.d(TAG, "Requesting to discover services: previous: " + servicesDiscovered);
             servicesDiscovered = DISCOVERED.PENDING;
@@ -211,8 +220,13 @@ public class DexCollectionService extends Service implements BtCallBack{
         }
         if (servicesDiscovered != DISCOVERED.COMPLETE) {
             if (mBluetoothGatt != null) {
-                Log.d(TAG, "Calling discoverServices");
-                mBluetoothGatt.discoverServices();
+                if (JoH.ratelimit("dexcollect-discover-services", 1)) {
+                    Log.d(TAG, "Calling discoverServices");
+                    mBluetoothGatt.discoverServices();
+                } else {
+                    Log.d(TAG, "Discover services duplicate blocked by rate limit");
+                }
+
             } else {
                 UserError.Log.d(TAG, "Wanted to discover services but gatt was null!");
             }
@@ -224,12 +238,23 @@ public class DexCollectionService extends Service implements BtCallBack{
 
     @Override
     public void btCallback(String address, String status) {
-        UserError.Log.d(TAG, "Processing callback: " + address + " " + status);
+        UserError.Log.d(TAG, "Processing callback: " + address + " :: " + status);
         if (address.equals(mDeviceAddress)) {
             switch (status) {
                 case "DISCONNECTED":
                     handleDisconnectedStateChange();
                     break;
+                case "SCAN_FOUND":
+                    connectIfNotConnected(address);
+                    break;
+                case "SCAN_TIMEOUT":
+                    status("Scan timed out");
+                    setRetryTimer();
+                    break;
+                case "SCAN_FAILED":
+                    status("Scan Failed!");
+                    break;
+
                 default:
                     UserError.Log.e(TAG, "Unknown status callback for: " + address + " with " + status);
             }
@@ -242,6 +267,19 @@ public class DexCollectionService extends Service implements BtCallBack{
         if (JoH.ratelimit("handle-disconnected-state-change", 2)) {
             mConnectionState = STATE_DISCONNECTED;
             ActiveBluetoothDevice.disconnected();
+
+            if (!getTrustAutoConnect()) {
+                if (mBluetoothGatt != null) {
+                    UserError.Log.d(TAG, "Sending disconnection");
+                    try {
+                        mBluetoothGatt.disconnect();
+                    } catch (Exception e) {
+                        //
+                    }
+                }
+            }
+
+            // TODO should we allow close when trusting auto-connect?
             if (prefs.getBoolean("close_gatt_on_ble_disconnect", true)) {
                 if (mBluetoothGatt != null) {
                     Log.i(TAG, "onConnectionStateChange: mBluetoothGatt is not null, closing.");
@@ -320,7 +358,6 @@ public class DexCollectionService extends Service implements BtCallBack{
         }
 
 
-
         @Override
         public synchronized void onServicesDiscovered(BluetoothGatt gatt, int status) {
             Log.d(TAG, "Services discovered start");
@@ -340,7 +377,7 @@ public class DexCollectionService extends Service implements BtCallBack{
                             Home.toaststaticnext("Bonding failing so disabling bonding feature");
                             Pref.setBoolean(PREF_DEX_COLLECTION_BONDING, false);
                         } else {
-                            device.setPin(JoH.convertPinToBytes(DEFAULT_BT_PIN));
+                            device.setPin(convertPinToBytes(DEFAULT_BT_PIN));
                             device.createBond();
                         }
                     }
@@ -560,22 +597,32 @@ public class DexCollectionService extends Service implements BtCallBack{
                     }
                 } catch (NullPointerException e) {
                     Log.e(TAG, "Got null pointer trying to set CCCD descriptor");
+                    if (static_use_blukon || Blukon.expectingBlukonDevice()) {
+                        // TODO applicable for other devices?
+                        if (JoH.ratelimit("null-ccd-retry", 300)) {
+                            Log.d(TAG, "Refresh result state close: " + JoH.refreshDeviceCache(TAG, mBluetoothGatt));
+                            setRetryTimer();
+                        }
+                    }
                 }
             });
 
-
-            final int charaProp = mCharacteristic.getProperties();
-            if (!static_use_blukon) {
-                if ((charaProp & BluetoothGattCharacteristic.PROPERTY_READ) > 0) {
-                    JoH.runOnUiThreadDelayed(() -> {
-                        try {
-                            Log.d(TAG, "Reading characteristic: " + mCharacteristic.getUuid().toString());
-                            mBluetoothGatt.readCharacteristic(mCharacteristic);
-                        } catch (NullPointerException e) {
-                            Log.e(TAG, "Got null pointer trying to readCharacteristic");
-                        }
-                    }, 300);
+            try {
+                final int charaProp = mCharacteristic.getProperties();
+                if (!static_use_blukon) {
+                    if ((charaProp & BluetoothGattCharacteristic.PROPERTY_READ) > 0) {
+                        JoH.runOnUiThreadDelayed(() -> {
+                            try {
+                                Log.d(TAG, "Reading characteristic: " + mCharacteristic.getUuid().toString());
+                                mBluetoothGatt.readCharacteristic(mCharacteristic);
+                            } catch (NullPointerException e) {
+                                Log.e(TAG, "Got null pointer trying to readCharacteristic");
+                            }
+                        }, 300);
+                    }
                 }
+            } catch (NullPointerException e) {
+                UserError.Log.d(TAG, "mCharacteristic was null when attempting to get properties!");
             }
 
             Log.d(TAG, "Services discovered end");
@@ -863,7 +910,7 @@ public class DexCollectionService extends Service implements BtCallBack{
                         @Override
                         public void run() {
                             Pref.setBoolean(PREF_DEX_COLLECTION_BONDING, true);
-                            JoH.static_toast_long("This probably only works on HM10/HM11 devices at the moment and takes a minute");
+                            JoH.static_toast_long("This probably only works on HM10/HM11 and blucon devices at the moment and takes a minute");
                             new Thread(new Runnable() {
                                 @Override
                                 public void run() {
@@ -942,7 +989,7 @@ public class DexCollectionService extends Service implements BtCallBack{
             l.add(new StatusItem("Tomato Hardware", PersistentStore.getString("TomatoHArdware")));
             l.add(new StatusItem("Tomato Firmware", PersistentStore.getString("TomatoFirmware")));
             l.add(new StatusItem("Libre SN", PersistentStore.getString("LibreSN")));
-            
+
         }
 
         return l;
@@ -959,6 +1006,12 @@ public class DexCollectionService extends Service implements BtCallBack{
 
     @Override
     public void onCreate() {
+
+        if (scanMeister == null) {
+            scanMeister = new ScanMeister()
+                    .addCallBack(this, TAG);
+        }
+
         foregroundServiceStarter = new ForegroundServiceStarter(getApplicationContext(), this);
         foregroundServiceStarter.start();
         //mContext = getApplicationContext();
@@ -1027,6 +1080,13 @@ public class DexCollectionService extends Service implements BtCallBack{
         return START_STICKY;
     }
 
+    private void unRegisterPairingReceiver() {
+        try {
+            unregisterReceiver(mPairingRequestRecevier);
+        } catch (Exception e) {
+            android.util.Log.e(TAG, "Error unregistering pairing receiver: " + e);
+        }
+    }
 
     @Override
     public void onDestroy() {
@@ -1036,13 +1096,14 @@ public class DexCollectionService extends Service implements BtCallBack{
         close();
         foregroundServiceStarter.stop();
 
-        try {
-            unregisterReceiver(mPairingRequestRecevier);
-        } catch (Exception e) {
-            android.util.Log.e(TAG, "Error unregistering pairing receiver: " + e);
-        }
+        unRegisterPairingReceiver();
 
         DisconnectReceiver.removeCallBack(TAG);
+
+        if (scanMeister != null) {
+            scanMeister.removeCallBack(TAG);
+            scanMeister.stop();
+        }
 
         if (shouldServiceRun()) {//Android killed service
             setRetryTimer();
@@ -1160,7 +1221,7 @@ public class DexCollectionService extends Service implements BtCallBack{
 
             }
         } else {
-            UserError.Log.d(TAG, "Device is null");
+            UserError.Log.d(TAG, "Device is null in checkConnection");
             mConnectionState = STATE_DISCONNECTED; // can't be connected if we don't know the device
         }
 
@@ -1172,8 +1233,13 @@ public class DexCollectionService extends Service implements BtCallBack{
                 mDeviceAddress = deviceAddress;
                 try {
                     if (mBluetoothAdapter.isEnabled() && mBluetoothAdapter.getRemoteDevice(deviceAddress) != null) {
-                        status("Connecting" + (Home.get_engineering_mode() ? ": " + deviceAddress : ""));
-                        connect(deviceAddress);
+                        if (useScanning()) {
+                            status("Scanning" + (Home.get_engineering_mode() ? ": " + deviceAddress : ""));
+                            scanMeister.setAddress(deviceAddress).addCallBack(this, TAG).scan();
+                        } else {
+                            status("Connecting" + (Home.get_engineering_mode() ? ": " + deviceAddress : ""));
+                            connect(deviceAddress);
+                        }
                         mStaticState = mConnectionState;
                         return;
                     }
@@ -1297,6 +1363,7 @@ public class DexCollectionService extends Service implements BtCallBack{
             return writeChar(mCharacteristicSend, value);
         }
 
+        // BLUCON NULL HERE? HOW TO RESOLVE?
         if (mCharacteristic == null) {
             status("Error: mCharacteristic was null in sendBtMessage");
             Log.e(TAG, lastState);
@@ -1346,6 +1413,17 @@ public class DexCollectionService extends Service implements BtCallBack{
         return result;
     }
 
+    public synchronized boolean connectIfNotConnected(final String address) {
+        UserError.Log.d(TAG, "connectIfNotConnected!!! " + address);
+        // check connected!
+        if (mConnectionState != STATE_CONNECTED) {
+            return connect(address);
+        } else {
+            UserError.Log.d(TAG, "Already connected");
+            return false;
+        }
+    }
+
     public synchronized boolean connect(final String address) {
         Log.i(TAG, "connect: going to connect to device at address: " + address);
         if (mBluetoothAdapter == null || address == null) {
@@ -1376,10 +1454,21 @@ public class DexCollectionService extends Service implements BtCallBack{
             return false;
         }
 
+        if (static_use_blukon || Blukon.expectingBlukonDevice()) {
+            UserError.Log.d(TAG, "Setting blukon pairing pin to: " + DEFAULT_BT_PIN);
+            device.setPin(convertPinToBytes(DEFAULT_BT_PIN));
+        }
+
         setRetryTimer();
         if (mBluetoothGatt == null) {
             Log.i(TAG, "connect: Trying to create a new connection.");
-            mBluetoothGatt = device.connectGatt(getApplicationContext(), getTrustAutoConnect(), mGattCallback);
+
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+                mBluetoothGatt = device.connectGatt(getApplicationContext(), getTrustAutoConnect(), mGattCallback, TRANSPORT_LE);
+            } else {
+                mBluetoothGatt = device.connectGatt(getApplicationContext(), getTrustAutoConnect(), mGattCallback);
+            }
+
         } else {
             Log.i(TAG, "connect: Trying to re-use connection.");
             mBluetoothGatt.connect();
@@ -1639,6 +1728,10 @@ public class DexCollectionService extends Service implements BtCallBack{
                 }
             }
         }
+    }
+
+    private static boolean useScanning() {
+        return Pref.getBooleanDefaultFalse("bluetooth_use_scan");
     }
 
     public void waitFor(final int millis) {
