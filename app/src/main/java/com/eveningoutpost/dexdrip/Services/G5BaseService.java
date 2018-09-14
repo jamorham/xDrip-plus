@@ -2,10 +2,13 @@ package com.eveningoutpost.dexdrip.Services;
 
 import android.app.Service;
 import android.bluetooth.BluetoothDevice;
+import android.content.SharedPreferences;
 import android.os.PowerManager;
 
 import com.eveningoutpost.dexdrip.Models.JoH;
 import com.eveningoutpost.dexdrip.Models.UserError;
+import com.eveningoutpost.dexdrip.UtilityModels.ForegroundServiceStarter;
+import com.eveningoutpost.dexdrip.UtilityModels.Inevitable;
 import com.eveningoutpost.dexdrip.UtilityModels.PersistentStore;
 import com.eveningoutpost.dexdrip.UtilityModels.Pref;
 import com.google.android.gms.wearable.DataMap;
@@ -19,7 +22,7 @@ public abstract class G5BaseService extends Service {
 
     private final PowerManager.WakeLock wl = JoH.getWakeLock("g5-base-bt", 100);
 
-    public static final int G6_SCALING = 32;
+    public static final int G6_SCALING = 34;
 
     public static final String G5_FIRMWARE_MARKER = "g5-firmware-";
 
@@ -34,15 +37,27 @@ public abstract class G5BaseService extends Service {
     protected static int LOW_BATTERY_WARNING_LEVEL = G5_LOW_BATTERY_WARNING_DEFAULT; // updated by updateBatteryWarningLevel()
 
     public static volatile boolean getBatteryStatusNow = false;
-    public static volatile boolean hardResetTransmitterNow = false;
+    protected static volatile boolean hardResetTransmitterNow = false;
 
     protected static String lastState = "Not running";
     protected static String lastStateWatch = "Not running";
     protected static long static_last_timestamp = 0;
     protected static long static_last_timestamp_watch = 0;
 
+    protected ForegroundServiceStarter foregroundServiceStarter;
+    protected Service service;
+
     static {
         updateBatteryWarningLevel();
+    }
+
+
+    @Override
+    public void onCreate() {
+        super.onCreate();
+        service = this;
+        UserError.Log.d("FOREGROUND", "Current Service: " + service.getClass().getSimpleName());
+        startInForeground();
     }
 
     public static void setWatchStatus(DataMap dataMap) {
@@ -80,6 +95,7 @@ public abstract class G5BaseService extends Service {
     public static boolean isRunning() {
         return runningStringCheck(lastState);
     }
+
     public static boolean isWatchRunning() {
         return runningStringCheck(lastStateWatch);
     }
@@ -103,6 +119,39 @@ public abstract class G5BaseService extends Service {
 
     protected synchronized void releaseWakeLock() {
         JoH.releaseWakeLock(wl);
+    }
+
+    protected void checkPreferenceKey(final String key, final SharedPreferences prefs) {
+        if (key.equals("run_service_in_foreground")) {
+            UserError.Log.d("FOREGROUND", "run_service_in_foreground changed!");
+            if (prefs.getBoolean("run_service_in_foreground", false)) {
+                startInForeground();
+                UserError.Log.i(service.getClass().getSimpleName(), "Moving to foreground");
+            } else {
+                stopInForeground();
+                UserError.Log.i(service.getClass().getSimpleName(), "Removing from foreground");
+            }
+        }
+    }
+
+    protected void startInForeground() {
+        foregroundServiceStarter = new ForegroundServiceStarter(getApplicationContext(), service);
+        foregroundServiceStarter.start();
+        foregroundStatus();
+    }
+
+    protected void stopInForeground() {
+        // TODO refuse to stop on oreo+ ?
+        if (service != null) {
+            service.stopForeground(true);
+        } else {
+            UserError.Log.e("FOREGROUND", "Cannot stop foreground as service is null");
+        }
+        foregroundStatus();
+    }
+
+    protected void foregroundStatus() {
+        Inevitable.task("foreground-status", 2000, () -> UserError.Log.d("FOREGROUND", service.getClass().getSimpleName() + (JoH.isServiceRunningInForeground(service.getClass()) ? " is running in foreground" : " is not running in foreground")));
     }
 
     protected static byte[] nn(final byte[] array) {
@@ -135,5 +184,8 @@ public abstract class G5BaseService extends Service {
         setG6bareBones();
     }
 
+    public static void setHardResetTransmitterNow() {
+        hardResetTransmitterNow = true;
+    }
 
 }
