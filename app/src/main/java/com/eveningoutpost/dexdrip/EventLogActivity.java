@@ -56,7 +56,7 @@ import static com.eveningoutpost.dexdrip.Home.startWatchUpdaterService;
  *
  */
 @ExtensionMethod({java.util.Arrays.class, ExtensionMethods.class})
-public class EventLogActivity extends AppCompatActivity {
+public class EventLogActivity extends BaseAppCompatActivity {
 
     private static final List<Integer> severitiesList = new ArrayList<>();
     private static final boolean D = false;
@@ -479,10 +479,12 @@ public class EventLogActivity extends AppCompatActivity {
         // scroll to top and update button visibility accordingly with smooth option
         public void scrollToTop(boolean smooth) {
             showScrollToTop.set(false);
-            if (smooth) {
-                recyclerView.smoothScrollToPosition(0);
-            } else {
-                recyclerView.scrollToPosition(0);
+            if (recyclerView != null) {
+                if (smooth) {
+                    recyclerView.smoothScrollToPosition(0);
+                } else {
+                    recyclerView.scrollToPosition(0);
+                }
             }
         }
 

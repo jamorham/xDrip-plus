@@ -19,6 +19,7 @@ import android.util.Base64;
 import com.eveningoutpost.dexdrip.Models.BgReading;
 import com.eveningoutpost.dexdrip.Models.BloodTest;
 import com.eveningoutpost.dexdrip.Models.Calibration;
+import com.eveningoutpost.dexdrip.Models.DesertSync;
 import com.eveningoutpost.dexdrip.Models.JoH;
 import com.eveningoutpost.dexdrip.Models.RollCall;
 import com.eveningoutpost.dexdrip.Models.Sensor;
@@ -29,6 +30,7 @@ import com.eveningoutpost.dexdrip.Models.UserError.Log;
 import com.eveningoutpost.dexdrip.Services.ActivityRecognizedService;
 import com.eveningoutpost.dexdrip.UtilityModels.AlertPlayer;
 import com.eveningoutpost.dexdrip.UtilityModels.Constants;
+import com.eveningoutpost.dexdrip.UtilityModels.NanoStatus;
 import com.eveningoutpost.dexdrip.UtilityModels.Pref;
 import com.eveningoutpost.dexdrip.UtilityModels.PumpStatus;
 import com.eveningoutpost.dexdrip.UtilityModels.StatusItem;
@@ -38,7 +40,6 @@ import com.eveningoutpost.dexdrip.utils.Preferences;
 import com.eveningoutpost.dexdrip.utils.WebAppHelper;
 import com.eveningoutpost.dexdrip.wearintegration.ExternalStatusService;
 import com.google.firebase.messaging.FirebaseMessaging;
-import com.google.firebase.messaging.FirebaseMessagingService;
 import com.google.firebase.messaging.RemoteMessage;
 
 import java.io.UnsupportedEncodingException;
@@ -49,10 +50,10 @@ import java.util.List;
 import java.util.Map;
 
 import static android.support.v4.content.WakefulBroadcastReceiver.completeWakefulIntent;
+import static com.eveningoutpost.dexdrip.Models.JoH.isAnyNetworkConnected;
 import static com.eveningoutpost.dexdrip.Models.JoH.showNotification;
 
-
-public class GcmListenerSvc extends FirebaseMessagingService {
+public class GcmListenerSvc extends JamListenerSvc {
 
     private static final String TAG = "jamorham GCMlis";
     private static final String EXTRA_WAKE_LOCK_ID = "android.support.content.wakelockid";
@@ -88,8 +89,22 @@ public class GcmListenerSvc extends FirebaseMessagingService {
 
     @Override
     public void onSendError(String msgID, Exception exception) {
-        Log.e(TAG, "onSendError called" + msgID, exception);
+        boolean unexpected = true;
+        if (exception.getMessage().equals("TooManyMessages")) {
+            if (isAnyNetworkConnected() && googleReachable()) {
+                GcmActivity.coolDown();
+            }
+            unexpected = false;
+        }
+        if (unexpected || JoH.ratelimit("gcm-expected-error", 86400)) {
+            Log.e(TAG, "onSendError called" + msgID, exception);
+        }
     }
+
+    private static boolean googleReachable() {
+        return false; // TODO we need a method for this to properly handle cooldown default to false to disable functionality
+    }
+
 
     @Override
     public void onDeletedMessages() {
@@ -114,7 +129,14 @@ public class GcmListenerSvc extends FirebaseMessagingService {
                 data.putString(entry.getKey(), entry.getValue());
             }
 
-            if (from == null) from = "null";
+            if (from == null) {
+                if (isInjectable()) {
+                    from = data.getString("yfrom");
+                }
+                if (from == null) {
+                    from = "null";
+                }
+            }
             String message = data.getString("message");
 
             Log.d(TAG, "From: " + from);
@@ -137,7 +159,7 @@ public class GcmListenerSvc extends FirebaseMessagingService {
             if (from.startsWith(getString(R.string.gcmtpc))) {
 
                 String xfrom = data.getString("xfrom");
-                String payload = data.getString("datum");
+                String payload = data.getString("datum", data.getString("payload"));
                 String action = data.getString("action");
 
                 if ((xfrom != null) && (xfrom.equals(GcmActivity.token))) {
@@ -157,6 +179,14 @@ public class GcmListenerSvc extends FirebaseMessagingService {
                     }
                     return;
                 }
+
+                if (!isInjectable()) {
+                    if (!DesertSync.fromGCM(data)) {
+                        UserError.Log.d(TAG, "Skipping inbound data due to duplicate detection");
+                        return;
+                    }
+                }
+
                 byte[] bpayload = null;
                 if (payload == null) payload = "";
                 if (action == null) action = "null";
@@ -339,6 +369,11 @@ public class GcmListenerSvc extends FirebaseMessagingService {
                     if (Home.get_follower()) {
                         Log.i(TAG, "Received pump status update");
                         PumpStatus.fromJson(payload);
+                    }
+                } else if (action.equals("nscu")) {
+                    if (Home.get_follower()) {
+                        Log.i(TAG,"Received nanostatus update");
+                        NanoStatus.setRemote(payload);
                     }
                 } else if (action.equals("not")) {
                     if (Home.get_follower()) {

@@ -5,6 +5,7 @@ import android.support.v7.app.AppCompatActivity;
 import android.view.View;
 import android.widget.TextView;
 
+import com.eveningoutpost.dexdrip.BaseAppCompatActivity;
 import com.eveningoutpost.dexdrip.Models.BgReading;
 import com.eveningoutpost.dexdrip.Models.GlucoseData;
 import com.eveningoutpost.dexdrip.Models.JoH;
@@ -31,9 +32,9 @@ import lecho.lib.hellocharts.view.LineChartView;
 import static com.eveningoutpost.dexdrip.UtilityModels.BgGraphBuilder.FUZZER;
 
 
-public class LibreTrendGraph extends AppCompatActivity {
-
+public class LibreTrendGraph extends BaseAppCompatActivity {
     private static final String TAG = "LibreTrendGraph";
+    
     private static LibreTrendGraph mInstance;
     private LineChartView chart;
     private LineChartData data;
@@ -84,7 +85,7 @@ public class LibreTrendGraph extends AppCompatActivity {
     
     private static ArrayList<Float> getLatestBgForXMinutes(int NumberOfMinutes) {
 
-        Log.e(TAG, "getLatestBgForXMinutes number of minutes = " + NumberOfMinutes);
+        Log.i(TAG, "getLatestBgForXMinutes number of minutes = " + NumberOfMinutes);
         
         List<LibreTrendPoint> LibreTrendPoints = LibreTrendUtil.getInstance().getData(JoH.tsl() - NumberOfMinutes * 60 * 1000, JoH.tsl());
         if(LibreTrendPoints == null || LibreTrendPoints.size() == 0) {

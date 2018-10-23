@@ -30,6 +30,7 @@ import android.widget.LinearLayout;
 import android.widget.ListView;
 import android.widget.TextView;
 
+import com.eveningoutpost.dexdrip.Models.DesertSync;
 import com.eveningoutpost.dexdrip.Models.JoH;
 import com.eveningoutpost.dexdrip.Models.RollCall;
 import com.eveningoutpost.dexdrip.Models.UserError;
@@ -177,6 +178,7 @@ public class MegaStatus extends ActivityWithMenu {
             case XDRIP_PLUS_SYNC:
                 la.addRows(DoNothingService.megaStatus());
                 la.addRows(GcmListenerSvc.megaStatus());
+                la.addRows(DesertSync.megaStatus());
                 la.addRows(RollCall.megaStatus());
                 break;
             case UPLOADERS:
@@ -573,29 +575,12 @@ public class MegaStatus extends ActivityWithMenu {
                 viewHolder.name.setText(row.name);
                 viewHolder.value.setText(row.value);
 
-                int new_colour = -1;
-                switch (row.highlight) {
-                    case BAD:
-                        new_colour = Color.parseColor("#480000");
-                        break;
-                    case NOTICE:
-                        new_colour = Color.parseColor("#403000");
-                        break;
-                    case GOOD:
-                        new_colour = Color.parseColor("#003000");
-                        break;
-                    case CRITICAL:
-                        new_colour = Color.parseColor("#770000");
-                        break;
-                    default:
-                        new_colour = Color.TRANSPARENT;
-                        break;
-                }
-                if (new_colour != -1) {
+                final int new_colour = row.highlight.color();
+                //if (new_colour != -1) {
                     viewHolder.value.setBackgroundColor(new_colour);
                     viewHolder.spacer.setBackgroundColor(new_colour);
                     viewHolder.name.setBackgroundColor(new_colour);
-                }
+                //}
                 view.setOnClickListener(null); // reset
                 if ((row.runnable != null) && (row.button_name != null) && (row.button_name.equals("long-press"))) {
                     runnableView = view; // last one

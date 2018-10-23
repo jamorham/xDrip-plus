@@ -15,6 +15,7 @@ import com.eveningoutpost.dexdrip.Models.TransmitterData;
 import com.eveningoutpost.dexdrip.Models.UserError;
 import com.eveningoutpost.dexdrip.Services.Ob1G5CollectionService;
 import com.eveningoutpost.dexdrip.UtilityModels.BgGraphBuilder;
+import com.eveningoutpost.dexdrip.UtilityModels.BroadcastGlucose;
 import com.eveningoutpost.dexdrip.UtilityModels.Constants;
 import com.eveningoutpost.dexdrip.UtilityModels.Inevitable;
 import com.eveningoutpost.dexdrip.UtilityModels.NotificationChannels;
@@ -32,7 +33,6 @@ import com.polidea.rxandroidble.exceptions.BleGattCharacteristicException;
 
 import java.io.UnsupportedEncodingException;
 import java.lang.reflect.Type;
-import java.nio.ByteBuffer;
 import java.security.InvalidKeyException;
 import java.security.NoSuchAlgorithmException;
 import java.util.ArrayList;
@@ -65,6 +65,7 @@ import static com.eveningoutpost.dexdrip.Services.Ob1G5CollectionService.G6_SCAL
 import static com.eveningoutpost.dexdrip.Services.Ob1G5CollectionService.android_wear;
 import static com.eveningoutpost.dexdrip.Services.Ob1G5CollectionService.getTransmitterID;
 import static com.eveningoutpost.dexdrip.Services.Ob1G5CollectionService.onlyUsingNativeMode;
+import static com.eveningoutpost.dexdrip.Services.Ob1G5CollectionService.wear_broadcast;
 import static com.eveningoutpost.dexdrip.UtilityModels.BgGraphBuilder.DEXCOM_PERIOD;
 import static com.eveningoutpost.dexdrip.UtilityModels.Constants.HOUR_IN_MS;
 import static com.eveningoutpost.dexdrip.UtilityModels.Constants.MINUTE_IN_MS;
@@ -126,7 +127,7 @@ public class Ob1G5StateMachine {
             UserError.Log.d(TAG, "Setting speak slowly to true"); // WARN should be reactive or on named devices
         }
 
-        final AuthRequestTxMessage authRequest = new AuthRequestTxMessage(getTokenSize(), JoH.areWeRunningOnAndroidWear() && !Pref.getBooleanDefaultFalse("only_ever_use_wear_collector"));
+        final AuthRequestTxMessage authRequest = new AuthRequestTxMessage(getTokenSize(), usingAlt());
         UserError.Log.i(TAG, "AuthRequestTX: " + JoH.bytesToHex(authRequest.byteSequence));
 
         connection.setupNotification(Authentication)
@@ -149,14 +150,14 @@ public class Ob1G5StateMachine {
                                                     switch (pkt.type) {
                                                         case AuthChallengeRxMessage:
                                                             // Respond to the challenge request
-                                                            byte[] challengeHash = calculateHash(((AuthChallengeRxMessage) pkt.msg).challenge);
+                                                            byte[] challengeHash = calculateChallengeHash(((AuthChallengeRxMessage) pkt.msg).challenge);
                                                             if (d)
                                                                 UserError.Log.d(TAG, "challenge hash" + Arrays.toString(challengeHash));
                                                             if (challengeHash != null) {
                                                                 if (d)
                                                                     UserError.Log.d(TAG, "Transmitter trying auth challenge");
 
-                                                                connection.writeCharacteristic(Authentication, nn(new AuthChallengeTxMessage(challengeHash).byteSequence))
+                                                                connection.writeCharacteristic(Authentication, nn(new BaseAuthChallengeTxMessage(challengeHash).byteSequence))
                                                                         .subscribe(
                                                                                 challenge_value -> {
 
@@ -419,7 +420,7 @@ public class Ob1G5StateMachine {
         if (connection == null) return false;
         // TODO switch modes depending on conditions as to whether we are using internal
         final boolean use_g5_internal_alg = Pref.getBooleanDefaultFalse("ob1_g5_use_transmitter_alg");
-        UserError.Log.d(TAG, use_g5_internal_alg ? "Requesting Glucose Data" : "Requesting Sensor Data");
+        UserError.Log.d(TAG, use_g5_internal_alg ? ("Requesting Glucose Data " + (getEGlucose() ? "G6" : "G5")) : "Requesting Sensor Data");
 
         if (!use_g5_internal_alg) {
             parent.lastSensorStatus = null; // not applicable
@@ -433,7 +434,7 @@ public class Ob1G5StateMachine {
                     if (d) UserError.Log.d(TAG, "Notifications enabled");
                     speakSlowly();
 
-                    connection.writeCharacteristic(Control, nn(use_g5_internal_alg ? (usingG6() ? new EGlucoseTxMessage().byteSequence : new GlucoseTxMessage().byteSequence) : new SensorTxMessage().byteSequence))
+                    connection.writeCharacteristic(Control, nn(use_g5_internal_alg ? (getEGlucose() ? new EGlucoseTxMessage().byteSequence : new GlucoseTxMessage().byteSequence) : new SensorTxMessage().byteSequence))
                             .subscribe(
                                     characteristicValue -> {
                                         if (d)
@@ -516,12 +517,16 @@ public class Ob1G5StateMachine {
                             if (session_start.isOkay()) {
                                 // TODO persist this
                                 parent.msg("Session Started Successfully: " + JoH.dateTimeText(session_start.getSessionStart()) + " " + JoH.dateTimeText(session_start.getRequestedStart()) + " " + JoH.dateTimeText(session_start.getTransmitterTime()));
+                                DexResetHelper.cancel();
                             } else {
                                 final String msg = "Session Start Failed: " + session_start.message();
                                 parent.msg(msg);
                                 UserError.Log.ueh(TAG, msg);
                                 JoH.showNotification("G5 Start Failed", msg, null, Constants.G5_START_REJECT, true, true, false);
                                 UserError.Log.ueh(TAG, "Session Start failed info: " + JoH.dateTimeText(session_start.getSessionStart()) + " " + JoH.dateTimeText(session_start.getRequestedStart()) + " " + JoH.dateTimeText(session_start.getTransmitterTime()));
+                                if (session_start.isFubar()) {
+                                    DexResetHelper.offer("Unusual session start failure, is transmitter crashed? Try Hard Reset?");
+                                }
                                 if (Pref.getBooleanDefaultFalse("ob1_g5_restart_sensor") && (Sensor.isActive())) {
                                     if (pratelimit("secondary-g5-start", 1800)) {
                                         UserError.Log.ueh(TAG, "Trying to Start sensor again");
@@ -541,9 +546,11 @@ public class Ob1G5StateMachine {
                                 parent.msg(msg);
                                 UserError.Log.ueh(TAG, msg);
                                 reReadGlucoseData();
-                                enqueueUniqueCommand(new TransmitterTimeTxMessage(), "Query time after stop");
+                                enqueueUniqueCommand(new TimeTxMessage(), "Query time after stop");
                             } else {
-                                UserError.Log.e(TAG, "Session Stop Error!");
+                                // TODO what does an error when session isn't started look like? Probably best to downgrade those somewhat
+                                final String msg = "Session Stop Failed: packet valid: " + session_stop.isValid() + "  Status code: " + session_stop.getStatus();
+                                UserError.Log.uel(TAG, msg);
                             }
                             break;
 
@@ -552,28 +559,12 @@ public class Ob1G5StateMachine {
                             parent.processCalibrationState(glucose.calibrationState());
 
                             if (glucose.usable()) {
-                                parent.msg("Got "+devName()+" glucose");
+                                parent.msg("Got " + devName() + " glucose");
                             } else {
-                                parent.msg("Got data from "+devName());
-                            }
-                            if (JoH.ratelimit("ob1-g5-also-read-raw", 20)) {
-                                enqueueUniqueCommand(new SensorTxMessage(), "Also read raw");
+                                parent.msg("Got data from " + devName());
                             }
 
-                            if (JoH.pratelimit("g5-tx-time-since", 7200)
-                                    || glucose.calibrationState().warmingUp()) {
-                                if (JoH.ratelimit("g5-tx-time-governer", 30)) {
-                                    enqueueUniqueCommand(new TransmitterTimeTxMessage(), "Periodic Query Time");
-                                }
-                            }
-
-                            // TODO check firmware version
-                            if (glucose.calibrationState().readyForBackfill() && !parent.getBatteryStatusNow) {
-                                backFillIfNeeded(parent, connection);
-                            }
-                            processGlucoseRxMessage(parent, glucose);
-                            parent.updateLast(JoH.tsl());
-                            parent.clearErrors();
+                            glucoseRxCommon(glucose, parent, connection);
                             break;
 
                         // TODO base class duplication
@@ -586,24 +577,8 @@ public class Ob1G5StateMachine {
                             } else {
                                 parent.msg("Got data from G6");
                             }
-                            if (JoH.ratelimit("ob1-g5-also-read-raw", 20)) {
-                                enqueueUniqueCommand(new SensorTxMessage(), "Also read raw");
-                            }
 
-                            if (JoH.pratelimit("g5-tx-time-since", 7200)
-                                    || eglucose.calibrationState().warmingUp()) {
-                                if (JoH.ratelimit("g5-tx-time-governer", 30)) {
-                                    enqueueUniqueCommand(new TransmitterTimeTxMessage(), "Periodic Query Time");
-                                }
-                            }
-
-                            // TODO check firmware version
-                            if (eglucose.calibrationState().readyForBackfill() && !parent.getBatteryStatusNow) {
-                                backFillIfNeeded(parent, connection);
-                            }
-                            processGlucoseRxMessage(parent, eglucose);
-                            parent.updateLast(JoH.tsl());
-                            parent.clearErrors();
+                            glucoseRxCommon(eglucose, parent, connection);
                             break;
 
 
@@ -632,7 +607,7 @@ public class Ob1G5StateMachine {
 
                         case TransmitterTimeRxMessage:
                             final TransmitterTimeRxMessage txtime = (TransmitterTimeRxMessage) data_packet.msg;
-                            DexTimeKeeper.updateAge(getTransmitterID(), txtime.getCurrentTime());
+                            DexTimeKeeper.updateAge(getTransmitterID(), txtime.getCurrentTime(), true);
                             if (txtime.sessionInProgress()) {
                                 UserError.Log.e(TAG, "Session start time reports: "
                                         + JoH.dateTimeText(txtime.getRealSessionStartTime()) + " Duration: "
@@ -675,6 +650,28 @@ public class Ob1G5StateMachine {
 
 
         return true;
+    }
+
+    private static void glucoseRxCommon(final BaseGlucoseRxMessage glucose, final Ob1G5CollectionService parent, final RxBleConnection connection) {
+        if (JoH.ratelimit("ob1-g5-also-read-raw", 20)) {
+            enqueueUniqueCommand(new SensorTxMessage(), "Also read raw");
+        }
+
+        if (JoH.pratelimit("g5-tx-time-since", 7200)
+                || glucose.calibrationState().warmingUp()
+                || !DexSessionKeeper.isStarted()) {
+            if (JoH.ratelimit("g5-tx-time-governer", 30)) {
+                enqueueUniqueCommand(new TimeTxMessage(), "Periodic Query Time");
+            }
+        }
+
+        // TODO check firmware version
+        if (glucose.calibrationState().readyForBackfill() && !parent.getBatteryStatusNow) {
+            backFillIfNeeded(parent, connection);
+        }
+        processGlucoseRxMessage(parent, glucose);
+        parent.updateLast(JoH.tsl());
+        parent.clearErrors();
     }
 
     private static void inevitableDisconnect(Ob1G5CollectionService parent, RxBleConnection connection) {
@@ -758,7 +755,7 @@ public class Ob1G5StateMachine {
         }
     }
 
-    private static void enqueueCommand(TransmitterMessage tm, String msg) {
+    private static void enqueueCommand(BaseMessage tm, String msg) {
         if (tm != null) {
             final Ob1Work item = new Ob1Work(tm, msg);
             synchronized (commandQueue) {
@@ -781,7 +778,7 @@ public class Ob1G5StateMachine {
         }
     }
 
-    private static void enqueueUniqueCommand(TransmitterMessage tm, String msg) {
+    private static void enqueueUniqueCommand(BaseMessage tm, String msg) {
         if (tm != null) {
             final Class searchClass = tm.getClass();
             Ob1Work item;
@@ -801,7 +798,7 @@ public class Ob1G5StateMachine {
         }
     }
 
-    private static boolean queueContains(TransmitterMessage tm) {
+    private static boolean queueContains(BaseMessage tm) {
         final Class searchClass = tm.getClass();
         return queueContains(searchClass);
     }
@@ -947,7 +944,7 @@ public class Ob1G5StateMachine {
         }
     }
 
-    private static void reprocessTxMessage(TransmitterMessage tm) {
+    private static void reprocessTxMessage(BaseMessage tm) {
         // rewrite session start messages in case our clock was wrong
         if (tm instanceof SessionStartTxMessage) {
             final SessionStartTxMessage ssm = (SessionStartTxMessage) tm;
@@ -1098,14 +1095,17 @@ public class Ob1G5StateMachine {
         if (glucose == null) return;
         lastGlucosePacket = JoH.tsl();
         DexTimeKeeper.updateAge(getTransmitterID(), glucose.timestamp);
-        if (glucose.usable() || (glucose.insufficient() && Pref.getBooleanDefaultFalse("ob1_g5_use_insufficiently_calibrated"))) {
+        if (glucose.usable() || (glucose.insufficient() && Pref.getBoolean("ob1_g5_use_insufficiently_calibrated", true))) {
             UserError.Log.d(TAG, "Got usable glucose data from G5!!");
             final BgReading bgReading = BgReading.bgReadingInsertFromG5(glucose.glucose, JoH.tsl());
             if (bgReading != null) {
                 try {
                     bgReading.calculated_value_slope = glucose.getTrend() / Constants.MINUTE_IN_MS; // note this is different to the typical calculated slope, (normally delta)
+                    if (bgReading.calculated_value_slope == Double.NaN) {
+                        bgReading.hide_slope = true;
+                    }
                 } catch (Exception e) {
-                    // not a good number
+                    // not a good number - does this exception ever actually fire?
                 }
                 if (glucose.insufficient()) {
                     bgReading.appendSourceInfo("Insufficient").save();
@@ -1122,6 +1122,12 @@ public class Ob1G5StateMachine {
                     Prediction.create(JoH.tsl(), glucose.getPredictedGlucose(), "EGlucoseRx").save();
                 }
             }
+
+            if (android_wear && wear_broadcast && bgReading != null) {
+                // emit local broadcast
+                BroadcastGlucose.sendLocalBroadcast(bgReading);
+            }
+
         } else {
             // TODO this is duplicated in processCalibrationState()
             if (glucose.calibrationState().sensorFailed()) {
@@ -1146,7 +1152,7 @@ public class Ob1G5StateMachine {
             sensor_battery_level = 216; //no message, just system status "OK"
         }
 
-        UserError.Log.d(TAG, "SUCCESS!! unfiltered: " + sensorRx.unfiltered + " filtered: " + sensorRx.filtered + " timestamp: " + sensorRx.timestamp + " " + JoH.qs((double) sensorRx.timestamp / 86400, 1) + " days");
+        UserError.Log.d(TAG, "SUCCESS!! unfiltered: " + sensorRx.unfiltered + " filtered: " + sensorRx.filtered + " timestamp: " + sensorRx.timestamp + " " + JoH.qs((double) sensorRx.timestamp / 86400, 1) + " days :: (" + sensorRx.status + ")");
         DexTimeKeeper.updateAge(getTransmitterID(), sensorRx.timestamp);
         if (sensorRx.unfiltered == 0) {
             UserError.Log.e(TAG, "Transmitter sent raw sensor value of 0 !! This isn't good. " + JoH.hourMinuteString());
@@ -1167,6 +1173,12 @@ public class Ob1G5StateMachine {
             UserError.Log.d(TAG, "Created transmitter data " + transmitterData.uuid + " " + JoH.dateTimeText(transmitterData.timestamp));
             // TODO timeInMillisecondsOfLastSuccessfulSensorRead = captureTime;
         }
+
+        if (transmitterData.unchangedRaw()) {
+            UserError.Log.wtf(TAG, "Raw values are not changing - blocking further processing: " + raw_data + " " + filtered_data);
+            return;
+        }
+
         final Sensor sensor = Sensor.currentSensor();
         if (sensor == null) {
             UserError.Log.e(TAG, "setSerialDataToTransmitterRawData: No Active Sensor, Data only stored in Transmitter Data");
@@ -1364,48 +1376,42 @@ public class Ob1G5StateMachine {
         if (d) UserError.Log.d(TAG, "monitor backfill exit");
     }
 
-    private static synchronized byte[] calculateHash(byte[] data) {
-        if (data == null || data.length != 8) {
-            UserError.Log.e(TAG, "Data length should be exactly 8.");
+    private static synchronized byte[] calculateChallengeHash(final byte[] challenge) {
+        if (challenge == null || challenge.length != 8) {
+            UserError.Log.e(TAG, "Challenge length must be 8");
             return null;
         }
 
-        final byte[] key = cryptKey();
-        if (key == null)
+        final byte[] key = getCryptKey();
+        if (key == null) {
             return null;
+        }
 
-        ByteBuffer bb = ByteBuffer.allocate(16);
-        bb.put(data);
-        bb.put(data);
+        final byte[] plainText = new byte[16];
+        System.arraycopy(challenge, 0, plainText, 0, 8);
+        System.arraycopy(challenge, 0, plainText, 8, 8);
 
-        final byte[] doubleData = bb.array();
-
-        final Cipher aesCipher;
         try {
-            aesCipher = Cipher.getInstance("AES/ECB/PKCS7Padding");
-            final SecretKeySpec skeySpec = new SecretKeySpec(key, "AES");
-            aesCipher.init(Cipher.ENCRYPT_MODE, skeySpec);
-            byte[] aesBytes = aesCipher.doFinal(doubleData, 0, doubleData.length);
-
-            bb = ByteBuffer.allocate(8);
-            bb.put(aesBytes, 0, 8);
-
-            return bb.array();
+            final SecretKeySpec secretKeySpec = new SecretKeySpec(key, "AES");
+            @SuppressLint("GetInstance") final Cipher aesCipher = Cipher.getInstance("AES/ECB/PKCS7Padding");
+            aesCipher.init(Cipher.ENCRYPT_MODE, secretKeySpec);
+            return Arrays.copyOfRange(aesCipher.doFinal(plainText, 0, plainText.length), 0, 8);
         } catch (NoSuchAlgorithmException | NoSuchPaddingException | IllegalBlockSizeException | BadPaddingException | InvalidKeyException e) {
-            e.printStackTrace();
+            UserError.Log.wtf(TAG, "System Encryption problem: " + e);
+            return null;
         }
 
-        return null;
     }
 
-    private static byte[] cryptKey() {
+    private static byte[] getCryptKey() {
         final String transmitterId = getTransmitterID();
         if (transmitterId.length() != 6)
             UserError.Log.e(TAG, "cryptKey: Wrong transmitter id length!: " + transmitterId.length());
         try {
-            return ("00" + transmitterId + "00" + transmitterId).getBytes("UTF-8");
+            final String padding = "00";
+            return (padding + transmitterId + padding + transmitterId).getBytes("UTF-8");
         } catch (UnsupportedEncodingException e) {
-            e.printStackTrace();
+            UserError.Log.wtf(TAG, "System encoding problem: " + e);
         }
         return null;
     }
@@ -1433,9 +1439,9 @@ public class Ob1G5StateMachine {
     // unified data structure
     private static class PacketShop {
         private PACKET type;
-        private TransmitterMessage msg;
+        private BaseMessage msg;
 
-        PacketShop(PACKET type, TransmitterMessage msg) {
+        PacketShop(PACKET type, BaseMessage msg) {
             this.type = type;
             this.msg = msg;
         }
@@ -1481,6 +1487,18 @@ public class Ob1G5StateMachine {
 
     public static boolean usingG6() {
         return Pref.getBooleanDefaultFalse("using_g6");
+    }
+
+    private static boolean getEGlucose() {
+        if (android_wear) {
+            return usingG6() && Pref.getBooleanDefaultFalse("show_g_prediction");
+        } else {
+            return usingG6();
+        }
+    }
+
+    public static boolean usingAlt() {
+        return android_wear && !Pref.getBooleanDefaultFalse("only_ever_use_wear_collector");
     }
 
     private static class OperationSuccess extends RuntimeException {

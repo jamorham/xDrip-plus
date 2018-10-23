@@ -26,7 +26,10 @@ public class WearSyncBooleans {
         booleansToSync.add("external_blukon_algorithm");
         booleansToSync.add("bluetooth_trust_autoconnect");
         booleansToSync.add("bluetooth_use_scan");
+        booleansToSync.add("ob1_minimize_scanning");
         booleansToSync.add("using_g6");
+        booleansToSync.add("show_g_prediction");
+        booleansToSync.add("enable_crashlytics");
     }
 
 

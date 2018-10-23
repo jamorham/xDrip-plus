@@ -33,7 +33,7 @@ public enum CalibrationState {
     Ended(0x0f, "Ended"),
     SensorFailed3(0x10, "Sensor Failed 3"),
     TransmitterProblem(0x11, "Transmitter Problem"),
-    Errors(0x12, "Errors"),
+    Errors(0x12, "Sensor Errors"),
     SensorFailed4(0x13, "Sensor Failed 4"),
     SensorFailed5(0x14, "Sensor Failed 5"),
     SensorFailed6(0x15, "Sensor Failed 6"),
@@ -108,6 +108,10 @@ public enum CalibrationState {
         return this == WarmingUp;
     }
 
+    public boolean ok() {
+        return this == Ok;
+    }
+
     public boolean readyForBackfill() {
         return this != WarmingUp && this != Stopped && this != Unknown && this != NeedsFirstCalibration && this != NeedsSecondCalibration;
     }
@@ -122,7 +126,11 @@ public enum CalibrationState {
                 }
             case WarmingUp:
                 if (DexSessionKeeper.isStarted()) {
-                    return getText() + "\n" + DexSessionKeeper.prettyTime() + " left";
+                    if (DexSessionKeeper.warmUpTimeValid()) {
+                        return getText() + "\n" + DexSessionKeeper.prettyTime() + " left";
+                    } else {
+                        return getText();
+                    }
                 } else {
                     return getText();
                 }
