@@ -5,6 +5,7 @@
     <string name="connected">Verbunden</string>
     <string name="disconnected">Getrennt</string>
     <string name="menu_scan">Scannen</string>
+    <string name="menu_stop">Stop</string>
     <string name="menu_refresh">Aktualisieren</string>
     <string name="menu_export_database">Datenbank exportieren</string>
     <string name="menu_export_csv_sidiary">Export als CSV (SiDiary-Format)</string>
@@ -26,7 +27,7 @@
     <string name="ok">Ok</string>
     <string name="cancel">Abbrechen</string>
     <string name="no">Nein</string>
-    <string name="pref_sensor_location_dont_ask_again">Nicht erneut fragen</string>
+    <string name="pref_sensor_location_dont_ask_again"> Nicht erneut fragen</string>
     <string name="title_activity_error">"Fehler- und Ereignisliste"</string>
     <string name="title_activity_main">Hauptbildschirm</string>
     <string name="title_activity_fake_numbers">Simulierte Zahlen</string>
@@ -125,7 +126,7 @@
     <string name="please_set_dex_receiver_serial_number">Bitte Seriennummer des Dexcom-Empfängers in den App-Einstellungen ändern</string>
     <string name="unfortunately_andoird_version_no_blueooth_low_energy">Leider unterstützt Ihre Android-Version kein Bluetooth Low Energy</string>
     <string name="waiting_for_packet">Warten auf Daten...</string>
-    <string name="persistent_high_for_greater_than">Dauerhaft Hoch für &gt;</string>
+    <string name="persistent_high_for_greater_than">Dauerhaft Hoch für &gt; </string>
     <string name="space_mins">" Min"</string>
     <string name="till">bis</string>
     <string name="low_predicted">Niedrig erwartet</string>
@@ -796,7 +797,7 @@
     <string name="blueReader_turnoffvalue">Wert in %</string>
     <string name="blueReader_turnoffvalue_sum">unter dem der Bluereader ausgeschaltet wird</string>
     <string name="days">Tage rest</string>
-    <string name="bluereaderoff">blueReader wird ausgeschaltet, da die Batterie folgenden Wert unterschreitet:</string>
+    <string name="bluereaderoff">blueReader wird ausgeschaltet, da die Batterie folgenden Wert unterschreitet: </string>
     <string name="bluereader_position">Bitte Positionierung des BlueReaders auf dem Sensor prüfen!</string>
     <string name="bluereaderuglystate">Der blueReader hat sich aufgehängt! Er wird nun ausgeschaltet. Bitte schlten Sie ihn in ein paar Sekunden wieder an (Taste nur kurz drücken). Danach sollte der blueReader wieder funktionieren!</string>
     <string name="offical_msg">Die offizielle App</string>
