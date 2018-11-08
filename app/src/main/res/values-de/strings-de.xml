@@ -95,6 +95,7 @@
     <string name="title_activity_update">xDrip+ Update verfügbar</string>
     <string name="title_activity_display_qrcode">Einstellungen per QR-Code teilen</string>
     <string name="title_activity_send_feed_back">Feedback an Jamorham senden</string>
+    <string name="title_activity_maps">Parakeet Karte</string>
     <string name="title_activity_display_preferences">Anzeigeeinstellungen</string>
     <string name="export_submenu">Import-/Export-Einstellungen</string>
     <string name="action_resend_to_watch">Werte erneut an Smartwatch senden</string>
@@ -130,6 +131,7 @@
     <string name="space_mins">" Min"</string>
     <string name="till">bis</string>
     <string name="low_predicted">Niedrig erwartet</string>
+    <string name="in">in</string>
     <string name="yes_enter_setup_mode">Ja, Setup-Modus starten</string>
     <string name="nokeep_parakeet_as_it_is">Parakeet unverändert lassen</string>
     <string name="are_you_sure_you_want_switch_parakeet_to_setup">Parakeet Setup-Modus starten?\n\Gewöhnlich ist dies nur erforderlich, um den Parakeet neu zu konfigurieren (Transmitter-ID, etc.)</string>
@@ -145,6 +147,7 @@
     <string name="show_parakeet_map">Parakeet Map anzeigen</string>
     <string name="switch_parakeet_to_setup_mode">Parakeet in Setup-Modus starten</string>
     <string name="view_events_log">Log anzeigen</string>
+    <string name="show_libre_trend">Libre-Trend anzeigen</string>
     <string name="share_config_via_qr_code">Einstellungen per QR-Code senden</string>
     <string name="check_for_updated_version">Auf Aktualisierung prüfen</string>
     <string name="send_feedback_to_developer">Feedback an Entwickler senden</string>
