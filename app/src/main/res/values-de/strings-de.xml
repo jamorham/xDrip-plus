@@ -822,6 +822,11 @@
     <string name="invalid_calibration_number">Ungültiger Kalibrierungswert!</string>
     <string name="calibration_out_of_range">Kalibrierung außerhalb des zulässigen Bereichs</string>
     <string name="note_search">Notiz Suche</string>
+    <string name="edit_note">Notiz bearbeiten</string>
+    <string name="adjust_note_text_here_there_is_no_undo">Ändere Notiz hier. (nicht Rückgängig zu machen)</string>
+    <string name="no_search_term_found">Keine Suchergebnisse gefunden</string>
+    <string name="bluetooth_scan">Bluetooth-Suche</string>
+    <string name="level_alerts">Alarmlevel</string>
     <!-- trend arrow for speak -->
     <string name="DoubleDown">schnell fallend</string>
     <string name="SingleDown">fallend</string>
