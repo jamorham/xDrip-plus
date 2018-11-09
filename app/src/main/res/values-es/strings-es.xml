@@ -27,7 +27,7 @@
     <string name="snooze_hint">Silenciar alerta durante x minutos</string>
     <string name="ok">DE ACUERDO</string>
     <string name="cancel">Cancelar</string>
-    <string name="pref_sensor_location_dont_ask_again">¡No me pregunte de nuevo</string>
+    <string name="pref_sensor_location_dont_ask_again"> ¡No me pregunte de nuevo</string>
     <string name="title_activity_error">"Error y Lista de eventos"</string>
     <string name="title_activity_main">Actividad principal</string>
     <string name="title_activity_fake_numbers">Números falsos</string>
@@ -115,7 +115,7 @@
     <string name="please_set_dex_receiver_serial_number">Por favor, establece el número de serie del receptor Dex en ajustes de la aplicación</string>
     <string name="unfortunately_andoird_version_no_blueooth_low_energy">Desgraciadamente su versión de Android no es compatible con Bluetooth Low Energy</string>
     <string name="waiting_for_packet">Esperando paquetes</string>
-    <string name="persistent_high_for_greater_than">Alta persistente durante&gt;</string>
+    <string name="persistent_high_for_greater_than">Alta persistente durante&gt; </string>
     <string name="space_mins">" Min"</string>
     <string name="till">hasta</string>
     <string name="low_predicted">Bajo predicho</string>
@@ -476,7 +476,7 @@
     <string name="if_the_phone_has_text_to_speech">Si el teléfono tiene capacidades de conversión de texto a voz se leerá cada nueva lectura.</string>
     <string name="upload_logs">Cargar los registros</string>
     <!-- trend arrow for speak -->
-    <string name="DoubleDown">caída rápida</string>
+    <string name="DoubleDown">caída rápida </string>
     <string name="SingleDown">cayendo</string>
     <string name="FortyFiveDown">ligeramente decreciente</string>
     <string name="Flat">consistente</string>
