@@ -827,6 +827,13 @@
     <string name="no_search_term_found">Keine Suchergebnisse gefunden</string>
     <string name="bluetooth_scan">Bluetooth-Suche</string>
     <string name="level_alerts">Alarmlevel</string>
+    <string name="override_calibration">Kalibrierung außer Kraft setzen</string>
+    <string name="only_stop_your_sensor_when_you_actually_plan">Stoppe den Sensor nur, wenn Du auch planst ihn zu entfernen. Ansonsten solltest Du ihn laufen lassen!</string>
+    <string name="restart_collector">Datensammler neustarten</string>
+    <string name="forget_device">Gerät löschen</string>
+    <string name="other_notes">Andere Notizen:</string>
+    <string name="delete_future_data">Zukünftige Daten löschen</string>
+    <string name="show_only_untranslated">Zeige nur unübersetztes</string>
     <!-- trend arrow for speak -->
     <string name="DoubleDown">schnell fallend</string>
     <string name="SingleDown">fallend</string>
@@ -856,4 +863,17 @@
     <string name="offical_msg">Die offizielle App</string>
     <string name="use_conflict_msg">kann versuchen gleichzeitig auf den Transmitter zuzugreifen, was Probleme verursachen kann</string>
     <string name="use_confict_msg_glimp">Sie können die Glimp-Einstellungen anpassen: Einstellngen -&gt; devices -&gt; deselektieren der Bluetooth-Option</string>
+    <string name="you_have_update_checks_off">Du hast die Updateüberprüfungen ausgeschaltet! \n\nWir versuchen permanent Fehler zu beheben und neue Funktionen zu xDrip+ hinzuzufügen.\n\nAlle 60 Tage wird diese Erinnerung erscheinen und Dich bitten die Updateüberprüfung zu aktivieren.</string>
+    <string name="update_checking_enabled">Updateprüfung aktiviert!</string>
+    <string name="cancel_alarm">Alarm abbrechen?</string>
+    <string name="please_confirm_to_cancel_the_alert">Bitte bestätigen, um den Alarm abzubrechen?</string>
+    <string name="warning_no_alert_will_be_played_in_silent_mode">Achtung, kein Alarm wird hörbar sein wenn Handy im stumm/vibrieren-Modus ist!!!</string>
+    <string name="automatic_message_from_xdrip">automatische Meldung von xDrip+</string>
+    <string name="zero_zero_zero_zero">0000</string>
+    <string name="emergency_messages">Notfall-Meldungen</string>
+    <string name="text_messages_can_be_sent_with_your_location_if_you_do_not_respond_to_alarms_this_feature_is_experimental_and_may_not_be_reliable">Text-Nachrichten können mit Deinem Standort gesendet werden, wenn Du nicht auf Alarme reagierst. Diese Funktion ist experimentell und möglicherweise nicht zuverlässig.</string>
+    <string name="your_name">Dein Name</string>
+    <string name="did_not_acknowledge_a_low_glucose_alert">%s reagierte für %s nicht auf einen niedrigen Zuckerwert</string>
+    <string name="did_not_acknowledge_a_high_glucose_alert">%s reagierte für %s nicht auf einen hohen Zuckerwert</string>
+    <string name="has_not_had_glucose_data_received_for">%s hat für %s keine Glukose-Daten empfangen</string>
 </resources>
