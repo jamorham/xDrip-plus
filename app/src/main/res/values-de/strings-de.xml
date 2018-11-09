@@ -99,7 +99,7 @@
     <string name="title_activity_display_preferences">Anzeigeeinstellungen</string>
     <string name="export_submenu">Import-/Export-Einstellungen</string>
     <string name="action_resend_to_watch">Werte erneut an Smartwatch senden</string>
-    <string name="action_open_watch_setting">Öffnen Sie die Einstellungen auf Wear</string>
+    <string name="action_open_watch_setting">Öffne Einstellungen auf der Wear (Uhr)</string>
     <string name="action_sync_watch_db">Zurücksetzen Wear DB</string>
     <string name="erase">Entfernen</string>
     <string name="interface_tips_from_start">Alle Interface-Tipps wieder anzeigen</string>
