@@ -121,11 +121,11 @@
     <string name="possible_bad_calibration">Möglicherweise schlechte Kalibrierung, bitte ein Glas Wasser trinken, die Hände waschen und in ein paar Minuten erneut versuchen.</string>
     <string name="please_wait_need_two_readings_first">Bitte warten. Es werden vorab zwei Werte vom Transmitter benötigt.</string>
     <string name="please_enter_two_calibrations_to_get_started">Zum Starten bitte zwei Kalibrierungswerte eingeben!</string>
-    <string name="now_pair_with_your_dexcom_share">Jetzt mit Ihrem Dexcom Share verbinden</string>
+    <string name="now_pair_with_your_dexcom_share">Jetzt mit Deinem Dexcom Share verbinden</string>
     <string name="now_choose_start_sensor_in_settings">Jetzt bitte Sensorstart in den Einstellungen auswählen</string>
     <string name="double_check_dex_receiver_serial_number">Bitte Seriennummer des Dexcom Empfängers doppelt prüfen! (10 Zeichen mit Buchstaben)</string>
     <string name="please_set_dex_receiver_serial_number">Bitte Seriennummer des Dexcom-Empfängers in den App-Einstellungen ändern</string>
-    <string name="unfortunately_andoird_version_no_blueooth_low_energy">Leider unterstützt Ihre Android-Version kein Bluetooth Low Energy</string>
+    <string name="unfortunately_andoird_version_no_blueooth_low_energy">Leider unterstützt Deine Android-Version kein Low-Energy-Bluetooth (BLE)</string>
     <string name="waiting_for_packet">Warten auf Daten...</string>
     <string name="persistent_high_for_greater_than">Dauerhaft Hoch für &gt; </string>
     <string name="space_mins">" Min"</string>
@@ -216,7 +216,7 @@
     <string name="list_of_receivers">Liste der Empfänger</string>
     <string name="extra_tags_for_logging">Zusätzliche Tags für die Protokollierung</string>
     <string name="extra_tags_dialog_message">Die hier eingegebenen Tags werden in xDrip protokolliert. Format ist tag:Ebene. Stufe kann v, d oder i sein. Zum Beispiel bgreading:i, DexCollectionService:v. Diese Tags werden mit niedriger Priorität protokolliert in der Fehler- und Ereignisliste.</string>
-    <string name="extra_tags_dialog_title">Geben Sie weitere Tags ein, die protokolliert werden sollen</string>
+    <string name="extra_tags_dialog_title">Gib weitere Tags ein, die protokolliert werden sollen</string>
     <string name="data_source_settings">Einstellung der Datenquelle</string>
     <string name="smart_watch_features">Smart Watch Eigenschaften</string>
     <string name="wear_integration">Wear Integration</string>
@@ -260,7 +260,7 @@
     <string name="speak_readings">Werte vorlesen</string>
     <string name="extra_status_line">Zusätzliche Statuszeile</string>
     <string name="dexcom_share_server_upload">Dexcom Share Server Upload</string>
-    <string name="upload_data_to_dex_servers">Daten zum Dexcom-Server hochladen, damit Sie Ihre Daten mit den offiziellen Dexcom-Apps nutzen können</string>
+    <string name="upload_data_to_dex_servers">Daten zum Dexcom-Server hochladen, damit Du Deine Daten mit den offiziellen Dexcom-Apps nutzen kannst</string>
     <string name="manage_followers">Follower verwalten</string>
     <string name="manage_existing_followers">Follower verwalten und neue hinzufügen.</string>
     <string name="glucose_calibration_and_other_alerts">Glukose-, Kalibrierungs- und andere Benachrichtigungen</string>
@@ -363,7 +363,7 @@
     <string name="please_enter_your_question_or_comments_here">Bitte Frage oder Kommentare hier eingeben.\n\Durch Angabe einer E-Mail-Adresse kann eine Antwort direkt erhalten werden.\n\n</string>
     <string name="optional_contact_info_here_eg_email">Optionale Informationen (E-Mail)</string>
     <string name="send_message">Nachricht senden</string>
-    <string name="please_indicate_what_you_think_of_the_app_generally">Bitte bewerten Sie die App</string>
+    <string name="please_indicate_what_you_think_of_the_app_generally">Bitte bewerte die App</string>
     <string name="preferences_saved_in_sdcard_downloads">Einstellungen auf SD-Karte unter Downloads gespeichert</string>
     <string name="could_not_write_to_sdcard_check_perms">Fehler beim Schreiben auf SD-Karte - Berechtigungen prüfen?</string>
     <string name="loaded_preferences_restarting">Einstellungen geladen! - Starte neu...</string>
@@ -865,10 +865,10 @@
     <string name="days">Tage rest</string>
     <string name="bluereaderoff">blueReader wird ausgeschaltet, da die Batterie folgenden Wert unterschreitet: </string>
     <string name="bluereader_position">Bitte Positionierung des BlueReaders auf dem Sensor prüfen!</string>
-    <string name="bluereaderuglystate">Der blueReader hat sich aufgehängt! Er wird nun ausgeschaltet. Bitte schlten Sie ihn in ein paar Sekunden wieder an (Taste nur kurz drücken). Danach sollte der blueReader wieder funktionieren!</string>
+    <string name="bluereaderuglystate">Der blueReader hat sich aufgehängt! Er wird nun ausgeschaltet. Bitte schalte ihn in ein paar Sekunden wieder ein (Taste nur kurz drücken). Danach sollte der blueReader wieder funktionieren!</string>
     <string name="offical_msg">Die offizielle App</string>
     <string name="use_conflict_msg">kann versuchen gleichzeitig auf den Transmitter zuzugreifen, was Probleme verursachen kann</string>
-    <string name="use_confict_msg_glimp">Sie können die Glimp-Einstellungen anpassen: Einstellngen -&gt; devices -&gt; deselektieren der Bluetooth-Option</string>
+    <string name="use_confict_msg_glimp">Du kannst die Glimp-Einstellungen anpassen: Einstellungen -&gt; devices -&gt; deselektieren der Bluetooth-Option</string>
     <string name="yes">Ja</string>
     <string name="xdrip_compatible_features">xDrip+ %s Funktionen</string>
     <string name="garmin">Garmin</string>
@@ -908,6 +908,7 @@
     <string name="please_enter_printed_calibration_code">Bitte gib die gedruckte Kalibrierungs-Code-Nummer (4 Ziffern, z. B. \'5678\') ein</string>
     <string name="enable_update_checks">Update-Prüfung aktivieren?</string>
     <string name="you_can_easily_roll_back_dialog_msg">Wenn Dir die neue Version von xDrip+ nicht gefällt, kannst Du leicht eine Rückkehr zu früheren Versionen nur durch erneutes Ausführen des APK-Installers für die alte Version in Deinem Ordner \"Downloads\" erreichen.\n\nMöchtest Du die Aktualisierungs-Prüfungen aktivieren?</string>
+    <string name="hey_fam">Hallo Fam...</string>
     <string name="you_have_update_checks_off">Du hast die Updateüberprüfungen ausgeschaltet! \n\nWir versuchen permanent Fehler zu beheben und neue Funktionen zu xDrip+ hinzuzufügen.\n\nAlle 60 Tage wird diese Erinnerung erscheinen und Dich bitten die Updateüberprüfung zu aktivieren.</string>
     <string name="update_checking_enabled">Updateprüfung aktiviert!</string>
     <string name="cancel_alarm">Alarm abbrechen?</string>
