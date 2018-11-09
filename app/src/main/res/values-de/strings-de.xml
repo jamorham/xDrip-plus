@@ -907,6 +907,7 @@
     <string name="g6_sensor_code">G6 Sensor Code</string>
     <string name="please_enter_printed_calibration_code">Bitte gib die gedruckte Kalibrierungs-Code-Nummer (4 Ziffern, z. B. \'5678\') ein</string>
     <string name="enable_update_checks">Update-Prüfung aktivieren?</string>
+    <string name="you_can_easily_roll_back_dialog_msg">Wenn Dir die neue Version von xDrip+ nicht gefällt, kannst Du leicht eine Rückkehr zu früheren Versionen nur durch erneutes Ausführen des APK-Installers für die alte Version in Deinem Ordner \"Downloads\" erreichen.\n\nMöchtest Du die Aktualisierungs-Prüfungen aktivieren?</string>
     <string name="you_have_update_checks_off">Du hast die Updateüberprüfungen ausgeschaltet! \n\nWir versuchen permanent Fehler zu beheben und neue Funktionen zu xDrip+ hinzuzufügen.\n\nAlle 60 Tage wird diese Erinnerung erscheinen und Dich bitten die Updateüberprüfung zu aktivieren.</string>
     <string name="update_checking_enabled">Updateprüfung aktiviert!</string>
     <string name="cancel_alarm">Alarm abbrechen?</string>
