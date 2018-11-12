@@ -28,7 +28,7 @@
     <string name="ok">确定</string>
     <string name="cancel">取消</string>
     <string name="no">否</string>
-    <string name="pref_sensor_location_dont_ask_again">下次不要再问我</string>
+    <string name="pref_sensor_location_dont_ask_again"> 下次不要再问我</string>
     <string name="title_activity_error">"错误和事件列表"</string>
     <string name="title_activity_main">主要活动</string>
     <string name="title_activity_fake_numbers">假数字</string>
@@ -58,7 +58,7 @@
     <string name="pref_title_api_enabled">启用</string>
     <string name="pref_summary_api_enabled">REST API是直接上传mongodb的替代方法</string>
     <string name="pref_title_api_url">远程网址基本URL</string>
-    <string name="pref_dialog_api_url">输入远程网址基本URL和 密钥API</string>
+    <string name="pref_dialog_api_url">输入远程网址基本URL和 密钥API </string>
     <string name="pref_message_api_url">这只是基本URL，上传者会自动附加/输入POST。 服务器上的API_SECRET应该与此设置中的密钥匹配.</string>
     <string name="pref_default_api_url">https://yourpassphrase@{YOUR-SITE}.azurewebsites.net/api/v1/</string>
     <!-- wifi Settings -->
@@ -129,7 +129,7 @@
     <string name="please_set_dex_receiver_serial_number">在APP设置中设定你的Dex 接收器的序列号</string>
     <string name="unfortunately_andoird_version_no_blueooth_low_energy">很不幸，你的安卓版本不支持蓝牙低耗能</string>
     <string name="waiting_for_packet">正在等待数据包</string>
-    <string name="persistent_high_for_greater_than">持续高了 &gt;</string>
+    <string name="persistent_high_for_greater_than">持续高了 &gt; </string>
     <string name="space_mins">" 分钟"</string>
     <string name="till">直到</string>
     <string name="low_predicted">低血糖预测</string>
@@ -398,7 +398,7 @@
     <string name="alarms_silenced_during_telephone_calls">手机通话时警报静音</string>
     <string name="suppress_alerts_if_missed_readings">如果无法读取到血糖数据禁止报警</string>
     <string name="bad_noisy_value_alerts">错误(嘈杂)值警报</string>
-    <string name="keep_snoozing_if_glucose_is_heading_in_right_direction">如果血糖向正确的方向行进，请继续推迟报警</string>
+    <string name="keep_snoozing_if_glucose_is_heading_in_right_direction"> 如果血糖向正确的方向行进，请继续推迟报警</string>
     <string name="dont_alert_if_glucose_in_right_direction">如果血糖在往正确的方向变化，不要报警</string>
     <string name="calibration_request_sound">校准请求的声音</string>
     <string name="display_filtered_line">显示过滤过的线</string>
@@ -627,7 +627,7 @@
     <string name="realtime_capture_percentage">实时数据包捕获百分比</string>
     <string name="show_calibration_accuracy">显示最近3天的校准精度评估</string>
     <string name="accuracy_evaluation">校准精度评估</string>
-    <string name="show_extra_status_on_widget">也在小部件(widget)上显示额外的状态线</string>
+    <string name="show_extra_status_on_widget">也在小部件(widget)上显示额外的状态线 </string>
     <string name="show_long_calibration_data">以长格式显示斜率和截距.</string>
     <string name="show_short_calibration_data">以短格式显示斜率和截距.</string>
     <string name="show_plugin_data">显示活动插件的斜率和血糖数据</string>
@@ -769,7 +769,7 @@
     <string name="show_bolus_wizard_preview">显示大剂量向导预览</string>
     <string name="display_calculations">显示胰岛素/碳水化合物计算器</string>
     <string name="display_calculations_everytime">一直显示胰岛素/碳水化合物计算器</string>
-    <string name="always_show_bolus_wizard_preview">总是显示大剂量向导预览</string>
+    <string name="always_show_bolus_wizard_preview">总是显示大剂量向导预览 </string>
     <string name="show_test_features">显示额外的和 alpha 测试功能</string>
     <string name="show_reminder_features">显示提醒菜单和功能</string>
     <string name="enable_reminder_features">启用提醒功能</string>
@@ -865,7 +865,7 @@
     <string name="blueReader_turnoffvalue">值 (%)</string>
     <string name="blueReader_turnoffvalue_sum">蓝牙将会关掉的地方</string>
     <string name="days">剩余天数</string>
-    <string name="bluereaderoff">蓝牙将关闭, 因为电池电量是低的, 然后</string>
+    <string name="bluereaderoff">蓝牙将关闭, 因为电池电量是低的, 然后 </string>
     <string name="bluereader_position">检查传感器上的 blueReader 位置, 因为无法读取到数据!</string>
     <string name="bluereaderuglystate">The blueReader was found in an ugly state! It will be now turn off now, and you turn it back to on (short press of the button). After that the blueReader should work as expectet!</string>
     <string name="offical_msg">官方app</string>
