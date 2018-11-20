@@ -585,6 +585,7 @@
     <string name="use_external_blukon_algorithm_summary">Verwende externen Libre Algorithmus (bluecon/NFC/LibreAlarm)</string>
     <string name="display_predictive_values">Vorhergesagte Werte anzeigen.</string>
     <string name="use_external_blukon_algorithm">Externer Libre-Algorithmus.</string>
+    <string name="calibrate_external_libre_algorithm_summary">Verwende xDrip-Kalibrierungsmethoden für OOP-Daten.</string>
     <string name="calibrate_external_libre_algorithm_title">OOP Kalibrierungsalgorithmus.</string>
     <string name="retrieve_blukon_history_title">Empfange historische Libre-Daten</string>
     <string name="retrieve_blukon_history_summary">Empfange verpasste Werte vom Bluekon-Empfänger wenn er sich wieder verbindet.</string>
@@ -913,6 +914,7 @@
     <string name="update_checking_enabled">Updateprüfung aktiviert!</string>
     <string name="cancel_alarm">Alarm abbrechen?</string>
     <string name="please_confirm_to_cancel_the_alert">Bitte bestätigen, um den Alarm abzubrechen?</string>
+    <string name="yes_cancel">Ja, Abbrechen</string>
     <string name="warning_no_alert_will_be_played_in_silent_mode">Achtung, kein Alarm wird hörbar sein wenn Handy im stumm/vibrieren-Modus ist!!!</string>
     <string name="automatic_message_from_xdrip">automatische Meldung von xDrip+</string>
     <string name="zero_zero_zero_zero">0000</string>
