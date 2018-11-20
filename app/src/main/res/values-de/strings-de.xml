@@ -23,6 +23,7 @@
     <string name="navigation_drawer_close">Navigationsleiste schließen</string>
     <string name="title_activity_calibration_check_in">Kalibrierung</string>
     <string name="title_activity_usb_connected">USB aktiv</string>
+    <string name="snooze">Schlummern (Snooze)</string>
     <string name="snooze_hint">Warnung für x Minuten unterbinden</string>
     <string name="ok">Ok</string>
     <string name="cancel">Abbrechen</string>
@@ -89,6 +90,7 @@
     <string name="toast_crash">Da ist etwas schief gegangen :( Ein Bericht über das Problem wurde an die Entwickler versendet.</string>
     <string name="taskerConfigInstruction">Einfach mit einem Klick auf den Haken bestätigen. Die Konfigurationszeile muss nicht geändert werden.</string>
     <string name="taskerConfiguration">Tasker-Konfiguration</string>
+    <string name="finish_preferences_activity">finish_preferences_activity</string>
     <string name="add_widget">Widget hinzufügen</string>
     <string name="title_activity_alert_list">Liste der Warnungen</string>
     <string name="speaktreatment">Behandlung sprechen</string>
@@ -185,6 +187,7 @@
     <string name="alerts_and_notifications">Benachrichtigungen</string>
     <string name="glucose_level_alerts_list">Glukose-Alarm-Liste</string>
     <string name="glucose_alerts_settings">Glukose-Alarm-Einstellungen</string>
+    <string name="smart_snoozing">Intelligentes Schlummern (Snoozing)</string>
     <string name="calibration_alerts">Kalibrierungserinnerungen</string>
     <string name="missed_reading_alert">Alarm bei verpassten Werten</string>
     <string name="other_alerts">Weitere Benachrichtigungen</string>
@@ -267,7 +270,7 @@
     <string name="alert_volume_profile">Lautstärke-Profil (Alarme)</string>
     <string name="smart_alerting">Intelligente Warnungen</string>
     <string name="dont_alarm_during_phone_calls">Keine Alarme bei Telefonaten</string>
-    <string name="start_snoozed">Starten im Snooze-Modus</string>
+    <string name="start_snoozed">Start im Schlummer-Modus</string>
     <string name="adjust_all_by_a_factor">Mit globalem Faktor anpassen</string>
     <string name="reset">Zurücksetzen</string>
     <string name="pebble_and_android_wear_options">Pebble und Android Wear Optionen</string>
@@ -395,7 +398,7 @@
     <string name="alarms_silenced_during_telephone_calls">Alarme bei Telefonaten lautlos</string>
     <string name="suppress_alerts_if_missed_readings">Warnungen deaktivieren bei verpassten Werten</string>
     <string name="bad_noisy_value_alerts">Schlechte (noisy) Werte Warnung</string>
-    <string name="keep_snoozing_if_glucose_is_heading_in_right_direction">Alarme im Schlummermodus (snoozed) halten bei Trend in der richtigen Richtung</string>
+    <string name="keep_snoozing_if_glucose_is_heading_in_right_direction">Alarme im Schlummermodus (snooze) behalten bei Trend in der richtigen Richtung</string>
     <string name="dont_alert_if_glucose_in_right_direction">Keine Warnungen bei Trend in richtiger Richtung</string>
     <string name="calibration_request_sound">Sound: Kalibrierung nötig</string>
     <string name="display_filtered_line">Gefilterte Werte zeigen</string>
@@ -710,7 +713,7 @@
     <string name="automatic_calibration">Automatische Kalibrierung</string>
     <string name="maximum_value">Die obere Grenze deines Zielbereichs</string>
     <string name="minimum_value">Die untere Grenze deines Zeilbereichs</string>
-    <string name="volume_buttons_snooze">Das Drücken der Lautstärkeknöpfe snoozed einen aktiven Alarm in der App.</string>
+    <string name="volume_buttons_snooze">Das Drücken der Lautstärkeknöpfe lässt einen aktiven Alarm in der App schlummern</string>
     <string name="buttons_silence_alarms">Knöpfe lassen Alarme verstummen</string>
     <string name="create_shortcut">In der Haupt-Navigationsleiste eine Verknüpfung zum Blutzucker-Bildschirm erstellen</string>
     <string name="shortcut_to_bg_alerts">Verknüpfung zu den Glukosealarmen</string>
@@ -730,7 +733,7 @@
     <string name="alert_noisy_values">Bei verrauschten Werten nach x Minuten alarmieren</string>
     <string name="alert_snooze">Alarm-Snooze</string>
     <string name="alert_minutes_reraise">Anzahl der Minuten, bevor derselbe Alarm nach dem Snoozen ertönt</string>
-    <string name="reraise_before_snooze">Alarmiere erneut vor der Snooze-Zeit.</string>
+    <string name="reraise_before_snooze">Alarmiere erneut vor der Schlummer-Zeit</string>
     <string name="reraise_not_snoozed_sooner">Alarmiere erneut, falls nicht früher gesnoozed.</string>
     <string name="alert_reraise_time">Alarm-Abspiel-Intervall</string>
     <string name="alert_seconds_reraise">Anzahl der Sekunden, die vergehen müssen, bevor derselbe Alarm erneut ertönt.</string>
@@ -919,6 +922,7 @@
     <string name="automatic_message_from_xdrip">automatische Meldung von xDrip+</string>
     <string name="zero_zero_zero_zero">0000</string>
     <string name="emergency_messages">Notfall-Meldungen</string>
+    <string name="emergency_message_feature">Notfallnachrichtenfunktion</string>
     <string name="text_messages_can_be_sent_with_your_location_if_you_do_not_respond_to_alarms_this_feature_is_experimental_and_may_not_be_reliable">Text-Nachrichten können mit Deinem Standort gesendet werden, wenn Du nicht auf Alarme reagierst. Diese Funktion ist experimentell und möglicherweise nicht zuverlässig.</string>
     <string name="your_name">Dein Name</string>
     <string name="did_not_acknowledge_a_low_glucose_alert">%s reagierte für %s nicht auf einen niedrigen Zuckerwert</string>
@@ -952,6 +956,7 @@
     <string name="title_Only_use_Wear">Verwende nur Wear</string>
     <string name="summary_Also_show_the_filtered_data_on_the_trend">Zeige auch gefilterte Daten im Trend</string>
     <string name="summary_Show_Bolus_Wizard_Preview_Insulin_value_on_watch_when_appropriate">Zeige wenn möglich Vorschau-Insulinwert vom Bolus-Assistenten auf der Uhr</string>
+    <string name="title_Display_BWP_Insulin">Zeige BWP Insulin</string>
     <string name="title_Smartwatch_Sensors">Smartwatch Sensoren</string>
     <string name="summary_Collect_and_display_Step_counter_and_Heart_rate_when_available">Sammle und zeige Schrittzähler und Herzfrequenz wenn verfügbar</string>
     <string name="title_Use_Health_Data">Verwende Gesundheits-Daten</string>
