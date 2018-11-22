@@ -342,7 +342,7 @@
     <string name="glucose_history">Glikoz Geçmişi</string>
     <string name="import_database">Veritabanını İçe Aktar</string>
     <string name="sensor_table">Sensör Tablosu</string>
-    <string name="bg_readings_table">Kan şekeri Okuma Tablosu</string>
+    <string name="bg_readings_table">Kan şekeri Ölçüm Tablosu</string>
     <string name="long_press_to_split_or_delete">Bölmek veya Silmek için uzunca basılı tutun</string>
     <string name="press_and_hold_on_the_background_to_split_or_delete">Bir zaman bloğunu Bölme veya Silme için arka plan üzerinde basılı tutun</string>
     <string name="search">Arama</string>
@@ -651,7 +651,8 @@
     <string name="meter_connect_sound_effect">Ses efekti göstergeleri</string>
     <string name="ask_for_calibration">Yeni bir kan şekeri sonucu alındığında, bunun kalibrasyon için kullanılmasının gerekip gerekmediğini sor</string>
     <string name="use_meter_for_calibrations">Kalibrasyonlar için glikometre\'yi kullan</string>
-    <string name="auto_calibration_good_conditions">Koşullar onaylamadan doğru şekilde görünüyorsa, yeni kan şekeri okumalarını kullanarak kalibre edin (deneysel)</string>
+    <string name="auto_calibration_good_conditions">Koşullar onaylamadan doğru şekilde görünüyorsa, yeni kan şekeri 	
+ölçümlerini kullanarak kalibre edin (deneysel)</string>
     <string name="automatic_calibration">Otomatik kalibrasyon</string>
     <string name="maximum_value">Hedef alanınızın üst sınırı.</string>
     <string name="minimum_value">Hedef alanınızın alt sınırı.</string>
