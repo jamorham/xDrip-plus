@@ -531,7 +531,7 @@
     <string name="reset_bluetooth_g5">Bluetooth\'u, G5 veri kaynağının çalışmaya devam etmesini sağlayacak şekilde kapatıp açarak sıfırlayın. Bu olmadan G5 toplayıcı başarısız olabilir.</string>
     <string name="g5_bluetooth_watchdog">G5 Bluetooth Watchdog</string>
     <string name="close_gatt">Bluetooth watchdog sık sık etkinleşirse, yardımcı olup olmadığını görmek için bu seçeneğin işaretini kaldırabilirsiniz</string>
-    <string name="transmitter_pl_support">Verici (PL) desteği</string>
+    <string name="transmitter_pl_support">Transmiter (PL) desteği</string>
     <string name="experimental_rdfuino_support">Tomasz Stachowicz\'den rfduino için deneysel destek</string>
     <string name="rfduino_support">RFDUINO desteği</string>
     <string name="aggressive_service_restarts">Agresif servis yeniden başlatılıyor</string>
