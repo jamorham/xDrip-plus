@@ -718,7 +718,7 @@
     <string name="create_shortcut">In der Haupt-Navigationsleiste eine Verknüpfung zum Blutzucker-Bildschirm erstellen</string>
     <string name="shortcut_to_bg_alerts">Verknüpfung zu den Glukosealarmen</string>
     <string name="suppress_alerts_missed_readings">Unterdrücke geschlummerte (snoozed) und aktive Alarme nach einer voreingestellten Zeit verpasster Werte</string>
-    <string name="suppress_alerts_after">Unterdrücke gesnoozete und aktive Alarme nach x Minuten (mindestens 10).</string>
+    <string name="suppress_alerts_after">Unterdrücke geschlummerte (Snoozed) und aktive Alarme nach x Minuten (mindestens 10)</string>
     <string name="alert_calibration_request">Alarmieren, wenn eine Kalibrierung angefordert wird</string>
     <string name="calibrations_request_time_time_difference">Wie viele Stunden zwischen Kalibrierungsanfragen?</string>
     <string name="hours_between_calibrations">Stunden zwischen den Kalibrierungen</string>
@@ -732,7 +732,7 @@
     <string name="alert_repeat_minutes">Alarmwiederholzeit</string>
     <string name="alert_noisy_values">Bei verrauschten Werten nach x Minuten alarmieren</string>
     <string name="alert_snooze">Alarm Schlummern</string>
-    <string name="alert_minutes_reraise">Anzahl der Minuten, bevor derselbe Alarm nach dem Snoozen ertönt</string>
+    <string name="alert_minutes_reraise">Anzahl der Minuten, bevor derselbe Alarm nach dem Schlummern (Snooze) ertönt.</string>
     <string name="reraise_before_snooze">Alarmiere erneut vor der Schlummer-Zeit</string>
     <string name="reraise_not_snoozed_sooner">Alarmiere erneut, falls nicht vorher geschlummert (snoozed) wird</string>
     <string name="alert_reraise_time">Alarm-Abspiel-Intervall</string>
