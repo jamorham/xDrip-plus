@@ -338,7 +338,7 @@
     <string name="enter_second_bg_value">Zweiter Blutzucker-Wert</string>
     <string name="language_editor">Angezeigte Sprache</string>
     <string name="configure_missed_readings">Einstellungen für verpasste Werte</string>
-    <string name="install_pebble_snooze_control_app">Installieren Pebble Weckwiederholung App</string>
+    <string name="install_pebble_snooze_control_app">Installiere Pebble Snooze-Control App</string>
     <string name="install_pebble_classic_trend_watchface">Pebble Classic Trend Watchface installieren</string>
     <string name="install_pebble_trend_watchface">Pebble Trend Watchface installieren</string>
     <string name="install_pebble_watchface">Pebble Watchface installieren</string>
@@ -782,12 +782,12 @@
     <string name="default_liver_maximum_impact">Maximaler Standardeinfluss der Leber (0-1)</string>
     <string name="remote_snoozes">Sende und empfange Remote-Schlummern (Snooze)</string>
     <string name="remote_snoozing">Remote-Snoozing</string>
-    <string name="snoozes_will_silence_all">Snoozes werden als Mobilteile in der Gruppe, die die Akzeptierungs-Einstellung unten gesetzt haben, verstummen lassen.</string>
-    <string name="send_snooze_to_all">Sende Snooze an alle</string>
-    <string name="confirm_remote_snoozes">Einen Dialog zum Bestätigen von jedem Remote-Snooze erscheinen lassen.</string>
-    <string name="confirm_sensing_snooze">Snooze senden bestätigen</string>
+    <string name="snoozes_will_silence_all">Bei Schlummern (Snoozes) werden alle Mobilteile in der Gruppe stummgeschaltet, bei denen das folgende Setting aktiviert ist</string>
+    <string name="send_snooze_to_all">Sende Schlummern (Snooze) an alle</string>
+    <string name="confirm_remote_snoozes">Einen Dialog zum Bestätigen von jedem Remote-Schlummern (Snooze) erscheinen lassen</string>
+    <string name="confirm_sensing_snooze">Bestätige Schlummern/Snooze-Senden</string>
     <string name="allow_remotes_silence">Anderen Mobilgeräten erlauben, Alarme auf diesem Gerät verstummen zu lassen.</string>
-    <string name="acccept_remote_snoozes">Remote-Snoozes annehmen</string>
+    <string name="acccept_remote_snoozes">Remote-Schlummern/Snoozes annehmen</string>
     <string name="only_accept_same_network">Nur akzeptieren, wenn das entfernte WLAN-Netzwerk mit demselben Buchstaben beginnt wie unseres oder die beiden sich sehr ähneln.</string>
     <string name="wifi_name_must_match">WLAN-Name muss übereinstimmen</string>
     <string name="movement_detection_and_vehicle_mode">Bewegungserkennung und Fahrzeugmodus</string>
