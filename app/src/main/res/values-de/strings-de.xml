@@ -717,7 +717,7 @@
     <string name="buttons_silence_alarms">Knöpfe lassen Alarme verstummen</string>
     <string name="create_shortcut">In der Haupt-Navigationsleiste eine Verknüpfung zum Blutzucker-Bildschirm erstellen</string>
     <string name="shortcut_to_bg_alerts">Verknüpfung zu den Glukosealarmen</string>
-    <string name="suppress_alerts_missed_readings">Unterdrücke gesnoozete und aktive Alarme nach einer voreingestellten Zeit verpasster Werte.</string>
+    <string name="suppress_alerts_missed_readings">Unterdrücke geschlummerte (snoozed) und aktive Alarme nach einer voreingestellten Zeit verpasster Werte</string>
     <string name="suppress_alerts_after">Unterdrücke gesnoozete und aktive Alarme nach x Minuten (mindestens 10).</string>
     <string name="alert_calibration_request">Alarmieren, wenn eine Kalibrierung angefordert wird</string>
     <string name="calibrations_request_time_time_difference">Wie viele Stunden zwischen Kalibrierungsanfragen?</string>
