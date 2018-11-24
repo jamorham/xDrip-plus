@@ -731,7 +731,7 @@
     <string name="calibration_minutes_reraise">Anzahl der Minuten, die vergehen müssen, bevor dieselbe Kalibrierungsanfrage kommt</string>
     <string name="alert_repeat_minutes">Alarmwiederholzeit</string>
     <string name="alert_noisy_values">Bei verrauschten Werten nach x Minuten alarmieren</string>
-    <string name="alert_snooze">Alarm-Snooze</string>
+    <string name="alert_snooze">Alarm Schlummern</string>
     <string name="alert_minutes_reraise">Anzahl der Minuten, bevor derselbe Alarm nach dem Snoozen ertönt</string>
     <string name="reraise_before_snooze">Alarmiere erneut vor der Schlummer-Zeit</string>
     <string name="reraise_not_snoozed_sooner">Alarmiere erneut, falls nicht vorher geschlummert (snoozed) wird</string>
@@ -780,7 +780,7 @@
     <string name="low_prediction_values">Unterzucker-Vorhersagewerte</string>
     <string name="target_glucose_default">Ziel-Glukosestandard</string>
     <string name="default_liver_maximum_impact">Maximaler Standardeinfluss der Leber (0-1)</string>
-    <string name="remote_snoozes">Sende und empfange Remote-Snoozes</string>
+    <string name="remote_snoozes">Sende und empfange Remote-Schlummern (Snooze)</string>
     <string name="remote_snoozing">Remote-Snoozing</string>
     <string name="snoozes_will_silence_all">Snoozes werden als Mobilteile in der Gruppe, die die Akzeptierungs-Einstellung unten gesetzt haben, verstummen lassen.</string>
     <string name="send_snooze_to_all">Sende Snooze an alle</string>
