@@ -24,7 +24,7 @@
     <string name="ok">Kunnossa</string>
     <string name="cancel">Peruuttaa</string>
     <string name="no">Ei</string>
-    <string name="pref_sensor_location_dont_ask_again">Älä kysy enää uudestaan</string>
+    <string name="pref_sensor_location_dont_ask_again"> Älä kysy enää uudestaan</string>
     <string name="title_activity_error">"Virhe ja Event List"</string>
     <string name="title_activity_main">Pääaktiviteetti</string>
     <string name="title_activity_double_calibration">Double kalibrointi</string>
@@ -108,7 +108,7 @@
     <string name="please_set_dex_receiver_serial_number">Ole hyvä ja aseta Dex Vastaanottimen sarjanumero App Settings</string>
     <string name="unfortunately_andoird_version_no_blueooth_low_energy">Valitettavasti Android versio ei tue wibree</string>
     <string name="waiting_for_packet">Odotetaan paketti</string>
-    <string name="persistent_high_for_greater_than">Pysyvät Korkealla&gt;</string>
+    <string name="persistent_high_for_greater_than">Pysyvät Korkealla&gt; </string>
     <string name="space_mins">" Min"</string>
     <string name="till">asti</string>
     <string name="low_predicted">Low ennusti</string>
