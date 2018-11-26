@@ -28,7 +28,7 @@
     <string name="ok">확인</string>
     <string name="cancel">취소</string>
     <string name="no">아니오</string>
-    <string name="pref_sensor_location_dont_ask_again">다시 묻지 않기</string>
+    <string name="pref_sensor_location_dont_ask_again"> 다시 묻지 않기</string>
     <string name="title_activity_error">"에러 및 이벤트 목록"</string>
     <string name="title_activity_main">메인 메뉴</string>
     <string name="title_activity_fake_numbers">가짜(fake) 번호</string>
@@ -110,7 +110,7 @@
     <string name="please_set_dex_receiver_serial_number">앱 세팅에서 Dexcom receiver의 시리얼 넘버를 세팅하세요.</string>
     <string name="unfortunately_andoird_version_no_blueooth_low_energy">불행하게도 당신의 안드로이드 버전은 BLE(Bluetooth Low Energy)를 지원하지 않습니다.</string>
     <string name="waiting_for_packet">패킷을 기다리는 중..</string>
-    <string name="persistent_high_for_greater_than">지속적으로 높은&gt;</string>
+    <string name="persistent_high_for_greater_than">지속적으로 높은&gt; </string>
     <string name="space_mins">" 분"</string>
     <string name="till">까지</string>
     <string name="low_predicted">저혈당으로 예측됨</string>
