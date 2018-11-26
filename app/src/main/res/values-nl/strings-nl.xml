@@ -24,7 +24,7 @@
     <string name="snooze_hint">Snooze alert voor x minuten</string>
     <string name="cancel">Annuleer</string>
     <string name="no">Nee</string>
-    <string name="pref_sensor_location_dont_ask_again">Vraag me dat niet opnieuw vragen</string>
+    <string name="pref_sensor_location_dont_ask_again"> Vraag me dat niet opnieuw vragen</string>
     <string name="title_activity_error">"Fout en Event List"</string>
     <string name="title_activity_main">Hoofdactiviteit</string>
     <string name="title_activity_fake_numbers">Valse Nummers</string>
@@ -107,7 +107,7 @@
     <string name="please_set_dex_receiver_serial_number">Stel uw Dex ontvanger Serial Number in de App-instellingen</string>
     <string name="unfortunately_andoird_version_no_blueooth_low_energy">Helaas je Android-versie biedt geen ondersteuning voor Bluetooth Low Energy</string>
     <string name="waiting_for_packet">Wachten op packet</string>
-    <string name="persistent_high_for_greater_than">Aanhoudend hoge gedurende&gt;</string>
+    <string name="persistent_high_for_greater_than">Aanhoudend hoge gedurende&gt; </string>
     <string name="space_mins">" Min"</string>
     <string name="till">tot</string>
     <string name="low_predicted">Lage voorspelde</string>
