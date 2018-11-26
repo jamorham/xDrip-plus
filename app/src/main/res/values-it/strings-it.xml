@@ -27,7 +27,7 @@
     <string name="snooze_hint">Allarme sospeso per x minuti</string>
     <string name="ok">Ok</string>
     <string name="cancel">Annulla</string>
-    <string name="pref_sensor_location_dont_ask_again">Non Chiedermelo Piu</string>
+    <string name="pref_sensor_location_dont_ask_again"> Non Chiedermelo Piu</string>
     <string name="title_activity_error">"Elenco Errori e Eventi"</string>
     <string name="title_activity_main">Attività principale</string>
     <string name="title_activity_fake_numbers">Numeri Fasulli</string>
@@ -116,7 +116,7 @@
     <string name="please_set_dex_receiver_serial_number">Si prega di impostare il numero di serie del ricevitore  Dex in Impostazioni app</string>
     <string name="unfortunately_andoird_version_no_blueooth_low_energy">Purtroppo la versione di Android non supporta Bluetooth Low Energy</string>
     <string name="waiting_for_packet">In attesa pacchetto dati</string>
-    <string name="persistent_high_for_greater_than">VALORI ALTI persistentI per&gt;</string>
+    <string name="persistent_high_for_greater_than">VALORI ALTI persistentI per&gt; </string>
     <string name="space_mins">" Min"</string>
     <string name="till">fino a</string>
     <string name="low_predicted">VALORE BASSO previsto</string>
