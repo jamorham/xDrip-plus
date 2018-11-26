@@ -27,7 +27,7 @@
     <string name="snooze_hint">Utsett varsling i x minutter</string>
     <string name="cancel">Avbryt</string>
     <string name="no">Nei</string>
-    <string name="pref_sensor_location_dont_ask_again">Ikke spør meg igjen</string>
+    <string name="pref_sensor_location_dont_ask_again"> Ikke spør meg igjen</string>
     <string name="title_activity_error">"Feil- og Hendelsesliste"</string>
     <string name="title_activity_main">Hovedaktivitet</string>
     <string name="title_activity_fake_numbers">Falske Nummer</string>
@@ -116,7 +116,7 @@
     <string name="please_set_dex_receiver_serial_number">Vennligst angi Dex Receiver serienummer i App-innstillinger</string>
     <string name="unfortunately_andoird_version_no_blueooth_low_energy">Dessverre støtter ikke din android-versjonen Bluetooth Low Energy</string>
     <string name="waiting_for_packet">Venter på pakke</string>
-    <string name="persistent_high_for_greater_than">Vedvarende høy i &gt;</string>
+    <string name="persistent_high_for_greater_than">Vedvarende høy i &gt; </string>
     <string name="space_mins">" min"</string>
     <string name="till">inntil</string>
     <string name="low_predicted">Lav beregnet</string>
@@ -737,7 +737,7 @@
     <string name="show_bolus_wizard_preview">Forhåndsvis bolusveileder</string>
     <string name="display_calculations">Vis insulin/karbohydrat beregninger</string>
     <string name="display_calculations_everytime">Vis alltid insulin/karbohydrat beregninger</string>
-    <string name="always_show_bolus_wizard_preview">Alltid forhåndsvis bolusveileder</string>
+    <string name="always_show_bolus_wizard_preview">Alltid forhåndsvis bolusveileder </string>
     <string name="show_test_features">Vis ekstra og alpha test funksjoner</string>
     <string name="show_reminder_features">Vis påminnelsesmeny og funksjoner</string>
     <string name="enable_reminder_features">Aktiver påminnelsesfunksjon</string>
