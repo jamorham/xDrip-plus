@@ -28,7 +28,7 @@
     <string name="ok">Ok</string>
     <string name="cancel">Avbryt</string>
     <string name="no">Nej</string>
-    <string name="pref_sensor_location_dont_ask_again">Fråga inte i framtiden</string>
+    <string name="pref_sensor_location_dont_ask_again"> Fråga inte i framtiden</string>
     <string name="title_activity_error">"Fel- och händelselista"</string>
     <string name="title_activity_main">Huvudaktivitet</string>
     <string name="title_activity_fake_numbers">Fejksiffror</string>
@@ -116,7 +116,7 @@
     <string name="please_set_dex_receiver_serial_number">Skriv in Dex-mottagarens serienummer i programinställningarna</string>
     <string name="unfortunately_andoird_version_no_blueooth_low_energy">Tyvärr har din Android inte stöd för Bluetooth Low Energy</string>
     <string name="waiting_for_packet">Inväntar paket</string>
-    <string name="persistent_high_for_greater_than">Beständig högt i &gt;</string>
+    <string name="persistent_high_for_greater_than">Beständig högt i &gt; </string>
     <string name="space_mins">" min"</string>
     <string name="low_predicted">Lågt förespås</string>
     <string name="in">om</string>
