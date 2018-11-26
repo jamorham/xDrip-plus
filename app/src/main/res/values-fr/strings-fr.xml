@@ -27,7 +27,7 @@
     <string name="ok">D\'accord</string>
     <string name="cancel">Annuler</string>
     <string name="no">Non</string>
-    <string name="pref_sensor_location_dont_ask_again">Ne pas me demander à nouveau</string>
+    <string name="pref_sensor_location_dont_ask_again"> Ne pas me demander à nouveau</string>
     <string name="title_activity_error">"Liste des événements et erreurs"</string>
     <string name="title_activity_main">Activité principale</string>
     <string name="title_activity_fake_numbers">Faux nombres</string>
@@ -114,7 +114,7 @@
     <string name="please_set_dex_receiver_serial_number">S\'il vous plaît configurer votre numéro de série Dex Receiver dans Paramètres App</string>
     <string name="unfortunately_andoird_version_no_blueooth_low_energy">Malheureusement votre version Android ne supporte pas le Bluetooth Low Energy</string>
     <string name="waiting_for_packet">En attente de paquets</string>
-    <string name="persistent_high_for_greater_than">Haut persistante pour &gt;</string>
+    <string name="persistent_high_for_greater_than">Haut persistante pour &gt; </string>
     <string name="space_mins">" mn"</string>
     <string name="till">jusqu\'à</string>
     <string name="low_predicted">Prediction Basse</string>
@@ -320,7 +320,7 @@
     <string name="temporary_work_around_disable_all_sync_detail">Palliatif, arrête complètement toute synchronisation. Peut nécessiter le redémarrage après avoir été réactivé. Utiliser avec précaution!</string>
     <string name="automatic_updates_crash_reports_and_feedback">Mises à jour automatiques, rapports d\'incidents et réactions au développeur</string>
     <string name="crowd_sourced_translation">Traduction crowdsourcing</string>
-    <string name="please_enter_your_question_or_comments_here">S\'il vous plaît entrez votre question ou commentaire.\n\nSi vous fournissez une adresse e-mail, vous pouvez obtenir une réponse.</string>
+    <string name="please_enter_your_question_or_comments_here">S\'il vous plaît entrez votre question ou commentaire.\n\nSi vous fournissez une adresse e-mail, vous pouvez obtenir une réponse. </string>
     <string name="optional_contact_info_here_eg_email">Information de contact facultative, par exemple email</string>
     <string name="send_message">Envoyer le message</string>
     <string name="please_indicate_what_you_think_of_the_app_generally">S\'il vous plaît indiquez ce que vous pensez de l\'application en général</string>
