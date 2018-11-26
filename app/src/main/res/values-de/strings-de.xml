@@ -1007,4 +1007,7 @@
     <string name="summary_allow_testing_with_dead_sensor">Erlaube tests mit totem Sensor</string>
     <string name="title_NOT_FOR_PRODUCTION_USE">NICHT FÜR DIE NORMALE ANWENDUNG</string>
     <string name="what_time_of_day_question">Welche Tageszeit?</string>
+    <string name="please_allow_permission">Bitte erteilen Sie die nötigen Berechtigungen</string>
+    <string name="without_location_scan_doesnt_work">Ohne die \"Location\"-Berechtigung wird der Bluetooth-Scan nicht funktionieren</string>
+    <string name="without_location_permission_emergency_cannot_get_location">Ohne die \"Location\"-Berechtigung kann die Notfall-SMS keine Orts-Daten mitsenden</string>
 </resources>
