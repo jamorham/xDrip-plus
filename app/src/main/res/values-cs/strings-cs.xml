@@ -26,7 +26,7 @@
     <string name="snooze_hint">Potvrzení výstrahy na x minut</string>
     <string name="cancel">Zrušit</string>
     <string name="no">Ne</string>
-    <string name="pref_sensor_location_dont_ask_again">Na toto se už neptat</string>
+    <string name="pref_sensor_location_dont_ask_again"> Na toto se už neptat</string>
     <string name="title_activity_error">"Seznam chyb a událostí"</string>
     <string name="title_activity_main">Hlavní stránka</string>
     <string name="title_activity_fake_numbers">Falešné hodnoty</string>
@@ -123,7 +123,7 @@
     <string name="please_set_dex_receiver_serial_number">Prosím nastavte sériové číslo Dexcom přijímače v nastavení</string>
     <string name="unfortunately_andoird_version_no_blueooth_low_energy">Bohužel toto zařízení nepodporuje Bluetooth s nízkou spotřebou (BLE)</string>
     <string name="waiting_for_packet">Čekání na paket</string>
-    <string name="persistent_high_for_greater_than">Přetrvávající vysoká&gt;</string>
+    <string name="persistent_high_for_greater_than">Přetrvávající vysoká&gt; </string>
     <string name="space_mins">" Min"</string>
     <string name="till">do</string>
     <string name="low_predicted">Nízká předpovídal</string>
