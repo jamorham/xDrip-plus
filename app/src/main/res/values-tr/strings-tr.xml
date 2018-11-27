@@ -161,7 +161,7 @@
     <string name="glucose_units">Glikoz birimleri</string>
     <string name="mmol_or_mgdl_high_and_low">mmol/l veya mg/dl yüksek ve düşük</string>
     <string name="general_settings">Genel Ayarlar</string>
-    <string name="high_value">Yüksek değer</string>
+    <string name="high_value">Yüksek Değer</string>
     <string name="low_value">Düşük değer</string>
     <string name="end_user_license_agreement">Son Kullanıcı Lisans Sözleşmesi</string>
     <string name="save">Kaydet</string>
@@ -819,7 +819,7 @@
     <string name="DoubleDown">Çift Aşağıya Doğru</string>
     <string name="SingleDown">Tek Aşağıya Doğru</string>
     <string name="FortyFiveDown">Hafif Düşmekte</string>
-    <string name="Flat">Sabit</string>
+    <string name="Flat">Değişmeyen</string>
     <string name="FortyFiveUp">Hafif Yükselmekte</string>
     <string name="SingleUp">Tek Yukarıya Doğru</string>
     <string name="DoubleUp">Çift Yukarıya Doğru</string>
