@@ -816,13 +816,13 @@
     <string name="play_sound_when_ready_for_calibration">Kalibrasyon için hazır olduğunda ses çal</string>
     <string name="receiving_data_from_collector">Toplayıcıdan %s Veri alınıyor</string>
     <!-- trend arrow for speak -->
-    <string name="DoubleDown">Hızlı düşüş</string>
-    <string name="SingleDown">Düşen</string>
+    <string name="DoubleDown">Çift Aşağıya Doğru</string>
+    <string name="SingleDown">Tek Aşağıya Doğru</string>
     <string name="FortyFiveDown">Hafif Düşen</string>
     <string name="Flat">Sabit</string>
     <string name="FortyFiveUp">Hafif Yükselen</string>
-    <string name="SingleUp">Tek Yukarı</string>
-    <string name="DoubleUp">Çift Yukarı</string>
+    <string name="SingleUp">Tek Yukarıya doğru</string>
+    <string name="DoubleUp">Çift Yukarı doğru</string>
     <string name="Speak_trend_arrow_name">Eğilim ok adıyla oku</string>
     <string name="Speak_everything_twice">Her şeyi iki kere söyle</string>
     <string name="Speech_speed">Ses hızı</string>
