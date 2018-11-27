@@ -144,7 +144,7 @@
     <string name="added">Eklendi</string>
     <string name="checking_for_update">Güncellemeler kontrol ediliyor..</string>
     <string name="signal_missed">Sinyal Yok</string>
-    <string name="space_minutes_ago">" Dakikalar önce"</string>
+    <string name="space_minutes_ago">" Dakika önce"</string>
     <string name="space_minute_ago">" Dakika önce"</string>
     <string name="show_parakeet_map">Parakeet haritasını göster</string>
     <string name="switch_parakeet_to_setup_mode">Parakeet kurulum moduna geç</string>
