@@ -813,7 +813,7 @@
     <string name="data_collector_running">Veri Toplayıcı Çalışıyor</string>
     <string name="received_some_recent_data">Bazı güncel verileri alındı</string>
     <string name="received_enough_good_data_to_calibrate">Kalibre Etmek İçin Yeterli İyi Veri Alındı</string>
-    <string name="play_sound_when_ready_for_calibration">Kalibrasyon için hazır olduğunda ses çal</string>
+    <string name="play_sound_when_ready_for_calibration">Kalibrasyon için hazır olduğunda ses çıkar</string>
     <string name="receiving_data_from_collector">Toplayıcıdan %s Veri alınıyor</string>
     <!-- trend arrow for speak -->
     <string name="DoubleDown">Çift Aşağıya Doğru</string>
