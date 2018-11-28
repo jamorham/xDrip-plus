@@ -943,7 +943,6 @@
     <string name="title_xDrip_Web_Service">xDrip Web Hizmeti</string>
     <string name="summary_Accept_connections_from_any_network_instead_of_just_internally">Sadece telefonda sadece dahili olmak yerine herhangi bir ağdan bağlantı kabul edin. Bu aktif olduğunda güvenlik sorunları oluşur! Bir kişi oluşturulduysa Shared Secret gereklidir.</string>
     <string name="title_Open_Web_Service">Açık Web hizmeti</string>
-    <string name="summary_Shared_Secret_for_open_web_service">Açık web hizmeti için paylaşılan parola (Nightscout API gizli kodunuzla eşleşmelidir)</string>
     <string name="title_xDrip_Web_Service_Secret">xDrip Web servisi gizli</string>
     <string name="summary_Display_status_from_other_apps_like_AndroidAPS">AndroidAPS gibi diğer uygulamalardan durum görüntüle</string>
     <string name="title_External_Status">Dış Durumu</string>
