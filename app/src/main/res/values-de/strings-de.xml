@@ -972,7 +972,6 @@
     <string name="title_xDrip_Web_Service">xDrip Web-Dienst</string>
     <string name="summary_Accept_connections_from_any_network_instead_of_just_internally">Akzeptiere Verbindungen von jedem Netzwerk anstelle von rein internen nur auf dem Handy. Es gibt Sicherheitsprobleme wenn dies aktiviert wird! Shared Secret wird benötigt wenn eines angelegt wurde.</string>
     <string name="title_Open_Web_Service">Offener Web-Dienst</string>
-    <string name="summary_Shared_Secret_for_open_web_service">Shared Secret für offenen Web-Dienst (sollte mit deinem Nightscout API Secret übereinstimmen)</string>
     <string name="title_xDrip_Web_Service_Secret">xDrip Web-Dienst Secret</string>
     <string name="summary_Display_status_from_other_apps_like_AndroidAPS">Zeige Status von anderen Apps wie z.B. AndroidAPS</string>
     <string name="title_External_Status">Externer Status</string>
