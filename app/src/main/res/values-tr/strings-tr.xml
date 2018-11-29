@@ -133,7 +133,7 @@
     <string name="space_mins">" mins"</string>
     <string name="till">dek</string>
     <string name="low_predicted">Düşük öngörüldü</string>
-    <string name="in">içinde</string>
+    <string name="in">içerisinde</string>
     <string name="yes_enter_setup_mode">Evet kurulum moduna gir</string>
     <string name="nokeep_parakeet_as_it_is">Parakeet\'in değişmemesine dikkat edin</string>
     <string name="are_you_sure_you_want_switch_parakeet_to_setup">Parakeet\'i kurulum moduna geçirmek istediğinizden emin misiniz?\n\nNormal olarak bu, yalnızca dinlediği vericiyi yeniden yapılandırmak için Parakeet\'e daha fazla metin mesajı göndermek için kullanılır.</string>
