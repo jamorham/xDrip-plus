@@ -130,6 +130,7 @@
     <string name="added">Aggiunto</string>
     <string name="checking_for_update">Verifica degli aggiornamenti ..</string>
     <string name="signal_missed">Segnale Perso</string>
+    <string name="minutes_ago">{0, choice,0#{0, number, integer} Minuti fa|1#{0, number, integer} Minuto fa|1&lt;{0, number, integer} Minuti fa}</string>
     <string name="space_minutes_ago">" Minuti fa"</string>
     <string name="space_minute_ago">" Minuto fa"</string>
     <string name="show_parakeet_map">Visualizza mappa Parakeet</string>
