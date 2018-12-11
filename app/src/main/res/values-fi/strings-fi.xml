@@ -122,6 +122,7 @@
     <string name="cancel_do_nothing">Peruuta - minkäänlaista</string>
     <string name="added">Lisä-</string>
     <string name="checking_for_update">Päivitysten ..</string>
+    <string name="minutes_ago">{0, choice,0#{0, number, integer} Minuuttia sitten|1#{0, number, integer} Minute sitten|1&lt;{0, number, integer} Minuuttia sitten}</string>
     <string name="space_minutes_ago">" Minuuttia sitten"</string>
     <string name="space_minute_ago">" Minute sitten"</string>
     <string name="show_parakeet_map">Näytä Parakeet kartta</string>
