@@ -125,6 +125,7 @@
     <string name="added">추가됨</string>
     <string name="checking_for_update">업데이트를 위해 확인 중..</string>
     <string name="signal_missed">신호 끊김</string>
+    <string name="minutes_ago">{0, choice,0#{0, number, integer} 몇분 전에|1#{0, number, integer} 분 전|1&lt;{0, number, integer} 몇분 전에}</string>
     <string name="space_minutes_ago">" 몇분 전에"</string>
     <string name="space_minute_ago">" 분 전"</string>
     <string name="show_parakeet_map">Parakeet map을 보여 주세요.</string>
