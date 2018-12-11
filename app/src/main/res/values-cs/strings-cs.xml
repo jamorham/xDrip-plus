@@ -138,6 +138,7 @@
     <string name="added">Přidáno</string>
     <string name="checking_for_update">Zjištuji novou verzi ...</string>
     <string name="signal_missed">Signál nezachycený</string>
+    <string name="minutes_ago">{0, choice,0#{0, number, integer} Minut zpět|1#{0, number, integer} Minuta zpět|1&lt;{0, number, integer} Minut zpět}</string>
     <string name="space_minutes_ago">" Minut zpět"</string>
     <string name="space_minute_ago">" Minuta zpět"</string>
     <string name="show_parakeet_map">Zobrazit mapu Parakeetů</string>
