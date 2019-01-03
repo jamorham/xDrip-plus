@@ -52,6 +52,7 @@ import com.eveningoutpost.dexdrip.UtilityModels.BgGraphBuilder;
 import com.eveningoutpost.dexdrip.UtilityModels.CollectionServiceStarter;
 import com.eveningoutpost.dexdrip.UtilityModels.Constants;
 import com.eveningoutpost.dexdrip.UtilityModels.Experience;
+import com.eveningoutpost.dexdrip.UtilityModels.Inevitable;
 import com.eveningoutpost.dexdrip.UtilityModels.Pref;
 import com.eveningoutpost.dexdrip.UtilityModels.ShotStateStore;
 import com.eveningoutpost.dexdrip.UtilityModels.SpeechUtil;
@@ -66,8 +67,10 @@ import com.eveningoutpost.dexdrip.UtilityModels.pebble.watchface.InstallPebbleWa
 import com.eveningoutpost.dexdrip.WidgetUpdateService;
 import com.eveningoutpost.dexdrip.calibrations.PluggableCalibration;
 import com.eveningoutpost.dexdrip.profileeditor.ProfileEditor;
+import com.eveningoutpost.dexdrip.tidepool.TidepoolUploader;
+import com.eveningoutpost.dexdrip.tidepool.UploadChunk;
 import com.eveningoutpost.dexdrip.ui.LockScreenWallPaper;
-import com.eveningoutpost.dexdrip.utils.time.TimeRangeUtils;
+import com.eveningoutpost.dexdrip.watch.lefun.LeFunEntry;
 import com.eveningoutpost.dexdrip.wearintegration.Amazfitservice;
 import com.eveningoutpost.dexdrip.wearintegration.WatchUpdaterService;
 import com.eveningoutpost.dexdrip.webservices.XdripWebService;
@@ -327,12 +330,14 @@ public class Preferences extends BasePreferenceActivity {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M && DexCollectionType.hasBluetooth()) {
             LocationHelper.requestLocationForBluetooth(this); // double check!
         }
+        PreferenceManager.getDefaultSharedPreferences(this).registerOnSharedPreferenceChangeListener(LeFunEntry.prefListener);
     }
 
     @Override
     protected void onPause()
     {
         PreferenceManager.getDefaultSharedPreferences(this).unregisterOnSharedPreferenceChangeListener(ActivityRecognizedService.prefListener);
+        PreferenceManager.getDefaultSharedPreferences(this).unregisterOnSharedPreferenceChangeListener(LeFunEntry.prefListener);
         pFragment = null;
         super.onPause();
     }
@@ -877,6 +882,12 @@ public class Preferences extends BasePreferenceActivity {
             final Preference shareAccountName = findPreference("dexcom_account_name");
             shareAccountName.setOnPreferenceChangeListener(shareTokenResettingListener);
 
+            final Preference tidepoolTestLogin = findPreference("tidepool_test_login");
+            tidepoolTestLogin.setOnPreferenceClickListener(preference -> {
+                Inevitable.task("tidepool-upload", 200, TidepoolUploader::doLoginFromUi);
+                return false;
+            });
+
             final Preference scanShare = findPreference("scan_share2_barcode");
             final EditTextPreference transmitterId = (EditTextPreference) findPreference("dex_txid");
            // final Preference closeGatt = findPreference("close_gatt_on_ble_disconnect");
@@ -932,6 +943,8 @@ public class Preferences extends BasePreferenceActivity {
             lockListener.setSummaryPreference(findPreference("pick_numberwall_start"));
 
             final Preference enableAmazfit = findPreference("pref_amazfit_enable_key");
+
+
             enableAmazfit.setOnPreferenceChangeListener(new Preference.OnPreferenceChangeListener() {
                @Override
                public boolean onPreferenceChange(Preference preference, Object newValue) {
@@ -1426,6 +1439,11 @@ public class Preferences extends BasePreferenceActivity {
             final NamedSliderProcessor processor = new BgToSpeech();
             bindPreferenceTitleAppendToIntegerValueFromLogSlider(findPreference("speak_readings_change_time"), processor, "time", false);
             bindPreferenceTitleAppendToIntegerValueFromLogSlider(findPreference("speak_readings_change_threshold"), processor, "threshold", true);
+
+
+            final NamedSliderProcessor tidepoolProcessor = new UploadChunk();
+            bindPreferenceTitleAppendToIntegerValueFromLogSlider(findPreference("tidepool_window_latency"), tidepoolProcessor, "latency", false);
+
 
             wifiRecievers.setOnPreferenceChangeListener(new Preference.OnPreferenceChangeListener() {
                 @Override

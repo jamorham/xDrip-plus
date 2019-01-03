@@ -69,6 +69,7 @@ import com.eveningoutpost.dexdrip.utils.CheckBridgeBattery;
 import com.eveningoutpost.dexdrip.utils.DexCollectionType;
 import com.eveningoutpost.dexdrip.utils.DisconnectReceiver;
 import com.eveningoutpost.dexdrip.utils.bt.ScanMeister;
+import com.eveningoutpost.dexdrip.utils.framework.WakeLockTrampoline;
 import com.eveningoutpost.dexdrip.xdrip;
 import com.google.android.gms.wearable.DataMap;
 import com.rits.cloning.Cloner;
@@ -185,6 +186,7 @@ public class DexCollectionService extends Service implements BtCallBack {
     // Experimental support for rfduino from Tomasz Stachowicz
     private static volatile BluetoothGattCharacteristic mCharacteristicSend;
     private byte[] lastdata = null;
+    private static int mStatus = -1; // for display in system status
     public SharedPreferences.OnSharedPreferenceChangeListener prefListener = new SharedPreferences.OnSharedPreferenceChangeListener() {
         public void onSharedPreferenceChanged(SharedPreferences prefs, String key) {
             if (key.compareTo("run_service_in_foreground") == 0) {
@@ -233,6 +235,12 @@ public class DexCollectionService extends Service implements BtCallBack {
         } else {
             Log.d(TAG, "Services already discovered");
             checkImmediateSend();
+        }
+
+        if (mBluetoothGatt == null) {
+            //gregorybel: no needs to continue if Gatt is null!
+            UserError.Log.e(TAG, "gregorybel: force disconnect!");
+            handleDisconnectedStateChange();
         }
     }
 
@@ -308,6 +316,9 @@ public class DexCollectionService extends Service implements BtCallBack {
         @Override
         public synchronized void onConnectionStateChange(BluetoothGatt gatt, int status, int newState) {
             final PowerManager.WakeLock wl = JoH.getWakeLock("bluetooth-gatt", 60000);
+
+            mStatus = status; // for display in system status
+
             if (status == 133) {
                 error133++;
             } else {
@@ -845,6 +856,30 @@ public class DexCollectionService extends Service implements BtCallBack {
 
         l.add(new StatusItem("Bluetooth Device", JoH.ucFirst(getStateStr(mStaticState))));
 
+        if (device != null) {
+            l.add(new StatusItem("Device Mac Address", device.getAddress()));
+        }
+
+        if (Home.get_engineering_mode()) {
+            l.add(new StatusItem("Active device connected", String.valueOf(ActiveBluetoothDevice.is_connected())));
+            l.add(new StatusItem("Bluetooth GATT", String.valueOf(mBluetoothGatt)));
+
+            String hint = "";
+            if (mStatus == 133) {
+                hint = " (restart device?)";
+            }
+
+            l.add(new StatusItem("Last status", String.valueOf(mStatus) + hint));
+
+            BluetoothManager myBluetoothManager = (BluetoothManager) xdrip.getAppContext().getSystemService(Context.BLUETOOTH_SERVICE);
+
+            if (myBluetoothManager != null) {
+                for (BluetoothDevice bluetoothDevice : myBluetoothManager.getConnectedDevices(BluetoothProfile.GATT)) {
+                    l.add(new StatusItem("GATT device connected", bluetoothDevice.getAddress()));
+                }
+            }
+        }
+
         if (mStaticState == STATE_CONNECTING) {
             final long connecting_ms = JoH.msSince(last_connect_request);
             l.add(new StatusItem("Connecting for", JoH.niceTimeScalar(connecting_ms)));
@@ -1142,7 +1177,8 @@ public class DexCollectionService extends Service implements BtCallBack {
             //final long retry_in = (Constants.SECOND_IN_MS * 25);
             final long retry_in = whenToRetryNext();
             Log.d(TAG, "setRetryTimer: Restarting in: " + (retry_in / Constants.SECOND_IN_MS) + " seconds");
-            serviceIntent = PendingIntent.getService(this, Constants.DEX_COLLECTION_SERVICE_RETRY_ID, new Intent(this, this.getClass()), 0);
+            //serviceIntent = PendingIntent.getService(this, Constants.DEX_COLLECTION_SERVICE_RETRY_ID, new Intent(this, this.getClass()), 0);
+            serviceIntent = WakeLockTrampoline.getPendingIntent(this.getClass(), Constants.DEX_COLLECTION_SERVICE_RETRY_ID);
             retry_time = JoH.wakeUpIntent(this, retry_in, serviceIntent);
         } else {
             Log.d(TAG, "Not setting retry timer as service should not be running");
@@ -1153,7 +1189,8 @@ public class DexCollectionService extends Service implements BtCallBack {
         if (shouldServiceRun()) {
             final long retry_in = use_polling ? whenToPollNext() : (Constants.MINUTE_IN_MS * 6);
             Log.d(TAG, "setFailoverTimer: Fallover Restarting in: " + (retry_in / (Constants.MINUTE_IN_MS)) + " minutes");
-            serviceFailoverIntent = PendingIntent.getService(this, Constants.DEX_COLLECTION_SERVICE_FAILOVER_ID, new Intent(this, this.getClass()), 0);
+            //serviceFailoverIntent = PendingIntent.getService(this, Constants.DEX_COLLECTION_SERVICE_FAILOVER_ID, new Intent(this, this.getClass()), 0);
+            serviceFailoverIntent = WakeLockTrampoline.getPendingIntent(this.getClass(), Constants.DEX_COLLECTION_SERVICE_FAILOVER_ID);
             failover_time = JoH.wakeUpIntent(this, retry_in, serviceFailoverIntent);
             retry_time = 0; // only one alarm will run
         } else {
@@ -1732,7 +1769,7 @@ public class DexCollectionService extends Service implements BtCallBack {
             int MAX_BT_WDG = 20;
             int bt_wdg_timer = JoH.parseIntWithDefault(Pref.getString("bluetooth_watchdog_timer", Integer.toString(MAX_BT_WDG)), 10, MAX_BT_WDG);
 
-            if ( (bt_wdg_timer <= 0) || (bt_wdg_timer > MAX_BT_WDG) ) {
+            if ( (bt_wdg_timer <= 5) || (bt_wdg_timer > MAX_BT_WDG) ) {
                 bt_wdg_timer = MAX_BT_WDG;
             }
 
