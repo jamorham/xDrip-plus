@@ -1,29 +1,23 @@
 package com.eveningoutpost.dexdrip;
 
-import android.content.ActivityNotFoundException;
-import android.content.Context;
-import android.content.Intent;
-import android.content.SharedPreferences;
-import android.graphics.Color;
-import android.net.Uri;
-import android.os.Build;
-import android.os.PowerManager;
-import android.preference.PreferenceManager;
-import android.provider.Settings;
-import android.support.v4.content.ContextCompat;
-import android.support.v4.content.LocalBroadcastManager;
-import android.support.wearable.watchface.WatchFaceStyle;
-import android.util.Log;
-import android.view.Gravity;
-import android.view.LayoutInflater;
-import android.widget.LinearLayout;
-import android.widget.Toast;
+import android.content.*;
+import android.graphics.*;
+import android.net.*;
+import android.os.*;
+import android.preference.*;
+import android.provider.*;
+import android.support.wearable.watchface.*;
+import android.util.*;
+import android.view.*;
+import android.widget.*;
 
-import com.eveningoutpost.dexdrip.Models.JoH;
-import com.eveningoutpost.dexdrip.Models.UserError;
-import com.eveningoutpost.dexdrip.UtilityModels.Pref;
-import com.eveningoutpost.dexdrip.utils.DexCollectionType;
-import com.ustwo.clockwise.common.WatchMode;
+import androidx.core.content.*;
+import androidx.localbroadcastmanager.content.*;
+
+import com.eveningoutpost.dexdrip.models.*;
+import com.eveningoutpost.dexdrip.utilitymodels.*;
+import com.eveningoutpost.dexdrip.utils.*;
+import com.ustwo.clockwise.common.*;
 
 public class Home extends BaseWatchFace {
     //KS the following were copied from app/home
@@ -36,8 +30,8 @@ public class Home extends BaseWatchFace {
     private static String nexttoast;//KS
     private static boolean is_follower = false;
     private static boolean is_follower_set = false;
-    private long chartTapTime = 0l;
-    private long fontsizeTapTime = 0l;
+    private long chartTapTime = 0L;
+    private long fontsizeTapTime = 0L;
 
     @Override
     public void onCreate() {
@@ -107,7 +101,7 @@ public class Home extends BaseWatchFace {
         int timeframe = Integer.parseInt(sharedPrefs.getString("chart_timeframe", "3"));
         Log.e(TAG, "changeChartTimeframe timeframe: " + timeframe);
         timeframe = (timeframe%5) + 1;
-        sharedPrefs.edit().putString("chart_timeframe", "" + timeframe).commit();
+        sharedPrefs.edit().putString("chart_timeframe", "" + timeframe).apply();
     }
 
     @Override
@@ -365,7 +359,7 @@ public class Home extends BaseWatchFace {
 
     public static double convertToMgDlIfMmol(double value) {
         if (!Pref.getString("units", "mgdl").equals("mgdl")) {
-            return value * com.eveningoutpost.dexdrip.UtilityModels.Constants.MMOLL_TO_MGDL;
+            return value * com.eveningoutpost.dexdrip.utilitymodels.Constants.MMOLL_TO_MGDL;
         } else {
             return value; // no conversion needed
         }

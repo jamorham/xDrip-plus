@@ -1,15 +1,16 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/keypad_layout"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="@drawable/keypad_background"
     android:orientation="vertical"
-    android:paddingBottom="1dp"
     android:paddingLeft="6dp"
+    android:paddingTop="1dp"
     android:paddingRight="6dp"
-    android:paddingTop="1dp">
+    android:paddingBottom="1dp">
 
     <TextView
         android:id="@+id/dialed_no_textview"
@@ -17,8 +18,8 @@
         android:layout_height="wrap_content"
         android:layout_gravity="center"
         android:layout_marginLeft="5dp"
-        android:layout_marginRight="5dp"
         android:layout_marginTop="10dp"
+        android:layout_marginRight="5dp"
         android:background="@drawable/tick_thing"
         android:fontFamily="sans-serif-condensed"
         android:gravity="center"
@@ -195,11 +196,11 @@
                 android:layout_gravity="left"
                 android:background="@android:color/transparent"
                 android:longClickable="false"
-                android:paddingEnd="5dp"
                 android:paddingStart="5dp"
+                android:paddingEnd="5dp"
                 android:scaleType="center"
-                android:src="@android:drawable/ic_btn_speak_now"
-                android:visibility="invisible" />
+                android:visibility="invisible"
+                app:srcCompat="@android:drawable/ic_btn_speak_now" />
         </LinearLayout>
 
         <LinearLayout
@@ -217,7 +218,7 @@
                 android:layout_marginLeft="2dp"
                 android:layout_marginRight="2dp"
                 android:scaleType="centerCrop"
-                android:src="@drawable/ic_touch_app_white_48dp" />
+                app:srcCompat="@drawable/ic_touch_app_white_48dp" />
 
             <ImageButton
                 android:id="@+id/carbstabbutton"
@@ -226,7 +227,7 @@
                 android:layout_marginLeft="2dp"
                 android:layout_marginRight="2dp"
                 android:scaleType="centerCrop"
-                android:src="@drawable/ic_local_dining_white_48dp" />
+                app:srcCompat="@drawable/ic_local_dining_white_48dp" />
 
             <ImageButton
                 android:id="@+id/insulintabbutton"
@@ -235,7 +236,7 @@
                 android:layout_marginLeft="2dp"
                 android:layout_marginRight="2dp"
                 android:scaleType="centerCrop"
-                android:src="@drawable/ic_colorize_white_48dp" />
+                app:srcCompat="@drawable/ic_colorize_white_48dp" />
 
             <ImageButton
                 android:id="@+id/timetabbutton"
@@ -244,7 +245,7 @@
                 android:layout_marginLeft="2dp"
                 android:layout_marginRight="2dp"
                 android:scaleType="centerCrop"
-                android:src="@drawable/ic_av_timer_white_36dp" />
+                app:srcCompat="@drawable/ic_av_timer_white_36dp" />
         </LinearLayout>
 
         <LinearLayout
@@ -262,10 +263,10 @@
                 android:layout_gravity="right"
                 android:background="@android:color/transparent"
                 android:longClickable="false"
-                android:paddingEnd="5dp"
                 android:paddingStart="5dp"
+                android:paddingEnd="5dp"
                 android:scaleType="center"
-                android:src="@android:drawable/ic_btn_speak_now" />
+                app:srcCompat="@android:drawable/ic_btn_speak_now" />
 
         </LinearLayout>
 

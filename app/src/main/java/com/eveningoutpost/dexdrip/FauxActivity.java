@@ -3,8 +3,8 @@ package com.eveningoutpost.dexdrip;
 import android.content.Intent;
 import android.os.Bundle;
 
-import com.eveningoutpost.dexdrip.Models.JoH;
-import com.eveningoutpost.dexdrip.Models.UserError;
+import com.eveningoutpost.dexdrip.models.JoH;
+import com.eveningoutpost.dexdrip.models.UserError;
 
 /**
  * Created by jamorham on 09/01/2017.
@@ -14,7 +14,7 @@ import com.eveningoutpost.dexdrip.Models.UserError;
 
 abstract class FauxActivity {
 
-    private final static String TAG = "FauxActivity";
+    private final static String TAG = FauxActivity.class.getSimpleName();
 
     protected void onCreate(Bundle savedInstanceState) {
         UserError.Log.d(TAG, "onCreate called: " + JoH.backTrace());

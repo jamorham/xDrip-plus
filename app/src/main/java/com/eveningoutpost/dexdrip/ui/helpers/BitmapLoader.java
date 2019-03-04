@@ -1,22 +1,18 @@
 package com.eveningoutpost.dexdrip.ui.helpers;
 
-import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
-import android.graphics.Canvas;
-import android.graphics.Matrix;
-import android.graphics.drawable.Drawable;
-import android.os.Build;
-import android.os.Bundle;
-import android.os.Parcel;
-import android.support.v4.graphics.drawable.DrawableCompat;
-import android.support.v7.content.res.AppCompatResources;
-import android.util.LruCache;
+import android.graphics.*;
+import android.graphics.drawable.*;
+import android.os.*;
+import android.util.*;
 
-import com.eveningoutpost.dexdrip.Models.UserError;
-import com.eveningoutpost.dexdrip.xdrip;
+import androidx.appcompat.content.res.*;
+import androidx.core.graphics.drawable.*;
 
-import lecho.lib.hellocharts.model.PointValue;
-import lecho.lib.hellocharts.renderer.BitmapCacheProvider;
+import com.eveningoutpost.dexdrip.models.*;
+import com.eveningoutpost.dexdrip.*;
+
+import lecho.lib.hellocharts.model.*;
+import lecho.lib.hellocharts.renderer.*;
 
 /**
  * jamorham

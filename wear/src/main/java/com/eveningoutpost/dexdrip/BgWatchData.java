@@ -1,5 +1,7 @@
 package com.eveningoutpost.dexdrip;
 
+import androidx.annotation.*;
+
 /**
  * Created by Emma Black on 1/7/15.
  */
@@ -30,10 +32,8 @@ public class BgWatchData implements Comparable<BgWatchData>{
     }
 
     @Override
-    public int compareTo(BgWatchData that) {
+    public int compareTo(@NonNull BgWatchData that) {
         // reverse order to get latest first
-        if(this.timestamp < that.timestamp) return 1;
-        if(this.timestamp > that.timestamp) return  -1;
-        return 0;
+	    return Double.compare(that.timestamp, this.timestamp);
     }
 }

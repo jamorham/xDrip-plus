@@ -1,47 +1,24 @@
 package com.eveningoutpost.dexdrip;
 
-import android.app.Activity;
-import android.bluetooth.BluetoothAdapter;
-import android.bluetooth.BluetoothDevice;
-import android.bluetooth.BluetoothGatt;
-import android.bluetooth.BluetoothGattCallback;
-import android.bluetooth.BluetoothGattCharacteristic;
-import android.bluetooth.BluetoothGattDescriptor;
-import android.bluetooth.BluetoothGattService;
-import android.bluetooth.BluetoothManager;
-import android.bluetooth.BluetoothProfile;
-import android.content.BroadcastReceiver;
-import android.content.Context;
-import android.content.Intent;
-import android.content.IntentFilter;
-import android.content.SharedPreferences;
-import android.os.Bundle;
-import android.preference.PreferenceManager;
-import android.view.View;
-import android.widget.Button;
-import android.widget.TextView;
-import android.widget.Toast;
+import android.annotation.*;
+import android.bluetooth.*;
+import android.content.*;
+import android.os.*;
+import android.preference.*;
+import android.widget.*;
 
-import com.activeandroid.query.Select;
-import com.eveningoutpost.dexdrip.ImportedLibraries.dexcom.ReadDataShare;
-import com.eveningoutpost.dexdrip.ImportedLibraries.dexcom.records.CalRecord;
-import com.eveningoutpost.dexdrip.ImportedLibraries.dexcom.records.EGVRecord;
-import com.eveningoutpost.dexdrip.ImportedLibraries.dexcom.records.SensorRecord;
-import com.eveningoutpost.dexdrip.Models.ActiveBluetoothDevice;
-import com.eveningoutpost.dexdrip.Models.BgReading;
-import com.eveningoutpost.dexdrip.Models.Calibration;
-import com.eveningoutpost.dexdrip.Models.UserError.Log;
-import com.eveningoutpost.dexdrip.UtilityModels.DexShareAttributes;
-import com.eveningoutpost.dexdrip.UtilityModels.ForegroundServiceStarter;
-import com.eveningoutpost.dexdrip.UtilityModels.HM10Attributes;
+import com.activeandroid.query.*;
+import com.eveningoutpost.dexdrip.importedLibraries.dexcom.*;
+import com.eveningoutpost.dexdrip.importedLibraries.dexcom.records.*;
+import com.eveningoutpost.dexdrip.models.*;
+import com.eveningoutpost.dexdrip.models.UserError.*;
+import com.eveningoutpost.dexdrip.utilitymodels.*;
 
-import java.nio.charset.StandardCharsets;
-import java.util.Date;
-import java.util.List;
-import java.util.UUID;
+import java.nio.charset.*;
+import java.util.*;
 
 import rx.Observable;
-import rx.functions.Action1;
+import rx.functions.*;
 
 
 public class ShareTest extends BaseActivity {
@@ -122,33 +99,20 @@ public class ShareTest extends BaseActivity {
     }
 
     public void addListenerOnButton() {
-        button.setOnClickListener(new View.OnClickListener() {
-            public void onClick(View v) {
-                attemptConnection();
-            }
-        });
-        readButton.setOnClickListener(new View.OnClickListener() {
-            public void onClick(View v) {
-                attemptRead();
-            }
-        });
-        bondButton.setOnClickListener(new View.OnClickListener() {
-            public void onClick(View v) {
-                bond(mBluetoothGatt);
-            }
-        });
+        button.setOnClickListener(v -> attemptConnection());
+        readButton.setOnClickListener(v -> attemptRead());
+        bondButton.setOnClickListener(v -> bond(mBluetoothGatt));
     }
 
     public void addListenerOnCloseButton() {
-        closeButton.setOnClickListener(new View.OnClickListener() {
-            public void onClick(View v) {
-                close();
-                details.setText("");
-            }
+        closeButton.setOnClickListener(v -> {
+            close();
+            details.setText("");
         });
     }
 
     private final BluetoothGattCallback mGattCallback = new BluetoothGattCallback() {
+        @SuppressLint("NewApi")
         @Override
         public void onConnectionStateChange(BluetoothGatt gatt, int status, int newState) {
             if (newState == BluetoothProfile.STATE_CONNECTED) {
@@ -188,7 +152,7 @@ public class ShareTest extends BaseActivity {
                 Log.i(TAG, "Characteristic Read");
                 byte[] value = characteristic.getValue();
                 if(value != null) {
-                    Log.i(TAG, "VALUE" + value);
+                    Log.i(TAG, "VALUE" + Arrays.toString(value));
                 } else {
                     Log.w(TAG, "Characteristic was null");
                 }
@@ -216,8 +180,8 @@ public class ShareTest extends BaseActivity {
                 Log.i(TAG, "mReceiveDataCharacteristic Update");
                 byte[] value = characteristic.getValue();
                 if(value != null) {
-                    Log.i(TAG, "Characteristic: " + value);
-                    Log.i(TAG, "Characteristic: " + value.toString());
+                    Log.i(TAG, "Characteristic: " + Arrays.toString(value));
+                    Log.i(TAG, "Characteristic: " + Arrays.toString(value));
                     Log.i(TAG, "Characteristic getstring: " + characteristic.getStringValue(0));
                     Log.i(TAG, "SUBSCRIBED TO RESPONSE LISTENER");
                     Observable.just(characteristic.getValue()).subscribe(mDataResponseListener);
@@ -225,7 +189,7 @@ public class ShareTest extends BaseActivity {
                     Log.w(TAG, "Characteristic was null");
                 }
             }
-            Log.i(TAG, "NEW VALUE: " + characteristic.getValue().toString());
+            Log.i(TAG, "NEW VALUE: " + Arrays.toString(characteristic.getValue()));
         }
 
         @Override
@@ -278,43 +242,31 @@ public class ShareTest extends BaseActivity {
 
     public void attemptRead() {
         final ReadDataShare readData = new ReadDataShare(this);
-        final Action1<Long> systemTimeListener = new Action1<Long>() {
-            @Override
-            public void call(Long s) {
+        final Action1<Long> systemTimeListener = s -> {
 
-                Log.d(TAG, "Made the full round trip, got " + s + " as the system time");
-                Log.d("SYSTTIME", "Made the full round trip, got " + s + " as the system time");
-                final long addativeSystemTimeOffset = new Date().getTime() - s;
-                Log.d(TAG, "Made the full round trip, got " + addativeSystemTimeOffset + " offset");
-                Log.d("SYSTTIME", "Made the full round trip, got " + addativeSystemTimeOffset + " offset");
+            Log.d(TAG, "Made the full round trip, got " + s + " as the system time");
+            Log.d("SYSTTIME", "Made the full round trip, got " + s + " as the system time");
+            final long addativeSystemTimeOffset = new Date().getTime() - s;
+            Log.d(TAG, "Made the full round trip, got " + addativeSystemTimeOffset + " offset");
+            Log.d("SYSTTIME", "Made the full round trip, got " + addativeSystemTimeOffset + " offset");
 
-                final Action1<CalRecord[]> calRecordListener = new Action1<CalRecord[]>() {
-                    @Override
-                    public void call(CalRecord[] calRecords) {
-                        Log.d(TAG, "Made the full round trip, got " + calRecords.length + " Cal Records");
-                        Calibration.create(calRecords, addativeSystemTimeOffset, getApplicationContext());
+            final Action1<CalRecord[]> calRecordListener = calRecords -> {
+	            Log.d(TAG, "Made the full round trip, got " + calRecords.length + " Cal Records");
+	            Calibration.create(calRecords, addativeSystemTimeOffset, getApplicationContext());
 
-                        final Action1<SensorRecord[]> sensorRecordListener = new Action1<SensorRecord[]>() {
-                            @Override
-                            public void call(SensorRecord[] sensorRecords) {
-                                Log.d(TAG, "Made the full round trip, got " + sensorRecords.length + " Sensor Records");
-                                BgReading.create(sensorRecords, addativeSystemTimeOffset, getApplicationContext());
+	            final Action1<SensorRecord[]> sensorRecordListener = sensorRecords -> {
+		            Log.d(TAG, "Made the full round trip, got " + sensorRecords.length + " Sensor Records");
+		            BgReading.create(sensorRecords, addativeSystemTimeOffset, getApplicationContext());
 
-                                final Action1<EGVRecord[]> evgRecordListener = new Action1<EGVRecord[]>() {
-                                    @Override
-                                    public void call(EGVRecord[] egvRecords) {
-                                        Log.d(TAG, "Made the full round trip, got " + egvRecords.length + " EVG Records");
-                                        BgReading.create(egvRecords, addativeSystemTimeOffset, getApplicationContext());
-                                    }
-                                };
-                                readData.getRecentEGVs(evgRecordListener);
-                            }
-                        };
-                        readData.getRecentSensorRecords(sensorRecordListener);
-                    }
-                };
-                readData.getRecentCalRecords(calRecordListener);
-            }
+		            final Action1<EGVRecord[]> evgRecordListener = egvRecords -> {
+			            Log.d(TAG, "Made the full round trip, got " + egvRecords.length + " EVG Records");
+			            BgReading.create(egvRecords, addativeSystemTimeOffset, getApplicationContext());
+		            };
+		            readData.getRecentEGVs(evgRecordListener);
+	            };
+	            readData.getRecentSensorRecords(sensorRecordListener);
+            };
+            readData.getRecentCalRecords(calRecordListener);
         };
         readData.readSystemTime(systemTimeListener);
     }
@@ -324,6 +276,7 @@ public class ShareTest extends BaseActivity {
         attemptConnection();
     }
 
+    @SuppressLint("NewApi")
     public boolean connect(final String address) {
 
         details.append("\nConnecting to device");
@@ -333,7 +286,7 @@ public class ShareTest extends BaseActivity {
             Log.w(TAG, "BluetoothAdapter not initialized or unspecified address.");
             return false;
         }
-        if (mBluetoothDeviceAddress != null && address.equals(mBluetoothDeviceAddress) && mBluetoothGatt != null) {
+        if (address.equals(mBluetoothDeviceAddress) && mBluetoothGatt != null) {
             details.append("\nTrying to use an existing mBluetoothGatt for connection.");
             if (mBluetoothGatt.connect()) {
                 mConnectionState = STATE_CONNECTING;
@@ -357,6 +310,7 @@ public class ShareTest extends BaseActivity {
         }
     }
 
+    @SuppressLint("NewApi")
     public void authenticateConnection(BluetoothGatt bluetoothGatt) {
         Log.i(TAG, "Trying to auth");
         SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(getApplicationContext());
@@ -515,7 +469,7 @@ public class ShareTest extends BaseActivity {
         Log.d(TAG, "Writing command to the Gatt, step: " + step);
         int index = step;
         if (index <= (writePackets.size() - 1)) {
-            Log.d(TAG, "Writing: " + writePackets.get(index) + " index: " + index);
+            Log.d(TAG, "Writing: " + Arrays.toString(writePackets.get(index)) + " index: " + index);
             mSendDataCharacteristic.setValue(writePackets.get(index));
             mBluetoothGatt.writeCharacteristic(mSendDataCharacteristic);
         } else {

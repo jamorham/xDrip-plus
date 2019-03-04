@@ -1,37 +1,24 @@
 package com.eveningoutpost.dexdrip;
 
-import android.app.DatePickerDialog;
-import android.app.Dialog;
-import android.content.SharedPreferences;
-import android.os.Bundle;
-import android.preference.PreferenceManager;
-import android.view.Menu;
-import android.view.MenuItem;
-import android.view.View;
-import android.widget.AdapterView;
-import android.widget.ArrayAdapter;
-import android.widget.Button;
-import android.widget.DatePicker;
-import android.widget.Spinner;
-import android.widget.TextView;
-import android.widget.Toast;
+import android.app.*;
+import android.app.DatePickerDialog.*;
+import android.content.*;
+import android.os.*;
+import android.preference.*;
+import android.view.*;
+import android.widget.*;
 
-import com.eveningoutpost.dexdrip.UtilityModels.BgGraphBuilder;
-import com.eveningoutpost.dexdrip.UtilityModels.Pref;
-import com.eveningoutpost.dexdrip.stats.StatsResult;
-import com.eveningoutpost.dexdrip.utils.ActivityWithMenu;
+import com.eveningoutpost.dexdrip.utilitymodels.*;
+import com.eveningoutpost.dexdrip.stats.*;
+import com.eveningoutpost.dexdrip.utils.*;
 
-import java.text.DateFormat;
-import java.text.DecimalFormat;
-import java.util.Calendar;
-import java.util.GregorianCalendar;
-import java.util.Locale;
+import java.text.*;
+import java.util.*;
 
-import lecho.lib.hellocharts.gesture.ZoomType;
-import lecho.lib.hellocharts.listener.ViewportChangeListener;
-import lecho.lib.hellocharts.model.Viewport;
-import lecho.lib.hellocharts.view.LineChartView;
-import lecho.lib.hellocharts.view.PreviewLineChartView;
+import lecho.lib.hellocharts.gesture.*;
+import lecho.lib.hellocharts.listener.*;
+import lecho.lib.hellocharts.model.*;
+import lecho.lib.hellocharts.view.*;
 
 // by AdrianLxM
 
@@ -85,34 +72,22 @@ public class BGHistory extends ActivityWithMenu {
         this.daysSpinner = (Spinner) findViewById(R.id.daysspinner);
 
 
-        prevButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                date1.add(Calendar.DATE, -noDays);
-                setupCharts();
-            }
+        prevButton.setOnClickListener(v -> {
+            date1.add(Calendar.DATE, -noDays);
+            setupCharts();
         });
 
-        nextButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                date1.add(Calendar.DATE, +noDays);
-                setupCharts();
-            }
+        nextButton.setOnClickListener(v -> {
+            date1.add(Calendar.DATE, +noDays);
+            setupCharts();
         });
 
-        dateButton1.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                Dialog dialog = new DatePickerDialog(BGHistory.this, new DatePickerDialog.OnDateSetListener() {
-                    @Override
-                    public void onDateSet(DatePicker view, int year, int monthOfYear, int dayOfMonth) {
-                        date1.set(year, monthOfYear, dayOfMonth);
-                        setupCharts();
-                    }
-                }, date1.get(Calendar.YEAR), date1.get(Calendar.MONTH), date1.get(Calendar.DAY_OF_MONTH));
-                dialog.show();
-            }
+        dateButton1.setOnClickListener(v -> {
+            Dialog dialog = new DatePickerDialog(BGHistory.this, (OnDateSetListener) (view, year, monthOfYear, dayOfMonth) -> {
+	            date1.set(year, monthOfYear, dayOfMonth);
+	            setupCharts();
+            }, date1.get(Calendar.YEAR), date1.get(Calendar.MONTH), date1.get(Calendar.DAY_OF_MONTH));
+            dialog.show();
         });
 
         String[] vals = new String[14];
@@ -213,8 +188,7 @@ public class BGHistory extends ActivityWithMenu {
                 if (steps > 0) {
                     Double km = (((double) steps) / 2000.0d) * 1.6d;
                     Double mi = (((double) steps) / 2000.0d) * 1.0d;
-                    sb.append((km > 0.0 ? " " + getResources().getString(R.string.label_show_steps_km, df.format(km)) : "") +
-                            (mi > 0.0 ? " " + getResources().getString(R.string.label_show_steps_mi, df.format(mi)) : ""));
+                    sb.append(km > 0.0 ? " " + getResources().getString(R.string.label_show_steps_km, df.format(km)) : "").append(mi > 0.0 ? " " + getResources().getString(R.string.label_show_steps_mi, df.format(mi)) : "");
                 }
             }
             sb.append('\n');

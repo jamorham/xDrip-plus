@@ -1,16 +1,13 @@
 package com.eveningoutpost.dexdrip.ui.activities;
 
-import android.databinding.ObservableField;
-import android.os.Bundle;
-import android.os.Handler;
-import android.support.v7.app.AppCompatActivity;
+import android.os.*;
 
-import com.eveningoutpost.dexdrip.BaseAppCompatActivity;
-import com.eveningoutpost.dexdrip.Models.JoH;
-import com.eveningoutpost.dexdrip.R;
-import com.eveningoutpost.dexdrip.UtilityModels.Pref;
-import com.eveningoutpost.dexdrip.databinding.ActivitySelectAudioDeviceBinding;
-import com.eveningoutpost.dexdrip.utils.HeadsetStateReceiver;
+import androidx.databinding.*;
+
+import com.eveningoutpost.dexdrip.*;
+import com.eveningoutpost.dexdrip.models.*;
+import com.eveningoutpost.dexdrip.utilitymodels.*;
+import com.eveningoutpost.dexdrip.utils.*;
 
 /**
  * jamorham
@@ -21,11 +18,11 @@ import com.eveningoutpost.dexdrip.utils.HeadsetStateReceiver;
  */
 
 
-public class SelectAudioDevice extends BaseAppCompatActivity {
+public class SelectAudioDevice extends BaseActivity {
 
     private static final String PREF_MAC_STORE = "vehicle-mode-audio-mac";
 
-    ActivitySelectAudioDeviceBinding binding;
+    com.eveningoutpost.dexdrip.databinding.ActivitySelectAudioDeviceBinding binding;
     final Handler handler = new Handler();
     private boolean stopping;
 
@@ -33,7 +30,7 @@ public class SelectAudioDevice extends BaseAppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        binding = ActivitySelectAudioDeviceBinding.inflate(getLayoutInflater());
+        binding = com.eveningoutpost.dexdrip.databinding.ActivitySelectAudioDeviceBinding.inflate(getLayoutInflater());
         binding.setI(new AudioDeviceOJO());
         binding.setVm(this);
 
@@ -116,7 +113,7 @@ public class SelectAudioDevice extends BaseAppCompatActivity {
 
 
     public static void setAudioMac(final String mac) {
-        if (mac == null || mac.length() == 0) return;
+        if (mac == null || mac.isEmpty()) return;
         Pref.setString(PREF_MAC_STORE, mac);
     }
 

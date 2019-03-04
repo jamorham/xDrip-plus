@@ -1,39 +1,28 @@
 package com.eveningoutpost.dexdrip.utils;
 
-import android.content.Intent;
-import android.content.SharedPreferences;
-import android.os.Bundle;
-import android.os.PowerManager;
-import android.preference.PreferenceManager;
+import android.content.*;
+import android.os.*;
+import android.preference.*;
 import android.util.Base64;
-import android.util.Log;
-import android.view.View;
+import android.util.*;
+import android.view.*;
 
-import com.eveningoutpost.dexdrip.BaseAppCompatActivity;
-import com.eveningoutpost.dexdrip.GcmActivity;
-import com.eveningoutpost.dexdrip.Models.JoH;
-import com.eveningoutpost.dexdrip.R;
-import com.eveningoutpost.dexdrip.UtilityModels.Pref;
-import com.eveningoutpost.dexdrip.UtilityModels.PrefsViewImpl;
-import com.eveningoutpost.dexdrip.UtilityModels.desertsync.RouteTools;
-import com.eveningoutpost.dexdrip.databinding.ActivityDisplayQrcodeBinding;
-import com.eveningoutpost.dexdrip.xdrip;
-import com.google.gson.Gson;
-import com.google.gson.reflect.TypeToken;
-import com.google.zxing.integration.android.IntentIntegrator;
-import com.squareup.okhttp.FormEncodingBuilder;
-import com.squareup.okhttp.OkHttpClient;
-import com.squareup.okhttp.Request;
-import com.squareup.okhttp.RequestBody;
-import com.squareup.okhttp.Response;
+import com.eveningoutpost.dexdrip.*;
+import com.eveningoutpost.dexdrip.models.*;
+import com.eveningoutpost.dexdrip.utilitymodels.*;
+import com.eveningoutpost.dexdrip.utilitymodels.desertsync.*;
+import com.eveningoutpost.dexdrip.databinding.*;
+import com.google.gson.*;
+import com.google.gson.reflect.*;
+import com.google.zxing.integration.android.*;
+import com.squareup.okhttp.*;
 
-import org.json.JSONObject;
+import org.json.*;
 
-import java.util.HashMap;
-import java.util.Map;
-import java.util.concurrent.TimeUnit;
+import java.util.*;
+import java.util.concurrent.*;
 
-public class DisplayQRCode extends BaseAppCompatActivity {
+public class DisplayQRCode extends BaseActivity {
 
     public static final String qrmarker = "xdpref:";
     private static final String TAG = "jamorham qr";
@@ -165,50 +154,48 @@ public class DisplayQRCode extends BaseAppCompatActivity {
                     final RequestBody formBody = new FormEncodingBuilder()
                             .add("data", bbody)
                             .build();
-                    new Thread(new Runnable() {
-                        public void run() {
-                            try {
-                                final Request request = new Request.Builder()
-                                        .header("User-Agent", "Mozilla/5.0 (jamorham)")
-                                        .header("Connection", "close")
-                                        .url(send_url)
-                                        .post(formBody)
-                                        .build();
-                                Log.i(TAG, "Uploading data");
-                                Response response = client.newCall(request).execute();
-                                if (response.isSuccessful()) {
-                                    final String reply = response.body().string();
-                                    Log.d(TAG, "Got success response length: " + reply.length() + " " + reply);
-                                    if ((reply.length() == 35) && (reply.startsWith("ID:"))) {
-                                        switch (callback_option) {
-                                            case 1: {
-                                                if (mInstance != null) {
-                                                    mInstance.display_final_all_settings_qr_code(reply.substring(3, 35), mykey);
-                                                } else {
-                                                    Log.e(TAG, "mInstance null");
-                                                }
-                                                break;
+                    new Thread(() -> {
+                        try {
+                            final Request request = new Request.Builder()
+                                    .header("User-Agent", "Mozilla/5.0 (jamorham)")
+                                    .header("Connection", "close")
+                                    .url(send_url)
+                                    .post(formBody)
+                                    .build();
+                            Log.i(TAG, "Uploading data");
+                            Response response = client.newCall(request).execute();
+                            if (response.isSuccessful()) {
+                                final String reply = response.body().string();
+                                Log.d(TAG, "Got success response length: " + reply.length() + " " + reply);
+                                if ((reply.length() == 35) && (reply.startsWith("ID:"))) {
+                                    switch (callback_option) {
+                                        case 1: {
+                                            if (mInstance != null) {
+                                                mInstance.display_final_all_settings_qr_code(reply.substring(3, 35), mykey);
+                                            } else {
+                                                Log.e(TAG, "mInstance null");
                                             }
-                                            case 2: {
-                                                GcmActivity.backfillLink(reply.substring(3, 35), JoH.bytesToHex(mykey));
-                                                break;
-                                            }
-                                            default: {
-                                                toast("Invalid callback option on upload");
-                                            }
+                                            break;
                                         }
-                                    } else {
-                                        Log.d(TAG, "Got unhandled reply: " + reply);
-                                        toast(reply);
+                                        case 2: {
+                                            GcmActivity.backfillLink(reply.substring(3, 35), JoH.bytesToHex(mykey));
+                                            break;
+                                        }
+                                        default: {
+                                            toast("Invalid callback option on upload");
+                                        }
                                     }
                                 } else {
-                                    toast("Error please try again");
+                                    Log.d(TAG, "Got unhandled reply: " + reply);
+                                    toast(reply);
                                 }
-                            } catch (Exception e) {
-                                Log.e(TAG, "Got exception in execute: " + e.toString());
-                                e.printStackTrace();
-                                toast("Error with connection");
+                            } else {
+                                toast("Error please try again");
                             }
+                        } catch (Exception e) {
+                            Log.e(TAG, "Got exception in execute: " + e.toString());
+                            e.printStackTrace();
+                            toast("Error with connection");
                         }
                     }).start();
                 } catch (Exception e) {
@@ -238,14 +225,11 @@ public class DisplayQRCode extends BaseAppCompatActivity {
     private void display_final_all_settings_qr_code(final String uid, final byte[] mykey) {
         Log.d(TAG, "Displaying final qr code: " + uid);
         try {
-            runOnUiThread(new Runnable() {
-                @Override
-                public void run() {
-                    prefsMap.put(getString(R.string.all_settings_wizard), "t");
-                    prefsMap.put("wizard_uuid", uid);
-                    prefsMap.put("wizard_key", CipherUtils.bytesToHex(mykey));
-                    showQRCode();
-                }
+            runOnUiThread((Runnable) () -> {
+                prefsMap.put(getString(R.string.all_settings_wizard), "t");
+                prefsMap.put("wizard_uuid", uid);
+                prefsMap.put("wizard_key", CipherUtils.bytesToHex(mykey));
+                showQRCode();
             });
         } catch (Exception e) {
             Log.e(TAG, "Got exception displaying final qrcode: " + e.toString());

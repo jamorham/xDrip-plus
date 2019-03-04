@@ -1,37 +1,22 @@
 package com.eveningoutpost.dexdrip.webservices;
 
-import android.os.PowerManager;
-import android.text.TextUtils;
-import android.util.Log;
+import android.os.*;
+import android.text.*;
+import android.util.*;
 
-import com.eveningoutpost.dexdrip.Models.JoH;
-import com.eveningoutpost.dexdrip.Models.UserError;
-import com.eveningoutpost.dexdrip.R;
-import com.eveningoutpost.dexdrip.UtilityModels.Constants;
-import com.eveningoutpost.dexdrip.UtilityModels.Pref;
-import com.eveningoutpost.dexdrip.dagger.Singleton;
-import com.eveningoutpost.dexdrip.utils.TriState;
-import com.eveningoutpost.dexdrip.xdrip;
-import com.google.common.base.Charsets;
-import com.google.common.hash.Hashing;
+import com.eveningoutpost.dexdrip.models.*;
+import com.eveningoutpost.dexdrip.*;
+import com.eveningoutpost.dexdrip.utilitymodels.*;
+import com.eveningoutpost.dexdrip.dagger.*;
+import com.eveningoutpost.dexdrip.utils.*;
+import com.google.common.base.*;
+import com.google.common.hash.*;
 
-import java.io.BufferedInputStream;
-import java.io.BufferedReader;
-import java.io.IOException;
-import java.io.InputStreamReader;
-import java.io.PrintStream;
-import java.net.InetAddress;
-import java.net.ServerSocket;
-import java.net.Socket;
-import java.net.SocketException;
-import java.net.SocketTimeoutException;
-import java.net.URLDecoder;
-import java.util.concurrent.atomic.AtomicInteger;
+import java.io.*;
+import java.net.*;
+import java.util.concurrent.atomic.*;
 
-import javax.net.ssl.SSLHandshakeException;
-import javax.net.ssl.SSLServerSocketFactory;
-import javax.net.ssl.SSLSession;
-import javax.net.ssl.SSLSocket;
+import javax.net.ssl.*;
 
 
 /**
@@ -54,7 +39,7 @@ import javax.net.ssl.SSLSocket;
 
 public class XdripWebService implements Runnable {
 
-    private static final String TAG = "xDripWebService";
+    private static final String TAG = XdripWebService.class.getSimpleName();
     private static final int MAX_RUNNING_THREADS = 15;
     private static volatile XdripWebService instance = null;
     private static volatile XdripWebService ssl_instance = null;
@@ -174,20 +159,17 @@ public class XdripWebService implements Runnable {
                 final int runningThreads = thread_count.get();
                 if (runningThreads < MAX_RUNNING_THREADS) {
                     Log.d(TAG, "Running threads: " + runningThreads);
-                    new Thread(new Runnable() {
-                        @Override
-                        public void run() {
-                            thread_count.incrementAndGet();
-                            try {
-                                handle(socket);
-                                socket.close();
-                            } catch (SocketException e) {
-                                // ignore
-                            } catch (IOException e) {
-                                Log.e(TAG, "Web server thread error.", e);
-                            } finally {
-                                thread_count.decrementAndGet();
-                            }
+                    new Thread(() -> {
+                        thread_count.incrementAndGet();
+                        try {
+                            handle(socket);
+                            socket.close();
+                        } catch (SocketException e) {
+                            // ignore
+                        } catch (IOException e) {
+                            Log.e(TAG, "Web server thread error.", e);
+                        } finally {
+                            thread_count.decrementAndGet();
                         }
                     }).start();
                 } else {
@@ -265,7 +247,7 @@ public class XdripWebService implements Runnable {
                     }
 
                 } else if (line.startsWith(("api-secret"))) {
-                    final String requestSecret[] = line.split(": ");
+	                final String[] requestSecret = line.split(": ");
                     if (requestSecret.length < 2) continue;
                     secretCheckResult.set(hashedSecret != null && hashedSecret.equalsIgnoreCase(requestSecret[1]));
                     break; // last and only header checked and will appear after GET request

@@ -8,8 +8,8 @@
     android:id="@+id/container"
     android:background="@color/white"
     android:paddingTop="32dp"
-    android:paddingLeft="36dp"
-    android:paddingRight="22dp"
+    android:paddingStart="36dp"
+    android:paddingEnd="22dp"
     tools:context="com.eveningoutpost.dexdrip.LocationPermissionActivity"
     tools:deviceIds="wear">
     <LinearLayout
@@ -40,7 +40,7 @@
                 app:circle_color="#0086D4"
                 android:src="@drawable/ic_lock_open_white_24dp"/>
 
-            <android.support.v4.widget.Space
+            <androidx.legacy.widget.Space
                 android:layout_width="8dp"
                 android:layout_height="8dp"/>
 

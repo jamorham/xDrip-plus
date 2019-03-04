@@ -11,8 +11,8 @@ import android.os.Build;
 import android.os.IBinder;
 import android.os.PowerManager;
 
-import com.eveningoutpost.dexdrip.Models.JoH;
-import com.eveningoutpost.dexdrip.Models.UserError.Log;
+import com.eveningoutpost.dexdrip.models.JoH;
+import com.eveningoutpost.dexdrip.models.UserError.Log;
 
 public class WidgetUpdateService extends Service {
     private static final String TAG = "WidgetUpdateService";
@@ -105,7 +105,7 @@ public class WidgetUpdateService extends Service {
 
     public void updateCurrentBgInfo() {
         Log.d(TAG, "Sending update flag to widget");
-        int ids[] = AppWidgetManager.getInstance(getApplication()).getAppWidgetIds(new ComponentName(getApplication(), xDripWidget.class));
+	    int[] ids = AppWidgetManager.getInstance(getApplication()).getAppWidgetIds(new ComponentName(getApplication(), xDripWidget.class));
         Log.d(TAG, "Updating " + ids.length + " widgets");
         Intent intent = new Intent(this,xDripWidget.class);
         intent.setAction(AppWidgetManager.ACTION_APPWIDGET_UPDATE);

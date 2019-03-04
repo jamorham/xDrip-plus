@@ -1,35 +1,23 @@
 package com.eveningoutpost.dexdrip.utils;
 
-import android.app.Activity;
-import android.app.AlertDialog;
-import android.content.Context;
-import android.content.DialogInterface;
-import android.graphics.Color;
-import android.net.nsd.NsdManager;
-import android.net.nsd.NsdServiceInfo;
-import android.os.PowerManager;
+import android.content.*;
+import android.graphics.*;
+import android.net.nsd.*;
+import android.os.*;
 
-import com.eveningoutpost.dexdrip.Home;
-import com.eveningoutpost.dexdrip.MegaStatus;
-import com.eveningoutpost.dexdrip.Models.JoH;
-import com.eveningoutpost.dexdrip.Models.UserError;
+import androidx.appcompat.app.*;
+
+import com.eveningoutpost.dexdrip.*;
 import com.eveningoutpost.dexdrip.R;
-import com.eveningoutpost.dexdrip.UtilityModels.Constants;
-import com.eveningoutpost.dexdrip.UtilityModels.JamorhamShowcaseDrawer;
-import com.eveningoutpost.dexdrip.UtilityModels.Pref;
-import com.eveningoutpost.dexdrip.UtilityModels.ShotStateStore;
-import com.eveningoutpost.dexdrip.UtilityModels.StatusItem;
-import com.eveningoutpost.dexdrip.xdrip;
-import com.github.amlcurran.showcaseview.ShowcaseView;
-import com.github.amlcurran.showcaseview.targets.ViewTarget;
+import com.eveningoutpost.dexdrip.models.*;
+import com.eveningoutpost.dexdrip.utilitymodels.ShotStateStore;
+import com.eveningoutpost.dexdrip.utilitymodels.*;
+import com.github.amlcurran.showcaseview.*;
+import com.github.amlcurran.showcaseview.targets.*;
 
-import java.net.InetAddress;
-import java.net.UnknownHostException;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.concurrent.atomic.AtomicInteger;
+import java.net.*;
+import java.util.*;
+import java.util.concurrent.atomic.*;
 
 /**
  * Created by jamorham on 18/02/2017.
@@ -105,12 +93,7 @@ public class Mdns {
         final LookUpInfo li = iplookup.get(name);
         if ((li == null) || (JoH.msSince(li.received) > CACHE_REFRESH_MS)) {
             if (JoH.quietratelimit("mdns-hunting", 60)) {
-                new Thread(new Runnable() {
-                    @Override
-                    public void run() {
-                        new Mdns().hunt();
-                    }
-                }).start();
+                new Thread(() -> new Mdns().hunt()).start();
             }
         }
         if (li == null) return null;
@@ -129,26 +112,23 @@ public class Mdns {
         initializeDiscoveryListener();
 
         mNsdManager.discoverServices(SERVICE_TYPE, NsdManager.PROTOCOL_DNS_SD, mDiscoveryListener);
-        new Thread(new Runnable() {
-            @Override
-            public void run() {
-                final long terminate_at = JoH.tsl() + WAIT_FOR_REPLIES_TIMEOUT_MS;
-                while (JoH.tsl() < terminate_at) {
-                    try {
-                        Thread.sleep(500);
-                    } catch (InterruptedException e) {
-                        //
-                    }
-                }
-                UserError.Log.d(TAG, "Shutting down");
+        new Thread(() -> {
+            final long terminate_at = JoH.tsl() + WAIT_FOR_REPLIES_TIMEOUT_MS;
+            while (JoH.tsl() < terminate_at) {
                 try {
-                    mNsdManager.stopServiceDiscovery(mDiscoveryListener);
-                } catch (IllegalArgumentException | IllegalStateException e) {
-                    UserError.Log.e(TAG, "Could not stop timed service discovery: " + e);
+                    Thread.sleep(500);
+                } catch (InterruptedException e) {
+                    //
                 }
-                hunt_running = false;
-                JoH.releaseWakeLock(wl);
             }
+            UserError.Log.d(TAG, "Shutting down");
+            try {
+                mNsdManager.stopServiceDiscovery(mDiscoveryListener);
+            } catch (IllegalArgumentException | IllegalStateException e) {
+                UserError.Log.e(TAG, "Could not stop timed service discovery: " + e);
+            }
+            hunt_running = false;
+            JoH.releaseWakeLock(wl);
         }).start();
 
     }
@@ -218,12 +198,7 @@ public class Mdns {
                     final String name = service.getServiceName();
                     final LookUpInfo li = iplookup.get(shortenName(name));
                     if ((li == null) || (JoH.msSince(li.received) > CACHE_REFRESH_MS)) {
-                        new Thread(new Runnable() {
-                            @Override
-                            public void run() {
-                                singleResolveService(service);
-                            }
-                        }).start();
+                        new Thread(() -> singleResolveService(service)).start();
                     } else {
                         UserError.Log.d(TAG, "Already have recent data for: " + name + " => " + li.address);
                     }
@@ -318,68 +293,53 @@ public class Mdns {
                 l.add(new StatusItem(entry.getValue().prettyName().replaceFirst(" ", "\n"),
                         entry.getValue().address + ((status_time != 0) ? ("\n" + JoH.niceTimeSince(status_time) + " " + "ago").replaceFirst("[0-9]+ second", "second") : ""),
                         StatusItem.Highlight.NORMAL,
-                        "long-press",
-                        new Runnable() {
-                            @Override
-                            public void run() {
+                        "long-press", () -> {
 
-                                // TODO: probe port 50005?
-                                final String receiver_list = Pref.getStringDefaultBlank("wifi_recievers_addresses").trim().toLowerCase();
-                                final String new_receiver = entry.getKey().toLowerCase() + ".local" + ":50005";
+                            // TODO: probe port 50005?
+                            final String receiver_list = Pref.getStringDefaultBlank("wifi_recievers_addresses").trim().toLowerCase();
+                            final String new_receiver = entry.getKey().toLowerCase() + ".local" + ":50005";
 
-                                if (!receiver_list.contains(entry.getKey().toLowerCase() + ".local")) {
-                                    // add item
-                                    final DialogInterface.OnClickListener dialogClickListener = new DialogInterface.OnClickListener() {
-                                        @Override
-                                        public void onClick(DialogInterface dialog, int which) {
-                                            switch (which) {
-                                                case DialogInterface.BUTTON_POSITIVE:
-                                                    String new_receiver_list = (receiver_list.length() > 0) ? receiver_list + "," + new_receiver : new_receiver;
-                                                    UserError.Log.d(TAG, "Updating receiver list to: " + new_receiver_list);
-                                                    Pref.setString("wifi_recievers_addresses", new_receiver_list);
-                                                    JoH.static_toast_long("Added receiver: " + JoH.ucFirst(entry.getKey()));
-                                                    break;
-                                            }
-                                        }
-                                    };
-                                    AlertDialog.Builder builder = new AlertDialog.Builder(context);
-                                    builder.setTitle("Add " + JoH.ucFirst(entry.getKey()) + " to list of receivers?");
-                                    builder.setMessage("Is this device running a collector?\n\n" + entry.getKey() + ".local can be automatically added to list of receivers").setPositiveButton("Add", dialogClickListener)
-                                            .setNegativeButton("No", dialogClickListener).show();
-                                } else {
-                                    // remove item
-                                    final DialogInterface.OnClickListener dialogClickListener = new DialogInterface.OnClickListener() {
-                                        @Override
-                                        public void onClick(DialogInterface dialog, int which) {
-                                            switch (which) {
-                                                case DialogInterface.BUTTON_POSITIVE:
-                                                    String new_receiver_list = receiver_list.replace(new_receiver, "").replace(",,", ",").replaceFirst(",$", "").replaceFirst("^,", "");
-                                                    UserError.Log.d(TAG, "Updating receiver list to: " + new_receiver_list);
-                                                    Pref.setString("wifi_recievers_addresses", new_receiver_list);
-                                                    JoH.static_toast_long("Removed receiver: " + JoH.ucFirst(entry.getKey()));
-                                                    break;
-                                            }
-                                        }
-                                    };
-                                    AlertDialog.Builder builder = new AlertDialog.Builder(context);
-                                    builder.setTitle("Remove " + JoH.ucFirst(entry.getKey()) + " from list of receivers?");
-                                    builder.setPositiveButton("Remove", dialogClickListener)
-                                            .setNegativeButton("No", dialogClickListener).show();
-                                }
-
-
+                            if (!receiver_list.contains(entry.getKey().toLowerCase() + ".local")) {
+                                // add item
+                                final DialogInterface.OnClickListener dialogClickListener = (dialog, which) -> {
+	                                switch (which) {
+		                                case DialogInterface.BUTTON_POSITIVE:
+			                                String new_receiver_list = (!receiver_list.isEmpty()) ? receiver_list + "," + new_receiver : new_receiver;
+			                                UserError.Log.d(TAG, "Updating receiver list to: " + new_receiver_list);
+			                                Pref.setString("wifi_recievers_addresses", new_receiver_list);
+			                                JoH.static_toast_long("Added receiver: " + JoH.ucFirst(entry.getKey()));
+			                                break;
+	                                }
+                                };
+                                androidx.appcompat.app.AlertDialog.Builder builder = new androidx.appcompat.app.AlertDialog.Builder(context);
+                                builder.setTitle("Add " + JoH.ucFirst(entry.getKey()) + " to list of receivers?");
+                                builder.setMessage("Is this device running a collector?\n\n" + entry.getKey() + ".local can be automatically added to list of receivers").setPositiveButton("Add", dialogClickListener)
+                                        .setNegativeButton("No", dialogClickListener).show();
+                            } else {
+                                // remove item
+                                final DialogInterface.OnClickListener dialogClickListener = (dialog, which) -> {
+	                                switch (which) {
+		                                case DialogInterface.BUTTON_POSITIVE:
+			                                String new_receiver_list = receiver_list.replace(new_receiver, "").replace(",,", ",").replaceFirst(",$", "").replaceFirst("^,", "");
+			                                UserError.Log.d(TAG, "Updating receiver list to: " + new_receiver_list);
+			                                Pref.setString("wifi_recievers_addresses", new_receiver_list);
+			                                JoH.static_toast_long("Removed receiver: " + JoH.ucFirst(entry.getKey()));
+			                                break;
+	                                }
+                                };
+                                AlertDialog.Builder builder = new AlertDialog.Builder(context);
+                                builder.setTitle("Remove " + JoH.ucFirst(entry.getKey()) + " from list of receivers?");
+                                builder.setPositiveButton("Remove", dialogClickListener)
+                                        .setNegativeButton("No", dialogClickListener).show();
                             }
+
+
                         }));
             }
         }
         if (l.size() > 1) {
             if (JoH.quietratelimit("mdns-check-showcase", 5)) {
-                JoH.runOnUiThreadDelayed(new Runnable() {
-                    @Override
-                    public void run() {
-                        startupInfo(context);
-                    }
-                }, 1500);
+                JoH.runOnUiThreadDelayed(() -> startupInfo(context), 1500);
             }
             return l;
         } else {
@@ -402,27 +362,23 @@ public class Mdns {
             final String title = "Tap to add or remove";
             final String message = "Devices discovered on the local network can be added or removed as collectors by tapping on them.";
             final ViewTarget target = new ViewTarget(MegaStatus.runnableView);
-            final Activity activity = (Activity) context;
+            final AppCompatActivity activity = (AppCompatActivity) context;
 
-            JoH.runOnUiThreadDelayed(new Runnable() {
-                                         @Override
-                                         public void run() {
-                                             final ShowcaseView myShowcase = new ShowcaseView.Builder(activity)
+            JoH.runOnUiThreadDelayed(() -> {
+                final ShowcaseView myShowcase = new ShowcaseView.Builder(activity)
 
-                                                     .setTarget(target)
-                                                     .setStyle(R.style.CustomShowcaseTheme2)
-                                                     .setContentTitle(title)
-                                                     .setContentText("\n" + message)
-                                                     .setShowcaseDrawer(new JamorhamShowcaseDrawer(activity.getResources(), activity.getTheme(), size1, size2, 255))
-                                                     .singleShot(oneshot ? option : -1)
-                                                     .build();
-                                             myShowcase.setBackgroundColor(Color.TRANSPARENT);
-                                             myShowcase.setShouldCentreText(false);
-                                             myShowcase.setBlocksTouches(true);
-                                             myShowcase.show();
-                                         }
-                                     }
-                    , 10);
+                        .setTarget(target)
+                        .setStyle(R.style.CustomShowcaseTheme2)
+                        .setContentTitle(title)
+                        .setContentText("\n" + message)
+                        .setShowcaseDrawer(new JamorhamShowcaseDrawer(activity.getResources(), activity.getTheme(), size1, size2, 255))
+                        .singleShot(oneshot ? option : -1)
+                        .build();
+                myShowcase.setBackgroundColor(Color.TRANSPARENT);
+                myShowcase.setShouldCentreText(false);
+                myShowcase.setBlocksTouches(true);
+                myShowcase.show();
+            }, 10);
         }
     }
 

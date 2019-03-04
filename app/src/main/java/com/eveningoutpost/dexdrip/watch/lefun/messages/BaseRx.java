@@ -2,10 +2,10 @@ package com.eveningoutpost.dexdrip.watch.lefun.messages;
 
 // jamorham
 
-import com.eveningoutpost.dexdrip.watch.lefun.LeFun;
+import com.eveningoutpost.dexdrip.watch.lefun.*;
 
-import java.io.UnsupportedEncodingException;
-import java.nio.ByteBuffer;
+import java.nio.*;
+import java.nio.charset.*;
 
 public abstract class BaseRx {
 
@@ -38,11 +38,7 @@ public abstract class BaseRx {
             buf[i] = buffer.get();
             if (buf[i] == 0x00) break;
         }
-        try {
-            return new String(buf, 0, i, "UTF-8");
-        } catch (UnsupportedEncodingException e) {
-            return null;
-        }
+	    return new String(buf, 0, i, StandardCharsets.UTF_8);
     }
 
     protected String getCanonicalVersion(final int count) {

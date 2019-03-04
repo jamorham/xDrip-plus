@@ -31,7 +31,7 @@ public class PacketStream {
     // remove control character escaping, sanity check and return valid packets after each burst
     public static synchronized List<byte[]> addBytes(byte[] bytes) {
         for (byte b : bytes) {
-            if (buffer.size() != 0 || b == START_OF_MESSAGE) {
+            if (!buffer.isEmpty() || b == START_OF_MESSAGE) {
                 buffer.add(b);
                 if (b == START_OF_MESSAGE) {
                     packet_start = buffer.size() - 1;

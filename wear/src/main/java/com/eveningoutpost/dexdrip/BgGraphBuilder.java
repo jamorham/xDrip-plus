@@ -1,37 +1,22 @@
 package com.eveningoutpost.dexdrip;
 
-import android.content.Context;
-import android.content.SharedPreferences;
-import android.graphics.Color;
+import android.content.*;
+import android.graphics.*;
 import android.text.format.DateFormat;
-import android.util.Log;
-import android.widget.Toast;
+import android.util.*;
+import android.widget.*;
 
-import java.text.SimpleDateFormat;
-import java.util.ArrayList;
-import java.util.Calendar;
-import java.util.Collections;
-import java.util.Date;
-import java.util.GregorianCalendar;
-import java.util.List;
-import java.util.TimeZone;
+import com.eveningoutpost.dexdrip.models.*;
+import com.eveningoutpost.dexdrip.utilitymodels.*;
 
-import com.eveningoutpost.dexdrip.Models.JoH;
-import com.eveningoutpost.dexdrip.Models.UserError;
-import com.eveningoutpost.dexdrip.UtilityModels.Constants;
+import java.text.*;
+import java.util.*;
 
-import lecho.lib.hellocharts.formatter.LineChartValueFormatter;
-import lecho.lib.hellocharts.formatter.SimpleLineChartValueFormatter;
-import lecho.lib.hellocharts.listener.LineChartOnValueSelectListener;
-import lecho.lib.hellocharts.model.Axis;
-import lecho.lib.hellocharts.model.AxisValue;
-import lecho.lib.hellocharts.model.Line;
-import lecho.lib.hellocharts.model.LineChartData;
-import lecho.lib.hellocharts.model.PointValue;
-import lecho.lib.hellocharts.model.ValueShape;
-import lecho.lib.hellocharts.model.Viewport;
+import lecho.lib.hellocharts.formatter.*;
+import lecho.lib.hellocharts.listener.*;
+import lecho.lib.hellocharts.model.*;
 
-import static com.eveningoutpost.dexdrip.Models.JoH.cloneObject;
+import static com.eveningoutpost.dexdrip.models.JoH.*;
 
 /**
  * Created by Emma Black on 11/15/14.
@@ -71,10 +56,10 @@ public class BgGraphBuilder {
     public Context context;
     public double highMark;
     public double lowMark;
-    public List<BgWatchData> bgDataList = new ArrayList<BgWatchData>();
-    public List<BgWatchData> treatsDataList = new ArrayList<BgWatchData>();
-    public List<BgWatchData> calDataList = new ArrayList<BgWatchData>();
-    public List<BgWatchData> btDataList = new ArrayList<BgWatchData>();
+    public List<BgWatchData> bgDataList = new ArrayList<>();
+    public List<BgWatchData> treatsDataList = new ArrayList<>();
+    public List<BgWatchData> calDataList = new ArrayList<>();
+    public List<BgWatchData> btDataList = new ArrayList<>();
     private final static String TAG = "jamorham graph";
     private final static boolean d = false; // debug flag, could be read from preferences
     public boolean doMgdl;
@@ -88,12 +73,12 @@ public class BgGraphBuilder {
     public boolean singleLine = false;
 
     private double endHour;
-    private List<PointValue> inRangeValues = new ArrayList<PointValue>();
-    private List<PointValue> highValues = new ArrayList<PointValue>();
-    private List<PointValue> lowValues = new ArrayList<PointValue>();
-    private final List<PointValue> treatmentValues = new ArrayList<PointValue>();
-    private final List<PointValue> calibrationValues = new ArrayList<PointValue>();
-    private final List<PointValue> bloodTestValues = new ArrayList<PointValue>();
+    private List<PointValue> inRangeValues = new ArrayList<>();
+    private List<PointValue> highValues = new ArrayList<>();
+    private List<PointValue> lowValues = new ArrayList<>();
+    private final List<PointValue> treatmentValues = new ArrayList<>();
+    private final List<PointValue> calibrationValues = new ArrayList<>();
+    private final List<PointValue> bloodTestValues = new ArrayList<>();
     public Viewport viewport;
 
     // ambient mode version
@@ -146,7 +131,7 @@ public class BgGraphBuilder {
 
     public List<Line> defaultLines() {
         addBgReadingValues();
-        List<Line> lines = new ArrayList<Line>();
+        List<Line> lines = new ArrayList<>();
         lines.add(highLine());
         lines.add(lowLine());
         if (singleLine) {
@@ -163,9 +148,7 @@ public class BgGraphBuilder {
         lines.add(calib[0]); // white circle of calib in background
         lines.add(calib[1]); // red dot of calib in foreground
         List<Line> extra_lines = extraLines();
-        for (Line eline : extra_lines) {
-            lines.add(eline);
-        }
+        lines.addAll(extra_lines);
 
         return lines;
     }
@@ -195,7 +178,7 @@ public class BgGraphBuilder {
                     } catch (NullPointerException e) {
                     //
                     }
-                        thesepoints = new ArrayList<PointValue>();
+                        thesepoints = new ArrayList<>();
                 }
                 lastx = thispoint.getX();
                 thesepoints.add(thispoint); // grow current line list
@@ -377,17 +360,17 @@ public class BgGraphBuilder {
                     if (height > highMark) height = highMark;
                     if (height < lowMark) height = lowMark;
 
-                    PointValueExtended pv = new PointValueExtended((float) (fuzz(treatment.timestamp)), (float) height);//(treatment.timestamp / FUZZER)
+                    PointValueExtended pv = new PointValueExtended((fuzz(treatment.timestamp)), (float) height);//(treatment.timestamp / FUZZER)
                     String mylabel = "";
                     if (insulin > 0) {
                         if (mylabel.length() > 0)
                             mylabel = mylabel + System.getProperty("line.separator");
-                        mylabel = mylabel + (Double.toString(insulin) + "u").replace(".0u", "u");
+                        mylabel = mylabel + (insulin + "u").replace(".0u", "u");
                     }
                     if (carbs > 0) {
                         if (mylabel.length() > 0)
                             mylabel = mylabel + System.getProperty("line.separator");
-                        mylabel = mylabel + (Double.toString(carbs) + "g").replace(".0g", "g");
+                        mylabel = mylabel + (carbs + "g").replace(".0g", "g");
                     }
                     pv.setLabel(mylabel); // standard label
                     if (d)
@@ -427,7 +410,7 @@ public class BgGraphBuilder {
 
                     //treatmentValues.add(pv); // hover
                     if (d)
-                        Log.d(TAG, "Treatment total record: " + Double.toString(height) + " " + " timestamp: " + Double.toString(treatment.timestamp) + " timestamp=" + JoH.dateTimeText((long) treatment.timestamp));
+                        Log.d(TAG, "Treatment total record: " + height + " " + " timestamp: " + treatment.timestamp + " timestamp=" + JoH.dateTimeText((long) treatment.timestamp));
                 }
             }
 
@@ -489,7 +472,7 @@ public class BgGraphBuilder {
     }
 
     public Line highLine() {
-        List<PointValue> highLineValues = new ArrayList<PointValue>();
+        List<PointValue> highLineValues = new ArrayList<>();
         highLineValues.add(new PointValue(fuzz(start_time), (float) highMark));
         highLineValues.add(new PointValue(fuzz(end_time), (float) highMark));
         Line highLine = new Line(highLineValues);
@@ -500,7 +483,7 @@ public class BgGraphBuilder {
     }
 
     public Line lowLine() {
-        List<PointValue> lowLineValues = new ArrayList<PointValue>();
+        List<PointValue> lowLineValues = new ArrayList<>();
         lowLineValues.add(new PointValue(fuzz(start_time), (float) lowMark));
         lowLineValues.add(new PointValue(fuzz(end_time), (float) lowMark));
         Line lowLine = new Line(lowLineValues);
@@ -514,7 +497,7 @@ public class BgGraphBuilder {
     public Axis yAxis() {
         Axis yAxis = new Axis();
         yAxis.setAutoGenerated(true);
-        List<AxisValue> axisValues = new ArrayList<AxisValue>();
+        List<AxisValue> axisValues = new ArrayList<>();
         yAxis.setValues(axisValues);
         yAxis.setHasLines(false);
         return yAxis;
@@ -524,7 +507,7 @@ public class BgGraphBuilder {
         //final boolean is24 = DateFormat.is24HourFormat(context);
         Axis xAxis = new Axis();
         xAxis.setAutoGenerated(false);
-        List<AxisValue> xAxisValues = new ArrayList<AxisValue>();
+        List<AxisValue> xAxisValues = new ArrayList<>();
         GregorianCalendar now = new GregorianCalendar();
         GregorianCalendar today = new GregorianCalendar(now.get(Calendar.YEAR), now.get(Calendar.MONTH), now.get(Calendar.DAY_OF_MONTH));
         SimpleDateFormat timeFormat = new SimpleDateFormat(is24? "HH" : "h a");

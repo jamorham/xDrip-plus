@@ -1,62 +1,42 @@
 package com.eveningoutpost.dexdrip;
 
-import android.app.Activity;
 import android.app.AlertDialog;
-import android.app.Dialog;
-import android.app.TimePickerDialog;
-import android.content.Context;
-import android.content.DialogInterface;
-import android.content.Intent;
-import android.content.SharedPreferences;
-import android.content.pm.PackageManager;
-import android.database.Cursor;
-import android.graphics.Paint;
-import android.media.Ringtone;
-import android.media.RingtoneManager;
-import android.net.Uri;
-import android.os.Build;
-import android.os.Bundle;
-import android.preference.PreferenceManager;
-import android.provider.MediaStore;
-import android.support.annotation.NonNull;
-import android.support.v4.app.ActivityCompat;
-import android.support.v4.content.ContextCompat;
-import android.text.InputType;
+import android.app.*;
+import android.app.TimePickerDialog.*;
+import android.content.*;
+import android.content.DialogInterface.*;
+import android.content.pm.*;
+import android.database.*;
+import android.graphics.*;
+import android.media.*;
+import android.net.*;
+import android.os.*;
+import android.preference.*;
+import android.provider.*;
+import android.text.*;
 import android.text.format.DateFormat;
-import android.text.method.DigitsKeyListener;
-import android.util.TypedValue;
-import android.view.MotionEvent;
-import android.view.View;
-import android.view.WindowManager;
-import android.widget.Button;
-import android.widget.CheckBox;
-import android.widget.CompoundButton;
-import android.widget.EditText;
-import android.widget.LinearLayout;
-import android.widget.NumberPicker;
-import android.widget.TextView;
-import android.widget.TimePicker;
-import android.widget.Toast;
+import android.text.method.*;
+import android.util.*;
+import android.view.*;
+import android.widget.*;
 
-import com.eveningoutpost.dexdrip.Models.AlertType;
-import com.eveningoutpost.dexdrip.Models.JoH;
-import com.eveningoutpost.dexdrip.Models.UserError.Log;
-import com.eveningoutpost.dexdrip.UtilityModels.AlertPlayer;
-import com.eveningoutpost.dexdrip.UtilityModels.BgGraphBuilder;
-import com.eveningoutpost.dexdrip.UtilityModels.Constants;
-import com.eveningoutpost.dexdrip.UtilityModels.Pref;
-import com.eveningoutpost.dexdrip.utils.ActivityWithMenu;
-import com.eveningoutpost.dexdrip.wearintegration.WatchUpdaterService;
+import androidx.annotation.*;
+import androidx.appcompat.app.*;
+import androidx.core.app.*;
+import androidx.core.content.*;
 
-import java.text.DecimalFormat;
+import com.eveningoutpost.dexdrip.models.*;
+import com.eveningoutpost.dexdrip.models.UserError.Log;
+import com.eveningoutpost.dexdrip.utilitymodels.*;
+import com.eveningoutpost.dexdrip.utils.*;
+import com.eveningoutpost.dexdrip.wearintegration.*;
+
 import java.text.ParseException;
-import java.text.SimpleDateFormat;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.List;
+import java.text.*;
+import java.util.*;
 
-import static com.eveningoutpost.dexdrip.Home.startWatchUpdaterService;
-import static com.eveningoutpost.dexdrip.xdrip.gs;
+import static com.eveningoutpost.dexdrip.Home.*;
+import static com.eveningoutpost.dexdrip.xdrip.*;
 
 public class EditAlertActivity extends ActivityWithMenu {
     //public static String menu_name = "Edit Alert";
@@ -357,7 +337,7 @@ public class EditAlertActivity extends ActivityWithMenu {
     void setDisabledView() {
     	boolean disabled = checkboxDisabled.isChecked();
     	
-    	ArrayList<TextView> textViews = new ArrayList<TextView>();
+    	ArrayList<TextView> textViews = new ArrayList<>();
     	textViews.add((TextView) findViewById(R.id.view_alert_text));
     	textViews.add((TextView) findViewById(R.id.view_alert_threshold));
     	textViews.add((TextView) findViewById(R.id.view_alert_default_snooze));
@@ -493,184 +473,142 @@ public class EditAlertActivity extends ActivityWithMenu {
 
     public void addListenerOnButtons() {
       
-        buttonSave.setOnClickListener(new View.OnClickListener() {
-            public void onClick(View v) {
-                // Check that values are ok.
-                double threshold = parseDouble(alertThreshold.getText().toString());
-                if(Double.isNaN(threshold))
-                    return;
+        buttonSave.setOnClickListener(v -> {
+            // Check that values are ok.
+            double threshold = parseDouble(alertThreshold.getText().toString());
+            if(Double.isNaN(threshold))
+                return;
 
-                threshold = unitsConvertFromDisp(threshold);
+            threshold = unitsConvertFromDisp(threshold);
 
-                int alertReraise = 1;
-                Integer alterReraiseInt = parseInt(reraise.getText().toString());
-                if(alterReraiseInt ==null)
-                    return;
-                alertReraise = alterReraiseInt;
-                int defaultSnooze = safeGetDefaultSnooze();
+            int alertReraise = 1;
+            Integer alterReraiseInt = parseInt(reraise.getText().toString());
+            if(alterReraiseInt ==null)
+                return;
+            alertReraise = alterReraiseInt;
+            int defaultSnooze = safeGetDefaultSnooze();
 
-                if(alertReraise < 1) {
-                    Toast.makeText(getApplicationContext(), "Reraise Value must be 1 minute or greater", Toast.LENGTH_LONG).show();
-                    return;
-                } else if (alertReraise >= defaultSnooze) {
-                    Toast.makeText(getApplicationContext(), "Reraise Value must be less than snooze length", Toast.LENGTH_LONG).show();
-                    return;
-                }
+            if(alertReraise < 1) {
+                Toast.makeText(getApplicationContext(), "Reraise Value must be 1 minute or greater", Toast.LENGTH_LONG).show();
+                return;
+            } else if (alertReraise >= defaultSnooze) {
+                Toast.makeText(getApplicationContext(), "Reraise Value must be less than snooze length", Toast.LENGTH_LONG).show();
+                return;
+            }
 
-                int timeStart = AlertType.toTime(startHour, startMinute);
-                int timeEnd = AlertType.toTime(endHour, endMinute);
+            int timeStart = AlertType.toTime(startHour, startMinute);
+            int timeEnd = AlertType.toTime(endHour, endMinute);
 
-                boolean allDay = checkboxAllDay.isChecked();
-                // if 23:59 was set, we increase it to 24:00
-                if(timeStart == AlertType.toTime(23, 59)) {
-                    timeStart++;
-                }
-                if(timeEnd == AlertType.toTime(23, 59)) {
-                    timeEnd++;
-                }
-                if(timeStart == AlertType.toTime(0, 0) &&
-                   timeEnd == AlertType.toTime(24, 0)) {
-                    allDay = true;
-                }
-                if (timeStart == timeEnd && (allDay==false)) {
-                    Toast.makeText(getApplicationContext(), "start time and end time of alert can not be equal",Toast.LENGTH_LONG).show();
-                    return;
-                }
-                boolean disabled = checkboxDisabled.isChecked();
-                if(!disabled && !verifyThreshold(threshold, allDay, timeStart, timeEnd)) {
-                    return;
-                }
-                boolean vibrate = checkboxVibrate.isChecked();
-                
-                boolean overrideSilentMode = checkboxOverrideSilent.isChecked();
-                boolean forceSpeaker = checkboxForceSpeaker.isChecked();
+            boolean allDay = checkboxAllDay.isChecked();
+            // if 23:59 was set, we increase it to 24:00
+            if(timeStart == AlertType.toTime(23, 59)) {
+                timeStart++;
+            }
+            if(timeEnd == AlertType.toTime(23, 59)) {
+                timeEnd++;
+            }
+            if(timeStart == AlertType.toTime(0, 0) &&
+               timeEnd == AlertType.toTime(24, 0)) {
+                allDay = true;
+            }
+            if (timeStart == timeEnd && (allDay==false)) {
+                Toast.makeText(getApplicationContext(), "start time and end time of alert can not be equal",Toast.LENGTH_LONG).show();
+                return;
+            }
+            boolean disabled = checkboxDisabled.isChecked();
+            if(!disabled && !verifyThreshold(threshold, allDay, timeStart, timeEnd)) {
+                return;
+            }
+            boolean vibrate = checkboxVibrate.isChecked();
 
-                String mp3_file = audioPath;
-                if (uuid != null) {
-                    AlertType.update_alert(uuid, alertText.getText().toString(), above, threshold, allDay, alertReraise, mp3_file, timeStart, timeEnd, overrideSilentMode, forceSpeaker, defaultSnooze, vibrate, !disabled);
-                }  else {
-                    AlertType.add_alert(null, alertText.getText().toString(), above, threshold, allDay, alertReraise, mp3_file, timeStart, timeEnd, overrideSilentMode, forceSpeaker, defaultSnooze, vibrate, !disabled);
-                }
+            boolean overrideSilentMode = checkboxOverrideSilent.isChecked();
+            boolean forceSpeaker = checkboxForceSpeaker.isChecked();
 
+            String mp3_file = audioPath;
+            if (uuid != null) {
+                AlertType.update_alert(uuid, alertText.getText().toString(), above, threshold, allDay, alertReraise, mp3_file, timeStart, timeEnd, overrideSilentMode, forceSpeaker, defaultSnooze, vibrate, !disabled);
+            }  else {
+                AlertType.add_alert(null, alertText.getText().toString(), above, threshold, allDay, alertReraise, mp3_file, timeStart, timeEnd, overrideSilentMode, forceSpeaker, defaultSnooze, vibrate, !disabled);
+            }
+
+            startWatchUpdaterService(mContext, WatchUpdaterService.ACTION_SYNC_ALERTTYPE, TAG);
+            Intent returnIntent = new Intent();
+            setResult(RESULT_OK,returnIntent);
+            finish();
+        });
+
+        buttonRemove.setOnClickListener(v -> {
+
+
+            if (uuid == null) {
+                Log.wtf(TAG, "Error remove pressed, while we were adding an alert");
+            }  else {
+                AlertType.remove_alert(uuid);
                 startWatchUpdaterService(mContext, WatchUpdaterService.ACTION_SYNC_ALERTTYPE, TAG);
-                Intent returnIntent = new Intent();
-                setResult(RESULT_OK,returnIntent);
-                finish();
             }
-
+            Intent returnIntent = new Intent();
+            setResult(RESULT_OK,returnIntent);
+            finish();
         });
 
-        buttonRemove.setOnClickListener(new View.OnClickListener() {
-            public void onClick(View v) {
+        buttonTest.setOnClickListener(v -> testAlert());
 
-
-                if (uuid == null) {
-                    Log.wtf(TAG, "Error remove pressed, while we were adding an alert");
-                }  else {
-                    AlertType.remove_alert(uuid);
-                    startWatchUpdaterService(mContext, WatchUpdaterService.ACTION_SYNC_ALERTTYPE, TAG);
-                }
-                Intent returnIntent = new Intent();
-                setResult(RESULT_OK,returnIntent);
-                finish();
-            }
-
-        });
-
-        buttonTest.setOnClickListener(new View.OnClickListener() {
-            public void onClick(View v) {
-                testAlert();
-            }
-
-        });
-
-        buttonalertMp3.setOnClickListener(new View.OnClickListener() {
-            public void onClick(View v) {
-                AlertDialog.Builder builder = new AlertDialog.Builder(mContext);
-                builder.setTitle("What type of Alert?")
-                        .setItems(R.array.alertType, new DialogInterface.OnClickListener() {
-                            public void onClick(DialogInterface dialog, int which) {
-                                if (which == 0) {
-                                    Intent intent = new Intent(RingtoneManager.ACTION_RINGTONE_PICKER);
-                                    intent.putExtra(RingtoneManager.EXTRA_RINGTONE_TITLE, "Select tone for Alerts:");
-                                    intent.putExtra(RingtoneManager.EXTRA_RINGTONE_SHOW_SILENT, true);
-                                    intent.putExtra(RingtoneManager.EXTRA_RINGTONE_SHOW_DEFAULT, true);
-                                    intent.putExtra(RingtoneManager.EXTRA_RINGTONE_TYPE, RingtoneManager.TYPE_ALL);
-                                    startActivityForResult(intent, 999);
-                                } else if (which == 1) {
-                                    if (checkPermissions()) {
-                                      chooseFile();
-                                    }
-                                } else {
-                                    // Xdrip default was chossen, we live the file name as empty.
-                                    audioPath = "";
-                                    alertMp3File.setText(shortPath(audioPath));
-                                }
+        buttonalertMp3.setOnClickListener(v -> {
+            androidx.appcompat.app.AlertDialog.Builder builder = new androidx.appcompat.app.AlertDialog.Builder(mContext);
+            builder.setTitle("What type of Alert?")
+                    .setItems(R.array.alertType, (OnClickListener) (dialog, which) -> {
+                        if (which == 0) {
+                            Intent intent = new Intent(RingtoneManager.ACTION_RINGTONE_PICKER);
+                            intent.putExtra(RingtoneManager.EXTRA_RINGTONE_TITLE, "Select tone for Alerts:");
+                            intent.putExtra(RingtoneManager.EXTRA_RINGTONE_SHOW_SILENT, true);
+                            intent.putExtra(RingtoneManager.EXTRA_RINGTONE_SHOW_DEFAULT, true);
+                            intent.putExtra(RingtoneManager.EXTRA_RINGTONE_TYPE, RingtoneManager.TYPE_ALL);
+                            startActivityForResult(intent, 999);
+                        } else if (which == 1) {
+                            if (checkPermissions()) {
+                                chooseFile();
                             }
-                        });
-                AlertDialog dialog = builder.create();
-                dialog.show();
-            }
-       }); //- See more at: http://blog.kerul.net/2011/12/pick-file-using-intentactiongetcontent.html#sthash.c8xtIr1Y.dpuf
+                        } else {
+                            // Xdrip default was chossen, we live the file name as empty.
+                            audioPath = "";
+                            alertMp3File.setText(shortPath(audioPath));
+                        }
+                    });
+            androidx.appcompat.app.AlertDialog dialog = builder.create();
+            dialog.show();
+        }); //- See more at: http://blog.kerul.net/2011/12/pick-file-using-intentactiongetcontent.html#sthash.c8xtIr1Y.dpuf
 
-        checkboxAllDay.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
-            //          @Override
-            public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
-                enableAllDayControls();
-            }
-        });
+        //          @Override
+        checkboxAllDay.setOnCheckedChangeListener((buttonView, isChecked) -> enableAllDayControls());
 
-        checkboxDisabled.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
-            //          @Override
-            public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
-                setDisabledView();
-            }
-        });
+        //          @Override
+        checkboxDisabled.setOnCheckedChangeListener((buttonView, isChecked) -> setDisabledView());
 
-        
-        checkboxOverrideSilent.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
-            //          @Override
-            public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
-                showHideSilentModeWarning();
-            }
-        });
+        //          @Override
+        checkboxOverrideSilent.setOnCheckedChangeListener((buttonView, isChecked) -> showHideSilentModeWarning());
 
         //Register Liseners to modify start and end time
 
-        View.OnClickListener startTimeListener = new View.OnClickListener() {
+        View.OnClickListener startTimeListener = v -> {
+            TimePickerDialog mTimePicker = new TimePickerDialog(mContext, AlertDialog.THEME_HOLO_DARK, (timePicker, selectedHour, selectedMinute) -> {
+                startHour = selectedHour;
+                startMinute = selectedMinute;
+                setTimeRanges();
+            }, startHour, startMinute, DateFormat.is24HourFormat(mContext));
+            mTimePicker.setTitle("Select Time");
+            mTimePicker.show();
 
-            @Override
-            public void onClick(View v) {
-                TimePickerDialog mTimePicker = new TimePickerDialog(mContext, AlertDialog.THEME_HOLO_DARK, new TimePickerDialog.OnTimeSetListener() {
-                    @Override
-                    public void onTimeSet(TimePicker timePicker, int selectedHour, int selectedMinute) {
-                        startHour = selectedHour;
-                        startMinute = selectedMinute;
-                        setTimeRanges();
-                    }
-                }, startHour, startMinute, DateFormat.is24HourFormat(mContext));
-                mTimePicker.setTitle("Select Time");
-                mTimePicker.show();
+        };
 
-            }
-        } ;
+        View.OnClickListener endTimeListener = v -> {
+            TimePickerDialog mTimePicker = new TimePickerDialog(mContext, AlertDialog.THEME_HOLO_DARK, (OnTimeSetListener) (timePicker, selectedHour, selectedMinute) -> {
+                endHour = selectedHour;
+                endMinute = selectedMinute;
+                setTimeRanges();
+            }, endHour, endMinute, DateFormat.is24HourFormat(mContext));
+            mTimePicker.setTitle("Select Time");
+            mTimePicker.show();
 
-        View.OnClickListener endTimeListener = new View.OnClickListener() {
-
-            @Override
-            public void onClick(View v) {
-                TimePickerDialog mTimePicker = new TimePickerDialog(mContext, AlertDialog.THEME_HOLO_DARK, new TimePickerDialog.OnTimeSetListener() {
-                    @Override
-                    public void onTimeSet(TimePicker timePicker, int selectedHour, int selectedMinute) {
-                        endHour = selectedHour;
-                        endMinute = selectedMinute;
-                        setTimeRanges();
-                    }
-                }, endHour, endMinute, DateFormat.is24HourFormat(mContext));
-                mTimePicker.setTitle("Select Time");
-                mTimePicker.show();
-
-            }
         };
 
         viewTimeStart.setOnClickListener(startTimeListener);
@@ -799,78 +737,57 @@ public class EditAlertActivity extends ActivityWithMenu {
     }
     public void setDefaultSnoozeSpinner(int defaultSnooze) {
         editSnooze.setText(String.valueOf(defaultSnooze));
-        editSnooze.setOnTouchListener(new View.OnTouchListener() {
-            @Override
-            public boolean onTouch(View mView, MotionEvent mMotionEvent) {
-                if (mMotionEvent.getAction() == MotionEvent.ACTION_DOWN) {
-                    final Dialog d = new Dialog(mContext);
-                    d.setTitle("Default Snooze");
-                    d.setContentView(R.layout.snooze_picker);
-                    Button b1 = (Button) d.findViewById(R.id.button1);
-                    Button b2 = (Button) d.findViewById(R.id.button2);
+        editSnooze.setOnTouchListener((mView, mMotionEvent) -> {
+            if (mMotionEvent.getAction() == MotionEvent.ACTION_DOWN) {
+                final Dialog d = new Dialog(mContext);
+                d.setTitle("Default Snooze");
+                d.setContentView(R.layout.snooze_picker);
+                Button b1 = (Button) d.findViewById(R.id.button1);
+                Button b2 = (Button) d.findViewById(R.id.button2);
 
-                    final NumberPicker snoozeValue = (NumberPicker) d.findViewById(R.id.numberPicker1);
+                final NumberPicker snoozeValue = (NumberPicker) d.findViewById(R.id.numberPicker1);
 
-                    int defaultSnooze = safeGetDefaultSnooze();
+                int defaultSnooze12 = safeGetDefaultSnooze();
 
-                    SnoozeActivity.SetSnoozePickerValues(snoozeValue, above, defaultSnooze);
-                    b1.setOnClickListener(new View.OnClickListener() {
-                        @Override
-                        public void onClick(View v) {
-                            int defaultSnooze = SnoozeActivity.getTimeFromSnoozeValue(snoozeValue.getValue());
-                            editSnooze.setText(String.valueOf(defaultSnooze));
+                SnoozeActivity.SetSnoozePickerValues(snoozeValue, above, defaultSnooze12);
+                b1.setOnClickListener(v -> {
+                    int defaultSnooze1 = SnoozeActivity.getTimeFromSnoozeValue(snoozeValue.getValue());
+                    editSnooze.setText(String.valueOf(defaultSnooze1));
 
-                            d.dismiss();
-                        }
-                    });
-                    b2.setOnClickListener(new View.OnClickListener() {
-                        @Override
-                        public void onClick(View v) {
-                            d.dismiss();
-                        }
-                    });
-                    d.show();
-                }
-                return false;
+                    d.dismiss();
+                });
+                b2.setOnClickListener(v -> d.dismiss());
+                d.show();
+            }
+            return false;
 
-            }});
+        });
 
     }
 
     public void setPreSnoozeSpinner() {
 
+        //public boolean onTouch(View mView, MotionEvent mMotionEvent) {
+        buttonPreSnooze.setOnClickListener(v -> {
+            final Dialog d = new Dialog(mContext);
+            d.setTitle("Snooze this alert...");
+            d.setContentView(R.layout.snooze_picker);
+            Button b1 = (Button) d.findViewById(R.id.button1);
+            Button b2 = (Button) d.findViewById(R.id.button2);
+            b1.setText("pre-Snooze");
 
-        buttonPreSnooze.setOnClickListener(new View.OnClickListener() {
-            @Override
-            //public boolean onTouch(View mView, MotionEvent mMotionEvent) {
-            public void onClick(View v) {
-                final Dialog d = new Dialog(mContext);
-                d.setTitle("Snooze this alert...");
-                d.setContentView(R.layout.snooze_picker);
-                Button b1 = (Button) d.findViewById(R.id.button1);
-                Button b2 = (Button) d.findViewById(R.id.button2);
-                b1.setText("pre-Snooze");
+            final NumberPicker snoozeValue = (NumberPicker) d.findViewById(R.id.numberPicker1);
 
-                final NumberPicker snoozeValue = (NumberPicker) d.findViewById(R.id.numberPicker1);
-
-                int defaultSnooze = safeGetDefaultSnooze();
-                SnoozeActivity.SetSnoozePickerValues(snoozeValue, above, defaultSnooze);
-                b1.setOnClickListener(new View.OnClickListener() {
-                    @Override
-                    public void onClick(View v) {
-                        int intValue = SnoozeActivity.getTimeFromSnoozeValue(snoozeValue.getValue());
-                        AlertPlayer.getPlayer().PreSnooze(getApplicationContext(), uuid, intValue);
-                        d.dismiss();
-                    }
-                });
-                b2.setOnClickListener(new View.OnClickListener() {
-                    @Override
-                    public void onClick(View v) {
-                        d.dismiss();
-                    }
-                });
-                d.show();
-            }});
+            int defaultSnooze = safeGetDefaultSnooze();
+            SnoozeActivity.SetSnoozePickerValues(snoozeValue, above, defaultSnooze);
+            b1.setOnClickListener(v12 -> {
+                int intValue = SnoozeActivity.getTimeFromSnoozeValue(snoozeValue.getValue());
+                AlertPlayer.getPlayer().PreSnooze(getApplicationContext(), uuid, intValue);
+                d.dismiss();
+            });
+            b2.setOnClickListener(v1 -> d.dismiss());
+            d.show();
+        });
 
     }
 
@@ -879,14 +796,9 @@ public class EditAlertActivity extends ActivityWithMenu {
             if (ContextCompat.checkSelfPermission(getApplicationContext(),
                     android.Manifest.permission.WRITE_EXTERNAL_STORAGE)
                     != PackageManager.PERMISSION_GRANTED) {
-                final Activity activity = this;
-                JoH.show_ok_dialog(activity, gs(R.string.please_allow_permission), gs(R.string.need_storage_permission_to_access_all_ringtones), new Runnable() {
-                    @Override
-                    public void run() {
-                        ActivityCompat.requestPermissions(activity,
-                                new String[]{android.Manifest.permission.WRITE_EXTERNAL_STORAGE}, MY_PERMISSIONS_REQUEST_STORAGE);
-                    }
-                });
+                final AppCompatActivity activity = this;
+                JoH.show_ok_dialog(activity, gs(R.string.please_allow_permission), gs(R.string.need_storage_permission_to_access_all_ringtones), () -> ActivityCompat.requestPermissions(activity,
+                        new String[]{android.Manifest.permission.WRITE_EXTERNAL_STORAGE}, MY_PERMISSIONS_REQUEST_STORAGE));
                 return false;
             }
         }

@@ -22,7 +22,4 @@ public class JamListenerSvc extends FirebaseMessagingService {
         attachBaseContext(xdrip.getAppContext());
         injectable = true;
     }
-
-
-
 }

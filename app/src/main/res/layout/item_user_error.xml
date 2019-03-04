@@ -1,34 +1,36 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout
-    xmlns:android="http://schemas.android.com/apk/res/android"
-    android:orientation="vertical"
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/errorRow"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:id="@+id/errorRow">
+    android:orientation="vertical">
+
     <LinearLayout
-        android:background="#000000"
         android:layout_width="fill_parent"
-        android:layout_height="wrap_content">
+        android:layout_height="wrap_content"
+        android:background="#000000">
+
         <TextView
-            android:background="#000000"
+            android:id="@+id/errorShort"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:id="@+id/errorShort"
-            android:textSize="14dp"/>
-        <TextView
             android:background="#000000"
+            android:textSize="14sp" />
+
+        <TextView
+            android:id="@+id/errorTimestamp"
             android:layout_width="fill_parent"
             android:layout_height="wrap_content"
             android:layout_gravity="right"
+            android:background="#000000"
             android:gravity="right"
-            android:id="@+id/errorTimestamp"
-            android:textSize="12dp"/>
+            android:textSize="12sp" />
     </LinearLayout>
 
     <TextView
-        android:background="#000000"
+        android:id="@+id/errorLong"
         android:layout_width="fill_parent"
         android:layout_height="wrap_content"
-        android:id="@+id/errorLong"
-        android:textSize="10dp"/>
+        android:background="#000000"
+        android:textSize="10sp" />
 </LinearLayout>

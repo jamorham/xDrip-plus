@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
@@ -206,25 +207,25 @@
             <ImageButton
                 android:layout_width="36dp"
                 android:layout_height="36dp"
-                android:src="@drawable/ic_touch_app_white_48dp"
+                app:srcCompat="@drawable/ic_touch_app_white_48dp"
                 android:scaleType="centerCrop"
                 android:id="@+id/bloodtesttabbutton" />
             <ImageButton
                 android:layout_width="36dp"
                 android:layout_height="36dp"
-                android:src="@drawable/ic_local_dining_white_48dp"
+                app:srcCompat="@drawable/ic_local_dining_white_48dp"
                 android:scaleType="centerCrop"
                 android:id="@+id/carbstabbutton" />
             <ImageButton
                 android:layout_width="36dp"
                 android:layout_height="36dp"
-                android:src="@drawable/ic_colorize_white_48dp"
+                app:srcCompat="@drawable/ic_colorize_white_48dp"
                 android:scaleType="centerCrop"
                 android:id="@+id/insulintabbutton" />
             <ImageButton
                 android:layout_width="36dp"
                 android:layout_height="36dp"
-                android:src="@drawable/ic_av_timer_white_36dp"
+                app:srcCompat="@drawable/ic_av_timer_white_36dp"
                 android:scaleType="centerCrop"
                 android:id="@+id/timetabbutton" />
         </LinearLayout>

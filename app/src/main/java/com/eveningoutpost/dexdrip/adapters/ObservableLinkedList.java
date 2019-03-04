@@ -16,8 +16,9 @@ package com.eveningoutpost.dexdrip.adapters;
  * limitations under the License.
  */
 
-import android.databinding.ListChangeRegistry;
-import android.databinding.ObservableList;
+import androidx.annotation.*;
+import androidx.databinding.ListChangeRegistry;
+import androidx.databinding.ObservableList;
 
 
 import java.util.Collection;
@@ -58,7 +59,7 @@ public class ObservableLinkedList<T> extends LinkedList<T> implements Observable
     }
 
     @Override
-    public boolean addAll(Collection<? extends T> collection) {
+    public boolean addAll(@NonNull Collection<? extends T> collection) {
         int oldSize = size();
         boolean added = super.addAll(collection);
         if (added) {
@@ -68,7 +69,7 @@ public class ObservableLinkedList<T> extends LinkedList<T> implements Observable
     }
 
     @Override
-    public boolean addAll(int index, Collection<? extends T> collection) {
+    public boolean addAll(int index, @NonNull Collection<? extends T> collection) {
         boolean added = super.addAll(index, collection);
         if (added) {
             notifyAdd(index, collection.size());

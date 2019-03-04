@@ -1,5 +1,4 @@
-<?xml version="1.0" encoding="utf-8"?>
-<!-- Copyright (C) 2013 The Android Open Source Project
+<?xml version="1.0" encoding="utf-8"?><!-- Copyright (C) 2013 The Android Open Source Project
 
      Licensed under the Apache License, Version 2.0 (the "License");
      you may not use this file except in compliance with the License.
@@ -13,18 +12,22 @@
      See the License for the specific language governing permissions and
      limitations under the License.
 -->
-<menu xmlns:android="http://schemas.android.com/apk/res/android">
-    <item android:id="@+id/menu_refresh"
-        android:title="@string/menu_refresh"
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+    <item
+        android:id="@+id/menu_refresh"
         android:checkable="false"
         android:orderInCategory="1"
-        android:showAsAction="ifRoom"/>
-    <item android:id="@+id/menu_scan"
-        android:title="@string/menu_scan"
+        android:title="@string/menu_refresh"
+        app:showAsAction="ifRoom" />
+    <item
+        android:id="@+id/menu_scan"
         android:orderInCategory="100"
-        android:showAsAction="ifRoom|withText"/>
-    <item android:id="@+id/menu_stop"
-        android:title="@string/menu_stop"
+        android:title="@string/menu_scan"
+        app:showAsAction="ifRoom|withText" />
+    <item
+        android:id="@+id/menu_stop"
         android:orderInCategory="101"
-        android:showAsAction="ifRoom|withText"/>
+        android:title="@string/menu_stop"
+        app:showAsAction="ifRoom|withText" />
 </menu>

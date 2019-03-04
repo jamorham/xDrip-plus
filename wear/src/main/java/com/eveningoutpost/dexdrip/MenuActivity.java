@@ -1,28 +1,22 @@
 package com.eveningoutpost.dexdrip;
 
-import android.app.Activity;
-import android.content.Intent;
-import android.graphics.Color;
-import android.os.Bundle;
-import android.support.wearable.view.WatchViewStub;
-import android.view.View;
-import android.widget.Button;
-import android.widget.ImageButton;
-import android.widget.TextView;
-import android.widget.Toast;
+import android.content.*;
+import android.graphics.*;
+import android.os.*;
+import android.support.wearable.view.*;
+import android.view.*;
+import android.widget.*;
 
-import com.eveningoutpost.dexdrip.Models.JoH;
-import com.eveningoutpost.dexdrip.Tables.BgReadingTable;
-import com.eveningoutpost.dexdrip.Tables.BloodTestTable;
-import com.eveningoutpost.dexdrip.Tables.CalibrationDataTable;
-import com.eveningoutpost.dexdrip.Tables.TreatmentsTable;
-import com.eveningoutpost.dexdrip.UtilityModels.CollectionServiceStarter;
-import com.eveningoutpost.dexdrip.utils.DexCollectionType;
+import androidx.appcompat.app.*;
 
-import java.util.HashMap;
-import java.util.Map;
+import com.eveningoutpost.dexdrip.models.*;
+import com.eveningoutpost.dexdrip.tables.*;
+import com.eveningoutpost.dexdrip.utilitymodels.*;
+import com.eveningoutpost.dexdrip.utils.*;
 
-import static com.eveningoutpost.dexdrip.ListenerService.WEARABLE_INITTREATMENTS_PATH;
+import java.util.*;
+
+import static com.eveningoutpost.dexdrip.ListenerService.*;
 
 /**
  * Adapted from WearDialer which is:
@@ -33,14 +27,14 @@ import static com.eveningoutpost.dexdrip.ListenerService.WEARABLE_INITTREATMENTS
 
 // jamorham xdrip plus
 
-public class MenuActivity extends Activity {
+public class MenuActivity extends AppCompatActivity {
 
     private final static String TAG = "jamorham " + MenuActivity.class.getSimpleName();
     //private TextView mDialTextView;
     private ImageButton addtreatmentbutton, xdripprefsbutton, restartcollectorbutton, refreshdbbutton,
             bloodtesttabbutton, treatmenttabbutton, calibrationtabbutton, bgtabbutton;
     private static String currenttab = "";
-    private static Map<String, String> values = new HashMap<String, String>();
+    private static Map<String, String> values = new HashMap<>();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -48,94 +42,67 @@ public class MenuActivity extends Activity {
         setContentView(R.layout.activity_menu);
         currenttab = "";
         final WatchViewStub stub = (WatchViewStub) findViewById(R.id.watch_view_stub);
-        stub.setOnLayoutInflatedListener(new WatchViewStub.OnLayoutInflatedListener() {
-            @Override
-            public void onLayoutInflated(WatchViewStub stub) {
-                //mDialTextView = (TextView) stub.findViewById(R.id.dialed_no_textview);
+        stub.setOnLayoutInflatedListener(stub1 -> {
+            //mDialTextView = (TextView) stub.findViewById(R.id.dialed_no_textview);
 
-                addtreatmentbutton = (ImageButton) stub.findViewById(R.id.addtreatmentbutton);
-                restartcollectorbutton = (ImageButton) stub.findViewById(R.id.restartcollectorbutton);
-                refreshdbbutton = (ImageButton) stub.findViewById(R.id.refreshdbbutton);
-                xdripprefsbutton = (ImageButton) stub.findViewById(R.id.xdripprefsbutton);
-                bloodtesttabbutton = (ImageButton) stub.findViewById(R.id.bloodtesttabbutton);
-                treatmenttabbutton = (ImageButton) stub.findViewById(R.id.treatmenttabbutton);
-                calibrationtabbutton = (ImageButton) stub.findViewById(R.id.calibrationtabbutton);
-                bgtabbutton = (ImageButton) stub.findViewById(R.id.bgtabbutton);
+            addtreatmentbutton = (ImageButton) stub1.findViewById(R.id.addtreatmentbutton);
+            restartcollectorbutton = (ImageButton) stub1.findViewById(R.id.restartcollectorbutton);
+            refreshdbbutton = (ImageButton) stub1.findViewById(R.id.refreshdbbutton);
+            xdripprefsbutton = (ImageButton) stub1.findViewById(R.id.xdripprefsbutton);
+            bloodtesttabbutton = (ImageButton) stub1.findViewById(R.id.bloodtesttabbutton);
+            treatmenttabbutton = (ImageButton) stub1.findViewById(R.id.treatmenttabbutton);
+            calibrationtabbutton = (ImageButton) stub1.findViewById(R.id.calibrationtabbutton);
+            bgtabbutton = (ImageButton) stub1.findViewById(R.id.bgtabbutton);
 
-                if (Home.get_forced_wear())
-                    restartcollectorbutton.setVisibility(View.VISIBLE);
-                else
-                    restartcollectorbutton.setVisibility(View.GONE);
+            if (Home.get_forced_wear())
+                restartcollectorbutton.setVisibility(View.VISIBLE);
+            else
+                restartcollectorbutton.setVisibility(View.GONE);
 
-                /*mDialTextView.setText("");
+            /*mDialTextView.setText("");
 
-                mDialTextView.setOnClickListener(new View.OnClickListener() {
-                    @Override
-                    public void onClick(View v) {
-                        submitAll();
-                    }
-                });*/
+            mDialTextView.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    submitAll();
+                }
+            });*/
 
 
-                addtreatmentbutton.setOnClickListener(new View.OnClickListener() {
-                    @Override
-                    public void onClick(View v) {
-                        currenttab = "addtreatment";
-                        updateTab();
-                    }
-                });
-                refreshdbbutton.setOnClickListener(new View.OnClickListener() {
-                    @Override
-                    public void onClick(View v) {
-                        currenttab = "refreshdb";
-                        updateTab();
-                    }
-                });
-                restartcollectorbutton.setOnClickListener(new View.OnClickListener() {
-                    @Override
-                    public void onClick(View v) {
-                        currenttab = "restartcollector";
-                        updateTab();
-                    }
-                });
-                xdripprefsbutton.setOnClickListener(new View.OnClickListener() {
-                    @Override
-                    public void onClick(View v) {
-                        currenttab = "xdripprefs";
-                        updateTab();
-                    }
-                });
-                bloodtesttabbutton.setOnClickListener(new View.OnClickListener() {
-                    @Override
-                    public void onClick(View v) {
-                        currenttab = "bloodtest";
-                        updateTab();
-                    }
-                });
-                treatmenttabbutton.setOnClickListener(new View.OnClickListener() {
-                    @Override
-                    public void onClick(View v) {
-                        currenttab = "treatments";
-                        updateTab();
-                    }
-                });
-                calibrationtabbutton.setOnClickListener(new View.OnClickListener() {
-                    @Override
-                    public void onClick(View v) {
-                        currenttab = "calibrations";
-                        updateTab();
-                    }
-                });
-                bgtabbutton.setOnClickListener(new View.OnClickListener() {
-                    @Override
-                    public void onClick(View v) {
-                        currenttab = "bgreadings";
-                        updateTab();
-                    }
-                });
-
+            addtreatmentbutton.setOnClickListener(v -> {
+                currenttab = "addtreatment";
                 updateTab();
-            }
+            });
+            refreshdbbutton.setOnClickListener(v -> {
+                currenttab = "refreshdb";
+                updateTab();
+            });
+            restartcollectorbutton.setOnClickListener(v -> {
+                currenttab = "restartcollector";
+                updateTab();
+            });
+            xdripprefsbutton.setOnClickListener(v -> {
+                currenttab = "xdripprefs";
+                updateTab();
+            });
+            bloodtesttabbutton.setOnClickListener(v -> {
+                currenttab = "bloodtest";
+                updateTab();
+            });
+            treatmenttabbutton.setOnClickListener(v -> {
+                currenttab = "treatments";
+                updateTab();
+            });
+            calibrationtabbutton.setOnClickListener(v -> {
+                currenttab = "calibrations";
+                updateTab();
+            });
+            bgtabbutton.setOnClickListener(v -> {
+                currenttab = "bgreadings";
+                updateTab();
+            });
+
+            updateTab();
         });
     }
 

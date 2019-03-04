@@ -1,40 +1,30 @@
 package com.eveningoutpost.dexdrip;
 
-import android.annotation.SuppressLint;
-import android.app.Application;
-import android.content.Context;
-import android.content.ContextWrapper;
-import android.content.res.Configuration;
-import android.os.Build;
+import android.annotation.*;
+import android.app.*;
+import android.content.*;
+import android.content.res.*;
+import android.os.*;
 import android.preference.PreferenceManager;
-import android.support.annotation.StringRes;
-import android.util.Log;
+import android.util.*;
 
-import com.crashlytics.android.Crashlytics;
-import com.crashlytics.android.core.CrashlyticsCore;
-import com.eveningoutpost.dexdrip.Models.AlertType;
-import com.eveningoutpost.dexdrip.Models.JoH;
-import com.eveningoutpost.dexdrip.Models.Reminder;
-import com.eveningoutpost.dexdrip.Services.ActivityRecognizedService;
-import com.eveningoutpost.dexdrip.Services.BluetoothGlucoseMeter;
-import com.eveningoutpost.dexdrip.Services.MissedReadingService;
-import com.eveningoutpost.dexdrip.Services.PlusSyncService;
-import com.eveningoutpost.dexdrip.Services.SyncService;
-import com.eveningoutpost.dexdrip.UtilityModels.CollectionServiceStarter;
-import com.eveningoutpost.dexdrip.UtilityModels.IdempotentMigrations;
-import com.eveningoutpost.dexdrip.UtilityModels.PlusAsyncExecutor;
-import com.eveningoutpost.dexdrip.UtilityModels.Pref;
-import com.eveningoutpost.dexdrip.UtilityModels.VersionTracker;
-import com.eveningoutpost.dexdrip.calibrations.PluggableCalibration;
+import androidx.annotation.*;
+
+import com.crashlytics.android.*;
+import com.crashlytics.android.core.*;
+import com.eveningoutpost.dexdrip.models.*;
+import com.eveningoutpost.dexdrip.services.*;
+import com.eveningoutpost.dexdrip.utilitymodels.*;
+import com.eveningoutpost.dexdrip.calibrations.*;
 import com.eveningoutpost.dexdrip.utils.jobs.DailyJob;
-import com.eveningoutpost.dexdrip.utils.jobs.XDripJobCreator;
-import com.eveningoutpost.dexdrip.watch.lefun.LeFunEntry;
-import com.eveningoutpost.dexdrip.webservices.XdripWebService;
-import com.evernote.android.job.JobManager;
+import com.eveningoutpost.dexdrip.utils.jobs.*;
+import com.eveningoutpost.dexdrip.watch.lefun.*;
+import com.eveningoutpost.dexdrip.webservices.*;
+import com.evernote.android.job.*;
 
-import java.util.Locale;
+import java.util.*;
 
-import io.fabric.sdk.android.Fabric;
+import io.fabric.sdk.android.*;
 
 //import com.bugfender.sdk.Bugfender;
 

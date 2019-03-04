@@ -1,14 +1,14 @@
 <?xml version="1.0" encoding="utf-8"?>
-<android.support.v4.widget.DrawerLayout
-    xmlns:android="http://schemas.android.com/apk/res/android"
+<androidx.drawerlayout.widget.DrawerLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/drawer_layout"
-    android:layout_width="match_parent" android:layout_height="match_parent">
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
 
     <LinearLayout
-        android:orientation="vertical"
         android:layout_width="match_parent"
-        android:layout_height="match_parent">
+        android:layout_height="match_parent"
+        android:orientation="vertical">
 
         <RelativeLayout
             android:layout_width="match_parent"
@@ -16,80 +16,86 @@
             android:background="#212121">
 
             <LinearLayout
-                android:orientation="horizontal"
+                android:id="@+id/linearLayout4"
                 android:layout_width="fill_parent"
                 android:layout_height="wrap_content"
-                android:id="@+id/linearLayout4">
+                android:orientation="horizontal">
 
                 <CheckBox
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="Low"
                     android:id="@+id/lowSeverityCheckBox"
-                    android:checked="false"/>
-                <CheckBox
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="Mid"
+                    android:checked="false"
+                    android:text="Low" />
+
+                <CheckBox
                     android:id="@+id/midSeverityCheckbox"
-                    android:checked="true"/>
-                <CheckBox
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="High"
-                    android:id="@+id/highSeverityCheckbox"
-                    android:checked="true"/>
-                <CheckBox
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="EL"
-                    android:id="@+id/userEventLowCheckbox"
                     android:checked="true"
-                    android:layout_marginLeft="12dp" />
+                    android:text="Mid" />
+
                 <CheckBox
+                    android:id="@+id/highSeverityCheckbox"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="EH"
+                    android:checked="true"
+                    android:text="High" />
+
+                <CheckBox
+                    android:id="@+id/userEventLowCheckbox"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginLeft="12dp"
+                    android:checked="true"
+                    android:text="EL" />
+
+                <CheckBox
                     android:id="@+id/userEventHighCheckbox"
-                    android:checked="true"/>
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:checked="true"
+                    android:text="EH" />
             </LinearLayout>
 
             <ListView
+                android:id="@+id/errorList"
                 android:layout_width="fill_parent"
                 android:layout_height="437dp"
-                android:id="@+id/errorList"
-                android:layout_below="@+id/linearLayout4"
-                android:layout_above="@+id/send_logs_button" />
+                android:layout_above="@+id/send_logs_button"
+                android:layout_below="@+id/linearLayout4" />
 
             <Button
+                android:id="@+id/send_logs_button"
                 style="?android:attr/buttonStyleSmall"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:onClick="uploadLogs"
-                android:text="@string/upload_logs"
-                android:id="@+id/send_logs_button"
+                android:layout_alignParentEnd="true"
                 android:layout_alignParentBottom="true"
-                android:layout_alignParentEnd="true" />
+                android:onClick="uploadLogs"
+                android:text="@string/upload_logs" />
 
             <Switch
+                android:id="@+id/autorefresh"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="@string/auto_refresh"
-                android:id="@+id/autorefresh"
-                android:layout_alignParentBottom="true"
                 android:layout_alignParentStart="true"
-                android:paddingBottom="5dp"
+                android:layout_alignParentBottom="true"
+                android:layout_marginLeft="5dp"
                 android:layout_marginBottom="7dp"
-                android:layout_marginLeft="5dp" />
+                android:paddingBottom="5dp"
+                android:text="@string/auto_refresh" />
 
         </RelativeLayout>
 
     </LinearLayout>
+
     <fragment
         android:id="@+id/navigation_drawer"
-        android:layout_width="@dimen/navigation_drawer_width" android:layout_height="match_parent"
-        android:layout_gravity="start"
         android:name="com.eveningoutpost.dexdrip.NavigationDrawerFragment"
+        android:layout_width="@dimen/navigation_drawer_width"
+        android:layout_height="match_parent"
+        android:layout_gravity="start"
         tools:layout="@layout/fragment_navigation_drawer" />
 
-</android.support.v4.widget.DrawerLayout>
+</androidx.drawerlayout.widget.DrawerLayout>

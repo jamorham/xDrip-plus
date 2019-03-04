@@ -1,18 +1,15 @@
 package com.eveningoutpost.dexdrip.eassist;
 
-import android.databinding.ObservableField;
-import android.os.PowerManager;
+import android.os.*;
 
-import com.eveningoutpost.dexdrip.Models.JoH;
-import com.eveningoutpost.dexdrip.Models.UserError;
-import com.eveningoutpost.dexdrip.R;
-import com.eveningoutpost.dexdrip.UtilityModels.Constants;
-import com.eveningoutpost.dexdrip.UtilityModels.Inevitable;
-import com.eveningoutpost.dexdrip.UtilityModels.Pref;
-import com.eveningoutpost.dexdrip.utils.SMS;
-import com.eveningoutpost.dexdrip.xdrip;
+import androidx.databinding.*;
 
-import java.util.List;
+import com.eveningoutpost.dexdrip.models.*;
+import com.eveningoutpost.dexdrip.*;
+import com.eveningoutpost.dexdrip.utilitymodels.*;
+import com.eveningoutpost.dexdrip.utils.*;
+
+import java.util.*;
 
 /*
  * jamorham
@@ -170,7 +167,7 @@ public class EmergencyAssist {
 
 
     private boolean destinationsDefined() {
-        return EmergencyContact.load().size() > 0;
+        return !EmergencyContact.load().isEmpty();
     }
 
     private boolean sendMessageReal(String msg) {
@@ -217,7 +214,7 @@ public class EmergencyAssist {
     public String getExtendedReasonText() {
         final String timeText = JoH.niceTimeScalar(since);
         final String userText = getUsername();
-        final String reasonText = String.format(getReasonText(reason), userText.length() > 0 ? userText : "Name not set", timeText);
+        final String reasonText = String.format(getReasonText(reason), !userText.isEmpty() ? userText : "Name not set", timeText);
         final String locationText = GetLocation.getBestLocation();
         final String mapText = GetLocation.getMapUrl();
         final String signatureText = getString(R.string.automatic_message_from_xdrip);

@@ -1,58 +1,33 @@
 package com.eveningoutpost.dexdrip;
 
+import android.content.*;
+import android.content.DialogInterface.*;
+import android.os.*;
+import android.preference.*;
+import android.widget.*;
 
-import android.app.Activity;
-import android.app.AlertDialog;
-import android.content.BroadcastReceiver;
-import android.content.Context;
-import android.content.DialogInterface;
-import android.content.Intent;
-import android.content.IntentFilter;
-import android.content.SharedPreferences;
-import android.os.Bundle;
-import android.os.Handler;
-import android.os.PowerManager;
-import android.preference.PreferenceManager;
-import android.support.v4.content.LocalBroadcastManager;
-import android.widget.Toast;
+import androidx.appcompat.app.*;
+import androidx.localbroadcastmanager.content.*;
 
-import com.eveningoutpost.dexdrip.Models.BgReading;
-import com.eveningoutpost.dexdrip.Models.BloodTest;
-import com.eveningoutpost.dexdrip.Models.Calibration;
-import com.eveningoutpost.dexdrip.Models.DesertSync;
-import com.eveningoutpost.dexdrip.Models.JoH;
-import com.eveningoutpost.dexdrip.Models.RollCall;
-import com.eveningoutpost.dexdrip.Models.Sensor;
-import com.eveningoutpost.dexdrip.Models.Treatments;
-import com.eveningoutpost.dexdrip.Models.UserError;
-import com.eveningoutpost.dexdrip.Models.UserError.Log;
-import com.eveningoutpost.dexdrip.R;
-import com.eveningoutpost.dexdrip.Services.PlusSyncService;
-import com.eveningoutpost.dexdrip.UtilityModels.Constants;
-import com.eveningoutpost.dexdrip.UtilityModels.InstalledApps;
-import com.eveningoutpost.dexdrip.UtilityModels.PersistentStore;
-import com.eveningoutpost.dexdrip.UtilityModels.Pref;
-import com.eveningoutpost.dexdrip.utils.CipherUtils;
-import com.eveningoutpost.dexdrip.utils.DisplayQRCode;
-import com.eveningoutpost.dexdrip.utils.SdcardImportExport;
-import com.google.android.gms.common.ConnectionResult;
-import com.google.android.gms.common.GoogleApiAvailability;
-import com.google.android.gms.gcm.GoogleCloudMessaging;
-import com.google.common.primitives.Bytes;
-import com.google.firebase.messaging.FirebaseMessaging;
-import com.google.firebase.messaging.RemoteMessage;
-import com.google.gson.Gson;
-import com.google.gson.GsonBuilder;
-import com.google.gson.annotations.Expose;
-import com.google.gson.internal.bind.DateTypeAdapter;
+import com.eveningoutpost.dexdrip.models.*;
+import com.eveningoutpost.dexdrip.models.UserError.*;
+import com.eveningoutpost.dexdrip.services.*;
+import com.eveningoutpost.dexdrip.utilitymodels.*;
+import com.eveningoutpost.dexdrip.utils.*;
+import com.google.android.gms.common.*;
+import com.google.android.gms.gcm.*;
+import com.google.common.primitives.*;
+import com.google.firebase.messaging.*;
+import com.google.gson.*;
+import com.google.gson.annotations.*;
+import com.google.gson.internal.bind.*;
 
-import java.io.IOException;
-import java.nio.charset.Charset;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.List;
-import java.util.concurrent.atomic.AtomicInteger;
-import static com.eveningoutpost.dexdrip.xdrip.gs;
+import java.io.*;
+import java.nio.charset.*;
+import java.util.*;
+import java.util.concurrent.atomic.*;
+
+import static com.eveningoutpost.dexdrip.xdrip.*;
 
 /**
  * Created by jamorham on 11/01/16.
@@ -95,7 +70,7 @@ public class GcmActivity extends FauxActivity {
 
     private static SensorCalibrations[] getSensorCalibrations(String json) {
         SensorCalibrations[] sensorCalibrations = new GsonBuilder().excludeFieldsWithoutExposeAnnotation().create().fromJson(json, SensorCalibrations[].class);
-        Log.d(TAG, "After fromjson sensorCalibrations are " + sensorCalibrations.toString());
+        Log.d(TAG, "After fromjson sensorCalibrations are " + Arrays.toString(sensorCalibrations));
         return sensorCalibrations;
     }
 
@@ -119,7 +94,7 @@ public class GcmActivity extends FauxActivity {
     static NewCalibration getNewCalibration(String json) {
         NewCalibration[] newCalibrationArray = new GsonBuilder().excludeFieldsWithoutExposeAnnotation().create().fromJson(json, NewCalibration[].class);
         if (newCalibrationArray != null) {
-            Log.e(TAG, "After fromjson NewCalibration are " + newCalibrationArray.toString());
+            Log.e(TAG, "After fromjson NewCalibration are " + Arrays.toString(newCalibrationArray));
         } else {
             Log.e(TAG, "Error creating newCalibrationArray");
             return null;
@@ -128,7 +103,7 @@ public class GcmActivity extends FauxActivity {
     }
 
     private static String newCalibrationToJson(double bgValue, String uuid, long offset) {
-        NewCalibration newCalibrationArray[] = new NewCalibration[1];
+	    NewCalibration[] newCalibrationArray = new NewCalibration[1];
         NewCalibration newCalibration = new NewCalibration();
         newCalibration.bgValue = bgValue;
         newCalibration.uuid = uuid;
@@ -315,13 +290,10 @@ public class GcmActivity extends FauxActivity {
             }
             Log.d(TAG, "Sent batch");
         } else {
-            JoH.runOnUiThreadDelayed(new Runnable() {
-                @Override
-                public void run() {
-                    if (JoH.msSince(PersistentStore.getLong("gcm-bgs-batch-time")) > 4000) {
-                        Log.d(TAG, "Progressing BGSbatch due to timeout");
-                        processBgsBatch(true);
-                    }
+            JoH.runOnUiThreadDelayed(() -> {
+                if (JoH.msSince(PersistentStore.getLong("gcm-bgs-batch-time")) > 4000) {
+                    Log.d(TAG, "Progressing BGSbatch due to timeout");
+                    processBgsBatch(true);
                 }
             }, 5000);
         }
@@ -425,7 +397,7 @@ public class GcmActivity extends FauxActivity {
         if (JoH.pratelimit("gcm-sra", 60)) {
             String wifi_ssid = JoH.getWifiSSID();
             if (wifi_ssid == null) wifi_ssid = "";
-            sendMessage("sra", Long.toString(JoH.tsl()) + "^" + JoH.base64encode(wifi_ssid));
+            sendMessage("sra", JoH.tsl() + "^" + JoH.base64encode(wifi_ssid));
         }
     }
 
@@ -444,51 +416,36 @@ public class GcmActivity extends FauxActivity {
 
     static void sendSnoozeToRemoteWithConfirm(final Context context) {
         final long when = JoH.tsl();
-        final AlertDialog.Builder builder = new AlertDialog.Builder(context);
+        final androidx.appcompat.app.AlertDialog.Builder builder = new AlertDialog.Builder(context);
         builder.setTitle(xdrip.getAppContext().getString(R.string.confirm_remote_snooze));
         builder.setMessage(xdrip.getAppContext().getString(R.string.are_you_sure_you_wish_to_snooze_all_other_devices_in_your_sync_group));
-        builder.setPositiveButton(xdrip.getAppContext().getString(R.string.yes_send_it), new DialogInterface.OnClickListener() {
-            public void onClick(DialogInterface dialog, int which) {
-                dialog.dismiss();
-                if ((JoH.tsl() - when) < 120000) {
-                    sendRealSnoozeToRemote();
-                    UserError.Log.ueh(TAG, "Sent snooze to remote after confirmation");
-                } else {
-                    JoH.static_toast_long("Took too long to confirm! Ignoring!");
-                    UserError.Log.ueh(TAG, "Ignored snooze confirmation as took > 2 minutes to confirm!");
-                }
+        builder.setPositiveButton(xdrip.getAppContext().getString(R.string.yes_send_it), (OnClickListener) (dialog, which) -> {
+            dialog.dismiss();
+            if ((JoH.tsl() - when) < 120000) {
+                sendRealSnoozeToRemote();
+                Log.ueh(TAG, "Sent snooze to remote after confirmation");
+            } else {
+                JoH.static_toast_long("Took too long to confirm! Ignoring!");
+                Log.ueh(TAG, "Ignored snooze confirmation as took > 2 minutes to confirm!");
             }
         });
 
-        builder.setNegativeButton(xdrip.getAppContext().getString(R.string.no), new DialogInterface.OnClickListener() {
-            @Override
-            public void onClick(DialogInterface dialog, int which) {
-                dialog.dismiss();
-            }
-        });
+        builder.setNegativeButton(xdrip.getAppContext().getString(R.string.no), (OnClickListener) (dialog, which) -> dialog.dismiss());
         final AlertDialog alert = builder.create();
         alert.show();
         // Hide after some seconds
         final Handler handler = new Handler();
-        final Runnable runnable = new Runnable() {
-            @Override
-            public void run() {
-                try {
-                    if (alert.isShowing()) {
-                        alert.dismiss();
-                    }
-                } catch (IllegalArgumentException e) {
-                    Log.e(TAG, "Got exception trying to auto-dismiss dialog: " + e);
+        final Runnable runnable = () -> {
+            try {
+                if (alert.isShowing()) {
+                    alert.dismiss();
                 }
+            } catch (IllegalArgumentException e) {
+                Log.e(TAG, "Got exception trying to auto-dismiss dialog: " + e);
             }
         };
 
-        alert.setOnDismissListener(new DialogInterface.OnDismissListener() {
-            @Override
-            public void onDismiss(DialogInterface dialog) {
-                handler.removeCallbacks(runnable);
-            }
-        });
+        alert.setOnDismissListener((OnDismissListener) dialog -> handler.removeCallbacks(runnable));
 
         handler.postDelayed(runnable, 120000);
 
@@ -497,7 +454,7 @@ public class GcmActivity extends FauxActivity {
 
     public static void sendMotionUpdate(final long timestamp, final int activity) {
         if (JoH.pratelimit("gcm-amu", 5)) {
-            sendMessage("amu", Long.toString(timestamp) + "^" + Integer.toString(activity));
+            sendMessage("amu", timestamp + "^" + activity);
         }
     }
 
@@ -908,29 +865,20 @@ public class GcmActivity extends FauxActivity {
                                 if (ack_outstanding > MAX_ACK_OUTSTANDING_MS) {
                                     if (JoH.ratelimit("ack-failure", 7200)) {
                                         if (JoH.isAnyNetworkConnected()) {
-                                            AlertDialog.Builder builder = new AlertDialog.Builder(context);
+                                            AlertDialog.Builder builder = new androidx.appcompat.app.AlertDialog.Builder(context);
                                             builder.setTitle("Possible Sync Problem");
                                             builder.setMessage("It appears we haven't been able to send/receive sync data for the last: " + JoH.qs(ack_outstanding / 60000, 0) + " minutes\n\nDo you want to perform a reset of the sync system?");
-                                            builder.setPositiveButton("YES, Do it!", new DialogInterface.OnClickListener() {
-                                                public void onClick(DialogInterface dialog, int which) {
-                                                    dialog.dismiss();
-                                                    JoH.static_toast(context, "Resetting...", Toast.LENGTH_LONG);
-                                                    SdcardImportExport.forceGMSreset();
-                                                }
+                                            builder.setPositiveButton("YES, Do it!", (OnClickListener) (dialog, which) -> {
+                                                dialog.dismiss();
+                                                JoH.static_toast(context, "Resetting...", Toast.LENGTH_LONG);
+                                                SdcardImportExport.forceGMSreset();
                                             });
-                                            builder.setNeutralButton(gs(R.string.maybe_later), new DialogInterface.OnClickListener() {
-                                                public void onClick(DialogInterface dialog, int which) {
-                                                    dialog.dismiss();
-                                                }
+                                            builder.setNeutralButton(gs(R.string.maybe_later), (OnClickListener) (dialog, which) -> dialog.dismiss());
+                                            builder.setNegativeButton("NO, Never", (OnClickListener) (dialog, which) -> {
+                                                dialog.dismiss();
+                                                Pref.setLong("sync_warning_never", JoH.tsl());
                                             });
-                                            builder.setNegativeButton("NO, Never", new DialogInterface.OnClickListener() {
-                                                @Override
-                                                public void onClick(DialogInterface dialog, int which) {
-                                                    dialog.dismiss();
-                                                    Pref.setLong("sync_warning_never", JoH.tsl());
-                                                }
-                                            });
-                                            AlertDialog alert = builder.create();
+                                            androidx.appcompat.app.AlertDialog alert = builder.create();
                                             alert.show();
                                         }
                                     }
@@ -962,7 +910,7 @@ public class GcmActivity extends FauxActivity {
         return checkPlayServices(xdrip.getAppContext(), null);
     }
 
-    static Boolean checkPlayServices(Context context, Activity activity) {
+    static Boolean checkPlayServices(Context context, AppCompatActivity activity) {
         checkCease();
         if (cease_all_activity) return false;
         final GoogleApiAvailability apiAvailability = GoogleApiAvailability.getInstance();

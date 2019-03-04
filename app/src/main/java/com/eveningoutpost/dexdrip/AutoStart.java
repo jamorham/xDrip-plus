@@ -4,11 +4,11 @@ import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 
-import com.eveningoutpost.dexdrip.Models.UserError;
-import com.eveningoutpost.dexdrip.Services.PlusSyncService;
-import com.eveningoutpost.dexdrip.UtilityModels.CollectionServiceStarter;
-import com.eveningoutpost.dexdrip.UtilityModels.Inevitable;
-import com.eveningoutpost.dexdrip.UtilityModels.Pref;
+import com.eveningoutpost.dexdrip.models.UserError;
+import com.eveningoutpost.dexdrip.services.PlusSyncService;
+import com.eveningoutpost.dexdrip.utilitymodels.CollectionServiceStarter;
+import com.eveningoutpost.dexdrip.utilitymodels.Inevitable;
+import com.eveningoutpost.dexdrip.utilitymodels.Pref;
 
 // jamorham
 
@@ -45,12 +45,7 @@ public class AutoStart extends BroadcastReceiver {
 
         try {
             if (Pref.getBooleanDefaultFalse("show_home_on_boot")) {
-                Inevitable.task("show_home_on_boot", 5000, new Runnable() {
-                    @Override
-                    public void run() {
-                        Home.startHomeWithExtra(xdrip.getAppContext(), "auto-start", "start");
-                    }
-                });
+                Inevitable.task("show_home_on_boot", 5000, () -> Home.startHomeWithExtra(xdrip.getAppContext(), "auto-start", "start"));
             }
         } catch (Exception e) {
             UserError.Log.wtf(TAG, "Failed to start home: " + e);

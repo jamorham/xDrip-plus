@@ -1,24 +1,17 @@
 package com.eveningoutpost.dexdrip;
 
-import android.app.AlertDialog;
-import android.app.TimePickerDialog;
-import android.content.Context;
-import android.content.Intent;
-import android.content.SharedPreferences;
-import android.os.Bundle;
-import android.preference.PreferenceManager;
-import android.text.format.DateFormat;
-import android.view.View;
-import android.widget.CheckBox;
-import android.widget.CompoundButton;
-import android.widget.EditText;
-import android.widget.LinearLayout;
-import android.widget.TextView;
-import android.widget.TimePicker;
+import android.app.*;
+import android.app.TimePickerDialog.*;
+import android.content.*;
+import android.os.*;
+import android.preference.*;
+import android.text.format.*;
+import android.view.*;
+import android.widget.*;
 
-import com.eveningoutpost.dexdrip.Models.AlertType;
-import com.eveningoutpost.dexdrip.Services.MissedReadingService;
-import com.eveningoutpost.dexdrip.utils.ActivityWithMenu;
+import com.eveningoutpost.dexdrip.models.*;
+import com.eveningoutpost.dexdrip.services.*;
+import com.eveningoutpost.dexdrip.utils.*;
 
 
 public class MissedReadingActivity extends ActivityWithMenu {
@@ -163,62 +156,36 @@ public class MissedReadingActivity extends ActivityWithMenu {
     
     
     public void addListenerOnButtons() {
-        checkboxAllDay.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
-            //          @Override
-            public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
-                enableAllControls();
-            }
-        });
+        //          @Override
+        checkboxAllDay.setOnCheckedChangeListener((buttonView, isChecked) -> enableAllControls());
 
-        checkboxEnableAlert.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
-            //          @Override
-            public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
-                enableAllControls();
-            }
-        });
-        
-        checkboxEnableReraise.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
-            //          @Override
-            public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
-                enableAllControls();
-            }
-        });
+        //          @Override
+        checkboxEnableAlert.setOnCheckedChangeListener((buttonView, isChecked) -> enableAllControls());
+
+        //          @Override
+        checkboxEnableReraise.setOnCheckedChangeListener((buttonView, isChecked) -> enableAllControls());
 
         
-        View.OnClickListener startTimeListener = new View.OnClickListener() {
+        View.OnClickListener startTimeListener = v -> {
+            TimePickerDialog mTimePicker = new TimePickerDialog(mContext, AlertDialog.THEME_HOLO_DARK, (OnTimeSetListener) (timePicker, selectedHour, selectedMinute) -> {
+                startHour = selectedHour;
+                startMinute = selectedMinute;
+                setTimeRanges();
+            }, startHour, startMinute, DateFormat.is24HourFormat(mContext));
+            mTimePicker.setTitle("Select start time");
+            mTimePicker.show();
 
-            @Override
-            public void onClick(View v) {
-                TimePickerDialog mTimePicker = new TimePickerDialog(mContext, AlertDialog.THEME_HOLO_DARK, new TimePickerDialog.OnTimeSetListener() {
-                    @Override
-                    public void onTimeSet(TimePicker timePicker, int selectedHour, int selectedMinute) {
-                        startHour = selectedHour;
-                        startMinute = selectedMinute;
-                        setTimeRanges();
-                    }
-                }, startHour, startMinute, DateFormat.is24HourFormat(mContext));
-                mTimePicker.setTitle("Select start time");
-                mTimePicker.show();
-
-            }
-        } ;
+        };
         
-        View.OnClickListener endTimeListener = new View.OnClickListener() {
+        View.OnClickListener endTimeListener = v -> {
+            TimePickerDialog mTimePicker = new TimePickerDialog(mContext, AlertDialog.THEME_HOLO_DARK, (timePicker, selectedHour, selectedMinute) -> {
+                endHour = selectedHour;
+                endMinute = selectedMinute;
+                setTimeRanges();
+            }, endHour, endMinute, DateFormat.is24HourFormat(mContext));
+            mTimePicker.setTitle("Select end time");
+            mTimePicker.show();
 
-            @Override
-            public void onClick(View v) {
-                TimePickerDialog mTimePicker = new TimePickerDialog(mContext, AlertDialog.THEME_HOLO_DARK, new TimePickerDialog.OnTimeSetListener() {
-                    @Override
-                    public void onTimeSet(TimePicker timePicker, int selectedHour, int selectedMinute) {
-                        endHour = selectedHour;
-                        endMinute = selectedMinute;
-                        setTimeRanges();
-                    }
-                }, endHour, endMinute, DateFormat.is24HourFormat(mContext));
-                mTimePicker.setTitle("Select end time");
-                mTimePicker.show();
-
-            }
         };
         
         viewTimeStart.setOnClickListener(startTimeListener);

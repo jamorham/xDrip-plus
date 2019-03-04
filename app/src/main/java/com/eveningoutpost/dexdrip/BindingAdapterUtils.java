@@ -1,21 +1,16 @@
 package com.eveningoutpost.dexdrip;
 
-import android.animation.Animator;
-import android.animation.AnimatorListenerAdapter;
-import android.animation.ObjectAnimator;
-import android.databinding.BindingAdapter;
-import android.graphics.Typeface;
-import android.support.annotation.NonNull;
-import android.view.View;
-import android.widget.Button;
-import android.widget.CompoundButton;
-import android.widget.ImageView;
-import android.widget.LinearLayout;
-import android.widget.TextView;
+import android.animation.*;
+import android.graphics.*;
+import android.view.*;
+import android.widget.*;
 
-import com.eveningoutpost.dexdrip.Models.JoH;
+import androidx.annotation.*;
+import androidx.databinding.*;
 
-import static com.eveningoutpost.dexdrip.UtilityModels.Constants.FINAL_VISIBILITY_ID;
+import com.eveningoutpost.dexdrip.models.*;
+
+import static com.eveningoutpost.dexdrip.utilitymodels.Constants.*;
 
 
 /**

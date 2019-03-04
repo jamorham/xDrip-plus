@@ -1,65 +1,36 @@
 package com.eveningoutpost.dexdrip;
 
-import android.app.Fragment;
-import android.bluetooth.BluetoothAdapter;
-import android.bluetooth.BluetoothDevice;
-import android.bluetooth.BluetoothManager;
-import android.bluetooth.BluetoothProfile;
-import android.content.BroadcastReceiver;
-import android.content.Context;
-import android.content.Intent;
-import android.content.IntentFilter;
-import android.content.SharedPreferences;
-import android.content.pm.PackageManager;
-import android.databinding.DataBindingUtil;
-import android.graphics.Point;
-import android.os.Build;
-import android.os.Bundle;
-import android.os.Handler;
-import android.os.PowerManager;
-import android.preference.PreferenceManager;
-import android.support.v4.content.LocalBroadcastManager;
-import android.view.Display;
-import android.view.LayoutInflater;
-import android.view.View;
-import android.view.ViewGroup;
-import android.widget.Button;
-import android.widget.ImageButton;
-import android.widget.LinearLayout;
-import android.widget.TextView;
+import android.bluetooth.*;
+import android.content.*;
+import android.content.pm.*;
+import android.graphics.*;
+import android.os.*;
+import android.preference.*;
+import android.view.*;
+import android.widget.*;
 
-import com.eveningoutpost.dexdrip.G5Model.Extensions;
-import com.eveningoutpost.dexdrip.G5Model.Transmitter;
-import com.eveningoutpost.dexdrip.ImportedLibraries.dexcom.Dex_Constants;
-import com.eveningoutpost.dexdrip.Models.ActiveBluetoothDevice;
-import com.eveningoutpost.dexdrip.Models.BgReading;
-import com.eveningoutpost.dexdrip.Models.Calibration;
-import com.eveningoutpost.dexdrip.Models.JoH;
-import com.eveningoutpost.dexdrip.Models.Sensor;
-import com.eveningoutpost.dexdrip.Models.TransmitterData;
-import com.eveningoutpost.dexdrip.Models.UserError;
-import com.eveningoutpost.dexdrip.Models.UserError.Log;
-import com.eveningoutpost.dexdrip.Services.DexCollectionService;
-import com.eveningoutpost.dexdrip.Services.G5CollectionService;
-import com.eveningoutpost.dexdrip.UtilityModels.CollectionServiceStarter;
-import com.eveningoutpost.dexdrip.UtilityModels.SensorStatus;
-import com.eveningoutpost.dexdrip.databinding.ActivitySystemStatusBinding;
-import com.eveningoutpost.dexdrip.ui.MicroStatus;
-import com.eveningoutpost.dexdrip.ui.MicroStatusImpl;
-import com.eveningoutpost.dexdrip.utils.DexCollectionType;
-import com.eveningoutpost.dexdrip.wearintegration.WatchUpdaterService;
-import com.google.android.gms.wearable.DataMap;
+import androidx.annotation.*;
+import androidx.databinding.*;
+import androidx.fragment.app.*;
+import androidx.localbroadcastmanager.content.*;
 
-import java.lang.reflect.Method;
-import java.text.DateFormat;
-import java.text.SimpleDateFormat;
-import java.util.Date;
-import java.util.List;
-import java.util.Set;
+import com.eveningoutpost.dexdrip.g5Model.*;
+import com.eveningoutpost.dexdrip.importedLibraries.dexcom.*;
+import com.eveningoutpost.dexdrip.models.*;
+import com.eveningoutpost.dexdrip.models.UserError.*;
+import com.eveningoutpost.dexdrip.services.*;
+import com.eveningoutpost.dexdrip.utilitymodels.*;
+import com.eveningoutpost.dexdrip.ui.*;
+import com.eveningoutpost.dexdrip.utils.*;
+import com.eveningoutpost.dexdrip.wearintegration.*;
+import com.google.android.gms.wearable.*;
 
-import static com.eveningoutpost.dexdrip.Home.startWatchUpdaterService;
-import static com.eveningoutpost.dexdrip.utils.DexCollectionType.DexcomG5;
-import static com.eveningoutpost.dexdrip.xdrip.gs;
+import java.lang.reflect.*;
+import java.util.*;
+
+import static com.eveningoutpost.dexdrip.Home.*;
+import static com.eveningoutpost.dexdrip.utils.DexCollectionType.*;
+import static com.eveningoutpost.dexdrip.xdrip.*;
 
 public class SystemStatusFragment extends Fragment {
     private static final int SMALL_SCREEN_WIDTH = 300;
@@ -86,7 +57,7 @@ public class SystemStatusFragment extends Fragment {
     MicroStatus microStatus;
 
     @Override
-    public View onCreateView(LayoutInflater inflater, ViewGroup container,
+    public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         super.onCreateView(inflater, container, savedInstanceState);
         //Injectors.getMicroStatusComponent().inject(this);
@@ -125,7 +96,7 @@ public class SystemStatusFragment extends Fragment {
                 }
             }
         };
-        final ActivitySystemStatusBinding binding = DataBindingUtil.inflate(
+        final com.eveningoutpost.dexdrip.databinding.ActivitySystemStatusBinding binding = DataBindingUtil.inflate(
                 inflater, R.layout.activity_system_status, container, false);
         microStatus = new MicroStatusImpl();
         binding.setMs(microStatus);
@@ -426,111 +397,98 @@ public class SystemStatusFragment extends Fragment {
             notes.append("\n- Your device has future data on it, Please double check the time and timezone on this phone.");
             futureDataDeleteButton.setVisibility(View.VISIBLE);
         }
-        futureDataDeleteButton.setOnClickListener(new View.OnClickListener() {
-            public void onClick(View v) {
-                if (futureReadings != null && futureReadings.size() > 0) {
-                    for (BgReading bgReading : futureReadings) {
-                        bgReading.calculated_value = 0;
-                        bgReading.raw_data = 0;
-                        bgReading.timestamp = 0;
-                        bgReading.save();
-                    }
+        futureDataDeleteButton.setOnClickListener(v -> {
+            if (futureReadings != null && futureReadings.size() > 0) {
+                for (BgReading bgReading : futureReadings) {
+                    bgReading.calculated_value = 0;
+                    bgReading.raw_data = 0;
+                    bgReading.timestamp = 0;
+                    bgReading.save();
                 }
-                if (futureCalibrations != null && futureCalibrations.size() > 0) {
-                    for (Calibration calibration : futureCalibrations) {
-                        calibration.slope_confidence = 0;
-                        calibration.sensor_confidence = 0;
-                        calibration.timestamp = 0;
-                        calibration.save();
-                    }
+            }
+            if (futureCalibrations != null && futureCalibrations.size() > 0) {
+                for (Calibration calibration : futureCalibrations) {
+                    calibration.slope_confidence = 0;
+                    calibration.sensor_confidence = 0;
+                    calibration.timestamp = 0;
+                    calibration.save();
                 }
             }
         });
     }
 
     private void restartButtonListener() {
-        restart_collection_service.setOnClickListener(new View.OnClickListener() {
-            public void onClick(final View v) {
-                v.setEnabled(false);
-                JoH.static_toast_short(gs(R.string.restarting_collector));
-                v.setAlpha(0.2f);
-                startWatchUpdaterService(safeGetContext(), WatchUpdaterService.ACTION_START_COLLECTOR, TAG);
-                CollectionServiceStarter.restartCollectionService(safeGetContext());
-                set_current_values();
-                JoH.runOnUiThreadDelayed(new Runnable() {
-                    @Override
-                    public void run() {
-                        v.setEnabled(true);
-                        v.setAlpha(1.0f);
-                        set_current_values();
-                    }
-                }, 2000);
-            }
+        restart_collection_service.setOnClickListener(v -> {
+            v.setEnabled(false);
+            JoH.static_toast_short(gs(R.string.restarting_collector));
+            v.setAlpha(0.2f);
+            startWatchUpdaterService(safeGetContext(), WatchUpdaterService.ACTION_START_COLLECTOR, TAG);
+            CollectionServiceStarter.restartCollectionService(safeGetContext());
+            set_current_values();
+            JoH.runOnUiThreadDelayed(() -> {
+	            v.setEnabled(true);
+	            v.setAlpha(1.0f);
+	            set_current_values();
+            }, 2000);
         });
     }
 
     private void forgetDeviceListener() {
-        forget_device.setOnClickListener(new View.OnClickListener() {
-            public void onClick(View v) {
-                if (mBluetoothManager != null && ActiveBluetoothDevice.first() != null) {
-                    final BluetoothAdapter bluetoothAdapter = mBluetoothManager.getAdapter();
-                    if (bluetoothAdapter != null) {
-                        for (BluetoothDevice bluetoothDevice : bluetoothAdapter.getBondedDevices()) {
-                            if (bluetoothDevice.getAddress().compareTo(ActiveBluetoothDevice.first().address) == 0) {
+        forget_device.setOnClickListener(v -> {
+            if (mBluetoothManager != null && ActiveBluetoothDevice.first() != null) {
+                final BluetoothAdapter bluetoothAdapter = mBluetoothManager.getAdapter();
+                if (bluetoothAdapter != null) {
+                    for (BluetoothDevice bluetoothDevice : bluetoothAdapter.getBondedDevices()) {
+                        if (bluetoothDevice.getAddress().compareTo(ActiveBluetoothDevice.first().address) == 0) {
+                            try {
+                                Method m = bluetoothDevice.getClass().getMethod("removeBond", (Class[]) null);
+                                m.invoke(bluetoothDevice, (Object[]) null);
+                                notes.append("\n- Bluetooth unbonded, if using share tell it to forget your device.");
+                                notes.append("\n- Scan for devices again to set connection back up!");
+                            } catch (Exception e) {
+                                Log.e("SystemStatus", e.getMessage(), e);
+                            }
+                        }
+                    }
+
+                    ActiveBluetoothDevice.forget();
+                    bluetoothAdapter.disable();
+
+
+                    mHandler.postDelayed(() -> {
+	                    bluetoothAdapter.enable();
+	                    set_current_values();
+	                    mHandler2.postDelayed(() -> {
+		                    CollectionServiceStarter.restartCollectionService(safeGetContext());
+		                    set_current_values();
+	                    }, 5000);
+                    }, 1000);
+                }
+            }
+
+            String collection_method = prefs.getString("dex_collection_method", "BluetoothWixel");
+            if (collection_method.compareTo("DexcomG5") == 0) {
+                Transmitter defaultTransmitter = new Transmitter(prefs.getString("dex_txid", "ABCDEF"));
+                mBluetoothAdapter = mBluetoothManager.getAdapter();
+
+                Set<BluetoothDevice> pairedDevices = mBluetoothAdapter.getBondedDevices();
+                if ((pairedDevices != null) && (pairedDevices.size() > 0)) {
+                    for (BluetoothDevice device : pairedDevices) {
+                        if (device.getName() != null) {
+
+                            String transmitterIdLastTwo = Extensions.lastTwoCharactersOfString(defaultTransmitter.transmitterId);
+                            String deviceNameLastTwo = Extensions.lastTwoCharactersOfString(device.getName());
+
+                            if (transmitterIdLastTwo.equals(deviceNameLastTwo)) {
                                 try {
-                                    Method m = bluetoothDevice.getClass().getMethod("removeBond", (Class[]) null);
-                                    m.invoke(bluetoothDevice, (Object[]) null);
-                                    notes.append("\n- Bluetooth unbonded, if using share tell it to forget your device.");
-                                    notes.append("\n- Scan for devices again to set connection back up!");
+                                    Method m = device.getClass().getMethod("removeBond", (Class[]) null);
+                                    m.invoke(device, (Object[]) null);
+                                    notes.append("\nG5 Transmitter unbonded, switch device mode to prevent re-pairing to G5.");
                                 } catch (Exception e) {
                                     Log.e("SystemStatus", e.getMessage(), e);
                                 }
                             }
-                        }
 
-                        ActiveBluetoothDevice.forget();
-                        bluetoothAdapter.disable();
-
-
-                        mHandler.postDelayed(new Runnable() {
-                            public void run() {
-                                bluetoothAdapter.enable();
-                                set_current_values();
-                                mHandler2.postDelayed(new Runnable() {
-                                    public void run() {
-                                        CollectionServiceStarter.restartCollectionService(safeGetContext());
-                                        set_current_values();
-                                    }
-                                }, 5000);
-                            }
-                        }, 1000);
-                    }
-                }
-
-                String collection_method = prefs.getString("dex_collection_method", "BluetoothWixel");
-                if (collection_method.compareTo("DexcomG5") == 0) {
-                    Transmitter defaultTransmitter = new Transmitter(prefs.getString("dex_txid", "ABCDEF"));
-                    mBluetoothAdapter = mBluetoothManager.getAdapter();
-
-                    Set<BluetoothDevice> pairedDevices = mBluetoothAdapter.getBondedDevices();
-                    if ((pairedDevices != null) && (pairedDevices.size() > 0)) {
-                        for (BluetoothDevice device : pairedDevices) {
-                            if (device.getName() != null) {
-
-                                String transmitterIdLastTwo = Extensions.lastTwoCharactersOfString(defaultTransmitter.transmitterId);
-                                String deviceNameLastTwo = Extensions.lastTwoCharactersOfString(device.getName());
-
-                                if (transmitterIdLastTwo.equals(deviceNameLastTwo)) {
-                                    try {
-                                        Method m = device.getClass().getMethod("removeBond", (Class[]) null);
-                                        m.invoke(device, (Object[]) null);
-                                        notes.append("\nG5 Transmitter unbonded, switch device mode to prevent re-pairing to G5.");
-                                    } catch (Exception e) {
-                                        Log.e("SystemStatus", e.getMessage(), e);
-                                    }
-                                }
-
-                            }
                         }
                     }
                 }
@@ -539,11 +497,9 @@ public class SystemStatusFragment extends Fragment {
     }
 
     private void refreshButtonListener() {
-        refresh.setOnClickListener(new View.OnClickListener() {
-            public void onClick(View v) {
-                set_current_values();
-                requestWearCollectorStatus();
-            }
+        refresh.setOnClickListener(v -> {
+            set_current_values();
+            requestWearCollectorStatus();
         });
     }
 

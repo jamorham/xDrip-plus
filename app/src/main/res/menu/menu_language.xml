@@ -3,26 +3,29 @@
     xmlns:app="http://schemas.android.com/apk/res-auto">
     <item
         android:id="@+id/action_language_search"
-        android:title="@string/search"
         android:icon="@android:drawable/ic_menu_search"
-        app:actionViewClass="android.support.v7.widget.SearchView"
-        app:showAsAction="always|collapseActionView"/>
-    <item android:id="@+id/showonlyuntranslated"
-        android:title="@string/show_only_untranslated"
+        android:title="@string/search"
+        app:actionViewClass="androidx.appcompat.widget.SearchView"
+        app:showAsAction="always|collapseActionView" />
+    <item
+        android:id="@+id/showonlyuntranslated"
         android:checkable="true"
-        android:orderInCategory="1"
         android:onClick="languageShowOnlyUntranslated"
-        app:showAsAction="never"/>
-    <item android:id="@+id/showonlycustomized"
-        android:title="@string/show_only_customized_entries"
+        android:orderInCategory="1"
+        android:title="@string/show_only_untranslated"
+        app:showAsAction="never" />
+    <item
+        android:id="@+id/showonlycustomized"
         android:checkable="true"
-        android:orderInCategory="2"
         android:onClick="languageShowOnlyCustomized"
-        app:showAsAction="never"/>
-    <item android:id="@+id/reseteverything"
-        android:title="@string/reset_all_language_data"
+        android:orderInCategory="2"
+        android:title="@string/show_only_customized_entries"
+        app:showAsAction="never" />
+    <item
+        android:id="@+id/reseteverything"
         android:checkable="false"
-        android:orderInCategory="3"
         android:onClick="languageResetEverything"
-        app:showAsAction="never"/>
+        android:orderInCategory="3"
+        android:title="@string/reset_all_language_data"
+        app:showAsAction="never" />
 </menu>

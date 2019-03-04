@@ -1,47 +1,53 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout
-    xmlns:android="http://schemas.android.com/apk/res/android"
-    android:orientation="vertical"
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="fill_parent"
     android:layout_height="fill_parent"
+    android:orientation="vertical"
     android:padding="10dp">
+
     <TextView
-        android:layout_width="fill_parent"
-        android:layout_height="wrap_content"
-        android:layout_margin="5dp"
         android:id="@+id/instructionsTextField"
-        android:layout_gravity="center_horizontal"/>
-    <EditText
         android:layout_width="fill_parent"
         android:layout_height="wrap_content"
-        android:id="@+id/editTextField"
-        android:layout_margin="5dp"
         android:layout_gravity="center_horizontal"
-        android:inputType="text"
-        android:hint=""/>
+        android:layout_margin="5dp" />
+
+    <EditText
+        android:id="@+id/editTextField"
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center_horizontal"
+        android:layout_margin="5dp"
+        android:hint=""
+        android:inputType="text" />
+
     <ImageButton
+        android:id="@+id/scannerButton"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:id="@+id/scannerButton"
-        android:layout_margin="5dp"
         android:layout_gravity="center_horizontal"
+        android:layout_margin="5dp"
         android:contentDescription="@string/scan_share2_barcode"
-        android:src="@drawable/ic_scan" />
+        app:srcCompat="@drawable/ic_scan" />
+
     <LinearLayout
-        android:orientation="horizontal"
         android:layout_width="fill_parent"
-        android:layout_height="wrap_content">
+        android:layout_height="wrap_content"
+        android:orientation="horizontal">
+
         <Button
+            android:id="@+id/cancelButton"
             android:layout_width="0dp"
-            android:layout_weight="1"
             android:layout_height="wrap_content"
-            android:text="Cancel"
-            android:id="@+id/cancelButton"/>
+            android:layout_weight="1"
+            android:text="Cancel" />
+
         <Button
+            android:id="@+id/saveButton"
             android:layout_width="0dp"
-            android:layout_weight="1"
             android:layout_height="wrap_content"
-            android:text="Save"
-            android:id="@+id/saveButton"/>
+            android:layout_weight="1"
+            android:text="Save" />
     </LinearLayout>
 </LinearLayout>

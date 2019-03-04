@@ -1,12 +1,11 @@
 package com.eveningoutpost.dexdrip;
 
-import android.os.Bundle;
-import android.support.v7.app.AppCompatActivity;
-import android.webkit.WebView;
+import android.os.*;
+import android.webkit.*;
 
-import com.eveningoutpost.dexdrip.Models.JoH;
+import com.eveningoutpost.dexdrip.models.*;
 
-public class HelpActivity extends BaseAppCompatActivity {
+public class HelpActivity extends BaseActivity {
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -14,7 +13,6 @@ public class HelpActivity extends BaseAppCompatActivity {
         setContentView(R.layout.activity_help);
         JoH.fixActionBar(this);
         WebView webview = (WebView)findViewById(R.id.helpWebView);
-
 
     }
 }

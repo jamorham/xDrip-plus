@@ -1,33 +1,33 @@
 package com.eveningoutpost.dexdrip.utils;
 
-import android.Manifest;
-import android.app.Activity;
-import android.content.pm.PackageManager;
-import android.os.Build;
-import android.support.v4.app.ActivityCompat;
-import android.support.v4.content.ContextCompat;
-import android.support.v7.app.AppCompatActivity;
-import android.widget.Toast;
+import android.*;
+import android.content.pm.*;
+import android.os.*;
+import android.widget.*;
 
-import com.google.zxing.client.android.Intents;
-import com.google.zxing.integration.android.IntentIntegrator;
+import androidx.annotation.*;
+import androidx.appcompat.app.*;
+import androidx.core.app.*;
+import androidx.core.content.*;
+
+import com.google.zxing.client.android.*;
+import com.google.zxing.integration.android.*;
 
 
 public class AndroidBarcode extends AppCompatActivity
         implements ActivityCompat.OnRequestPermissionsResultCallback {
     public static final String SCAN_INTENT = Intents.Scan.ACTION;
-    Activity activity;
+    AppCompatActivity activity;
     final static int MY_PERMISSIONS_REQUEST_CAMERA = 1003;
     final static String TAG = "jamorham barcode";
 
-    public AndroidBarcode(Activity activity) {
+    public AndroidBarcode(AppCompatActivity activity) {
         this.activity = activity;
     }
 
     // callback not received in test
     @Override
-    public void onRequestPermissionsResult(int requestCode,
-                                           String permissions[], int[] grantResults) {
+    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
         switch (requestCode) {
             case MY_PERMISSIONS_REQUEST_CAMERA: {
                 if (grantResults.length > 0
@@ -62,12 +62,7 @@ public class AndroidBarcode extends AppCompatActivity
 
     private void toast(final String msg) {
         try {
-            activity.runOnUiThread(new Runnable() {
-                @Override
-                public void run() {
-                    Toast.makeText(activity.getApplicationContext(), msg, Toast.LENGTH_SHORT).show();
-                }
-            });
+            activity.runOnUiThread(() -> Toast.makeText(activity.getApplicationContext(), msg, Toast.LENGTH_SHORT).show());
             android.util.Log.d(TAG, "Toast msg: " + msg);
         } catch (Exception e) {
             android.util.Log.e(TAG, "Couldn't display toast: " + msg);

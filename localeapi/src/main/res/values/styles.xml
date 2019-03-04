@@ -23,4 +23,6 @@
     <!-- Style for Activities that look like a dialog -->
     <style name="Theme.Locale.Dialog" parent="@android:style/Theme.Translucent.NoTitleBar" />
 
+    <style name="MotorolaListViewHackStyle" />
+
 </resources>

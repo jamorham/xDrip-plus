@@ -3,10 +3,9 @@
     xmlns:appx="http://schemas.android.com/apk/res-auto">
 
     <data>
-
         <variable
             name="item"
-            type="com.eveningoutpost.dexdrip.UtilityModels.SourceWizard.Item" />
+            type="com.eveningoutpost.dexdrip.utilitymodels.SourceWizard.Item" />
 
         <import type="android.view.View" />
     </data>
@@ -21,32 +20,29 @@
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:layout_marginLeft="10dp"
+            android:layout_marginStart="10dp"
             android:onClick="@{item::onClick}"
             android:orientation="horizontal">
 
             <ImageView
-
                 android:id="@+id/imageView2"
                 android:layout_width="150dp"
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
                 android:scaleType="fitCenter"
-                android:src="@drawable/checker_background"
-                appx:src="@{item.resource}" />
+                appx:src="@{item.resource}"
+                appx:srcCompat="@drawable/checker_background" />
 
             <TextView
                 android:id="@+id/text"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_gravity="center_vertical"
-                android:layout_marginLeft="10dp"
+                android:layout_marginStart="10dp"
                 android:layout_weight="1"
                 android:text="@{item.name, default=`Test text`}"
                 android:textSize="@{item.isShortName() ? item.dpToPx(24) : item.dpToPx(18)}" />
 
         </LinearLayout>
-
-
     </LinearLayout>
 </layout>

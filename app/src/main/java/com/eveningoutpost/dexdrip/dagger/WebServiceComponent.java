@@ -14,9 +14,7 @@ import dagger.Component;
  */
 
 @javax.inject.Singleton
-@Component(modules = {WebServiceModule.class})
+@Component(modules = WebServiceModule.class)
 public interface WebServiceComponent {
-
     void inject(Singleton target);
-
 }

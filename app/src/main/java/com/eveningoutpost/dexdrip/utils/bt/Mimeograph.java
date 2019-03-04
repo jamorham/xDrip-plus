@@ -1,11 +1,11 @@
 package com.eveningoutpost.dexdrip.utils.bt;
 
 import com.eveningoutpost.dexdrip.GcmActivity;
-import com.eveningoutpost.dexdrip.Models.JoH;
-import com.eveningoutpost.dexdrip.Models.UserError;
-import com.eveningoutpost.dexdrip.Services.Ob1G5CollectionService;
-import com.eveningoutpost.dexdrip.UtilityModels.Inevitable;
-import com.eveningoutpost.dexdrip.UtilityModels.WholeHouse;
+import com.eveningoutpost.dexdrip.models.JoH;
+import com.eveningoutpost.dexdrip.models.UserError;
+import com.eveningoutpost.dexdrip.services.Ob1G5CollectionService;
+import com.eveningoutpost.dexdrip.utilitymodels.Inevitable;
+import com.eveningoutpost.dexdrip.utilitymodels.WholeHouse;
 import com.eveningoutpost.dexdrip.utils.CipherUtils;
 import com.eveningoutpost.dexdrip.utils.Root;
 import com.eveningoutpost.dexdrip.xdrip;
@@ -17,12 +17,12 @@ import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import java.nio.charset.IllegalCharsetNameException;
+import java.nio.charset.*;
 import java.util.List;
 
 import lombok.RequiredArgsConstructor;
 
-import static com.eveningoutpost.dexdrip.Models.JoH.emptyString;
+import static com.eveningoutpost.dexdrip.models.JoH.emptyString;
 import static com.eveningoutpost.dexdrip.utils.bt.Mimeograph.SearchState.COPY_COLLISION_KEY;
 import static com.eveningoutpost.dexdrip.utils.bt.Mimeograph.SearchState.COPY_DEVICE_KEY;
 import static com.eveningoutpost.dexdrip.utils.bt.Mimeograph.SearchState.COPY_SCAN;
@@ -114,7 +114,7 @@ public class Mimeograph {
             }
             final byte[] buffer = new byte[length];
             readAllToBuffer(fileInputStream, buffer);
-            return new String(buffer, "UTF-8");
+            return new String(buffer, StandardCharsets.UTF_8);
         } catch (FileNotFoundException e) {
             UserError.Log.e(TAG, "Could not find: " + path);
         } catch (IOException e) {
@@ -125,7 +125,7 @@ public class Mimeograph {
 
     private static boolean writeFileContent(final String path, final String content) {
         try (final FileOutputStream fileOutputStream = new FileOutputStream(path)) {
-            final byte[] bytes = content.getBytes("UTF-8");
+            final byte[] bytes = content.getBytes(StandardCharsets.UTF_8);
             fileOutputStream.write(bytes);
             fileOutputStream.flush();
             fileOutputStream.close();
@@ -170,7 +170,7 @@ public class Mimeograph {
                 state = COPY_COLLISION_KEY;
             } else if (line.startsWith(deviceHunt)) {
                 state = COPY_DEVICE_KEY;
-            } else if (line.length() == 0) {
+            } else if (line.isEmpty()) {
                 state = SCAN;
             }
             switch (state) {
@@ -231,7 +231,7 @@ public class Mimeograph {
             } else if (line.startsWith(deviceArray[0])) {
                 state = INJECT_DEVICE_KEY;
                 processedSections++;
-            } else if (line.length() == 0) {
+            } else if (line.isEmpty()) {
                 state = COPY_SCAN;
             }
             switch (state) {
@@ -319,7 +319,7 @@ public class Mimeograph {
     }
 
     private synchronized static void add(final String aLine, final StringBuilder output) {
-        if (aLine.length() != 0 || lastWrite.length() != 0) {
+        if (!aLine.isEmpty() || !lastWrite.isEmpty()) {
             output.append(aLine);
             output.append("\n");
             lastWrite = aLine;

@@ -4,7 +4,7 @@ package com.eveningoutpost.dexdrip.watch.lefun;
 
 import android.util.Pair;
 
-import com.eveningoutpost.dexdrip.UtilityModels.Pref;
+import com.eveningoutpost.dexdrip.utilitymodels.Pref;
 import com.eveningoutpost.dexdrip.watch.lefun.messages.TxSetFeatures;
 import com.eveningoutpost.dexdrip.watch.lefun.messages.TxSetLocaleFeature;
 import com.eveningoutpost.dexdrip.watch.lefun.messages.TxSetScreens;

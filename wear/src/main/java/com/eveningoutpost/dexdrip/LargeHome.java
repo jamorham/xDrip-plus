@@ -1,19 +1,19 @@
 package com.eveningoutpost.dexdrip;
 
-import android.content.Intent;
-import android.graphics.Color;
-import android.support.v4.content.ContextCompat;
-import android.support.wearable.watchface.WatchFaceStyle;
-import android.view.Gravity;
-import android.view.LayoutInflater;
-import android.widget.LinearLayout;
+import android.content.*;
+import android.graphics.*;
+import android.support.wearable.watchface.*;
+import android.view.*;
+import android.widget.*;
 
-import com.eveningoutpost.dexdrip.Models.JoH;
-import com.ustwo.clockwise.common.WatchMode;
+import androidx.core.content.*;
+
+import com.eveningoutpost.dexdrip.models.*;
+import com.ustwo.clockwise.common.*;
 
 public class LargeHome extends BaseWatchFace {
     private static final String TAG = "jamorham: " + Home.class.getSimpleName();
-    private long fontsizeTapTime = 0l;
+    private long fontsizeTapTime = 0L;
 
     @Override
     public void onCreate() {

@@ -1,7 +1,7 @@
 package com.eveningoutpost.dexdrip.webservices;
 
-import com.eveningoutpost.dexdrip.Models.DesertSync;
-import com.eveningoutpost.dexdrip.Models.UserError;
+import com.eveningoutpost.dexdrip.models.DesertSync;
+import com.eveningoutpost.dexdrip.models.UserError;
 
 import java.net.InetAddress;
 import java.util.List;
@@ -13,7 +13,7 @@ import java.util.List;
 
 public class WebServiceSync extends BaseWebService {
 
-    private final static String TAG = "WebServiceSync";
+    private final static String TAG = WebServiceSync.class.getSimpleName();
 
     // process the request and produce a response object
     @Override

@@ -1,6 +1,6 @@
 package com.eveningoutpost.dexdrip.tidepool;
 
-import com.eveningoutpost.dexdrip.Models.Treatments;
+import com.eveningoutpost.dexdrip.models.Treatments;
 import com.google.gson.annotations.Expose;
 
 // jamorham

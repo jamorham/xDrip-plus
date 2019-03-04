@@ -1,12 +1,12 @@
 package com.eveningoutpost.dexdrip.tidepool;
 
-import com.eveningoutpost.dexdrip.Models.UserError;
+import androidx.annotation.*;
+
+import com.eveningoutpost.dexdrip.models.UserError;
 import com.eveningoutpost.dexdrip.store.FastStore;
 
 import lombok.RequiredArgsConstructor;
-import retrofit2.Call;
-import retrofit2.Callback;
-import retrofit2.Response;
+import retrofit2.*;
 
 // jamorham
 
@@ -27,7 +27,7 @@ class TidepoolCallback<T> implements Callback<T> {
     }
 
     @Override
-    public void onResponse(Call<T> call, Response<T> response) {
+    public void onResponse(@NonNull Call<T> call, @NonNull Response<T> response) {
         if (response.isSuccessful() && response.body() != null) {
             UserError.Log.d(TidepoolUploader.TAG, name + " success");
             session.populateBody(response.body());
@@ -46,7 +46,7 @@ class TidepoolCallback<T> implements Callback<T> {
     }
 
     @Override
-    public void onFailure(Call<T> call, Throwable t) {
+    public void onFailure(@NonNull Call<T> call, @NonNull Throwable t) {
         final String msg = name + " Failed: " + t;
         UserError.Log.e(TidepoolUploader.TAG, msg);
         status(msg);

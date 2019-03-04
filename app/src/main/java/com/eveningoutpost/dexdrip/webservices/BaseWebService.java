@@ -81,7 +81,7 @@ public abstract class BaseWebService {
     static String stripFirstComponent(String query, char delimiter) {
         try {
             int start = query.indexOf(delimiter) + 1;
-            return query.substring(start, query.length());
+            return query.substring(start);
         } catch (Exception e) {
             return "";
         }

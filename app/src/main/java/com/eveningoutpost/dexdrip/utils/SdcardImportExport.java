@@ -1,41 +1,28 @@
 package com.eveningoutpost.dexdrip.utils;
 
-import android.Manifest;
-import android.app.Activity;
-import android.app.AlertDialog;
-import android.content.Context;
-import android.content.pm.PackageManager;
-import android.os.Build;
-import android.os.Bundle;
-import android.os.Environment;
-import android.support.v4.app.ActivityCompat;
-import android.support.v4.content.ContextCompat;
-import android.util.Log;
-import android.view.View;
-import android.widget.Toast;
+import android.*;
+import android.content.*;
+import android.content.pm.*;
+import android.os.*;
+import android.util.*;
+import android.view.*;
+import android.widget.*;
 
-import com.eveningoutpost.dexdrip.BaseAppCompatActivity;
-import com.eveningoutpost.dexdrip.GcmActivity;
-import com.eveningoutpost.dexdrip.Home;
-import com.eveningoutpost.dexdrip.Models.AlertType;
-import com.eveningoutpost.dexdrip.Models.JoH;
+import androidx.appcompat.app.*;
+import androidx.core.app.*;
+import androidx.core.content.*;
+
+import com.eveningoutpost.dexdrip.*;
 import com.eveningoutpost.dexdrip.R;
-import com.eveningoutpost.dexdrip.UtilityModels.Pref;
-import com.eveningoutpost.dexdrip.xdrip;
+import com.eveningoutpost.dexdrip.models.*;
+import com.eveningoutpost.dexdrip.utilitymodels.*;
 
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileOutputStream;
-import java.io.InputStream;
-import java.io.OutputStream;
-import java.util.ArrayList;
-import java.util.List;
+import java.io.*;
+import java.util.*;
 
-import static com.eveningoutpost.dexdrip.utils.FileUtils.getExternalDir;
-
-
-import static com.eveningoutpost.dexdrip.xdrip.gs;
-public class SdcardImportExport extends BaseAppCompatActivity {
+import static com.eveningoutpost.dexdrip.utils.FileUtils.*;
+import static com.eveningoutpost.dexdrip.xdrip.*;
+public class SdcardImportExport extends BaseActivity {
 
     private final static String TAG = "jamorham sdcard";
     private final static int MY_PERMISSIONS_REQUEST_STORAGE = 104;
@@ -88,7 +75,7 @@ public class SdcardImportExport extends BaseAppCompatActivity {
     }
 
     // TODO refactor to own class
-    public static boolean checkPermissions(Activity context, boolean ask, int request_code) {
+    public static boolean checkPermissions(AppCompatActivity context, boolean ask, int request_code) {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
             if (ContextCompat.checkSelfPermission(context,
                     Manifest.permission.WRITE_EXTERNAL_STORAGE)
@@ -253,12 +240,12 @@ public class SdcardImportExport extends BaseAppCompatActivity {
     }
 
     // restore settings backup if there is one, produce dialogs for prompting and permissions as required
-    public static boolean handleBackup(final Activity activity) {
+    public static boolean handleBackup(final AppCompatActivity activity) {
         final List<String> results = findAnyBackups(activity);
-        if (!backupDismissed && (results != null) && (results.size() > 0)) {
+        if (!backupDismissed && (results != null) && (!results.isEmpty())) {
             Log.e(TAG, "Found: " + results.size() + " backup files");
 
-            final AlertDialog.Builder builder = new AlertDialog.Builder(activity);
+            final AlertDialog.Builder builder = new androidx.appcompat.app.AlertDialog.Builder(activity);
             builder.setTitle(gs(R.string.backup_detected));
             builder.setMessage(gs(R.string.it_looks_like_you_maybe_have_a_settings_backup_shall_we_try_to_restore_it));
 
@@ -285,9 +272,9 @@ public class SdcardImportExport extends BaseAppCompatActivity {
         }
     }
 
-    public static void restoreSettingsNow(Activity activity) {
+    public static void restoreSettingsNow(AppCompatActivity activity) {
         final List<String> results = findAnyBackups(activity);
-        if ((results != null) && (results.size() > 0)) {
+        if ((results != null) && (!results.isEmpty())) {
             JoH.static_toast_long("Restoring Settings");
             if (copyPreferencesFileBack(activity, results.get(0))) {
                 Log.e(TAG, "Restoring preferences succeeded from first match: " + results.get(0));

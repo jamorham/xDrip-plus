@@ -29,6 +29,7 @@
     </string-array>
 
     <string-array name="TreatmentCalibrationChoiceDetail">
+        <item>Automatic mode (best)</item>
         <item>Jedes Mal nachfragen</item>
         <item>Nie benutzen</item>
         <item>Immer benutzen</item>

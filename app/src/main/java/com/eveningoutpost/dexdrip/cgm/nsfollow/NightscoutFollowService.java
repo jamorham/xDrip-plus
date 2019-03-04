@@ -1,25 +1,20 @@
 package com.eveningoutpost.dexdrip.cgm.nsfollow;
 
-import android.content.Intent;
-import android.os.IBinder;
-import android.os.PowerManager;
-import android.support.annotation.Nullable;
-import android.text.SpannableString;
+import android.content.*;
+import android.os.*;
+import android.text.*;
 
-import com.eveningoutpost.dexdrip.Models.BgReading;
-import com.eveningoutpost.dexdrip.Models.JoH;
-import com.eveningoutpost.dexdrip.Models.UserError;
-import com.eveningoutpost.dexdrip.UtilityModels.Constants;
-import com.eveningoutpost.dexdrip.UtilityModels.Inevitable;
-import com.eveningoutpost.dexdrip.cgm.nsfollow.utils.Anticipate;
-import com.eveningoutpost.dexdrip.utils.DexCollectionType;
-import com.eveningoutpost.dexdrip.utils.framework.BuggySamsung;
-import com.eveningoutpost.dexdrip.utils.framework.ForegroundService;
-import com.eveningoutpost.dexdrip.utils.framework.WakeLockTrampoline;
-import com.eveningoutpost.dexdrip.xdrip;
+import androidx.annotation.*;
 
-import static com.eveningoutpost.dexdrip.UtilityModels.BgGraphBuilder.DEXCOM_PERIOD;
-import static com.eveningoutpost.dexdrip.utils.DexCollectionType.NSFollow;
+import com.eveningoutpost.dexdrip.models.*;
+import com.eveningoutpost.dexdrip.utilitymodels.*;
+import com.eveningoutpost.dexdrip.cgm.nsfollow.utils.*;
+import com.eveningoutpost.dexdrip.utils.*;
+import com.eveningoutpost.dexdrip.utils.framework.*;
+import com.eveningoutpost.dexdrip.*;
+
+import static com.eveningoutpost.dexdrip.utilitymodels.BgGraphBuilder.*;
+import static com.eveningoutpost.dexdrip.utils.DexCollectionType.*;
 
 /**
  * jamorham

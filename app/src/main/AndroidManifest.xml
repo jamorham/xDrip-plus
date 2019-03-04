@@ -5,6 +5,7 @@
     package="com.eveningoutpost.dexdrip"
     android:installLocation="internalOnly">
     <!-- To receive data from HAPP. -->
+    <uses-permission android:name="android.permission.BLUETOOTH_PRIVILEGED" />
     <uses-permission android:name="com.eveningoutpost.dexdrip.permissions.RECEIVE_EXTERNAL_STATUSLINE" />
 
     <uses-feature
@@ -55,7 +56,8 @@
         android:icon="@drawable/ic_launcher"
         android:label="@string/app_name"
         android:largeHeap="true"
-        android:theme="@style/AppTheme">
+        android:theme="@style/AppTheme"
+        tools:ignore="GoogleAppIndexingWarning">
         <meta-data
             android:name="AA_DB_NAME"
             android:value="DexDrip.db" />
@@ -72,7 +74,7 @@
             android:enabled="true"
             android:exported="false" />
         <provider
-            android:name="android.support.v4.content.FileProvider"
+            android:name="androidx.core.content.FileProvider"
             android:authorities="${applicationId}.provider"
             android:exported="false"
             android:grantUriPermissions="true">
@@ -97,15 +99,15 @@
             android:label="@string/title_activity_bluetooth_scan" />
 
         <service
-            android:name=".Services.DexCollectionService"
+            android:name=".services.DexCollectionService"
             android:enabled="true"
             android:exported="true" />
         <service
-            android:name=".Services.WifiCollectionService"
+            android:name=".services.WifiCollectionService"
             android:enabled="true"
             android:exported="true" />
-        <service android:name=".Services.ActivityRecognizedService" />
-        <service android:name=".Services.BluetoothGlucoseMeter" />
+        <service android:name=".services.ActivityRecognizedService" />
+        <service android:name=".services.BluetoothGlucoseMeter" />
         <service
             android:name=".wearintegration.WatchUpdaterService"
             android:exported="true">
@@ -130,11 +132,11 @@
             android:exported="false" />
 
         <activity
-            android:name=".Tables.BgReadingTable"
+            android:name=".tables.BgReadingTable"
             android:configChanges="orientation|screenSize"
             android:label="@string/bg_readings_table" />
         <activity
-            android:name=".Tables.SensorDataTable"
+            android:name=".tables.SensorDataTable"
             android:configChanges="orientation|screenSize"
             android:label="@string/sensor_table" />
         <activity
@@ -211,7 +213,7 @@
         </receiver>
 
         <activity
-            android:name=".Tables.CalibrationDataTable"
+            android:name=".tables.CalibrationDataTable"
             android:label="@string/calibration_data_table" />
 
         <service android:name=".GcmListenerSvc">
@@ -237,11 +239,11 @@
         </service>
         -->
         <service
-            android:name=".Services.SyncService"
+            android:name=".services.SyncService"
             android:enabled="true"
             android:exported="true" />
         <service
-            android:name=".ImportedLibraries.dexcom.SyncingService"
+            android:name=".importedLibraries.dexcom.SyncingService"
             android:enabled="true"
             android:exported="true" />
 
@@ -282,19 +284,19 @@
             android:configChanges="orientation|screenSize"
             android:label="@string/title_activity_calibration_check_in" />
         <activity
-            android:name=".UtilityModels.pebble.watchface.InstallPebbleWatchFace"
+            android:name=".utilitymodels.pebble.watchface.InstallPebbleWatchFace"
             android:label="@string/install_pebble_watchface" />
         <activity
-            android:name=".UtilityModels.pebble.watchface.InstallPebbleTrendWatchFace"
+            android:name=".utilitymodels.pebble.watchface.InstallPebbleTrendWatchFace"
             android:label="@string/install_pebble_trend_watchface" />
         <activity
-            android:name=".UtilityModels.pebble.watchface.InstallPebbleClassicTrendWatchface"
+            android:name=".utilitymodels.pebble.watchface.InstallPebbleClassicTrendWatchface"
             android:label="@string/install_pebble_classic_trend_watchface" />
         <activity
-            android:name=".UtilityModels.pebble.watchface.InstallPebbleTrendClayWatchFace"
+            android:name=".utilitymodels.pebble.watchface.InstallPebbleTrendClayWatchFace"
             android:label="Install Pebble Clay Watchface" />
         <activity
-            android:name=".UtilityModels.pebble.watchface.InstallPebbleSnoozeControlApp"
+            android:name=".utilitymodels.pebble.watchface.InstallPebbleSnoozeControlApp"
             android:label="@string/install_pebble_snooze_control_app" />
         <activity
             android:name=".UsbConnectedActivity"
@@ -327,15 +329,15 @@
             android:launchMode="singleTask" />
 
         <service
-            android:name=".Services.DexShareCollectionService"
+            android:name=".services.DexShareCollectionService"
             android:enabled="true"
             android:exported="true" />
         <service
-            android:name=".Services.G5CollectionService"
+            android:name=".services.G5CollectionService"
             android:enabled="true"
             android:exported="true" />
         <service
-            android:name=".Services.Ob1G5CollectionService"
+            android:name=".services.Ob1G5CollectionService"
             android:enabled="true" />
         <service
             android:name=".insulin.pendiq.PendiqService"
@@ -396,21 +398,21 @@
             android:label="@string/manage_followers" />
 
         <service
-            android:name=".Services.SnoozeOnNotificationDismissService"
+            android:name=".services.SnoozeOnNotificationDismissService"
             android:exported="false" />
         <service
-            android:name=".Services.MissedReadingService"
+            android:name=".services.MissedReadingService"
             android:enabled="true"
             android:exported="true" />
         <service
-            android:name=".UtilityModels.Notifications"
+            android:name=".utilitymodels.Notifications"
             android:exported="false" />
         <service
-            android:name=".UtilityModels.pebble.PebbleWatchSync"
+            android:name=".utilitymodels.pebble.PebbleWatchSync"
             android:enabled="true"
             android:exported="true" />
         <service
-            android:name=".Services.DailyIntentService"
+            android:name=".services.DailyIntentService"
             android:exported="false" />
 
         <activity
@@ -462,7 +464,7 @@
                 <action android:name="com.twofortyfouram.locale.intent.action.FIRE_SETTING" />
             </intent-filter>
         </receiver>
-        <receiver android:name=".UtilityModels.CompatibleApps">
+        <receiver android:name=".utilitymodels.CompatibleApps">
             <intent-filter android:priority="100">
                 <action android:name="android.intent.action.PACKAGE_ADDED" />
 
@@ -480,7 +482,7 @@
             </intent-filter>
         </service>
         <service
-            android:name=".UtilityModels.XDripDreamService"
+            android:name=".utilitymodels.XDripDreamService"
             android:exported="true"
             android:icon="@drawable/ic_launcher"
             android:label="xDrip+"
@@ -496,12 +498,12 @@
                 android:resource="@xml/xdrip_dream" />
         </service>
         <service
-            android:name=".Services.PlusSyncService"
+            android:name=".services.PlusSyncService"
             android:enabled="true"
             android:exported="true" />
 
         <activity
-            android:name=".UtilityModels.UpdateActivity"
+            android:name=".utilitymodels.UpdateActivity"
             android:configChanges="orientation|screenSize"
             android:label="@string/title_activity_update" />
         <activity
@@ -516,7 +518,7 @@
             android:label="@string/libre_15_minutes_graph"
             android:noHistory="true" />
         <activity
-            android:name=".UtilityModels.SendFeedBack"
+            android:name=".utilitymodels.SendFeedBack"
             android:configChanges="orientation|screenSize"
             android:label="@string/title_activity_send_feed_back"
             android:noHistory="true">
@@ -550,12 +552,12 @@
             android:noHistory="true" />
 
                 <activity
-                    android:name=".profileeditor.BasalProfileEditor"
+                    android:name=".profileEditor.BasalProfileEditor"
                     android:configChanges="orientation|keyboardHidden"
                     android:label="@string/basal_editor"
                     android:screenOrientation="landscape" />
         <service
-            android:name=".Services.DoNothingService"
+            android:name=".services.DoNothingService"
             android:enabled="true"
             android:exported="true" />
 
@@ -583,17 +585,17 @@
             </intent-filter>
         </activity>
         <activity
-            android:name=".profileeditor.ProfileEditor"
+            android:name=".profileEditor.ProfileEditor"
             android:configChanges="orientation|screenSize"
             android:label="@string/title_activity_profile_editor"
             android:windowSoftInputMode="adjustPan" />
         <activity
-            android:name=".languageeditor.LanguageEditor"
+            android:name=".languageEditor.LanguageEditor"
             android:configChanges="orientation|screenSize"
             android:label="@string/language_editor"
             android:windowSoftInputMode="adjustPan" />
         <activity
-            android:name=".GlucoseMeter.BTGlucoseMeterActivity"
+            android:name=".glucoseMeter.BTGlucoseMeterActivity"
             android:configChanges="orientation|screenSize"
             android:label="@string/title_activity_btglucose_meter"
             android:parentActivityName=".Home">
@@ -637,7 +639,7 @@
             android:name="com.sec.android.multiwindow.MINIMUM_SIZE_H"
             android:value="598.0dip" />
 
-        <activity android:name=".UtilityModels.XDripDreamSettingsActivity" />
+        <activity android:name=".utilitymodels.XDripDreamSettingsActivity" />
 
         <service
             android:name=".wearintegration.Amazfitservice"
@@ -659,13 +661,13 @@
             android:label="@string/select_device" />
 
         <activity
-            android:name=".UtilityModels.MtpConfigureActivity"
+            android:name=".utilitymodels.MtpConfigureActivity"
             android:label="USB programmer" />
         <activity
             android:name=".ui.activities.NumberWallPreview"
             android:exported="true"
             android:label="@string/number_wall_config" />
-        <activity android:name=".ui.activities.TimePickerPrefActivity"></activity>
+        <activity android:name=".ui.activities.TimePickerPrefActivity" />
     </application>
 
 </manifest>

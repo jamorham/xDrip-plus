@@ -1,19 +1,19 @@
 package com.eveningoutpost.dexdrip.utils;
 
-import android.Manifest;
-import android.app.Activity;
-import android.app.AlertDialog;
-import android.content.Context;
-import android.content.DialogInterface;
-import android.content.Intent;
-import android.content.pm.PackageManager;
-import android.location.LocationManager;
-import android.os.Build;
-import android.os.Looper;
-import android.support.v4.app.ActivityCompat;
-import android.support.v4.content.ContextCompat;
+import android.*;
+import android.Manifest.*;
+import android.content.*;
+import android.content.DialogInterface.*;
+import android.content.pm.*;
+import android.location.*;
+import android.os.*;
+import android.provider.*;
 
-import com.eveningoutpost.dexdrip.Models.JoH;
+import androidx.core.app.*;
+import androidx.core.content.*;
+import androidx.appcompat.app.*;
+
+import com.eveningoutpost.dexdrip.models.*;
 import com.eveningoutpost.dexdrip.R;
 
 /**
@@ -44,7 +44,7 @@ public class LocationHelper {
      *
      * @param parent The currently visible activity.
      */
-    public static void requestLocation(final Activity parent) {
+    public static void requestLocation(final AppCompatActivity parent) {
         if (LocationHelper.isLocationEnabled(parent)) {
             return;
         }
@@ -54,11 +54,7 @@ public class LocationHelper {
         AlertDialog.Builder builder = new AlertDialog.Builder(parent);
         builder.setTitle(R.string.location_not_found_title);
         builder.setMessage(R.string.location_not_found_message);
-        builder.setPositiveButton(R.string.location_yes, new DialogInterface.OnClickListener() {
-            public void onClick(DialogInterface dialogInterface, int i) {
-                parent.startActivity(new Intent(android.provider.Settings.ACTION_LOCATION_SOURCE_SETTINGS));
-            }
-        });
+        builder.setPositiveButton(R.string.location_yes, (OnClickListener) (dialogInterface, i) -> parent.startActivity(new Intent(Settings.ACTION_LOCATION_SOURCE_SETTINGS)));
         builder.setNegativeButton(R.string.no, null);
         try {
             builder.create().show();
@@ -75,7 +71,7 @@ public class LocationHelper {
      *
      * @param activity The currently visible activity.
      */
-    public static void requestLocationForBluetooth(final Activity activity) {
+    public static void requestLocationForBluetooth(final AppCompatActivity activity) {
         // Location needs to be enabled for Bluetooth discovery on Marshmallow.
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
 
@@ -83,16 +79,13 @@ public class LocationHelper {
                     android.Manifest.permission.ACCESS_COARSE_LOCATION)
                     != PackageManager.PERMISSION_GRANTED) {
 
-                JoH.show_ok_dialog(activity, activity.getString(R.string.please_allow_permission), activity.getString(R.string.without_location_scan_doesnt_work), new Runnable() {
-                    @Override
-                    public void run() {
-                        try {
-                            ActivityCompat.requestPermissions(activity,
-                                    new String[]{android.Manifest.permission.ACCESS_COARSE_LOCATION},
-                                    0);
-                        } catch (Exception e) {
-                            JoH.static_toast_long("Got Exception with Location Permission: " + e);
-                        }
+                JoH.show_ok_dialog(activity, activity.getString(R.string.please_allow_permission), activity.getString(R.string.without_location_scan_doesnt_work), (Runnable) () -> {
+                    try {
+                        ActivityCompat.requestPermissions(activity,
+                                new String[]{permission.ACCESS_COARSE_LOCATION},
+                                0);
+                    } catch (Exception e) {
+                        JoH.static_toast_long("Got Exception with Location Permission: " + e);
                     }
                 });
             }
@@ -101,7 +94,7 @@ public class LocationHelper {
         }
     }
 
-    public static void requestLocationForEmergencyMessage(final Activity activity) {
+    public static void requestLocationForEmergencyMessage(final AppCompatActivity activity) {
         // Location needs to be enabled for Bluetooth discovery on Marshmallow.
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
 
@@ -109,16 +102,13 @@ public class LocationHelper {
                     android.Manifest.permission.ACCESS_FINE_LOCATION)
                     != PackageManager.PERMISSION_GRANTED) {
 
-                JoH.show_ok_dialog(activity, activity.getString(R.string.please_allow_permission), activity.getString(R.string.without_location_permission_emergency_cannot_get_location), new Runnable() {
-                    @Override
-                    public void run() {
-                        try {
-                            ActivityCompat.requestPermissions(activity,
-                                    new String[]{android.Manifest.permission.ACCESS_FINE_LOCATION},
-                                    0);
-                        } catch (Exception e) {
-                            JoH.static_toast_long("Got Exception with Location Permission: " + e);
-                        }
+                JoH.show_ok_dialog(activity, activity.getString(R.string.please_allow_permission), activity.getString(R.string.without_location_permission_emergency_cannot_get_location), (Runnable) () -> {
+                    try {
+                        ActivityCompat.requestPermissions(activity,
+                                new String[]{permission.ACCESS_FINE_LOCATION},
+                                0);
+                    } catch (Exception e) {
+                        JoH.static_toast_long("Got Exception with Location Permission: " + e);
                     }
                 });
             }

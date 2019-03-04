@@ -1,25 +1,20 @@
 package com.eveningoutpost.dexdrip;
 
-import android.content.Context;
-import android.graphics.Color;
-import android.graphics.PointF;
-import android.os.Bundle;
-import android.support.v7.app.AppCompatActivity;
-import android.support.v7.widget.LinearLayoutManager;
-import android.support.v7.widget.LinearSmoothScroller;
-import android.support.v7.widget.RecyclerView;
-import android.support.v7.widget.helper.ItemTouchHelper;
-import android.util.AttributeSet;
-import android.util.DisplayMetrics;
-import android.view.View;
-import android.view.ViewGroup;
+import android.content.*;
+import android.graphics.*;
+import android.os.*;
+import android.util.*;
+import android.view.*;
+
+import androidx.annotation.*;
+import androidx.recyclerview.widget.*;
 
 /**
  * Created by jamorham on 01/02/2017.
  */
 
 
-public class ActivityWithRecycler extends BaseAppCompatActivity {
+public class ActivityWithRecycler extends BaseActivity {
 
     RecyclerView recyclerView;
     RecyclerAdapater mAdapter;
@@ -77,13 +72,14 @@ public class ActivityWithRecycler extends BaseAppCompatActivity {
             return 0; // stub
         }
 
+        @NonNull
         @Override
-        public MyViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
+        public MyViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
             return null; // stub
         }
 
         @Override
-        public void onBindViewHolder(final MyViewHolder holder, int position) {
+        public void onBindViewHolder(@NonNull final MyViewHolder holder, int position) {
         }
 
         @Override

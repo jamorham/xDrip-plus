@@ -1,9 +1,8 @@
 package com.eveningoutpost.dexdrip.adapters;
 
-import android.databinding.BindingAdapter;
-import android.databinding.InverseBindingAdapter;
-import android.databinding.InverseBindingListener;
-import android.widget.SeekBar;
+import android.widget.*;
+
+import androidx.databinding.*;
 
 // jamorham
 
@@ -11,7 +10,7 @@ import android.widget.SeekBar;
 
 public class SeekBarBindingAdapterUtils {
 
-    @BindingAdapter(value = {"progressString"})
+    @BindingAdapter("progressString")
     public static void setProgressString(SeekBar view, String progress) {
         int value = 0;
         try {

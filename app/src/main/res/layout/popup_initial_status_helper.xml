@@ -6,7 +6,7 @@
 
         <variable
             name="idq"
-            type="com.eveningoutpost.dexdrip.Models.ProcessInitialDataQuality.InitialDataQuality" />
+            type="com.eveningoutpost.dexdrip.models.ProcessInitialDataQuality.InitialDataQuality" />
 
         <variable
             name="ms"
@@ -14,7 +14,7 @@
 
         <variable
             name="prefs"
-            type="com.eveningoutpost.dexdrip.UtilityModels.PrefsView" />
+            type="com.eveningoutpost.dexdrip.utilitymodels.PrefsView" />
     </data>
 
     <LinearLayout
@@ -25,10 +25,10 @@
 
         <ProgressBar
             android:id="@+id/progressBar2"
-            android:visibility="gone"
             style="?android:attr/progressBarStyle"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content" />
+            android:layout_height="wrap_content"
+            android:visibility="gone" />
 
         <RadioButton
             android:id="@+id/collector_running_indicator"

@@ -6,17 +6,17 @@ import android.util.Log;
 
 import com.crashlytics.android.answers.Answers;
 import com.crashlytics.android.answers.CustomEvent;
-import com.eveningoutpost.dexdrip.G5Model.Ob1G5StateMachine;
+import com.eveningoutpost.dexdrip.g5Model.Ob1G5StateMachine;
 import com.eveningoutpost.dexdrip.Home;
-import com.eveningoutpost.dexdrip.Models.JoH;
-import com.eveningoutpost.dexdrip.Models.Sensor;
+import com.eveningoutpost.dexdrip.models.JoH;
+import com.eveningoutpost.dexdrip.models.Sensor;
 import com.eveningoutpost.dexdrip.NFCReaderX;
-import com.eveningoutpost.dexdrip.UtilityModels.Pref;
+import com.eveningoutpost.dexdrip.utilitymodels.Pref;
 import com.eveningoutpost.dexdrip.stats.StatsResult;
 import com.eveningoutpost.dexdrip.xdrip;
 
-import static com.eveningoutpost.dexdrip.Models.JoH.getVersionDetails;
-import static com.eveningoutpost.dexdrip.Services.Ob1G5CollectionService.getTransmitterID;
+import static com.eveningoutpost.dexdrip.models.JoH.getVersionDetails;
+import static com.eveningoutpost.dexdrip.services.Ob1G5CollectionService.getTransmitterID;
 import static com.eveningoutpost.dexdrip.utils.DexCollectionType.DexcomG5;
 
 /**
@@ -51,7 +51,7 @@ public class Telemetry {
                     if (DexCollectionType.getDexCollectionType() == DexcomG5) {
 
                         final String version = Ob1G5StateMachine.getRawFirmwareVersionString(getTransmitterID());
-                        if (version.length() > 0) {
+                        if (!version.isEmpty()) {
                             Answers.getInstance().logCustom(new CustomEvent("GFirmware")
                                     .putCustomAttribute("Firmware", version));
                         }
@@ -89,16 +89,16 @@ public class Telemetry {
                                 final String capture_id = DexCollectionType.getDexCollectionType().toString() + subtype + " Captured " + capture_set;
 
                                 Log.d(TAG, "SEND CAPTURE EVENT PROCESS: " + capture_id);
-                                String watch_model = "";
+                                StringBuilder watch_model = new StringBuilder();
 
                                 if (Home.get_forced_wear()) {
                                     // anonymize watch model
                                     final String wear_node = Pref.getStringDefaultBlank("node_wearG5");
-                                    if (wear_node.length() > 0) {
+                                    if (!wear_node.isEmpty()) {
                                         final String[] wear_array = wear_node.split(" ");
                                         for (String ii : wear_array) {
                                             if (!ii.contains("|"))
-                                                watch_model = watch_model + ii;
+                                                watch_model.append(ii);
                                         }
                                     }
                                 }
@@ -108,7 +108,7 @@ public class Telemetry {
                                             .putCustomAttribute("Manufacturer", Build.MANUFACTURER)
                                             .putCustomAttribute("Version", Build.VERSION.RELEASE)
                                             .putCustomAttribute("xDrip", getVersionDetails())
-                                            .putCustomAttribute("Watch", watch_model)
+                                            .putCustomAttribute("Watch", watch_model.toString())
                                             .putCustomAttribute("Percentage", capture_percentage));
                                 } else {
                                     Answers.getInstance().logCustom(new CustomEvent(capture_id)

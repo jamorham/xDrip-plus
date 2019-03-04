@@ -6,9 +6,9 @@ package com.eveningoutpost.dexdrip.insulin.pendiq;
 
 import android.content.Intent;
 
-import com.eveningoutpost.dexdrip.Models.JoH;
-import com.eveningoutpost.dexdrip.UtilityModels.PersistentStore;
-import com.eveningoutpost.dexdrip.UtilityModels.Pref;
+import com.eveningoutpost.dexdrip.models.JoH;
+import com.eveningoutpost.dexdrip.utilitymodels.PersistentStore;
+import com.eveningoutpost.dexdrip.utilitymodels.Pref;
 import com.eveningoutpost.dexdrip.xdrip;
 
 import static com.eveningoutpost.dexdrip.insulin.pendiq.Const.MINIMUM_DOSE;
@@ -34,7 +34,7 @@ public class Pendiq {
 
     static boolean isEightHexChars(String string) {
         return (string.length() == 8
-                && string.replaceAll("[0-9A-F]", "").length() == 0);
+                && string.replaceAll("[0-9A-F]", "").isEmpty());
 
     }
 

@@ -1,7 +1,7 @@
 package com.eveningoutpost.dexdrip;
 
-/**
- * Created by jamorham on 11/01/16.
+/*
+  Created by jamorham on 11/01/16.
  */
 
 import android.content.Intent;

@@ -21,8 +21,7 @@
     <lecho.lib.hellocharts.view.LineChartView
         android:id="@+id/example_linechart"
         android:layout_width="match_parent"
-        android:layout_height="140dp"
-        />
+        android:layout_height="140dp" />
 
 
 </LinearLayout>

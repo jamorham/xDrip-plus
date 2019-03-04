@@ -1,10 +1,9 @@
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
-    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:padding="10dp"
     android:orientation="vertical"
+    android:padding="10dp"
     android:weightSum="1">
 
     <RelativeLayout
@@ -28,8 +27,8 @@
             android:id="@+id/reminder_edit_new"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:hint="@string/reminder_title"
             android:layout_below="@+id/reminder_edit_alt_title"
+            android:hint="@string/reminder_title"
             android:inputType="text|textCapWords"
             android:lines="4"
             android:linksClickable="false"
@@ -40,8 +39,8 @@
             android:id="@+id/radioGroup"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_alignParentEnd="true"
             android:layout_below="@+id/reminder_edit_new"
+            android:layout_alignParentEnd="true"
             android:layout_marginEnd="11dp">
 
             <RadioButton
@@ -78,8 +77,8 @@
             android:id="@+id/reminderRepeatDays"
             android:layout_width="20dp"
             android:layout_height="wrap_content"
-            android:layout_alignEnd="@+id/reminderUpButton"
             android:layout_below="@+id/reminder_edit_new"
+            android:layout_alignEnd="@+id/reminderUpButton"
             android:layout_marginTop="26dp"
 
             android:layout_toEndOf="@+id/reminderRepeatcheckBox"
@@ -105,8 +104,8 @@
             android:id="@+id/reminderDownButton"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_alignBottom="@+id/radioGroup"
             android:layout_alignStart="@+id/reminderUpButton"
+            android:layout_alignBottom="@+id/radioGroup"
             android:onClick="reminderDownButton"
             app:srcCompat="@android:drawable/arrow_down_float" />
 
@@ -124,18 +123,18 @@
             android:id="@+id/chimeonlycheckbox"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="@string/chime_only"
-            android:layout_marginStart="8dp"
             android:layout_below="@+id/reminderUpButton"
-            android:layout_alignParentStart="true" />
+            android:layout_alignParentStart="true"
+            android:layout_marginStart="8dp"
+            android:text="@string/chime_only" />
 
         <CheckBox
             android:id="@+id/alternatingcheckbox"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="@string/alternating"
             android:layout_below="@+id/reminder_edit_new"
-            android:layout_alignStart="@+id/chimeonlycheckbox" />
+            android:layout_alignStart="@+id/chimeonlycheckbox"
+            android:text="@string/alternating" />
 
         <ImageButton
             android:id="@+id/reminderSoundButton"
@@ -151,13 +150,13 @@
             android:id="@+id/reminderSwapButton"
             android:layout_width="30dp"
             android:layout_height="wrap_content"
-            android:layout_alignParentEnd="true"
             android:layout_alignParentTop="true"
+            android:layout_alignParentEnd="true"
             android:layout_marginTop="6dp"
             android:background="@android:color/transparent"
-            android:paddingBottom="2dp"
             android:paddingLeft="2dp"
             android:paddingTop="2dp"
+            android:paddingBottom="2dp"
             app:srcCompat="@drawable/ic_swap_vert_white_24dp" />
 
 
@@ -173,26 +172,24 @@
 
         <CheckBox
             android:id="@+id/weekEndsCheckbox"
-            android:layout_marginLeft="10dp"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_below="@+id/reminderRepeatcheckBox"
+            android:layout_marginLeft="10dp"
             android:layout_toEndOf="@+id/weekDaysCheckbox"
             android:checked="true"
             android:text="@string/weekends" />
 
         <CheckBox
             android:id="@+id/highPriorityCheckbox"
-            android:layout_marginLeft="10dp"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_below="@+id/reminderRepeatcheckBox"
+            android:layout_marginLeft="10dp"
             android:layout_toEndOf="@+id/weekEndsCheckbox"
             android:checked="false"
             android:text="@string/mega_priority" />
     </RelativeLayout>
-
-
 
 
 </LinearLayout>

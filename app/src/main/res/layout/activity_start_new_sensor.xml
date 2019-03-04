@@ -1,59 +1,65 @@
-<android.support.v4.widget.DrawerLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:tools="http://schemas.android.com/tools" android:id="@+id/drawer_layout"
-    android:layout_width="match_parent" android:layout_height="match_parent"
+<androidx.drawerlayout.widget.DrawerLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/drawer_layout"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
     tools:context="com.eveningoutpost.dexdrip.Home">
 
     <LinearLayout
-        android:orientation="vertical"
         android:layout_width="fill_parent"
         android:layout_height="fill_parent"
-        android:gravity="center_horizontal">
+        android:gravity="center_horizontal"
+        android:orientation="vertical">
+
         <ScrollView
+            android:id="@+id/scrollView4"
             android:layout_width="fill_parent"
-            android:layout_height="fill_parent"
-            android:id="@+id/scrollView4" >
+            android:layout_height="fill_parent">
+
             <LinearLayout
-                android:orientation="vertical"
                 android:layout_width="fill_parent"
-                android:layout_height="fill_parent"
+                android:layout_height="wrap_content"
                 android:gravity="center_horizontal"
+                android:orientation="vertical"
                 android:weightSum="1">
 
                 <TextView
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:textAppearance="?android:attr/textAppearanceMedium"
-                    android:text="@string/do_not_hit_start_long"
                     android:id="@+id/textView"
+                    android:layout_width="match_parent"
+                    android:layout_height="0dp"
                     android:layout_above="@+id/startNewSensor"
-                    android:layout_toStartOf="@+id/startNewSensor"
                     android:layout_alignParentEnd="true"
                     android:layout_marginTop="10dp"
-                    android:gravity="center_horizontal"
-                    android:textSize="20sp"
+                    android:layout_toStartOf="@+id/startNewSensor"
                     android:layout_weight="0.68"
-                    android:paddingRight="10dp"
+                    android:gravity="center_horizontal"
                     android:paddingLeft="10dp"
-                    android:paddingTop="10dp" />
+                    android:paddingTop="10dp"
+                    android:paddingRight="10dp"
+                    android:text="@string/do_not_hit_start_long"
+                    android:textAppearance="?android:attr/textAppearanceMedium"
+                    android:textSize="20sp" />
 
                 <Button
+                    android:id="@+id/startNewSensor"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="@string/start_sensor"
-                    android:id="@+id/startNewSensor"
                     android:layout_alignParentBottom="true"
                     android:layout_centerHorizontal="true"
-                    android:layout_marginTop="15dp" />
+                    android:layout_marginTop="15dp"
+                    android:text="@string/start_sensor" />
             </LinearLayout>
         </ScrollView>
 
     </LinearLayout>
 
-    <fragment android:id="@+id/navigation_drawer"
-        android:layout_width="@dimen/navigation_drawer_width" android:layout_height="match_parent"
-        android:layout_gravity="start"
+    <fragment
+        android:id="@+id/navigation_drawer"
         android:name="com.eveningoutpost.dexdrip.NavigationDrawerFragment"
+        android:layout_width="@dimen/navigation_drawer_width"
+        android:layout_height="match_parent"
+        android:layout_gravity="start"
         tools:layout="@layout/fragment_navigation_drawer" />
 
-</android.support.v4.widget.DrawerLayout>
+</androidx.drawerlayout.widget.DrawerLayout>
 

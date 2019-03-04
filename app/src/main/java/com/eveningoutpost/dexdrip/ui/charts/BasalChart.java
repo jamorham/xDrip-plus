@@ -1,33 +1,21 @@
 package com.eveningoutpost.dexdrip.ui.charts;
 
-import android.support.annotation.ColorInt;
-import android.support.annotation.NonNull;
 import android.text.format.DateFormat;
 
-import com.eveningoutpost.dexdrip.Models.JoH;
-import com.eveningoutpost.dexdrip.UtilityModels.ColorCache;
-import com.eveningoutpost.dexdrip.UtilityModels.Constants;
-import com.eveningoutpost.dexdrip.xdrip;
+import androidx.annotation.*;
 
-import java.text.DateFormatSymbols;
-import java.text.SimpleDateFormat;
-import java.util.ArrayList;
-import java.util.Calendar;
-import java.util.GregorianCalendar;
-import java.util.List;
-import java.util.Locale;
-import java.util.TimeZone;
+import com.eveningoutpost.dexdrip.models.*;
+import com.eveningoutpost.dexdrip.utilitymodels.*;
+import com.eveningoutpost.dexdrip.*;
 
-import lecho.lib.hellocharts.formatter.AxisValueFormatter;
-import lecho.lib.hellocharts.formatter.SimpleAxisValueFormatter;
-import lecho.lib.hellocharts.model.Axis;
-import lecho.lib.hellocharts.model.AxisValue;
-import lecho.lib.hellocharts.model.Column;
-import lecho.lib.hellocharts.model.ColumnChartData;
-import lecho.lib.hellocharts.model.SubcolumnValue;
-import lecho.lib.hellocharts.view.ColumnChartView;
+import java.text.*;
+import java.util.*;
 
-import static com.eveningoutpost.dexdrip.UtilityModels.ColorCache.getCol;
+import lecho.lib.hellocharts.formatter.*;
+import lecho.lib.hellocharts.model.*;
+import lecho.lib.hellocharts.view.*;
+
+import static com.eveningoutpost.dexdrip.utilitymodels.ColorCache.*;
 
 // jamorham
 
@@ -41,7 +29,7 @@ public class BasalChart {
     private static final int segments = 48;
 
     public static ColumnChartData columnData() {
-        final ColumnChartData columnChartData = new ColumnChartData(getColumns(getCol(ColorCache.X.color_basal_tbr)));;
+        final ColumnChartData columnChartData = new ColumnChartData(getColumns(getCol(ColorCache.X.color_basal_tbr)));
         columnChartData.setBaseValue(-0.1f);
         columnChartData.setAxisXBottom(chartXAxis(columnChartData.getColumns().size()));
         return columnChartData;

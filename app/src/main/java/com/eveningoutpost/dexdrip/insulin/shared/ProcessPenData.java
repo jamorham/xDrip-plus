@@ -1,11 +1,11 @@
 package com.eveningoutpost.dexdrip.insulin.shared;
 
 import com.eveningoutpost.dexdrip.Home;
-import com.eveningoutpost.dexdrip.Models.JoH;
-import com.eveningoutpost.dexdrip.Models.PenData;
-import com.eveningoutpost.dexdrip.Models.Treatments;
-import com.eveningoutpost.dexdrip.Models.UserError;
-import com.eveningoutpost.dexdrip.UtilityModels.Constants;
+import com.eveningoutpost.dexdrip.models.JoH;
+import com.eveningoutpost.dexdrip.models.PenData;
+import com.eveningoutpost.dexdrip.models.Treatments;
+import com.eveningoutpost.dexdrip.models.UserError;
+import com.eveningoutpost.dexdrip.utilitymodels.Constants;
 
 import java.util.List;
 
@@ -31,7 +31,7 @@ public class ProcessPenData {
 
         boolean newData = false;
 
-        if (doses.size() > 0 || rewinds.size() > 0) {
+        if (!doses.isEmpty() || !rewinds.isEmpty()) {
 
             for (final PenData pd : rewinds) {
                 if (!Treatments.matchUUID(treatments, pd.uuid)) {

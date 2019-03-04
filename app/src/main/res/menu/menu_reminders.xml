@@ -4,37 +4,33 @@
     <item
         android:id="@+id/reminders_atnight"
         android:checkable="true"
+        android:onClick="onRemindNightClick"
         android:orderInCategory="1"
         android:title="@string/quiet_at_night"
-        android:visible="true"
-        android:onClick="onRemindNightClick"
-        />
+        android:visible="true" />
 
     <item
         android:id="@+id/reminders_disabled"
         android:checkable="true"
+        android:onClick="onAllDisabledClick"
         android:orderInCategory="1"
         android:title="@string/alerts_disabled"
-        android:visible="true"
-        android:onClick="onAllDisabledClick"
-        />
+        android:visible="true" />
 
     <item
         android:id="@+id/reminders_restart"
         android:checkable="true"
+        android:onClick="onRestartTomorrowClick"
         android:orderInCategory="1"
         android:title="@string/restart_in_the_morning"
-        android:visible="true"
-        android:onClick="onRestartTomorrowClick"
-        />
+        android:visible="true" />
 
     <item
         android:id="@+id/reminders_advanced"
         android:checkable="true"
+        android:onClick="onRemindersAdvancedClick"
         android:orderInCategory="1"
         android:title="@string/advanced_mode"
-        android:visible="true"
-        android:onClick="onRemindersAdvancedClick"
-        />
+        android:visible="true" />
 
 </menu>

@@ -8,11 +8,11 @@ package com.eveningoutpost.dexdrip.ui;
 
 public interface ViewShelf {
 
-    public boolean get(String id) ;
-    public void set(String id, boolean value) ;
-    public void pset(String id, boolean value) ;
+    boolean get(String id) ;
+    void set(String id, boolean value) ;
+    void pset(String id, boolean value) ;
 
-    public void ptoggle(String id);
+    void ptoggle(String id);
     //public void populate();
 
 }

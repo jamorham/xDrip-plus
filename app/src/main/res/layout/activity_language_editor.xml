@@ -1,60 +1,58 @@
 <?xml version="1.0" encoding="utf-8"?>
 
-<android.support.design.widget.CoordinatorLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<androidx.coordinatorlayout.widget.CoordinatorLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:fitsSystemWindows="true">
 
 
-
-    <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
-        xmlns:tools="http://schemas.android.com/tools"
+    <RelativeLayout xmlns:tools="http://schemas.android.com/tools"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
 
-        tools:context=".languageeditor.LanguageEditor">
+        tools:context=".languageEditor.LanguageEditor">
 
-        <android.support.v7.widget.Toolbar
+        <androidx.appcompat.widget.Toolbar
             android:id="@+id/language_toolbar"
-            app:theme="@style/Toolbar"
-
             android:layout_width="match_parent"
+
             android:layout_height="wrap_content"
+            android:layout_alignParentStart="true"
             android:minHeight="?attr/actionBarSize"
-            android:layout_alignParentStart="true" />
+            app:theme="@style/Toolbar" />
 
         <LinearLayout
 
+            android:id="@+id/linearLayout3"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:layout_alignParentEnd="true"
+            android:layout_below="@+id/language_toolbar"
             android:layout_alignParentStart="true"
+            android:layout_alignParentEnd="true"
             android:orientation="vertical"
-            android:weightSum="1"
-            android:id="@+id/linearLayout3"
-            android:layout_below="@+id/language_toolbar">
+            android:weightSum="1">
 
 
-            <android.support.v7.widget.RecyclerView
+            <androidx.recyclerview.widget.RecyclerView
                 android:id="@+id/language_recycler_view"
                 android:layout_width="match_parent"
                 android:layout_height="0dp"
                 android:layout_gravity="top"
+                android:layout_weight="0.99"
                 android:fadeScrollbars="false"
-                android:scrollbars="vertical"
-                android:paddingBottom="8dp"
                 android:paddingLeft="8dp"
-                android:paddingRight="8dp"
                 android:paddingTop="8dp"
-                android:layout_weight="0.99" />
+                android:paddingRight="8dp"
+                android:paddingBottom="8dp"
+                android:scrollbars="vertical" />
 
             <RelativeLayout
                 android:layout_width="match_parent"
 
                 android:layout_height="63dp"
-                android:gravity="bottom"
-                android:layout_alignParentStart="true">
+                android:layout_alignParentStart="true"
+                android:gravity="bottom">
 
 
                 <Button
@@ -62,21 +60,21 @@
                     style="?android:attr/buttonStyleSmall"
                     android:layout_width="wrap_content"
                     android:layout_height="32dp"
-                    android:layout_alignParentBottom="true"
-                    android:layout_alignParentStart="true"
                     android:layout_alignTop="@+id/languageUndoBtn"
+                    android:layout_alignParentStart="true"
+                    android:layout_alignParentBottom="true"
+                    android:layout_marginRight="3dp"
                     android:onClick="languageCancelButton"
-                    android:text="Cancel"
-                    android:layout_marginRight="3dp" />
+                    android:text="Cancel" />
 
                 <Button
                     android:id="@+id/languageSaveBtn"
                     style="?android:attr/buttonStyleSmall"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:layout_alignParentBottom="true"
-                    android:layout_alignParentEnd="true"
                     android:layout_alignTop="@+id/languageUndoBtn"
+                    android:layout_alignParentEnd="true"
+                    android:layout_alignParentBottom="true"
                     android:onClick="languageSaveButton"
                     android:text="Save" />
 
@@ -85,10 +83,10 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_alignParentBottom="true"
+                    android:layout_marginRight="3dp"
                     android:layout_toEndOf="@+id/languageCancelBtn"
                     android:onClick="languageUndoButton"
-                    android:text="Reset"
-                    android:layout_marginRight="3dp" />
+                    android:text="Reset" />
 
             </RelativeLayout>
 
@@ -98,4 +96,4 @@
     </RelativeLayout>
 
 
-</android.support.design.widget.CoordinatorLayout>
+</androidx.coordinatorlayout.widget.CoordinatorLayout>

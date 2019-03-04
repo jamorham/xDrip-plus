@@ -1,13 +1,13 @@
 package com.eveningoutpost.dexdrip.utils.bt;
 
-import android.os.ParcelUuid;
-import android.support.annotation.Nullable;
-import android.util.SparseArray;
+import android.os.*;
+import android.util.*;
 
-import com.polidea.rxandroidble.scan.ScanRecord;
+import androidx.annotation.*;
 
-import java.util.List;
-import java.util.Map;
+import com.polidea.rxandroidble.scan.*;
+
+import java.util.*;
 
 // jamorham - legacy support from BluetoothScan
 

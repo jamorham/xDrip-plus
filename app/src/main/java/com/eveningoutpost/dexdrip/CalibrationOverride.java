@@ -1,27 +1,17 @@
 package com.eveningoutpost.dexdrip;
 
-import android.content.Intent;
-import android.os.Bundle;
-import android.text.TextUtils;
+import android.content.*;
+import android.os.*;
+import android.text.*;
+import android.widget.*;
 
-import com.eveningoutpost.dexdrip.G5Model.Ob1G5StateMachine;
-import com.eveningoutpost.dexdrip.Models.JoH;
-import com.eveningoutpost.dexdrip.Models.Sensor;
-import com.eveningoutpost.dexdrip.Models.UserError.Log;
+import com.eveningoutpost.dexdrip.models.*;
+import com.eveningoutpost.dexdrip.models.UserError.*;
+import com.eveningoutpost.dexdrip.utilitymodels.*;
+import com.eveningoutpost.dexdrip.calibrations.*;
+import com.eveningoutpost.dexdrip.utils.*;
 
-import android.view.View;
-import android.widget.Button;
-import android.widget.EditText;
-
-import com.eveningoutpost.dexdrip.Models.Calibration;
-import com.eveningoutpost.dexdrip.UtilityModels.CollectionServiceStarter;
-import com.eveningoutpost.dexdrip.UtilityModels.UndoRedo;
-import com.eveningoutpost.dexdrip.UtilityModels.CalibrationSendQueue;
-import com.eveningoutpost.dexdrip.calibrations.NativeCalibrationPipe;
-import com.eveningoutpost.dexdrip.utils.ActivityWithMenu;
-import com.eveningoutpost.dexdrip.wearintegration.WatchUpdaterService;
-import static com.eveningoutpost.dexdrip.Home.startWatchUpdaterService;
-import static com.eveningoutpost.dexdrip.xdrip.gs;
+import static com.eveningoutpost.dexdrip.xdrip.*;
 
 public class CalibrationOverride extends ActivityWithMenu {
     Button button;
@@ -47,50 +37,48 @@ public class CalibrationOverride extends ActivityWithMenu {
     public void addListenerOnButton() {
             button = (Button) findViewById(R.id.save_calibration_button);
 
-        button.setOnClickListener(new View.OnClickListener() {
-            public void onClick(View v) {
-                if (Sensor.isActive()) {
-                    EditText value = (EditText) findViewById(R.id.bg_value);
-                    String string_value = value.getText().toString();
-                    if (!TextUtils.isEmpty(string_value)) {
-                        try {
-                            final double calValue = JoH.tolerantParseDouble(string_value);
+        button.setOnClickListener(v -> {
+            if (Sensor.isActive()) {
+                EditText value = (EditText) findViewById(R.id.bg_value);
+                String string_value = value.getText().toString();
+                if (!TextUtils.isEmpty(string_value)) {
+                    try {
+                        final double calValue = JoH.tolerantParseDouble(string_value);
 
-                            final Calibration last_calibration = Calibration.lastValid();
-                            if (last_calibration == null) {
-                                Log.wtf(TAG, "Last valid calibration is null when trying to cancel it in override!");
-                            } else {
-                                last_calibration.sensor_confidence = 0;
-                                last_calibration.slope_confidence = 0;
-                                last_calibration.save();
-                                CalibrationSendQueue.addToQueue(last_calibration, getApplicationContext());
-                                // TODO we need to push the nixing of this last calibration
-                            }
-
-                            final Calibration calibration = Calibration.create(calValue, getApplicationContext());
-                            if (calibration != null) {
-                                UndoRedo.addUndoCalibration(calibration.uuid);
-                                GcmActivity.pushCalibration(string_value, "0");
-                               // Ob1G5StateMachine.addCalibration((int)calibration.bg, calibration.timestamp);
-                                NativeCalibrationPipe.addCalibration((int)calibration.bg, calibration.timestamp);
-                                //startWatchUpdaterService(v.getContext(), WatchUpdaterService.ACTION_SYNC_CALIBRATION, TAG);
-
-                            } else {
-                                Log.e(TAG, "Calibration creation resulted in null");
-                                JoH.static_toast_long("Could not create calibration!");
-                            }
-                            Intent tableIntent = new Intent(v.getContext(), Home.class);
-                            startActivity(tableIntent);
-                            finish();
-                        } catch (NumberFormatException e) {
-                            value.setError(gs(R.string.number_error_) + e);
+                        final Calibration last_calibration = Calibration.lastValid();
+                        if (last_calibration == null) {
+                            Log.wtf(TAG, "Last valid calibration is null when trying to cancel it in override!");
+                        } else {
+                            last_calibration.sensor_confidence = 0;
+                            last_calibration.slope_confidence = 0;
+                            last_calibration.save();
+                            CalibrationSendQueue.addToQueue(last_calibration, getApplicationContext());
+                            // TODO we need to push the nixing of this last calibration
                         }
-                    } else {
-                        value.setError("Calibration Can Not be blank");
+
+                        final Calibration calibration = Calibration.create(calValue, getApplicationContext());
+                        if (calibration != null) {
+                            UndoRedo.addUndoCalibration(calibration.uuid);
+                            GcmActivity.pushCalibration(string_value, "0");
+                           // Ob1G5StateMachine.addCalibration((int)calibration.bg, calibration.timestamp);
+                            NativeCalibrationPipe.addCalibration((int)calibration.bg, calibration.timestamp);
+                            //startWatchUpdaterService(v.getContext(), WatchUpdaterService.ACTION_SYNC_CALIBRATION, TAG);
+
+                        } else {
+                            Log.e(TAG, "Calibration creation resulted in null");
+                            JoH.static_toast_long("Could not create calibration!");
+                        }
+                        Intent tableIntent = new Intent(v.getContext(), Home.class);
+                        startActivity(tableIntent);
+                        finish();
+                    } catch (NumberFormatException e) {
+                        value.setError(gs(R.string.number_error_) + e);
                     }
                 } else {
-                    Log.w("Calibration", "ERROR, no active sensor");
+                    value.setError("Calibration Can Not be blank");
                 }
+            } else {
+                Log.w("Calibration", "ERROR, no active sensor");
             }
         });
 

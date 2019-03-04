@@ -1,17 +1,12 @@
 package com.eveningoutpost.dexdrip;
 
 
-import android.content.SharedPreferences;
-import android.os.Bundle;
-import android.preference.Preference;
-import android.preference.PreferenceActivity;
-import android.preference.PreferenceCategory;
-import android.preference.PreferenceManager;
-import android.preference.PreferenceScreen;
-import android.util.Log;
+import android.content.*;
+import android.os.*;
+import android.preference.*;
+import android.util.*;
 
-import com.eveningoutpost.dexdrip.R;
-import com.eveningoutpost.dexdrip.utils.DexCollectionType;
+import com.eveningoutpost.dexdrip.utils.*;
 
 public class NWPreferences extends PreferenceActivity {
 
@@ -58,24 +53,19 @@ public class NWPreferences extends PreferenceActivity {
         }
     }
 
-    private static Preference.OnPreferenceChangeListener sBindPreferenceSummaryToValueListener = new Preference.OnPreferenceChangeListener() {
-        @Override
-        public boolean onPreferenceChange(Preference preference, Object value) {
-            String stringValue = value.toString();
-            Log.d(TAG, "Set preference summary: " + stringValue);
-            preference.setSummary(stringValue);
-            return true;
-        }
+    private static Preference.OnPreferenceChangeListener sBindPreferenceSummaryToValueListener = (preference, value) -> {
+        String stringValue = value.toString();
+        Log.d(TAG, "Set preference summary: " + stringValue);
+        preference.setSummary(stringValue);
+        return true;
     };
 
-    public SharedPreferences.OnSharedPreferenceChangeListener prefListener = new SharedPreferences.OnSharedPreferenceChangeListener() {
-        public void onSharedPreferenceChanged(SharedPreferences prefs, String key) {
+    public SharedPreferences.OnSharedPreferenceChangeListener prefListener = (prefs, key) -> {
 
-        if(key.compareTo("dex_collection_method") == 0) {
-            setCollectionPrefs();
-        }
+    if(key.compareTo("dex_collection_method") == 0) {
+        setCollectionPrefs();
+    }
 
-        }
     };
 
     public void listenForChangeInSettings() {

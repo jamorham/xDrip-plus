@@ -9,8 +9,8 @@ import android.widget.Button;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.eveningoutpost.dexdrip.ShareModels.Models.ExistingFollower;
-import com.eveningoutpost.dexdrip.ShareModels.ShareRest;
+import com.eveningoutpost.dexdrip.shareModels.models.ExistingFollower;
+import com.eveningoutpost.dexdrip.shareModels.ShareRest;
 import com.squareup.okhttp.ResponseBody;
 
 import java.util.List;
@@ -22,6 +22,7 @@ import retrofit.Retrofit;
 /**
  * Created by Emma Black on 8/11/15.
  */
+
 import static com.eveningoutpost.dexdrip.xdrip.gs;
 public class FollowerListAdapter extends BaseAdapter {
     private List<ExistingFollower> list;
@@ -61,28 +62,25 @@ public class FollowerListAdapter extends BaseAdapter {
         final ExistingFollower follower = list.get(position);
 
         followerName.setText(follower.ContactName);
-        deleteButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                Callback<ResponseBody> deleteFollowerListener = new Callback<ResponseBody>() {
-                    @Override
-                    public void onResponse(Response<ResponseBody> response, Retrofit retrofit) {
-                        if (response.isSuccess()) {
-                            Toast.makeText(context, gs(R.string.follower_deleted_succesfully), Toast.LENGTH_LONG).show();
-                            list.remove(position);
-                            notifyDataSetChanged();
-                        } else {
-                            Toast.makeText(context, gs(R.string.failed_to_delete_follower), Toast.LENGTH_LONG).show();
-                        }
-                    }
-
-                    @Override
-                    public void onFailure(Throwable t) {
+        deleteButton.setOnClickListener(v -> {
+            Callback<ResponseBody> deleteFollowerListener = new Callback<ResponseBody>() {
+                @Override
+                public void onResponse(Response<ResponseBody> response, Retrofit retrofit) {
+                    if (response.isSuccess()) {
+                        Toast.makeText(context, gs(R.string.follower_deleted_succesfully), Toast.LENGTH_LONG).show();
+                        list.remove(position);
+                        notifyDataSetChanged();
+                    } else {
                         Toast.makeText(context, gs(R.string.failed_to_delete_follower), Toast.LENGTH_LONG).show();
                     }
-                };
-                shareRest.deleteContact(follower.ContactId, deleteFollowerListener);
-            }
+                }
+
+                @Override
+                public void onFailure(Throwable t) {
+                    Toast.makeText(context, gs(R.string.failed_to_delete_follower), Toast.LENGTH_LONG).show();
+                }
+            };
+            shareRest.deleteContact(follower.ContactId, deleteFollowerListener);
         });
         return view;
     }

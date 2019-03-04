@@ -1,40 +1,29 @@
 package com.eveningoutpost.dexdrip;
 
-import android.content.DialogInterface;
-import android.graphics.Color;
-import android.os.Bundle;
-import android.support.annotation.NonNull;
-import android.support.v7.app.AlertDialog;
-import android.text.InputType;
-import android.text.TextUtils;
-import android.view.Menu;
-import android.view.MenuItem;
-import android.widget.EditText;
-import android.widget.TextView;
+import android.content.DialogInterface.*;
+import android.graphics.*;
+import android.os.*;
+import android.text.*;
+import android.view.*;
+import android.widget.*;
 
-import com.eveningoutpost.dexdrip.Models.Calibration;
-import com.eveningoutpost.dexdrip.Models.JoH;
-import com.eveningoutpost.dexdrip.UtilityModels.CalibrationSendQueue;
-import com.eveningoutpost.dexdrip.UtilityModels.Constants;
-import com.eveningoutpost.dexdrip.UtilityModels.Pref;
-import com.eveningoutpost.dexdrip.calibrations.CalibrationAbstract;
-import com.eveningoutpost.dexdrip.utils.ActivityWithMenu;
+import androidx.annotation.*;
+import androidx.appcompat.app.*;
 
-import java.text.DateFormat;
-import java.text.DecimalFormat;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.List;
+import com.eveningoutpost.dexdrip.models.*;
+import com.eveningoutpost.dexdrip.utilitymodels.*;
+import com.eveningoutpost.dexdrip.calibrations.*;
+import com.eveningoutpost.dexdrip.utils.*;
 
-import lecho.lib.hellocharts.model.Axis;
-import lecho.lib.hellocharts.model.Line;
-import lecho.lib.hellocharts.model.LineChartData;
-import lecho.lib.hellocharts.model.PointValue;
-import lecho.lib.hellocharts.util.ChartUtils;
-import lecho.lib.hellocharts.view.LineChartView;
+import java.text.*;
+import java.util.*;
 
-import static com.eveningoutpost.dexdrip.calibrations.PluggableCalibration.getCalibrationPluginFromPreferences;
-import static com.eveningoutpost.dexdrip.xdrip.gs;
+import lecho.lib.hellocharts.model.*;
+import lecho.lib.hellocharts.util.*;
+import lecho.lib.hellocharts.view.*;
+
+import static com.eveningoutpost.dexdrip.calibrations.PluggableCalibration.*;
+import static com.eveningoutpost.dexdrip.xdrip.*;
 
 public class CalibrationGraph extends ActivityWithMenu {
     //public static String menu_name = "Calibration Graph";
@@ -73,7 +62,7 @@ public class CalibrationGraph extends ActivityWithMenu {
 
     public void setupCharts() {
         chart = (LineChartView) findViewById(R.id.chart);
-        List<Line> lines = new ArrayList<Line>();
+        List<Line> lines = new ArrayList<>();
 
         //calibration values
         List<Calibration> calibrations = Calibration.allForSensor();
@@ -91,7 +80,7 @@ public class CalibrationGraph extends ActivityWithMenu {
             GraphHeader.setText(Header);
 
             //red line
-            List<PointValue> lineValues = new ArrayList<PointValue>();
+            List<PointValue> lineValues = new ArrayList<>();
             final float conversion_factor = (float) (doMgdl ? 1 : Constants.MGDL_TO_MMOLL);
 
             lineValues.add(new PointValue((float) start_x, (conversion_factor * (float) (start_x * calibration.slope + calibration.intercept))));
@@ -107,7 +96,7 @@ public class CalibrationGraph extends ActivityWithMenu {
             if (plugin != null) {
                 final CalibrationAbstract.CalibrationData pcalibration = plugin.getCalibrationData();
 
-                final List<PointValue> plineValues = new ArrayList<PointValue>();
+                final List<PointValue> plineValues = new ArrayList<>();
 
                 plineValues.add(new PointValue((float) start_x, (conversion_factor * (float) (plugin.getGlucoseFromSensorValue(start_x, pcalibration)))));
                 plineValues.add(new PointValue((float) end_x, (conversion_factor * (float) (plugin.getGlucoseFromSensorValue(end_x, pcalibration)))));
@@ -122,12 +111,8 @@ public class CalibrationGraph extends ActivityWithMenu {
             }
 
             //add lines in order
-            for (Line greyLine : greyLines) {
-                lines.add(greyLine);
-            }
-            for (Line blueLine : blueLines) {
-                lines.add(blueLine);
-            }
+            lines.addAll(greyLines);
+            lines.addAll(blueLines);
 
         }
         Axis axisX = new Axis();
@@ -150,9 +135,9 @@ public class CalibrationGraph extends ActivityWithMenu {
     @NonNull
     public List<Line> getCalibrationsLine(List<Calibration> calibrations, int color) {
         if (calibrations == null) return new ArrayList<>();
-        List<PointValue> values = new ArrayList<PointValue>();
-        List<PointValue> valuesb = new ArrayList<PointValue>();
-        List<PointValue> valuesc = new ArrayList<PointValue>();
+        List<PointValue> values = new ArrayList<>();
+        List<PointValue> valuesb = new ArrayList<>();
+        List<PointValue> valuesc = new ArrayList<>();
         for (Calibration calibration : calibrations) {
             if (calibration.estimate_raw_at_time_of_calibration > end_x) {
                 end_x = calibration.estimate_raw_at_time_of_calibration;
@@ -166,7 +151,7 @@ public class CalibrationGraph extends ActivityWithMenu {
             String time;
             if (show_days_since) {
                 final int days_ago = daysAgo(calibration.raw_timestamp);
-                time = (days_ago > 0) ? Integer.toString(days_ago) + "d  " : "";
+                time = (days_ago > 0) ? days_ago + "d  " : "";
                 time = time + (JoH.hourMinuteString(calibration.raw_timestamp));
             } else {
                 time = DateFormat.getDateTimeInstance(DateFormat.SHORT, DateFormat.SHORT).format(new Date((long) calibration.raw_timestamp));
@@ -260,28 +245,20 @@ public class CalibrationGraph extends ActivityWithMenu {
                 .setTitle("Ovewrite Intercept")
                 .setMessage("Overwrite Intercept")
                 .setView(editText)
-                .setPositiveButton("OK", new DialogInterface.OnClickListener() {
-                    public void onClick(DialogInterface dialog, int which) {
-                        String text = editText.getText().toString();
-                        if (!TextUtils.isEmpty(text)) {
-                            double doubleValue = JoH.tolerantParseDouble(text);
-                            Calibration calibration = Calibration.lastValid();
-                            calibration.intercept = doubleValue;
-                            calibration.save();
-                            CalibrationSendQueue.addToQueue(calibration, getApplicationContext());
-                            recreate();
-                        } else {
-                            JoH.static_toast_long(gs(R.string.input_not_found_cancelled));
-                        }
+                .setPositiveButton("OK", (OnClickListener) (dialog, which) -> {
+                    String text = editText.getText().toString();
+                    if (!TextUtils.isEmpty(text)) {
+                        double doubleValue = JoH.tolerantParseDouble(text);
+                        Calibration calibration = Calibration.lastValid();
+                        calibration.intercept = doubleValue;
+                        calibration.save();
+                        CalibrationSendQueue.addToQueue(calibration, getApplicationContext());
+                        recreate();
+                    } else {
+                        JoH.static_toast_long(gs(R.string.input_not_found_cancelled));
                     }
                 })
-                .setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
-
-                    @Override
-                    public void onClick(DialogInterface dialog, int which) {
-                        JoH.static_toast_long(gs(R.string.cancelled));
-                    }
-                })
+                .setNegativeButton("Cancel", (OnClickListener) (dialog, which) -> JoH.static_toast_long(gs(R.string.cancelled)))
                 .show();
     }
 
@@ -293,28 +270,20 @@ public class CalibrationGraph extends ActivityWithMenu {
                 .setTitle("Ovewrite Slope")
                 .setMessage("Overwrite Slope")
                 .setView(editText)
-                .setPositiveButton("OK", new DialogInterface.OnClickListener() {
-                    public void onClick(DialogInterface dialog, int which) {
-                        String text = editText.getText().toString();
-                        if (!TextUtils.isEmpty(text)) {
-                            double doubleValue = JoH.tolerantParseDouble(text);
-                            Calibration calibration = Calibration.lastValid();
-                            calibration.slope = doubleValue;
-                            calibration.save();
-                            CalibrationSendQueue.addToQueue(calibration, getApplicationContext());
-                            recreate();
-                        } else {
-                            JoH.static_toast_long(gs(R.string.input_not_found_cancelled));
-                        }
+                .setPositiveButton("OK", (OnClickListener) (dialog, which) -> {
+                    String text = editText.getText().toString();
+                    if (!TextUtils.isEmpty(text)) {
+                        double doubleValue = JoH.tolerantParseDouble(text);
+                        Calibration calibration = Calibration.lastValid();
+                        calibration.slope = doubleValue;
+                        calibration.save();
+                        CalibrationSendQueue.addToQueue(calibration, getApplicationContext());
+                        recreate();
+                    } else {
+                        JoH.static_toast_long(gs(R.string.input_not_found_cancelled));
                     }
                 })
-                .setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
-
-                    @Override
-                    public void onClick(DialogInterface dialog, int which) {
-                        JoH.static_toast_long(gs(R.string.cancelled));
-                    }
-                })
+                .setNegativeButton("Cancel", (OnClickListener) (dialog, which) -> JoH.static_toast_long(gs(R.string.cancelled)))
                 .show();
     }
 

@@ -18,5 +18,4 @@ public class ExtensionMethods {
     public static boolean containsIgnoreCaseF(final String haystack, final String needle) {
         return haystack.toLowerCase().contains(needle);
     }
-
 }

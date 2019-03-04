@@ -2,38 +2,30 @@ package com.eveningoutpost.dexdrip;
 
 // jamorham
 
-import android.app.Activity;
-import android.content.Intent;
-import android.graphics.Color;
-import android.os.Bundle;
-import android.support.v4.app.FragmentActivity;
-import android.util.Log;
-import android.view.WindowManager;
+import android.content.*;
+import android.graphics.*;
+import android.os.*;
+import android.util.*;
+import android.view.*;
 
-import com.eveningoutpost.dexdrip.UtilityModels.Pref;
-import com.google.android.gms.maps.CameraUpdateFactory;
-import com.google.android.gms.maps.GoogleMap;
-import com.google.android.gms.maps.OnMapReadyCallback;
-import com.google.android.gms.maps.SupportMapFragment;
-import com.google.android.gms.maps.model.BitmapDescriptorFactory;
-import com.google.android.gms.maps.model.CircleOptions;
-import com.google.android.gms.maps.model.LatLng;
-import com.google.android.gms.maps.model.MarkerOptions;
-import com.google.android.gms.maps.model.PolylineOptions;
+import androidx.appcompat.app.*;
 
-import java.util.ArrayList;
-import java.util.List;
+import com.eveningoutpost.dexdrip.utilitymodels.*;
+import com.google.android.gms.maps.*;
+import com.google.android.gms.maps.model.*;
 
-public class MapsActivity extends FragmentActivity implements OnMapReadyCallback {
+import java.util.*;
+
+public class MapsActivity extends /*FragmentActivity*/AppCompatActivity implements OnMapReadyCallback {
 
     private static final String defaultLocation = "-31.988644,115.515637"; // default bogus position
     private static final String TAG = "jamorham map";
     public static String lastGeoLocation = defaultLocation;
-    private static List<Double> longs = new ArrayList<Double>();
-    private static List<Double> lats = new ArrayList<Double>();
+    private static List<Double> longs = new ArrayList<>();
+    private static List<Double> lats = new ArrayList<>();
     private static boolean active = false;
     private static GoogleMap mMap;
-    private static Activity static_activity;
+    private static AppCompatActivity static_activity;
 
     // receive updates from elsewhere
     public static void newMapLocation(String location, long when) {

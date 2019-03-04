@@ -1,182 +1,80 @@
 package com.eveningoutpost.dexdrip;
 
-import android.Manifest;
-import android.annotation.TargetApi;
-import android.app.Activity;
-import android.app.AlertDialog;
-import android.app.Dialog;
-import android.app.PendingIntent;
-import android.content.ActivityNotFoundException;
-import android.content.BroadcastReceiver;
-import android.content.Context;
-import android.content.DialogInterface;
-import android.content.Intent;
-import android.content.IntentFilter;
-import android.content.pm.PackageManager;
-import android.content.res.Resources;
-import android.graphics.Canvas;
-import android.graphics.Color;
-import android.graphics.ColorFilter;
-import android.graphics.Paint;
-import android.graphics.Point;
-import android.graphics.Typeface;
-import android.graphics.drawable.ColorDrawable;
-import android.graphics.drawable.Drawable;
-import android.media.AudioManager;
-import android.net.Uri;
-import android.os.AsyncTask;
-import android.os.Build;
-import android.os.Bundle;
-import android.os.PowerManager;
-import android.preference.PreferenceManager;
-import android.provider.Settings;
-import android.speech.RecognizerIntent;
-import android.support.annotation.NonNull;
-import android.support.annotation.RequiresApi;
-import android.support.v4.app.ActivityCompat;
-import android.support.v4.content.ContextCompat;
-import android.support.v4.content.LocalBroadcastManager;
-import android.support.v4.widget.DrawerLayout;
-import android.support.v7.widget.Toolbar;
-import android.text.InputType;
-import android.util.DisplayMetrics;
-import android.util.Log;
-import android.view.KeyEvent;
-import android.view.LayoutInflater;
-import android.view.Menu;
-import android.view.MenuItem;
-import android.view.MotionEvent;
-import android.view.View;
-import android.view.ViewGroup;
-import android.view.Window;
-import android.view.WindowManager;
-import android.widget.AdapterView;
-import android.widget.Button;
-import android.widget.CheckBox;
-import android.widget.EditText;
-import android.widget.ImageButton;
-import android.widget.TextView;
-import android.widget.Toast;
+import android.*;
+import android.annotation.*;
+import android.app.*;
+import android.content.*;
+import android.content.DialogInterface.*;
+import android.content.pm.*;
+import android.content.res.*;
+import android.graphics.*;
+import android.graphics.drawable.*;
+import android.media.*;
+import android.net.*;
+import android.os.*;
+import android.preference.*;
+import android.provider.*;
+import android.speech.*;
+import android.text.*;
+import android.util.*;
+import android.view.*;
+import android.widget.*;
 
-import com.crashlytics.android.Crashlytics;
-import com.eveningoutpost.dexdrip.G5Model.Ob1G5StateMachine;
-import com.eveningoutpost.dexdrip.ImportedLibraries.dexcom.Dex_Constants;
-import com.eveningoutpost.dexdrip.ImportedLibraries.usbserial.util.HexDump;
-import com.eveningoutpost.dexdrip.Models.ActiveBgAlert;
-import com.eveningoutpost.dexdrip.Models.ActiveBluetoothDevice;
-import com.eveningoutpost.dexdrip.Models.BgReading;
-import com.eveningoutpost.dexdrip.Models.BloodTest;
-import com.eveningoutpost.dexdrip.Models.Calibration;
-import com.eveningoutpost.dexdrip.Models.HeartRate;
-import com.eveningoutpost.dexdrip.Models.JoH;
-import com.eveningoutpost.dexdrip.Models.LibreBlock;
-import com.eveningoutpost.dexdrip.Models.ProcessInitialDataQuality;
-import com.eveningoutpost.dexdrip.Models.Sensor;
-import com.eveningoutpost.dexdrip.Models.StepCounter;
-import com.eveningoutpost.dexdrip.Models.Treatments;
-import com.eveningoutpost.dexdrip.Models.UserError;
-import com.eveningoutpost.dexdrip.Services.ActivityRecognizedService;
-import com.eveningoutpost.dexdrip.Services.DexCollectionService;
-import com.eveningoutpost.dexdrip.Services.Ob1G5CollectionService;
-import com.eveningoutpost.dexdrip.Services.PlusSyncService;
-import com.eveningoutpost.dexdrip.Services.WixelReader;
-import com.eveningoutpost.dexdrip.UtilityModels.AlertPlayer;
-import com.eveningoutpost.dexdrip.UtilityModels.BgGraphBuilder;
-import com.eveningoutpost.dexdrip.UtilityModels.CollectionServiceStarter;
-import com.eveningoutpost.dexdrip.UtilityModels.CompatibleApps;
-import com.eveningoutpost.dexdrip.UtilityModels.Constants;
-import com.eveningoutpost.dexdrip.UtilityModels.Experience;
-import com.eveningoutpost.dexdrip.UtilityModels.Inevitable;
-import com.eveningoutpost.dexdrip.UtilityModels.Intents;
-import com.eveningoutpost.dexdrip.UtilityModels.JamorhamShowcaseDrawer;
-import com.eveningoutpost.dexdrip.UtilityModels.NanoStatus;
-import com.eveningoutpost.dexdrip.UtilityModels.NightscoutUploader;
-import com.eveningoutpost.dexdrip.UtilityModels.Notifications;
-import com.eveningoutpost.dexdrip.UtilityModels.PersistentStore;
-import com.eveningoutpost.dexdrip.UtilityModels.Pref;
-import com.eveningoutpost.dexdrip.UtilityModels.PrefsViewImpl;
-import com.eveningoutpost.dexdrip.UtilityModels.SendFeedBack;
-import com.eveningoutpost.dexdrip.UtilityModels.ShotStateStore;
-import com.eveningoutpost.dexdrip.UtilityModels.SourceWizard;
-import com.eveningoutpost.dexdrip.UtilityModels.StatusLine;
-import com.eveningoutpost.dexdrip.UtilityModels.UndoRedo;
-import com.eveningoutpost.dexdrip.UtilityModels.UpdateActivity;
-import com.eveningoutpost.dexdrip.UtilityModels.VoiceCommands;
-import com.eveningoutpost.dexdrip.calibrations.NativeCalibrationPipe;
-import com.eveningoutpost.dexdrip.calibrations.PluggableCalibration;
-import com.eveningoutpost.dexdrip.dagger.Injectors;
-import com.eveningoutpost.dexdrip.databinding.ActivityHomeBinding;
-import com.eveningoutpost.dexdrip.databinding.ActivityHomeShelfSettingsBinding;
-import com.eveningoutpost.dexdrip.databinding.PopupInitialStatusHelperBinding;
-import com.eveningoutpost.dexdrip.eassist.EmergencyAssistActivity;
-import com.eveningoutpost.dexdrip.insulin.inpen.InPenEntry;
-import com.eveningoutpost.dexdrip.insulin.pendiq.Pendiq;
-import com.eveningoutpost.dexdrip.languageeditor.LanguageEditor;
-import com.eveningoutpost.dexdrip.profileeditor.DatePickerFragment;
-import com.eveningoutpost.dexdrip.profileeditor.ProfileAdapter;
-import com.eveningoutpost.dexdrip.ui.BaseShelf;
-import com.eveningoutpost.dexdrip.ui.MicroStatus;
-import com.eveningoutpost.dexdrip.ui.MicroStatusImpl;
-import com.eveningoutpost.dexdrip.ui.NumberGraphic;
-import com.eveningoutpost.dexdrip.ui.UiPing;
-import com.eveningoutpost.dexdrip.ui.dialog.DidYouCancelAlarm;
-import com.eveningoutpost.dexdrip.ui.dialog.HeyFamUpdateOptInDialog;
-import com.eveningoutpost.dexdrip.ui.graphic.ITrendArrow;
-import com.eveningoutpost.dexdrip.ui.graphic.TrendArrowFactory;
-import com.eveningoutpost.dexdrip.utils.ActivityWithMenu;
-import com.eveningoutpost.dexdrip.utils.BgToSpeech;
-import com.eveningoutpost.dexdrip.utils.DatabaseUtil;
-import com.eveningoutpost.dexdrip.utils.DexCollectionHelper;
-import com.eveningoutpost.dexdrip.utils.DexCollectionType;
-import com.eveningoutpost.dexdrip.utils.DisplayQRCode;
-import com.eveningoutpost.dexdrip.utils.LibreTrendGraph;
-import com.eveningoutpost.dexdrip.utils.Preferences;
-import com.eveningoutpost.dexdrip.utils.SdcardImportExport;
-import com.eveningoutpost.dexdrip.wearintegration.Amazfitservice;
-import com.eveningoutpost.dexdrip.wearintegration.WatchUpdaterService;
-import com.github.amlcurran.showcaseview.ShowcaseView;
-import com.github.amlcurran.showcaseview.targets.Target;
-import com.github.amlcurran.showcaseview.targets.ViewTarget;
-import com.google.gson.Gson;
+import androidx.appcompat.app.AlertDialog;
+import androidx.appcompat.app.*;
+import androidx.appcompat.widget.Toolbar;
+import androidx.core.app.*;
+import androidx.core.content.*;
+import androidx.drawerlayout.widget.*;
+import androidx.localbroadcastmanager.content.*;
 
-import java.io.ByteArrayOutputStream;
-import java.io.File;
-import java.io.IOException;
-import java.io.InputStream;
-import java.nio.charset.StandardCharsets;
-import java.text.DecimalFormat;
-import java.text.MessageFormat;
-import java.text.NumberFormat;
+import com.crashlytics.android.*;
+import com.eveningoutpost.dexdrip.g5Model.*;
+import com.eveningoutpost.dexdrip.importedLibraries.dexcom.*;
+import com.eveningoutpost.dexdrip.importedLibraries.usbserial.util.*;
+import com.eveningoutpost.dexdrip.models.*;
+import com.eveningoutpost.dexdrip.services.*;
+import com.eveningoutpost.dexdrip.utilitymodels.Constants;
+import com.eveningoutpost.dexdrip.utilitymodels.ShotStateStore;
+import com.eveningoutpost.dexdrip.utilitymodels.*;
+import com.eveningoutpost.dexdrip.calibrations.*;
+import com.eveningoutpost.dexdrip.dagger.*;
+import com.eveningoutpost.dexdrip.eassist.*;
+import com.eveningoutpost.dexdrip.insulin.inpen.*;
+import com.eveningoutpost.dexdrip.insulin.pendiq.*;
+import com.eveningoutpost.dexdrip.languageEditor.*;
+import com.eveningoutpost.dexdrip.profileEditor.*;
+import com.eveningoutpost.dexdrip.ui.*;
+import com.eveningoutpost.dexdrip.ui.dialog.*;
+import com.eveningoutpost.dexdrip.ui.graphic.*;
+import com.eveningoutpost.dexdrip.utils.*;
+import com.eveningoutpost.dexdrip.wearintegration.*;
+import com.github.amlcurran.showcaseview.*;
+import com.github.amlcurran.showcaseview.targets.*;
+import com.google.android.material.snackbar.*;
+import com.google.gson.*;
+
+import java.io.*;
+import java.nio.charset.*;
 import java.text.ParseException;
-import java.text.SimpleDateFormat;
-import java.util.ArrayList;
-import java.util.Calendar;
-import java.util.Date;
-import java.util.GregorianCalendar;
-import java.util.List;
-import java.util.Locale;
-import java.util.Timer;
-import java.util.TimerTask;
+import java.text.*;
+import java.util.*;
 
-import javax.inject.Inject;
+import javax.inject.*;
 
-import lecho.lib.hellocharts.gesture.ZoomType;
-import lecho.lib.hellocharts.listener.ViewportChangeListener;
-import lecho.lib.hellocharts.model.Viewport;
-import lecho.lib.hellocharts.view.LineChartView;
-import lecho.lib.hellocharts.view.PreviewLineChartView;
-import lombok.Getter;
+import lecho.lib.hellocharts.gesture.*;
+import lecho.lib.hellocharts.listener.*;
+import lecho.lib.hellocharts.model.*;
+import lecho.lib.hellocharts.view.*;
+import lombok.*;
 
-import static android.Manifest.permission.WRITE_EXTERNAL_STORAGE;
-import static com.eveningoutpost.dexdrip.UtilityModels.ColorCache.X;
-import static com.eveningoutpost.dexdrip.UtilityModels.ColorCache.getCol;
-import static com.eveningoutpost.dexdrip.UtilityModels.Constants.DAY_IN_MS;
-import static com.eveningoutpost.dexdrip.UtilityModels.Constants.HOUR_IN_MS;
-import static com.eveningoutpost.dexdrip.UtilityModels.Constants.MINUTE_IN_MS;
-import static com.eveningoutpost.dexdrip.xdrip.gs;
+import static android.Manifest.permission.*;
+import static com.eveningoutpost.dexdrip.utilitymodels.ColorCache.*;
+import static com.eveningoutpost.dexdrip.utilitymodels.Constants.*;
+import static com.eveningoutpost.dexdrip.xdrip.*;
 
 public class Home extends ActivityWithMenu implements ActivityCompat.OnRequestPermissionsResultCallback {
-    private final static String TAG = "jamorham: " + Home.class.getSimpleName();
+    private final static String TAG = Home.class.getSimpleName();
     private final static boolean d = true;
     public final static String START_SPEECH_RECOGNITION = "START_APP_SPEECH_RECOGNITION";
     public final static String START_TEXT_RECOGNITION = "START_APP_TEXT_RECOGNITION";
@@ -281,8 +179,8 @@ public class Home extends ActivityWithMenu implements ActivityCompat.OnRequestPe
     public AlertDialog dialog;
     private AlertDialog helper_dialog;
     private AlertDialog status_helper_dialog;
-    private PopupInitialStatusHelperBinding initial_status_binding;
-    private ActivityHomeBinding binding;
+    private com.eveningoutpost.dexdrip.databinding.PopupInitialStatusHelperBinding initial_status_binding;
+    private com.eveningoutpost.dexdrip.databinding.ActivityHomeBinding binding;
     private boolean is_newbie;
     private boolean checkedeula;
 
@@ -300,7 +198,7 @@ public class Home extends ActivityWithMenu implements ActivityCompat.OnRequestPe
 
     private static final boolean oneshot = true;
     private static ShowcaseView myShowcase;
-    private static Activity mActivity;
+    private static AppCompatActivity mActivity;
 
     @Getter
     private static String statusIOB = "";
@@ -308,6 +206,7 @@ public class Home extends ActivityWithMenu implements ActivityCompat.OnRequestPe
 
 
     @Override
+    @SuppressLint("NewApi")
     protected void onCreate(Bundle savedInstanceState) {
         mActivity = this;
 
@@ -331,11 +230,6 @@ public class Home extends ActivityWithMenu implements ActivityCompat.OnRequestPe
             }
         }
 
-        if (Build.VERSION.SDK_INT < 17) {
-            JoH.static_toast_long(gs(R.string.xdrip_will_not_work_below_android_version_42));
-            finish();
-        }
-
         xdrip.checkForcedEnglish(Home.this);
 
         super.onCreate(savedInstanceState);
@@ -357,33 +251,30 @@ public class Home extends ActivityWithMenu implements ActivityCompat.OnRequestPe
 
         checkedeula = checkEula();
 
-        binding = ActivityHomeBinding.inflate(getLayoutInflater());
+        binding = com.eveningoutpost.dexdrip.databinding.ActivityHomeBinding.inflate(getLayoutInflater());
         binding.setVs(homeShelf);
         binding.setHome(this);
         binding.setUi(ui);
         binding.setNano(nanoStatus);
         setContentView(binding.getRoot());
 
-        Toolbar mToolbar = (Toolbar) findViewById(R.id.my_toolbar);
+         Toolbar mToolbar = (Toolbar) findViewById(R.id.my_toolbar);
         setSupportActionBar(mToolbar);
 
         final Home home = this;
         mToolbar.setLongClickable(true);
-        mToolbar.setOnLongClickListener(new View.OnLongClickListener() {
-            @Override
-            public boolean onLongClick(View v) {
-                // show configurator
-                final ActivityHomeShelfSettingsBinding binding = ActivityHomeShelfSettingsBinding.inflate(getLayoutInflater());
-                final Dialog dialog = new Dialog(v.getContext());
-                dialog.requestWindowFeature(Window.FEATURE_NO_TITLE);
-                binding.setVs(homeShelf);
-                binding.setHome(home);
-                homeShelf.set("arrow_configurator", false);
-                dialog.setContentView(binding.getRoot());
-                dialog.getWindow().setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
-                dialog.show();
-                return false;
-            }
+        mToolbar.setOnLongClickListener(v -> {
+            // show configurator
+            final com.eveningoutpost.dexdrip.databinding.ActivityHomeShelfSettingsBinding binding = com.eveningoutpost.dexdrip.databinding.ActivityHomeShelfSettingsBinding.inflate(getLayoutInflater());
+            final Dialog dialog = new Dialog(v.getContext());
+            dialog.requestWindowFeature(Window.FEATURE_NO_TITLE);
+            binding.setVs(homeShelf);
+            binding.setHome(home);
+            homeShelf.set("arrow_configurator", false);
+            dialog.setContentView(binding.getRoot());
+            dialog.getWindow().setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
+            dialog.show();
+            return false;
         });
 
         //findViewById(R.id.home_layout_holder).setBackgroundColor(getCol(X.color_home_chart_background));
@@ -440,113 +331,69 @@ public class Home extends ActivityWithMenu implements ActivityCompat.OnRequestPe
         }
 
         this.btnSpeak = (ImageButton) findViewById(R.id.btnTreatment);
-        btnSpeak.setOnClickListener(new View.OnClickListener() {
-
-            @Override
-            public void onClick(View v) {
-                promptTextInput();
-
-            }
-        });
-        btnSpeak.setOnLongClickListener(new View.OnLongClickListener() {
-            @Override
-            public boolean onLongClick(View v) {
-                promptSpeechInput();
-                return true;
-            }
+        btnSpeak.setOnClickListener(v -> promptTextInput());
+        btnSpeak.setOnLongClickListener(v -> {
+            promptSpeechInput();
+            return true;
         });
 
         this.btnNote = (ImageButton) findViewById(R.id.btnNote);
-        btnNote.setOnLongClickListener(new View.OnLongClickListener() {
-            @Override
-            public boolean onLongClick(View v) {
-                if (Pref.getBooleanDefaultFalse("default_to_voice_notes")) {
-                    showNoteTextInputDialog(v, 0);
-                } else {
-                    promptSpeechNoteInput(v);
-                }
-                return false;
+        btnNote.setOnLongClickListener(v -> {
+            if (Pref.getBooleanDefaultFalse("default_to_voice_notes")) {
+                showNoteTextInputDialog(v, 0);
+            } else {
+                promptSpeechNoteInput(v);
             }
+            return false;
         });
-        btnNote.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                if (!Pref.getBooleanDefaultFalse("default_to_voice_notes")) {
-                    showNoteTextInputDialog(v, 0);
-                } else {
-                    promptSpeechNoteInput(v);
-                }
+        btnNote.setOnClickListener(v -> {
+            if (!Pref.getBooleanDefaultFalse("default_to_voice_notes")) {
+                showNoteTextInputDialog(v, 0);
+            } else {
+                promptSpeechNoteInput(v);
             }
         });
 
 
-        btnCancel.setOnClickListener(new View.OnClickListener() {
+        btnCancel.setOnClickListener(v -> cancelTreatment());
 
-            @Override
-            public void onClick(View v) {
-                cancelTreatment();
+        btnApprove.setOnClickListener(v -> processAndApproveTreatment());
+
+        btnInsulinDose.setOnClickListener(v -> {
+            // proccess and approve treatment
+            textInsulinDose.setVisibility(View.INVISIBLE);
+            btnInsulinDose.setVisibility(View.INVISIBLE);
+            Treatments.create(0, thisinsulinnumber, Treatments.getTimeStampWithOffset(thistimeoffset));
+            Pendiq.handleTreatment(thisinsulinnumber);
+            thisinsulinnumber = 0;
+            reset_viewport = true;
+            if (hideTreatmentButtonsIfAllDone()) {
+                updateCurrentBgInfo("insulin button");
+            }
+        });
+        btnCarbohydrates.setOnClickListener(v -> {
+            // proccess and approve treatment
+            textCarbohydrates.setVisibility(View.INVISIBLE);
+            btnCarbohydrates.setVisibility(View.INVISIBLE);
+            reset_viewport = true;
+            Treatments.create(thiscarbsnumber, 0, Treatments.getTimeStampWithOffset(thistimeoffset));
+            thiscarbsnumber = 0;
+            if (hideTreatmentButtonsIfAllDone()) {
+                updateCurrentBgInfo("carbs button");
             }
         });
 
-        btnApprove.setOnClickListener(new View.OnClickListener() {
-
-            @Override
-            public void onClick(View v) {
-                processAndApproveTreatment();
-            }
+        btnBloodGlucose.setOnClickListener(v -> {
+            reset_viewport = true;
+            processCalibration();
         });
 
-        btnInsulinDose.setOnClickListener(new View.OnClickListener() {
-
-            @Override
-            public void onClick(View v) {
-                // proccess and approve treatment
-                textInsulinDose.setVisibility(View.INVISIBLE);
-                btnInsulinDose.setVisibility(View.INVISIBLE);
-                Treatments.create(0, thisinsulinnumber, Treatments.getTimeStampWithOffset(thistimeoffset));
-                Pendiq.handleTreatment(thisinsulinnumber);
-                thisinsulinnumber = 0;
-                reset_viewport = true;
-                if (hideTreatmentButtonsIfAllDone()) {
-                    updateCurrentBgInfo("insulin button");
-                }
-            }
-        });
-        btnCarbohydrates.setOnClickListener(new View.OnClickListener() {
-
-            @Override
-            public void onClick(View v) {
-                // proccess and approve treatment
-                textCarbohydrates.setVisibility(View.INVISIBLE);
-                btnCarbohydrates.setVisibility(View.INVISIBLE);
-                reset_viewport = true;
-                Treatments.create(thiscarbsnumber, 0, Treatments.getTimeStampWithOffset(thistimeoffset));
-                thiscarbsnumber = 0;
-                if (hideTreatmentButtonsIfAllDone()) {
-                    updateCurrentBgInfo("carbs button");
-                }
-            }
-        });
-
-        btnBloodGlucose.setOnClickListener(new View.OnClickListener() {
-
-            @Override
-            public void onClick(View v) {
-                reset_viewport = true;
-                processCalibration();
-            }
-        });
-
-        btnTime.setOnClickListener(new View.OnClickListener() {
-
-            @Override
-            public void onClick(View v) {
-                // clears time if clicked
-                textTime.setVisibility(View.INVISIBLE);
-                btnTime.setVisibility(View.INVISIBLE);
-                if (hideTreatmentButtonsIfAllDone()) {
-                    updateCurrentBgInfo("time button");
-                }
+        btnTime.setOnClickListener(v -> {
+            // clears time if clicked
+            textTime.setVisibility(View.INVISIBLE);
+            btnTime.setVisibility(View.INVISIBLE);
+            if (hideTreatmentButtonsIfAllDone()) {
+                updateCurrentBgInfo("time button");
             }
         });
 
@@ -638,25 +485,20 @@ public class Home extends ActivityWithMenu implements ActivityCompat.OnRequestPe
 
                 if (((dialog == null) || (!dialog.isShowing()))
                         && (PersistentStore.incrementLong("asked_battery_optimization") < 40)) {
-                    JoH.show_ok_dialog(this, gs(R.string.please_allow_permission), gs(R.string.xdrip_needs_whitelisting_for_proper_performance), new Runnable() {
+                    JoH.show_ok_dialog(this, gs(R.string.please_allow_permission), gs(R.string.xdrip_needs_whitelisting_for_proper_performance), (Runnable) () -> {
+                        try {
+                            final Intent intent = new Intent();
 
-                        @RequiresApi(api = Build.VERSION_CODES.M)
-                        @Override
-                        public void run() {
-                            try {
-                                final Intent intent = new Intent();
+                            // ignoring battery optimizations required for constant connection
+                            // to peripheral device - eg CGM transmitter.
+                            intent.setAction(Settings.ACTION_REQUEST_IGNORE_BATTERY_OPTIMIZATIONS);
+                            intent.setData(Uri.parse("package:" + packageName));
+                            startActivityForResult(intent, REQ_CODE_BATTERY_OPTIMIZATION);
 
-                                // ignoring battery optimizations required for constant connection
-                                // to peripheral device - eg CGM transmitter.
-                                intent.setAction(Settings.ACTION_REQUEST_IGNORE_BATTERY_OPTIMIZATIONS);
-                                intent.setData(Uri.parse("package:" + packageName));
-                                startActivityForResult(intent, REQ_CODE_BATTERY_OPTIMIZATION);
-
-                            } catch (ActivityNotFoundException e) {
-                                final String msg = "Device does not appear to support battery optimization whitelisting!";
-                                JoH.static_toast_short(msg);
-                                UserError.Log.wtf(TAG, msg);
-                            }
+                        } catch (ActivityNotFoundException e) {
+                            final String msg = "Device does not appear to support battery optimization whitelisting!";
+                            JoH.static_toast_short(msg);
+                            UserError.Log.wtf(TAG, msg);
                         }
                     });
                 } else {
@@ -692,24 +534,17 @@ public class Home extends ActivityWithMenu implements ActivityCompat.OnRequestPe
 
     private void checkBadSettings() {
         if (Pref.getBoolean("predictive_bg", false)) {
-            AlertDialog.Builder builder = new AlertDialog.Builder(this);
+            androidx.appcompat.app.AlertDialog.Builder builder = new androidx.appcompat.app.AlertDialog.Builder(this);
             builder.setTitle(gs(R.string.settings_issue));
             builder.setMessage(gs(R.string.you_have_an_old_experimental_glucose_prediction_setting_enabled__this_is_not_recommended_and_could_mess_things_up_badly__shall_i_disable_this_for_you));
 
-            builder.setPositiveButton(gs(R.string.yes_please), new DialogInterface.OnClickListener() {
-                public void onClick(DialogInterface dialog, int which) {
-                    dialog.dismiss();
-                    Pref.setBoolean("predictive_bg", false);
-                    toast(gs(R.string.setting_disabled_));
-                }
+            builder.setPositiveButton(gs(R.string.yes_please), (OnClickListener) (dialog, which) -> {
+                dialog.dismiss();
+                Pref.setBoolean("predictive_bg", false);
+                toast(gs(R.string.setting_disabled_));
             });
 
-            builder.setNegativeButton("No, I really know what I'm doing", new DialogInterface.OnClickListener() {
-                @Override
-                public void onClick(DialogInterface dialog, int which) {
-                    dialog.dismiss();
-                }
-            });
+            builder.setNegativeButton("No, I really know what I'm doing", (OnClickListener) (dialog, which) -> dialog.dismiss());
 
             AlertDialog alert = builder.create();
             alert.show();
@@ -746,25 +581,18 @@ public class Home extends ActivityWithMenu implements ActivityCompat.OnRequestPe
                     startIntentThreadWithDelayedRefresh(calintent);
                 }
             } else {
-                AlertDialog.Builder builder = new AlertDialog.Builder(this);
+                AlertDialog.Builder builder = new androidx.appcompat.app.AlertDialog.Builder(this);
                 builder.setTitle("Use " + JoH.qs(glucosenumber, 1) + " for Calibration?");
                 builder.setMessage(gs(R.string.do_you_want_to_use_this_synced_fingerstick_blood_glucose_result_to_calibrate_with__you_can_change_when_this_dialog_is_displayed_in_settings));
 
-                builder.setPositiveButton(gs(R.string.yes_calibrate), new DialogInterface.OnClickListener() {
-                    public void onClick(DialogInterface dialog, int which) {
-                        calintent.putExtra("note_only", "false");
-                        calintent.putExtra("from_interactive", "true");
-                        startIntentThreadWithDelayedRefresh(calintent);
-                        dialog.dismiss();
-                    }
+                builder.setPositiveButton(gs(R.string.yes_calibrate), (dialog, which) -> {
+                    calintent.putExtra("note_only", "false");
+                    calintent.putExtra("from_interactive", "true");
+                    startIntentThreadWithDelayedRefresh(calintent);
+                    dialog.dismiss();
                 });
 
-                builder.setNegativeButton("NO", new DialogInterface.OnClickListener() {
-                    @Override
-                    public void onClick(DialogInterface dialog, int which) {
-                        dialog.dismiss();
-                    }
-                });
+                builder.setNegativeButton("NO", (dialog, which) -> dialog.dismiss());
 
                 AlertDialog alert = builder.create();
                 alert.show();
@@ -794,30 +622,25 @@ public class Home extends ActivityWithMenu implements ActivityCompat.OnRequestPe
 
             final String calibration_type = Pref.getString("treatment_fingerstick_calibration_usage", "ask");
             if (calibration_type.equals("ask")) {
-                AlertDialog.Builder builder = new AlertDialog.Builder(this);
+                AlertDialog.Builder builder = new androidx.appcompat.app.AlertDialog.Builder(this);
                 builder.setTitle(gs(R.string.use_bg_for_calibration));
                 builder.setMessage(gs(R.string.do_you_want_to_use_this_entered_fingerstick_blood_glucose_test_to_calibrate_with__you_can_change_when_this_dialog_is_displayed_in_settings));
 
-                builder.setPositiveButton(gs(R.string.yes_calibrate), new DialogInterface.OnClickListener() {
-                    public void onClick(DialogInterface dialog, int which) {
-                        calintent.putExtra("note_only", "false");
-                        calintent.putExtra("from_interactive", "true");
-                        startIntentThreadWithDelayedRefresh(calintent);
-                        dialog.dismiss();
-                    }
+                builder.setPositiveButton(gs(R.string.yes_calibrate), (dialog, which) -> {
+                    calintent.putExtra("note_only", "false");
+                    calintent.putExtra("from_interactive", "true");
+                    startIntentThreadWithDelayedRefresh(calintent);
+                    dialog.dismiss();
                 });
 
-                builder.setNegativeButton("NO", new DialogInterface.OnClickListener() {
-                    @Override
-                    public void onClick(DialogInterface dialog, int which) {
-                        // TODO make this a blood test entry xx
-                        calintent.putExtra("note_only", "true");
-                        startIntentThreadWithDelayedRefresh(calintent);
-                        dialog.dismiss();
-                    }
+                builder.setNegativeButton("NO", (dialog, which) -> {
+                    // TODO make this a blood test entry xx
+                    calintent.putExtra("note_only", "true");
+                    startIntentThreadWithDelayedRefresh(calintent);
+                    dialog.dismiss();
                 });
 
-                AlertDialog alert = builder.create();
+                androidx.appcompat.app.AlertDialog alert = builder.create();
                 alert.show();
 
             } else if (calibration_type.equals("auto")) {
@@ -831,22 +654,15 @@ public class Home extends ActivityWithMenu implements ActivityCompat.OnRequestPe
                     builder.setTitle(gs(R.string.enable_automatic_calibration));
                     builder.setMessage(gs(R.string.entered_blood_tests_which_occur_during_flat_trend_periods_can_automatically_be_used_to_recalibrate_after_20_minutes_this_should_provide_the_most_accurate_method_to_calibrate_with__do_you_want_to_enable_this_feature));
 
-                    builder.setPositiveButton(gs(R.string.yes_enable), new DialogInterface.OnClickListener() {
-                        public void onClick(DialogInterface dialog, int which) {
-                            Pref.setBoolean("bluetooth_meter_for_calibrations_auto", true);
-                            JoH.static_toast_long(gs(R.string.automated_calibration_enabled));
-                            dialog.dismiss();
-                        }
+                    builder.setPositiveButton(gs(R.string.yes_enable), (dialog, which) -> {
+                        Pref.setBoolean("bluetooth_meter_for_calibrations_auto", true);
+                        JoH.static_toast_long(gs(R.string.automated_calibration_enabled));
+                        dialog.dismiss();
                     });
 
-                    builder.setNegativeButton("NO", new DialogInterface.OnClickListener() {
-                        @Override
-                        public void onClick(DialogInterface dialog, int which) {
-                            dialog.dismiss();
-                        }
-                    });
+                    builder.setNegativeButton("NO", (dialog, which) -> dialog.dismiss());
 
-                    final AlertDialog alert = builder.create();
+                    final androidx.appcompat.app.AlertDialog alert = builder.create();
                     alert.show();
                 }
                 // offer choice to enable auto-calibration mode if not already enabled on pratelimit
@@ -867,12 +683,7 @@ public class Home extends ActivityWithMenu implements ActivityCompat.OnRequestPe
             }
         }.start();
 
-        JoH.runOnUiThreadDelayed(new Runnable() {
-            @Override
-            public void run() {
-                staticRefreshBGCharts();
-            }
-        }, 4000);
+        JoH.runOnUiThreadDelayed(Home::staticRefreshBGCharts, 4000);
     }
 
     private void processCalibration() {
@@ -1018,71 +829,53 @@ public class Home extends ActivityWithMenu implements ActivityCompat.OnRequestPe
                 CompatibleApps.showChoiceDialog(this, bundle.getParcelable("choice-intentx"));
             } else if (bundle.getString("numberIconTest") != null) {
 
-                JoH.show_ok_dialog(this, gs(R.string.prepare_to_test), gs(R.string.after_you_click_ok_look_for_a_number_icon_in_the_notification_area_if_you_see_123_then_the_test_has_succeeded__on_some_phones_this_test_will_crash_the_phone__after_30_seconds_we_will_shut_off_the_notification_if_your_phone_does_not_recover_after_this_then_hold_the_power_button_to_reboot_it), new Runnable() {
-                    @Override
-                    public void run() {
-                        JoH.static_toast_long(gs(R.string.running_test_with_number_123));
-                        NumberGraphic.testNotification("123");
-                    }
+                JoH.show_ok_dialog(this, gs(R.string.prepare_to_test), gs(R.string.after_you_click_ok_look_for_a_number_icon_in_the_notification_area_if_you_see_123_then_the_test_has_succeeded__on_some_phones_this_test_will_crash_the_phone__after_30_seconds_we_will_shut_off_the_notification_if_your_phone_does_not_recover_after_this_then_hold_the_power_button_to_reboot_it), (Runnable) () -> {
+                    JoH.static_toast_long(gs(R.string.running_test_with_number_123));
+                    NumberGraphic.testNotification("123");
                 });
             } else if (bundle.getString("inpen-reset") != null) {
                 InPenEntry.startWithReset();
             } else if (bundle.getString(Home.BLOOD_TEST_ACTION) != null) {
                 Log.d(TAG, "BLOOD_TEST_ACTION");
-                final AlertDialog.Builder builder = new AlertDialog.Builder(this);
+                final androidx.appcompat.app.AlertDialog.Builder builder = new AlertDialog.Builder(this);
                 builder.setTitle(gs(R.string.blood_test_action));
                 builder.setMessage(gs(R.string.what_would_you_like_to_do));
                 final String bt_uuid = bundle.getString(Home.BLOOD_TEST_ACTION + "2");
                 if (bt_uuid != null) {
                     final BloodTest bt = BloodTest.byUUID(bt_uuid);
                     if (bt != null) {
-                        builder.setNeutralButton(gs(R.string.nothing), new DialogInterface.OnClickListener() {
-                            public void onClick(DialogInterface dialog, int which) {
-                                dialog.dismiss();
-                            }
+                        builder.setNeutralButton(gs(R.string.nothing), (OnClickListener) (dialog, which) -> dialog.dismiss());
+
+                        builder.setPositiveButton(gs(R.string.calibrate), (OnClickListener) (dialog, which) -> {
+                            dialog.dismiss();
+                            // TODO time should be absolute not relative!?!?
+                            final long time_since = JoH.msSince(bt.timestamp);
+                            Home.startHomeWithExtra(getAppContext(), Home.BLUETOOTH_METER_CALIBRATION, BgGraphBuilder.unitized_string_static(bt.mgdl), Long.toString(time_since));
+                            bt.addState(BloodTest.STATE_CALIBRATION);
+                            GcmActivity.syncBloodTests();
+
                         });
 
-                        builder.setPositiveButton(gs(R.string.calibrate), new DialogInterface.OnClickListener() {
-                            public void onClick(DialogInterface dialog, int which) {
-                                dialog.dismiss();
-                                // TODO time should be absolute not relative!?!?
-                                final long time_since = JoH.msSince(bt.timestamp);
-                                Home.startHomeWithExtra(xdrip.getAppContext(), Home.BLUETOOTH_METER_CALIBRATION, BgGraphBuilder.unitized_string_static(bt.mgdl), Long.toString(time_since));
-                                bt.addState(BloodTest.STATE_CALIBRATION);
+                        builder.setNegativeButton("Delete", (OnClickListener) (dialog, which) -> {
+                            dialog.dismiss();
+                            final AlertDialog.Builder builder1 = new androidx.appcompat.app.AlertDialog.Builder(mActivity);
+                            builder1.setTitle(gs(R.string.confirm_delete));
+                            builder1.setMessage(gs(R.string.are_you_sure_you_want_to_delete_this_blood_test_result));
+                            builder1.setPositiveButton(gs(R.string.yes_delete), (dialog12, which12) -> {
+                                dialog12.dismiss();
+                                bt.removeState(BloodTest.STATE_VALID);
+                                NativeCalibrationPipe.removePendingCalibration((int) bt.mgdl);
                                 GcmActivity.syncBloodTests();
-
-                            }
+                                if (Home.get_show_wear_treatments())
+                                    BloodTest.pushBloodTestSyncToWatch(bt, false);
+                                staticRefreshBGCharts();
+                                JoH.static_toast_short(gs(R.string.deleted));
+                            });
+                            builder1.setNegativeButton("No", (dialog1, which1) -> dialog1.dismiss());
+                            final AlertDialog alert = builder1.create();
+                            alert.show();
                         });
-
-                        builder.setNegativeButton("Delete", new DialogInterface.OnClickListener() {
-                            @Override
-                            public void onClick(DialogInterface dialog, int which) {
-                                dialog.dismiss();
-                                final AlertDialog.Builder builder = new AlertDialog.Builder(mActivity);
-                                builder.setTitle(gs(R.string.confirm_delete));
-                                builder.setMessage(gs(R.string.are_you_sure_you_want_to_delete_this_blood_test_result));
-                                builder.setPositiveButton(gs(R.string.yes_delete), new DialogInterface.OnClickListener() {
-                                    public void onClick(DialogInterface dialog, int which) {
-                                        dialog.dismiss();
-                                        bt.removeState(BloodTest.STATE_VALID);
-                                        NativeCalibrationPipe.removePendingCalibration((int) bt.mgdl);
-                                        GcmActivity.syncBloodTests();
-                                        if (Home.get_show_wear_treatments())
-                                            BloodTest.pushBloodTestSyncToWatch(bt, false);
-                                        staticRefreshBGCharts();
-                                        JoH.static_toast_short(gs(R.string.deleted));
-                                    }
-                                });
-                                builder.setNegativeButton("No", new DialogInterface.OnClickListener() {
-                                    public void onClick(DialogInterface dialog, int which) {
-                                        dialog.dismiss();
-                                    }
-                                });
-                                final AlertDialog alert = builder.create();
-                                alert.show();
-                            }
-                        });
-                        final AlertDialog alert = builder.create();
+                        final androidx.appcompat.app.AlertDialog alert = builder.create();
                         alert.show();
                     } else {
                         JoH.static_toast_long("Could not find blood test data!! " + bt_uuid);
@@ -1193,7 +986,7 @@ public class Home extends ActivityWithMenu implements ActivityCompat.OnRequestPe
     public String readTextFile(InputStream inputStream) {
         ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
 
-        byte buf[] = new byte[1024];
+        byte[] buf = new byte[1024];
         int len;
         try {
             while ((len = inputStream.read(buf)) != -1) {
@@ -1201,7 +994,7 @@ public class Home extends ActivityWithMenu implements ActivityCompat.OnRequestPe
             }
             outputStream.close();
             inputStream.close();
-        } catch (IOException e) {
+        } catch (IOException ignored) {
 
         }
         return outputStream.toString();
@@ -1228,7 +1021,7 @@ public class Home extends ActivityWithMenu implements ActivityCompat.OnRequestPe
                     "Problem loading speech lexicon!",
                     Toast.LENGTH_LONG).show();
         }
-        Log.d(TAG, "Loaded Words: " + Integer.toString(lcs.entries.size()));
+        Log.d(TAG, "Loaded Words: " + lcs.entries.size());
         searchWords = lcs;
     }
 
@@ -1281,38 +1074,27 @@ public class Home extends ActivityWithMenu implements ActivityCompat.OnRequestPe
         recognitionRunning = true;
 
 
-        final AlertDialog.Builder builder = new AlertDialog.Builder(this);
+        final androidx.appcompat.app.AlertDialog.Builder builder = new AlertDialog.Builder(this);
         builder.setTitle("Type treatment\neg: units x.x");
 // Set up the input
         final EditText input = new EditText(this);
         input.setInputType(InputType.TYPE_CLASS_TEXT);
         builder.setView(input);
 // Set up the buttons
-        builder.setPositiveButton("OK", new DialogInterface.OnClickListener() {
-            @Override
-            public void onClick(DialogInterface dialog, int which) {
-                voiceRecognitionText.setText(input.getText().toString());
-                voiceRecognitionText.setVisibility(View.VISIBLE);
-                last_speech_time = JoH.ts();
-                naturalLanguageRecognition(input.getText().toString());
+        builder.setPositiveButton("OK", (OnClickListener) (dialog, which) -> {
+            voiceRecognitionText.setText(input.getText().toString());
+            voiceRecognitionText.setVisibility(View.VISIBLE);
+            last_speech_time = JoH.ts();
+            naturalLanguageRecognition(input.getText().toString());
 
-            }
         });
-        builder.setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
-            @Override
-            public void onClick(DialogInterface dialog, int which) {
-                dialog.cancel();
-            }
-        });
+        builder.setNegativeButton("Cancel", (OnClickListener) (dialog, which) -> dialog.cancel());
 
         final AlertDialog dialog = builder.create();
-        input.setOnFocusChangeListener(new View.OnFocusChangeListener() {
-            @Override
-            public void onFocusChange(View v, boolean hasFocus) {
-                if (hasFocus) {
-                    if (dialog != null)
-                        dialog.getWindow().setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_ALWAYS_VISIBLE);
-                }
+        input.setOnFocusChangeListener((v, hasFocus) -> {
+            if (hasFocus) {
+                if (dialog != null)
+                    dialog.getWindow().setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_ALWAYS_VISIBLE);
             }
         });
         dialog.show();
@@ -1375,7 +1157,7 @@ public class Home extends ActivityWithMenu implements ActivityCompat.OnRequestPe
         int end = allWords.indexOf(" uuid ");
         if (end > 0) {
             thisuuid = (end > 0 ? allWords.substring(0, end) : "");
-            allWords = allWords.substring(end + 6, allWords.length());
+            allWords = allWords.substring(end + 6);
         }
         byte[] RTL_BYTES = {(byte) 0xE2, (byte) 0x80, (byte) 0x8f}; // See https://stackoverflow.com/questions/21470476/why-is-e2808f-being-added-to-my-youtube-embed-code
 
@@ -1432,14 +1214,14 @@ public class Home extends ActivityWithMenu implements ActivityCompat.OnRequestPe
                     thisword = result;
                 handleWordPair();
                 if (thisword.equals("note")) {
-                    String note_text = "";
+                    StringBuilder note_text = new StringBuilder();
                     for (int j = i + 1; j < wordsArray.length; j++) {
-                        if (note_text.length() > 0) note_text += " ";
-                        note_text += wordsArray[j];
+                        if (note_text.length() > 0) note_text.append(" ");
+                        note_text.append(wordsArray[j]);
                     }
                     if (note_text.length() > 0) {
                         // TODO respect historic timeset?
-                        Treatments.create_note(note_text, JoH.tsl());
+                        Treatments.create_note(note_text.toString(), JoH.tsl());
                         staticRefreshBGCharts();
                         break; // don't process any more
                     }
@@ -1461,7 +1243,7 @@ public class Home extends ActivityWithMenu implements ActivityCompat.OnRequestPe
                     watchkeypad = true;
                     watchkeypadset = true;
                     watchkeypad_timestamp = (long) (thisnumber * 1000);
-                    Log.d(TAG, "Treatment entered on watchkeypad: " + Double.toString(thisnumber));
+                    Log.d(TAG, "Treatment entered on watchkeypad: " + thisnumber);
                 } else {
                     Log.d(TAG, "watchkeypad already set");
                 }
@@ -1470,8 +1252,8 @@ public class Home extends ActivityWithMenu implements ActivityCompat.OnRequestPe
             case "rapid":
                 if ((insulinset == false) && (thisnumber > 0)) {
                     thisinsulinnumber = thisnumber;
-                    textInsulinDose.setText(Double.toString(thisnumber) + " units");
-                    Log.d(TAG, "Rapid dose: " + Double.toString(thisnumber));
+                    textInsulinDose.setText(thisnumber + " units");
+                    Log.d(TAG, "Rapid dose: " + thisnumber);
                     insulinset = true;
                     btnInsulinDose.setVisibility(View.VISIBLE);
                     textInsulinDose.setVisibility(View.VISIBLE);
@@ -1484,9 +1266,9 @@ public class Home extends ActivityWithMenu implements ActivityCompat.OnRequestPe
             case "carbs":
                 if ((carbsset == false) && (thisnumber > 0)) {
                     thiscarbsnumber = thisnumber;
-                    textCarbohydrates.setText(Integer.toString((int) thisnumber) + " carbs");
+                    textCarbohydrates.setText((int) thisnumber + " carbs");
                     carbsset = true;
-                    Log.d(TAG, "Carbs eaten: " + Double.toString(thisnumber));
+                    Log.d(TAG, "Carbs eaten: " + thisnumber);
                     btnCarbohydrates.setVisibility(View.VISIBLE);
                     textCarbohydrates.setVisibility(View.VISIBLE);
                 } else {
@@ -1500,13 +1282,13 @@ public class Home extends ActivityWithMenu implements ActivityCompat.OnRequestPe
                     thisglucosenumber = thisnumber;
                     if (Pref.getString("units", "mgdl").equals("mgdl")) {
                         if (textBloodGlucose != null)
-                            textBloodGlucose.setText(Double.toString(thisnumber) + " mg/dl");
+                            textBloodGlucose.setText(thisnumber + " mg/dl");
                     } else {
                         if (textBloodGlucose != null)
-                            textBloodGlucose.setText(Double.toString(thisnumber) + " mmol/l");
+                            textBloodGlucose.setText(thisnumber + " mmol/l");
                     }
 
-                    Log.d(TAG, "Blood test: " + Double.toString(thisnumber));
+                    Log.d(TAG, "Blood test: " + thisnumber);
                     glucoseset = true;
                     if (textBloodGlucose != null) {
                         btnBloodGlucose.setVisibility(View.VISIBLE);
@@ -1642,12 +1424,7 @@ public class Home extends ActivityWithMenu implements ActivityCompat.OnRequestPe
 
     public void toast(final String msg) {
         try {
-            runOnUiThread(new Runnable() {
-                @Override
-                public void run() {
-                    Toast.makeText(mActivity, msg, Toast.LENGTH_LONG).show();
-                }
-            });
+            runOnUiThread((Runnable) () -> Toast.makeText(mActivity, msg, Toast.LENGTH_LONG).show());
             Log.d(TAG, "toast: " + msg);
         } catch (Exception e) {
             Log.d(TAG, "Couldn't display toast: " + msg + " / " + e.toString());
@@ -1728,7 +1505,7 @@ public class Home extends ActivityWithMenu implements ActivityCompat.OnRequestPe
         public ArrayList<wordData> entries;
 
         wordDataWrapper() {
-            entries = new ArrayList<wordData>();
+            entries = new ArrayList<>();
 
         }
     }
@@ -1880,14 +1657,11 @@ public class Home extends ActivityWithMenu implements ActivityCompat.OnRequestPe
         HeyFamUpdateOptInDialog.heyFam(this); // remind about updates
         firstRunDialogs(checkedeula);
 
-        Inevitable.task("home-resume-bg", 2000, new Runnable() {
-            @Override
-            public void run() {
-                InPenEntry.startIfEnabled();
-                EmergencyAssistActivity.checkPermissionRemoved();
-                NightscoutUploader.launchDownloadRest();
-                Pendiq.immortality(); // Experimental testing phase
-            }
+        Inevitable.task("home-resume-bg", 2000, () -> {
+            InPenEntry.startIfEnabled();
+            EmergencyAssistActivity.checkPermissionRemoved();
+            NightscoutUploader.launchDownloadRest();
+            Pendiq.immortality(); // Experimental testing phase
         });
 
     }
@@ -1898,35 +1672,26 @@ public class Home extends ActivityWithMenu implements ActivityCompat.OnRequestPe
             if (JoH.ratelimit("policy-never", 3600)) {
                 if (Pref.getLong("wifi_warning_never", 0) == 0) {
                     if (!JoH.isMobileDataOrEthernetConnected()) {
-                        AlertDialog.Builder builder = new AlertDialog.Builder(this);
+                        androidx.appcompat.app.AlertDialog.Builder builder = new AlertDialog.Builder(this);
                         builder.setTitle(gs(R.string.wifi_sleep_policy_issue));
                         builder.setMessage(gs(R.string.your_wifi_is_set_to_sleep_when_the_phone_screen_is_off__this_may_cause_problems_if_you_dont_have_cellular_data_or_have_devices_on_your_local_network__would_you_like_to_go_to_the_settings_page_to_set__always_keep_wifi_on_during_sleep));
 
-                        builder.setNeutralButton(gs(R.string.maybe_later), new DialogInterface.OnClickListener() {
-                            public void onClick(DialogInterface dialog, int which) {
-                                dialog.dismiss();
+                        builder.setNeutralButton(gs(R.string.maybe_later), (OnClickListener) (dialog, which) -> dialog.dismiss());
+
+                        builder.setPositiveButton(gs(R.string.yes_do_it), (OnClickListener) (dialog, which) -> {
+                            dialog.dismiss();
+                            toast(gs(R.string.recommend_that_you_change_wifi_to_always_be_on_during_sleep));
+                            try {
+                                startActivity(new Intent(Settings.ACTION_WIFI_IP_SETTINGS));
+                            } catch (ActivityNotFoundException e) {
+                                JoH.static_toast_long(gs(R.string.ooops_this_device_doesnt_seem_to_have_a_wifi_settings_page));
                             }
+
                         });
 
-                        builder.setPositiveButton(gs(R.string.yes_do_it), new DialogInterface.OnClickListener() {
-                            public void onClick(DialogInterface dialog, int which) {
-                                dialog.dismiss();
-                                toast(gs(R.string.recommend_that_you_change_wifi_to_always_be_on_during_sleep));
-                                try {
-                                    startActivity(new Intent(Settings.ACTION_WIFI_IP_SETTINGS));
-                                } catch (ActivityNotFoundException e) {
-                                    JoH.static_toast_long(gs(R.string.ooops_this_device_doesnt_seem_to_have_a_wifi_settings_page));
-                                }
-
-                            }
-                        });
-
-                        builder.setNegativeButton("NO, Never", new DialogInterface.OnClickListener() {
-                            @Override
-                            public void onClick(DialogInterface dialog, int which) {
-                                dialog.dismiss();
-                                Pref.setLong("wifi_warning_never", (long) JoH.ts());
-                            }
+                        builder.setNegativeButton("NO, Never", (OnClickListener) (dialog, which) -> {
+                            dialog.dismiss();
+                            Pref.setLong("wifi_warning_never", (long) JoH.ts());
                         });
 
                         AlertDialog alert = builder.create();
@@ -1990,7 +1755,7 @@ public class Home extends ActivityWithMenu implements ActivityCompat.OnRequestPe
 
                 @Override
                 public int getOpacity() {
-                    return 0; // TODO Which pixel format should this be?
+                    return PixelFormat.UNKNOWN /*0*/; // TODO Which pixel format should this be?
                 }
             };
             chart.setBackground(background);
@@ -2335,14 +2100,11 @@ public class Home extends ActivityWithMenu implements ActivityCompat.OnRequestPe
             notificationText.append("\n DATA SOURCE DISABLED");
             if (!Experience.gotData()) {
                 // TODO should this move to Experience::processSteps ?
-                final Activity activity = this;
-                JoH.runOnUiThreadDelayed(new Runnable() {
-                    @Override
-                    public void run() {
-                        if ((dialog == null || !dialog.isShowing())) {
-                            if (JoH.ratelimit("start_source_wizard", 30)) {
-                                SourceWizard.start(activity, false);
-                            }
+                final AppCompatActivity activity = this;
+                JoH.runOnUiThreadDelayed(() -> {
+                    if ((dialog == null || !dialog.isShowing())) {
+                        if (JoH.ratelimit("start_source_wizard", 30)) {
+                            SourceWizard.start(activity, false);
                         }
                     }
                 }, 500);
@@ -2362,7 +2124,7 @@ public class Home extends ActivityWithMenu implements ActivityCompat.OnRequestPe
         } else if (Pref.getLong("high_alerts_disabled_until", 0) > new Date().getTime()) {
             notificationText.append("\n " + getString(R.string.high_alerts_currently_disabled));
         }
-        NavigationDrawerFragment navigationDrawerFragment = (NavigationDrawerFragment) getFragmentManager().findFragmentById(R.id.navigation_drawer);
+        NavigationDrawerFragment navigationDrawerFragment = (NavigationDrawerFragment) getSupportFragmentManager().findFragmentById(R.id.navigation_drawer);
 
         // DEBUG ONLY
         if ((BgGraphBuilder.last_noise > 0) && (Pref.getBoolean("show_noise_workings", false))) {
@@ -2495,38 +2257,26 @@ public class Home extends ActivityWithMenu implements ActivityCompat.OnRequestPe
                     final Context context = this;
                     builder.setTitle(gs(R.string.restore_backup));
                     builder.setMessage(gs(R.string.do_you_want_to_restore_the_backup_file_) + Pref.getString("last-saved-database-zip", "ERROR").replaceFirst("^.*/", ""));
-                    builder.setNegativeButton("No", new DialogInterface.OnClickListener() {
-                        public void onClick(DialogInterface dialog, int which) {
-                            dialog.dismiss();
-                        }
-                    });
-                    builder.setPositiveButton(gs(R.string.restore), new DialogInterface.OnClickListener() {
-                        @Override
-                        public void onClick(DialogInterface dialog, int which) {
-                            dialog.dismiss();
-                            startActivity(new Intent(context, ImportDatabaseActivity.class).putExtra("importit", Pref.getString("last-saved-database-zip", "")).setFlags(Intent.FLAG_ACTIVITY_NEW_TASK));
-                        }
+                    builder.setNegativeButton("No", (dialog, which) -> dialog.dismiss());
+                    builder.setPositiveButton(gs(R.string.restore), (dialog, which) -> {
+                        dialog.dismiss();
+                        startActivity(new Intent(context, ImportDatabaseActivity.class).putExtra("importit", Pref.getString("last-saved-database-zip", "")).setFlags(Intent.FLAG_ACTIVITY_NEW_TASK));
                     });
                     dialog = builder.create();
                     dialog.show();
                 } else {
                     if (!Experience.gotData() && !DexCollectionHelper.isDialogShowing() && JoH.ratelimit("start-sensor_prompt", 20)) {
-                        final AlertDialog.Builder builder = new AlertDialog.Builder(this);
+                        final AlertDialog.Builder builder = new androidx.appcompat.app.AlertDialog.Builder(this);
                         final Context context = this;
                         builder.setTitle(getString(R.string.start_sensor) + "?");
                         builder.setMessage("Data Source is set to: " + DexCollectionType.getDexCollectionType().toString() + "\n\nDo you want to change settings or start sensor?");
-                        builder.setNegativeButton(gs(R.string.change_settings), new DialogInterface.OnClickListener() {
-                            public void onClick(DialogInterface dialog, int which) {
-                                dialog.dismiss();
-                                startActivity(new Intent(context, Preferences.class).setFlags(Intent.FLAG_ACTIVITY_NEW_TASK));
-                            }
+                        builder.setNegativeButton(gs(R.string.change_settings), (dialog, which) -> {
+                            dialog.dismiss();
+                            startActivity(new Intent(context, Preferences.class).setFlags(Intent.FLAG_ACTIVITY_NEW_TASK));
                         });
-                        builder.setPositiveButton(R.string.start_sensor, new DialogInterface.OnClickListener() {
-                            @Override
-                            public void onClick(DialogInterface dialog, int which) {
-                                dialog.dismiss();
-                                startActivity(new Intent(context, StartNewSensor.class).setFlags(Intent.FLAG_ACTIVITY_NEW_TASK));
-                            }
+                        builder.setPositiveButton(R.string.start_sensor, (dialog, which) -> {
+                            dialog.dismiss();
+                            startActivity(new Intent(context, StartNewSensor.class).setFlags(Intent.FLAG_ACTIVITY_NEW_TASK));
                         });
                         dialog = builder.create();
                         dialog.show();
@@ -2626,7 +2376,7 @@ public class Home extends ActivityWithMenu implements ActivityCompat.OnRequestPe
 
             final AlertDialog.Builder builder = new AlertDialog.Builder(this);
             builder.setTitle(R.string.collecting_initial_readings);
-            initial_status_binding = PopupInitialStatusHelperBinding.inflate(getLayoutInflater());
+            initial_status_binding = com.eveningoutpost.dexdrip.databinding.PopupInitialStatusHelperBinding.inflate(getLayoutInflater());
             initial_status_binding.setIdq(initialDataQuality);
             if (microStatus == null) microStatus = new MicroStatusImpl();
             initial_status_binding.setMs(microStatus);
@@ -2650,23 +2400,18 @@ public class Home extends ActivityWithMenu implements ActivityCompat.OnRequestPe
         if ((helper_dialog != null) && (helper_dialog.isShowing())) return;
         if (btnApprove.getVisibility() == View.VISIBLE) return;
         if (JoH.ratelimit("calibrate-sensor_prompt", 10)) {
-            final AlertDialog.Builder builder = new AlertDialog.Builder(this);
+            final AlertDialog.Builder builder = new androidx.appcompat.app.AlertDialog.Builder(this);
             final Context context = this;
             builder.setTitle(gs(R.string.calibrate_sensor));
             builder.setMessage(gs(R.string.we_have_some_readings__next_we_need_the_first_calibration_blood_test__ready_to_calibrate_now));
-            builder.setNegativeButton("No", new DialogInterface.OnClickListener() {
-                public void onClick(DialogInterface dialog, int which) {
-                    dialog.dismiss();
-                    helper_dialog = null;
-                }
+            builder.setNegativeButton("No", (dialog, which) -> {
+                dialog.dismiss();
+                helper_dialog = null;
             });
-            builder.setPositiveButton(gs(R.string.calibrate), new DialogInterface.OnClickListener() {
-                @Override
-                public void onClick(DialogInterface dialog, int which) {
-                    dialog.dismiss();
-                    helper_dialog = null;
-                    startActivity(new Intent(context, DoubleCalibrationActivity.class).setFlags(Intent.FLAG_ACTIVITY_NEW_TASK));
-                }
+            builder.setPositiveButton(gs(R.string.calibrate), (dialog, which) -> {
+                dialog.dismiss();
+                helper_dialog = null;
+                startActivity(new Intent(context, DoubleCalibrationActivity.class).setFlags(Intent.FLAG_ACTIVITY_NEW_TASK));
             });
             helper_dialog = builder.create();
             try {
@@ -3007,7 +2752,7 @@ public class Home extends ActivityWithMenu implements ActivityCompat.OnRequestPe
 
     private void addDisplayDelta() {
         if (BgGraphBuilder.isXLargeTablet(getApplicationContext())) {
-            if (Locale.getDefault().getLanguage() == "iw") {
+            if (Locale.getDefault().getLanguage().equals("iw")) {
                 HebrewAppendDisplayData();
             } else {
                 notificationText.append("  ");
@@ -3215,26 +2960,20 @@ public class Home extends ActivityWithMenu implements ActivityCompat.OnRequestPe
 
 
     public void parakeetSetupMode(MenuItem myitem) {
-        AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(this);
+        androidx.appcompat.app.AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(this);
         alertDialogBuilder.setMessage(R.string.are_you_sure_you_want_switch_parakeet_to_setup);
 
-        alertDialogBuilder.setPositiveButton(R.string.yes_enter_setup_mode, new DialogInterface.OnClickListener() {
-            @Override
-            public void onClick(DialogInterface arg0, int arg1) {
-                // switch parakeet to setup mode
-                ParakeetHelper.parakeetSetupMode(getApplicationContext());
-            }
+        alertDialogBuilder.setPositiveButton(R.string.yes_enter_setup_mode, (OnClickListener) (arg0, arg1) -> {
+            // switch parakeet to setup mode
+            ParakeetHelper.parakeetSetupMode(getApplicationContext());
         });
 
 
-        alertDialogBuilder.setNegativeButton(R.string.nokeep_parakeet_as_it_is, new DialogInterface.OnClickListener() {
-            @Override
-            public void onClick(DialogInterface dialog, int which) {
-                // do nothing
-            }
+        alertDialogBuilder.setNegativeButton(R.string.nokeep_parakeet_as_it_is, (OnClickListener) (dialog, which) -> {
+            // do nothing
         });
 
-        AlertDialog alertDialog = alertDialogBuilder.create();
+        androidx.appcompat.app.AlertDialog alertDialog = alertDialogBuilder.create();
         alertDialog.show();
     }
 
@@ -3250,13 +2989,18 @@ public class Home extends ActivityWithMenu implements ActivityCompat.OnRequestPe
         Pref.setBoolean("default_to_voice_notes", !Pref.getBooleanDefaultFalse("default_to_voice_notes"));
     }
 
+    //TODO timestamp
+    public void showNoteTextInputDialog(View myitem) {
+        showNoteTextInputDialog(myitem, 0L, -1);
+    }
+
     public void showNoteTextInputDialog(View myitem, final long timestamp) {
         showNoteTextInputDialog(myitem, timestamp, -1);
     }
 
     public void showNoteTextInputDialog(View myitem, final long timestamp, final double position) {
         Log.d(TAG, "showNoteTextInputDialog: ts:" + timestamp + " pos:" + position);
-        AlertDialog.Builder dialogBuilder = new AlertDialog.Builder(this);
+        androidx.appcompat.app.AlertDialog.Builder dialogBuilder = new androidx.appcompat.app.AlertDialog.Builder(this);
         LayoutInflater inflater = this.getLayoutInflater();
         final View dialogView = inflater.inflate(R.layout.note_dialog_phone, null);
         dialogBuilder.setView(dialogView);
@@ -3267,72 +3011,52 @@ public class Home extends ActivityWithMenu implements ActivityCompat.OnRequestPe
 
         dialogBuilder.setTitle(R.string.treatment_note);
         //dialogBuilder.setMessage("Enter text below");
-        dialogBuilder.setPositiveButton(R.string.done, new DialogInterface.OnClickListener() {
-            public void onClick(DialogInterface dialog, int whichButton) {
-                String treatment_text = edt.getText().toString().trim();
-                Log.d(TAG, "Got treatment note: " + treatment_text);
-                Treatments.create_note(treatment_text, timestamp, position); // timestamp?
-                Home.staticRefreshBGCharts();
+        dialogBuilder.setPositiveButton(R.string.done, (OnClickListener) (dialog, whichButton) -> {
+            String treatment_text = edt.getText().toString().trim();
+            Log.d(TAG, "Got treatment note: " + treatment_text);
+            Treatments.create_note(treatment_text, timestamp, position); // timestamp?
+            Home.staticRefreshBGCharts();
 
-                if (treatment_text.length() > 0) {
-                    // display snackbar of the snackbar
-                    final View.OnClickListener mOnClickListener = new View.OnClickListener() {
-                        @Override
-                        public void onClick(View v) {
-                            Home.startHomeWithExtra(xdrip.getAppContext(), Home.CREATE_TREATMENT_NOTE, Long.toString(timestamp), Double.toString(position));
-                        }
-                    };
-                    Home.snackBar(R.string.add_note, getString(R.string.added) + ":    " + treatment_text, mOnClickListener, mActivity);
-                }
-
-                if (Pref.getBooleanDefaultFalse("default_to_voice_notes"))
-                    showcasemenu(SHOWCASE_NOTE_LONG);
-                dialog = null;
+            if (treatment_text.length() > 0) {
+                // display snackbar of the snackbar
+                final View.OnClickListener mOnClickListener = v -> Home.startHomeWithExtra(getAppContext(), Home.CREATE_TREATMENT_NOTE, Long.toString(timestamp), Double.toString(position));
+                Home.snackBar(R.string.add_note, getString(R.string.added) + ":    " + treatment_text, mOnClickListener, mActivity);
             }
+
+            if (Pref.getBooleanDefaultFalse("default_to_voice_notes"))
+                showcasemenu(SHOWCASE_NOTE_LONG);
+            dialog = null;
         });
-        dialogBuilder.setNegativeButton(getString(R.string.cancel), new DialogInterface.OnClickListener() {
-            public void onClick(DialogInterface dialog, int whichButton) {
-                if (Pref.getBooleanDefaultFalse("default_to_voice_notes"))
-                    showcasemenu(SHOWCASE_NOTE_LONG);
-                dialog = null;
+        dialogBuilder.setNegativeButton(getString(R.string.cancel), (OnClickListener) (dialog, whichButton) -> {
+            if (Pref.getBooleanDefaultFalse("default_to_voice_notes"))
+                showcasemenu(SHOWCASE_NOTE_LONG);
+            dialog = null;
 
-            }
         });
         if (Treatments.byTimestamp(timestamp, (int) (2.5 * MINUTE_IN_MS)) != null) {
-            dialogBuilder.setNeutralButton("Delete", new DialogInterface.OnClickListener() {
-                public void onClick(DialogInterface dialog, int whichButton) {
-                    // are you sure?
-                    final AlertDialog.Builder builder = new AlertDialog.Builder(mActivity);
-                    builder.setTitle(gs(R.string.confirm_delete));
-                    builder.setMessage(gs(R.string.are_you_sure_you_want_to_delete_this_treatment));
-                    builder.setPositiveButton(gs(R.string.yes_delete), new DialogInterface.OnClickListener() {
-                        public void onClick(DialogInterface dialog, int which) {
-                            dialog.dismiss();
-                            Treatments.delete_by_timestamp(timestamp, (int) (2.5 * MINUTE_IN_MS), true); // 2.5 min resolution
-                            staticRefreshBGCharts();
-                            JoH.static_toast_short(gs(R.string.deleted));
-                        }
-                    });
-                    builder.setNegativeButton("No", new DialogInterface.OnClickListener() {
-                        public void onClick(DialogInterface dialog, int which) {
-                            dialog.dismiss();
-                        }
-                    });
-                    final AlertDialog alert = builder.create();
-                    alert.show();
-                    dialog = null;
-                }
+            dialogBuilder.setNeutralButton("Delete", (OnClickListener) (dialog, whichButton) -> {
+                // are you sure?
+                final androidx.appcompat.app.AlertDialog.Builder builder = new androidx.appcompat.app.AlertDialog.Builder(mActivity);
+                builder.setTitle(gs(R.string.confirm_delete));
+                builder.setMessage(gs(R.string.are_you_sure_you_want_to_delete_this_treatment));
+                builder.setPositiveButton(gs(R.string.yes_delete), (OnClickListener) (dialog12, which) -> {
+                    dialog12.dismiss();
+                    Treatments.delete_by_timestamp(timestamp, (int) (2.5 * MINUTE_IN_MS), true); // 2.5 min resolution
+                    staticRefreshBGCharts();
+                    JoH.static_toast_short(gs(R.string.deleted));
+                });
+                builder.setNegativeButton("No", (OnClickListener) (dialog1, which) -> dialog1.dismiss());
+                final AlertDialog alert = builder.create();
+                alert.show();
+                dialog = null;
             });
         }
         dialog = dialogBuilder.create();
         edt.setInputType(InputType.TYPE_CLASS_TEXT);
-        edt.setOnFocusChangeListener(new View.OnFocusChangeListener() {
-            @Override
-            public void onFocusChange(View v, boolean hasFocus) {
-                if (hasFocus) {
-                    if (dialog != null)
-                        dialog.getWindow().setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_ALWAYS_VISIBLE);
-                }
+        edt.setOnFocusChangeListener((v, hasFocus) -> {
+            if (hasFocus) {
+                if (dialog != null)
+                    dialog.getWindow().setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_ALWAYS_VISIBLE);
             }
         });
 
@@ -3508,7 +3232,7 @@ public class Home extends ActivityWithMenu implements ActivityCompat.OnRequestPe
                     }.execute();
                 }
             });
-            datePickerFragment.show(getFragmentManager(), "DatePicker");
+            datePickerFragment.show(getSupportFragmentManager(), "DatePicker");
             return true;
         }
 
@@ -3540,24 +3264,23 @@ public class Home extends ActivityWithMenu implements ActivityCompat.OnRequestPe
 
     public static double convertToMgDlIfMmol(double value) {
         if (!Pref.getString("units", "mgdl").equals("mgdl")) {
-            return value * com.eveningoutpost.dexdrip.UtilityModels.Constants.MMOLL_TO_MGDL;
+            return value * com.eveningoutpost.dexdrip.utilitymodels.Constants.MMOLL_TO_MGDL;
         } else {
             return value; // no conversion needed
         }
     }
 
-    public static void snackBar(int buttonString, String message, View.OnClickListener mOnClickListener, Activity activity) {
+    public static void snackBar(int buttonString, String message, View.OnClickListener mOnClickListener, AppCompatActivity activity) {
 
-        android.support.design.widget.Snackbar.make(
-
+        Snackbar.make(
                 activity.findViewById(android.R.id.content),
-                message, android.support.design.widget.Snackbar.LENGTH_LONG)
+                message, Snackbar.LENGTH_LONG)
                 .setAction(buttonString, mOnClickListener)
                 //.setActionTextColor(Color.RED)
                 .show();
     }
 
-    public static void staticBlockUI(Activity context, boolean state) {
+    public static void staticBlockUI(AppCompatActivity context, boolean state) {
         blockTouches = state;
         if (state) {
             JoH.lockOrientation(context);
@@ -3647,15 +3370,12 @@ public class Home extends ActivityWithMenu implements ActivityCompat.OnRequestPe
     }
 
     private View.OnClickListener makeSnackBarUriLauncher(final Uri uri, final String text) {
-        return new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                Intent shareIntent = new Intent();
-                shareIntent.setAction(Intent.ACTION_SEND);
-                shareIntent.putExtra(Intent.EXTRA_STREAM, uri);
-                shareIntent.setType("application/octet-stream");
-                Home.this.startActivity(Intent.createChooser(shareIntent, text));
-            }
+        return v -> {
+            Intent shareIntent = new Intent();
+            shareIntent.setAction(Intent.ACTION_SEND);
+            shareIntent.putExtra(Intent.EXTRA_STREAM, uri);
+            shareIntent.setType("application/octet-stream");
+            Home.this.startActivity(Intent.createChooser(shareIntent, text));
         };
     }
 
@@ -3711,8 +3431,8 @@ public class Home extends ActivityWithMenu implements ActivityCompat.OnRequestPe
 
     @Override
     public void onRequestPermissionsResult(int requestCode,
-                                           @NonNull String[] permissions,
-                                           @NonNull int[] grantResults) {
+                                           @androidx.annotation.NonNull @NonNull String[] permissions,
+                                           @androidx.annotation.NonNull @NonNull int[] grantResults) {
         // automatically restore settings backup if we just approved a request coming from that
         if (requestCode == SdcardImportExport.TRIGGER_RESTORE_PERMISSIONS_REQUEST_STORAGE
                 && permissions.length > 0 && grantResults.length > 0

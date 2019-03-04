@@ -1,95 +1,46 @@
 package com.eveningoutpost.dexdrip.wearintegration;
 
 import android.annotation.SuppressLint;
-import android.app.ActivityManager;
-import android.app.PendingIntent;
-import android.content.Context;
-import android.content.Intent;
-import android.content.SharedPreferences;
-import android.os.AsyncTask;
-import android.os.Bundle;
-import android.os.PowerManager;
-import android.preference.PreferenceManager;
-import android.support.v4.content.LocalBroadcastManager;
-import android.util.Log;
-import android.widget.Toast;
+import android.app.*;
+import android.content.*;
+import android.os.*;
+import android.preference.*;
+import android.util.*;
+import android.widget.*;
+
+import androidx.annotation.*;
+import androidx.localbroadcastmanager.content.*;
 
 import com.eveningoutpost.dexdrip.BestGlucose;
 import com.eveningoutpost.dexdrip.BuildConfig;
-import com.eveningoutpost.dexdrip.G5Model.CalibrationState;
-import com.eveningoutpost.dexdrip.G5Model.Ob1G5StateMachine;
 import com.eveningoutpost.dexdrip.Home;
-import com.eveningoutpost.dexdrip.Models.ActiveBluetoothDevice;
-import com.eveningoutpost.dexdrip.Models.AlertType;
-import com.eveningoutpost.dexdrip.Models.BgReading;
-import com.eveningoutpost.dexdrip.Models.BloodTest;
-import com.eveningoutpost.dexdrip.Models.Calibration;
-import com.eveningoutpost.dexdrip.Models.HeartRate;
-import com.eveningoutpost.dexdrip.Models.JoH;
-import com.eveningoutpost.dexdrip.Models.Sensor;
-import com.eveningoutpost.dexdrip.Models.StepCounter;
-import com.eveningoutpost.dexdrip.Models.TransmitterData;
-import com.eveningoutpost.dexdrip.Models.Treatments;
-import com.eveningoutpost.dexdrip.Models.UserError;
 import com.eveningoutpost.dexdrip.R;
-import com.eveningoutpost.dexdrip.Services.G5CollectionService;
-import com.eveningoutpost.dexdrip.Services.Ob1G5CollectionService;
-import com.eveningoutpost.dexdrip.UtilityModels.AlertPlayer;
-import com.eveningoutpost.dexdrip.UtilityModels.BgGraphBuilder;
-import com.eveningoutpost.dexdrip.UtilityModels.BgSendQueue;
-import com.eveningoutpost.dexdrip.UtilityModels.Blukon;
-import com.eveningoutpost.dexdrip.UtilityModels.CollectionServiceStarter;
-import com.eveningoutpost.dexdrip.UtilityModels.Constants;
-import com.eveningoutpost.dexdrip.UtilityModels.Inevitable;
-import com.eveningoutpost.dexdrip.UtilityModels.LowPriorityThread;
-import com.eveningoutpost.dexdrip.UtilityModels.PersistentStore;
-import com.eveningoutpost.dexdrip.UtilityModels.Pref;
-import com.eveningoutpost.dexdrip.UtilityModels.StatusLine;
-import com.eveningoutpost.dexdrip.UtilityModels.WearSyncBooleans;
-import com.eveningoutpost.dexdrip.UtilityModels.WearSyncPersistentStrings;
-import com.eveningoutpost.dexdrip.utils.CheckBridgeBattery;
-import com.eveningoutpost.dexdrip.utils.DexCollectionType;
-import com.eveningoutpost.dexdrip.utils.GetWearApk;
-import com.eveningoutpost.dexdrip.utils.PowerStateReceiver;
+import com.eveningoutpost.dexdrip.g5Model.*;
+import com.eveningoutpost.dexdrip.R;
+import com.eveningoutpost.dexdrip.models.*;
+import com.eveningoutpost.dexdrip.services.*;
+import com.eveningoutpost.dexdrip.utilitymodels.*;
+import com.eveningoutpost.dexdrip.utils.*;
 import com.eveningoutpost.dexdrip.xdrip;
-import com.google.android.gms.common.ConnectionResult;
-import com.google.android.gms.common.api.GoogleApiClient;
-import com.google.android.gms.common.api.PendingResult;
-import com.google.android.gms.common.api.ResultCallback;
-import com.google.android.gms.wearable.Asset;
-import com.google.android.gms.wearable.CapabilityApi;
-import com.google.android.gms.wearable.CapabilityInfo;
-import com.google.android.gms.wearable.Channel;
-import com.google.android.gms.wearable.ChannelApi;
-import com.google.android.gms.wearable.DataApi;
-import com.google.android.gms.wearable.DataEvent;
-import com.google.android.gms.wearable.DataEventBuffer;
-import com.google.android.gms.wearable.DataMap;
-import com.google.android.gms.wearable.DataMapItem;
-import com.google.android.gms.wearable.MessageEvent;
-import com.google.android.gms.wearable.Node;
-import com.google.android.gms.wearable.NodeApi;
-import com.google.android.gms.wearable.PutDataMapRequest;
-import com.google.android.gms.wearable.PutDataRequest;
-import com.google.android.gms.wearable.Wearable;
-import com.google.android.gms.wearable.WearableListenerService;
-import com.google.gson.Gson;
-import com.google.gson.GsonBuilder;
-import com.google.gson.internal.bind.DateTypeAdapter;
+import com.google.android.gms.common.*;
+import com.google.android.gms.common.api.*;
+import com.google.android.gms.wearable.*;
+import com.google.android.gms.wearable.DataApi.*;
+import com.google.gson.*;
+import com.google.gson.internal.bind.*;
 
 import java.io.IOException;
 import java.io.OutputStream;
-import java.io.UnsupportedEncodingException;
+import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import java.util.Locale;
 import java.util.Set;
-import java.util.concurrent.TimeUnit;
+import java.util.concurrent.*;
 
-import static com.eveningoutpost.dexdrip.G5Model.Ob1G5StateMachine.PREF_QUEUE_DRAINED;
-import static com.eveningoutpost.dexdrip.Models.JoH.showNotification;
-import static com.eveningoutpost.dexdrip.Models.JoH.ts;
+import static com.eveningoutpost.dexdrip.g5Model.Ob1G5StateMachine.*;
+import static com.eveningoutpost.dexdrip.models.JoH.*;
 
 @SuppressLint("LogNotTimber")
 public class WatchUpdaterService extends WearableListenerService implements
@@ -487,7 +438,7 @@ public class WatchUpdaterService extends WearableListenerService implements
                                 }
                                 //TODO : LOG if unfiltered or filtered values are zero
                                 Sensor.updateBatteryLevel(sensor, bgData.sensor_battery_level);
-                                Log.i(TAG, "syncTransmitterData: BG timestamp create " + Long.toString(bgData.timestamp));//android.util.Log.i
+                                Log.i(TAG, "syncTransmitterData: BG timestamp create " + bgData.timestamp);//android.util.Log.i
                                 BgReading bgExists;
 
                                 //KS TODO wear implements limited alerts, therefore continue to process all alerts on phone for last entry
@@ -737,21 +688,19 @@ public class WatchUpdaterService extends WearableListenerService implements
     }
 
     private void listenForChangeInSettings() {
-        mPreferencesListener = new SharedPreferences.OnSharedPreferenceChangeListener() {
-            public void onSharedPreferenceChanged(SharedPreferences prefs, String key) {
+        mPreferencesListener = (prefs, key) -> {
 
-                pebble_integration = mPrefs.getBoolean("pebble_sync", false);
-                if (key.compareTo("bridge_battery") != 0 && key.compareTo("nfc_sensor_age") != 0 &&
-                        key.compareTo("bg_notifications_watch") != 0 && key.compareTo("persistent_high_alert_enabled_watch") != 0) {
+            pebble_integration = mPrefs.getBoolean("pebble_sync", false);
+            if (key.compareTo("bridge_battery") != 0 && key.compareTo("nfc_sensor_age") != 0 &&
+                    key.compareTo("bg_notifications_watch") != 0 && key.compareTo("persistent_high_alert_enabled_watch") != 0) {
 
-                    Log.d(TAG, "Triggering Wear Settings Update due to key=" + key);
+                Log.d(TAG, "Triggering Wear Settings Update due to key=" + key);
 
-                    Inevitable.task("wear-update-settings", 2000, () -> {
-                        sendPrefSettings();
-                        processConnect();
-                    });
+                Inevitable.task("wear-update-settings", 2000, () -> {
+                    sendPrefSettings();
+                    processConnect();
+                });
 
-                }
             }
         };
         mPrefs.registerOnSharedPreferenceChangeListener(mPreferencesListener);
@@ -897,12 +846,9 @@ public class WatchUpdaterService extends WearableListenerService implements
 
     public static void startSelf() {
         // TODO replace with inevitable task
-        new Thread(new Runnable() {
-            @Override
-            public void run() {
-                if (JoH.ratelimit("start-wear", 5)) {
-                    startServiceAndResendData(0);
-                }
+        new Thread(() -> {
+            if (JoH.ratelimit("start-wear", 5)) {
+                startServiceAndResendData(0);
             }
         }).start();
     }
@@ -1242,11 +1188,7 @@ public class WatchUpdaterService extends WearableListenerService implements
                         break;
                     case WEARABLE_VOICE_PAYLOAD:
                         String eventData = "";
-                        try {
-                            eventData = new String(event.getData(), "UTF-8");
-                        } catch (UnsupportedEncodingException e) {
-                            eventData = "error";
-                        }
+                        eventData = new String(event.getData(), StandardCharsets.UTF_8);
                         Log.d(TAG, "Received wearable: voice payload: " + eventData);
                         if (eventData.length() > 1)
                             receivedText(getApplicationContext(), eventData);
@@ -1258,11 +1200,7 @@ public class WatchUpdaterService extends WearableListenerService implements
                         cancelTreatment(getApplicationContext(), "");
                         break;
                     case WEARABLE_SNOOZE_ALERT:
-                        try {
-                            eventData = new String(event.getData(), "UTF-8");
-                        } catch (UnsupportedEncodingException e) {
-                            eventData = "30";
-                        }
+                        eventData = new String(event.getData(), StandardCharsets.UTF_8);
                         int snooze;
                         try {
                             snooze = Integer.parseInt(eventData);
@@ -1450,83 +1388,73 @@ public class WatchUpdaterService extends WearableListenerService implements
                                     JoH.static_toast_long("Sending latest version to watch");
                                 }
                                 final int finalStartAt = startAt;
-                                new Thread(new Runnable() {
-                                    @Override
-                                    public void run() {
-                                        if (mWearNodeId == null) {
-                                            UserError.Log.d(TAG, "VUP: nodeid is null");
-                                            updateWearSyncBgsCapability(); // try to populate
+                                new Thread(() -> {
+                                    if (mWearNodeId == null) {
+                                        UserError.Log.d(TAG, "VUP: nodeid is null");
+                                        updateWearSyncBgsCapability(); // try to populate
+                                    }
+
+                                    if (mWearNodeId != null) {
+                                        // TODO limit to 120
+                                        UserError.Log.d(TAG, "VUP: nodeid is now not null");
+                                        if (apkBytes == null) {
+                                            UserError.Log.d(TAG, "VUP: getting bytes");
+                                            apkBytes = GetWearApk.getBytes();
                                         }
+                                        if (apkBytes != null) {
+                                            UserError.Log.d(TAG, "VUP: Trying to open channel to send apk");
+                                            ChannelApi.OpenChannelResult result = Wearable.ChannelApi.openChannel(googleApiClient, mWearNodeId, "/updated-apk").await();
 
-                                        if (mWearNodeId != null) {
-                                            // TODO limit to 120
-                                            UserError.Log.d(TAG, "VUP: nodeid is now not null");
-                                            if (apkBytes == null) {
-                                                UserError.Log.d(TAG, "VUP: getting bytes");
-                                                apkBytes = GetWearApk.getBytes();
-                                            }
-                                            if (apkBytes != null) {
-                                                UserError.Log.d(TAG, "VUP: Trying to open channel to send apk");
-                                                ChannelApi.OpenChannelResult result = Wearable.ChannelApi.openChannel(googleApiClient, mWearNodeId, "/updated-apk").await();
+                                            final Channel channel = result.getChannel();
+                                            if (channel != null) {
 
-                                                final Channel channel = result.getChannel();
-                                                if (channel != null) {
+                                                channel.getOutputStream(googleApiClient).setResultCallback(getOutputStreamResult -> {
+                                                    Log.d(TAG, "VUP: channel get outputstream onResult:");
 
-                                                    channel.getOutputStream(googleApiClient).setResultCallback(new ResultCallback<Channel.GetOutputStreamResult>() {
-                                                        @Override
-                                                        public void onResult(final Channel.GetOutputStreamResult getOutputStreamResult) {
-                                                            Log.d(TAG, "VUP: channel get outputstream onResult:");
+                                                    // TODO recurse/retry a few times if we haven't sent anything?
+                                                    new Thread(() -> {
 
-
-                                                            // TODO recurse/retry a few times if we haven't sent anything?
-                                                            new Thread(new Runnable() {
-                                                                @Override
-                                                                public void run() {
-
-                                                                    OutputStream output = null;
-                                                                    try {
-                                                                        output = getOutputStreamResult.getOutputStream();
-                                                                        Log.d(TAG, "VUP: output stream opened");
-                                                                        // this protocol can never be changed
-                                                                        output.write((BuildConfig.VERSION_NAME + "\n").getBytes("UTF-8")); // version name
-                                                                        output.write((apkBytes.length + "\n").getBytes("UTF-8")); // total length
-                                                                        output.write((finalStartAt + "\n").getBytes("UTF-8")); // data starting from position
-                                                                        // send data
-                                                                        JoH.threadSleep(5000);
-                                                                        Log.d(TAG, "VUP: sending data");
-                                                                        // TODO stagger write?  await confirmation from far end to start xmit??
-                                                                        output.write(apkBytes, finalStartAt, apkBytes.length - finalStartAt);
-                                                                        output.flush();
-                                                                        output.write(new byte[64000]); // seems to need some kind of padding
-                                                                        JoH.threadSleep(5000);
-                                                                        Log.d(TAG, "VUP: sent bytes: " + (apkBytes.length - finalStartAt));
-                                                                    } catch (final IOException e) {
-                                                                        Log.w(TAG, "VUP: could not send message: " + "Node: " + channel.getNodeId() + "Path: " + channel.getPath() + " Error message: " + e.getMessage() + " Error cause: " + e.getCause());
-                                                                    } finally {
-                                                                        try {
-                                                                            Log.w(TAG, "VUP: Closing output stream");
-                                                                            if (output != null) {
-                                                                                output.close();
-                                                                            }
-                                                                        } catch (final IOException e) {
-                                                                            Log.w(TAG, "VUP: could not close Output Stream: " + "Node ID: " + channel.getNodeId() + " Path: " + channel.getPath() + " Error message: " + e.getMessage() + " Error cause: " + e.getCause());
-                                                                        } finally {
-                                                                            channel.close(googleApiClient);
-                                                                        }
-                                                                    }
-
+                                                        OutputStream output = null;
+                                                        try {
+                                                            output = getOutputStreamResult.getOutputStream();
+                                                            Log.d(TAG, "VUP: output stream opened");
+                                                            // this protocol can never be changed
+                                                            output.write((BuildConfig.VERSION_NAME + "\n").getBytes(StandardCharsets.UTF_8)); // version name
+                                                            output.write((apkBytes.length + "\n").getBytes(StandardCharsets.UTF_8)); // total length
+                                                            output.write((finalStartAt + "\n").getBytes(StandardCharsets.UTF_8)); // data starting from position
+                                                            // send data
+                                                            JoH.threadSleep(5000);
+                                                            Log.d(TAG, "VUP: sending data");
+                                                            // TODO stagger write?  await confirmation from far end to start xmit??
+                                                            output.write(apkBytes, finalStartAt, apkBytes.length - finalStartAt);
+                                                            output.flush();
+                                                            output.write(new byte[64000]); // seems to need some kind of padding
+                                                            JoH.threadSleep(5000);
+                                                            Log.d(TAG, "VUP: sent bytes: " + (apkBytes.length - finalStartAt));
+                                                        } catch (final IOException e) {
+                                                            Log.w(TAG, "VUP: could not send message: " + "Node: " + channel.getNodeId() + "Path: " + channel.getPath() + " Error message: " + e.getMessage() + " Error cause: " + e.getCause());
+                                                        } finally {
+                                                            try {
+                                                                Log.w(TAG, "VUP: Closing output stream");
+                                                                if (output != null) {
+                                                                    output.close();
                                                                 }
-                                                            }).start();
-
+                                                            } catch (final IOException e) {
+                                                                Log.w(TAG, "VUP: could not close Output Stream: " + "Node ID: " + channel.getNodeId() + " Path: " + channel.getPath() + " Error message: " + e.getMessage() + " Error cause: " + e.getCause());
+                                                            } finally {
+                                                                channel.close(googleApiClient);
+                                                            }
                                                         }
-                                                    });
-                                                } else {
-                                                    UserError.Log.d(TAG, "VUP: Could not send wearable apk as Channel result was null!");
-                                                }
+
+                                                    }).start();
+
+                                                });
+                                            } else {
+                                                UserError.Log.d(TAG, "VUP: Could not send wearable apk as Channel result was null!");
                                             }
-                                        } else {
-                                            Log.d(TAG, "VUP: Could not send wearable apk as nodeid is currently null");
                                         }
+                                    } else {
+                                        Log.d(TAG, "VUP: Could not send wearable apk as nodeid is currently null");
                                     }
                                 }).start();
                             }
@@ -1686,14 +1614,11 @@ public class WatchUpdaterService extends WearableListenerService implements
 
             final PendingResult result = Wearable.DataApi.putDataItem(googleApiClient, request.asPutDataRequest());
 
-            result.setResultCallback(new ResultCallback<DataApi.DataItemResult>() {
-                @Override
-                public void onResult(DataApi.DataItemResult sendMessageResult) {
-                    if (!sendMessageResult.getStatus().isSuccess()) {
-                        UserError.Log.e(TAG, "ERROR: failed to sendblob Status=" + sendMessageResult.getStatus().getStatusMessage());
-                    } else {
-                        UserError.Log.i(TAG, "Sendblob  Status=: " + sendMessageResult.getStatus().getStatusMessage());
-                    }
+            result.setResultCallback((ResultCallback<DataItemResult>) sendMessageResult -> {
+                if (!sendMessageResult.getStatus().isSuccess()) {
+                    UserError.Log.e(TAG, "ERROR: failed to sendblob Status=" + sendMessageResult.getStatus().getStatusMessage());
+                } else {
+                    UserError.Log.i(TAG, "Sendblob  Status=: " + sendMessageResult.getStatus().getStatusMessage());
                 }
             });
 
@@ -1707,8 +1632,8 @@ public class WatchUpdaterService extends WearableListenerService implements
 
     // sending to watch - beware we munge the calculated value and replace with display glucose
     private DataMap dataMap(BgReading bg, SharedPreferences sPrefs, BgGraphBuilder bgGraphBuilder, int battery) {
-        Double highMark = Double.parseDouble(sPrefs.getString("highValue", "170"));
-        Double lowMark = Double.parseDouble(sPrefs.getString("lowValue", "70"));
+        double highMark = Double.parseDouble(sPrefs.getString("highValue", "170"));
+        double lowMark = Double.parseDouble(sPrefs.getString("lowValue", "70"));
         DataMap dataMap = new DataMap();
 
         //int battery = BgSendQueue.getBatteryLevel(getApplicationContext());
@@ -1841,8 +1766,8 @@ public class WatchUpdaterService extends WearableListenerService implements
         dataMap.putBoolean("use_wear_health", mPrefs.getBoolean("use_pebble_health", true));
         is_using_bt = DexCollectionType.hasBluetooth();
 
-        Double highMark = Double.parseDouble(mPrefs.getString("highValue", "170"));
-        Double lowMark = Double.parseDouble(mPrefs.getString("lowValue", "70"));
+        double highMark = Double.parseDouble(mPrefs.getString("highValue", "170"));
+        double lowMark = Double.parseDouble(mPrefs.getString("lowValue", "70"));
         Log.d(TAG, "sendPrefSettings enable_wearG5: " + enable_wearG5 + " force_wearG5:" + force_wearG5 + " node_wearG5:" + node_wearG5 + " dex_collection_method:" + dexCollector);
         dataMap.putLong("time", new Date().getTime()); // MOST IMPORTANT LINE FOR TIMESTAMP
         dataMap.putString("dex_txid", mPrefs.getString("dex_txid", "ABCDEF"));
@@ -1990,7 +1915,7 @@ public class WatchUpdaterService extends WearableListenerService implements
                 DataMap entries = new DataMap();
                 entries.putLong("time", new Date().getTime()); // MOST IMPORTANT LINE FOR TIMESTAMP
                 entries.putString("action", "delete");
-                entries.putStringArrayList("entries", (new ArrayList<String>(list)));
+                entries.putStringArrayList("entries", (new ArrayList<>(list)));
                 new SendToDataLayerThread(WEARABLE_TREATMENTS_DATA_PATH, googleApiClient).executeOnExecutor(xdrip.executor, entries);
             } else
                 Log.d(TAG, "sendWearTreatmentsDataDelete treatments count = 0");
@@ -2304,8 +2229,8 @@ public class WatchUpdaterService extends WearableListenerService implements
     }
 
     private long sgvLevel(double sgv_double, SharedPreferences prefs, BgGraphBuilder bgGB) {
-        Double highMark = Double.parseDouble(prefs.getString("highValue", "170"));
-        Double lowMark = Double.parseDouble(prefs.getString("lowValue", "70"));
+        double highMark = Double.parseDouble(prefs.getString("highValue", "170"));
+        double lowMark = Double.parseDouble(prefs.getString("lowValue", "70"));
         if (bgGB.unitized(sgv_double) >= highMark) {
             return 1;
         } else if (bgGB.unitized(sgv_double) >= lowMark) {
@@ -2348,7 +2273,7 @@ public class WatchUpdaterService extends WearableListenerService implements
     }
 
     @Override
-    public void onConnectionFailed(ConnectionResult connectionResult) {
+    public void onConnectionFailed(@NonNull ConnectionResult connectionResult) {
     }
 
     public static boolean isEnabled() {

@@ -51,7 +51,7 @@ public final class PackageUtilities
      */
     private static Set<String> constructPackageSet()
     {
-        final HashSet<String> packages = new HashSet<String>();
+        final HashSet<String> packages = new HashSet<>();
 
         packages.add(Constants.LOCALE_PACKAGE);
 

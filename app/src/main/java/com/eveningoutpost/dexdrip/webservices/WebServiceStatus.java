@@ -2,15 +2,15 @@ package com.eveningoutpost.dexdrip.webservices;
 
 import android.util.Log;
 
-import com.eveningoutpost.dexdrip.Models.JoH;
-import com.eveningoutpost.dexdrip.Models.UserError;
-import com.eveningoutpost.dexdrip.UtilityModels.Constants;
-import com.eveningoutpost.dexdrip.UtilityModels.Pref;
+import com.eveningoutpost.dexdrip.models.JoH;
+import com.eveningoutpost.dexdrip.models.UserError;
+import com.eveningoutpost.dexdrip.utilitymodels.Constants;
+import com.eveningoutpost.dexdrip.utilitymodels.Pref;
 
 import org.json.JSONException;
 import org.json.JSONObject;
 
-import static com.eveningoutpost.dexdrip.Models.JoH.tolerantParseDouble;
+import static com.eveningoutpost.dexdrip.models.JoH.tolerantParseDouble;
 
 /**
  * Created by jamorham on 04/02/2018.
@@ -18,7 +18,7 @@ import static com.eveningoutpost.dexdrip.Models.JoH.tolerantParseDouble;
 
 public class WebServiceStatus extends BaseWebService {
 
-    private static String TAG = "WebServiceStatus";
+    private static String TAG = WebServiceStatus.class.getSimpleName();
 
     // process the request and produce a response object
     public WebResponse request(String query) {

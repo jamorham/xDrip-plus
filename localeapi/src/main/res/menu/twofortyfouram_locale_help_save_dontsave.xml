@@ -14,6 +14,7 @@
 -->
 
 <menu xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     tools:ignore="UnusedResources" >
 
@@ -22,7 +23,7 @@
     <item
         android:id="@id/twofortyfouram_locale_menu_dontsave"
         android:icon="@drawable/twofortyfouram_locale_ic_menu_dontsave"
-        android:showAsAction="ifRoom|withText"
+        app:showAsAction="ifRoom|withText"
         android:title="@string/twofortyfouram_locale_menu_dontsave"/>
 
     <!--
@@ -33,7 +34,7 @@
     <item
         android:id="@id/twofortyfouram_locale_menu_save"
         android:icon="@drawable/twofortyfouram_locale_ic_menu_save"
-        android:showAsAction="ifRoom|withText"
+        app:showAsAction="ifRoom|withText"
         android:title="@string/twofortyfouram_locale_menu_save"/>
 
     <!-- Menu item to launch the Help. It should launch the web browser using ACTION_VIEW with the data set to a URL. -->
@@ -41,7 +42,7 @@
     <item
         android:id="@id/twofortyfouram_locale_menu_help"
         android:icon="@drawable/twofortyfouram_locale_ic_menu_help"
-        android:showAsAction="never"
+        app:showAsAction="never"
         android:title="@string/twofortyfouram_locale_menu_help"
         android:visible="false"/>
 

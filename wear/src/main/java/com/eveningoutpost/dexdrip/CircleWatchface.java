@@ -1,48 +1,24 @@
 package com.eveningoutpost.dexdrip;
 
-import android.content.BroadcastReceiver;
-import android.content.Context;
-import android.content.Intent;
-import android.content.IntentFilter;
-import android.content.SharedPreferences;
-import android.graphics.Canvas;
-import android.graphics.Color;
-import android.graphics.LinearGradient;
-import android.graphics.Matrix;
-import android.graphics.Paint;
-import android.graphics.Point;
-import android.graphics.RectF;
-import android.graphics.Shader;
-import android.os.Bundle;
-import android.os.PowerManager;
-import android.preference.PreferenceManager;
-import android.support.v4.content.LocalBroadcastManager;
-import android.support.wearable.watchface.WatchFaceStyle;
-import android.util.Log;
-import android.util.TypedValue;
-import android.view.Display;
-import android.view.Gravity;
-import android.view.LayoutInflater;
-import android.view.View;
-import android.view.WindowManager;
-import android.widget.Button;
-import android.widget.LinearLayout;
-import android.widget.TextView;
+import android.content.*;
+import android.graphics.*;
+import android.os.*;
+import android.preference.*;
+import android.support.wearable.watchface.*;
+import android.util.*;
+import android.view.*;
+import android.widget.*;
 
-import com.eveningoutpost.dexdrip.Models.JoH;
-import com.eveningoutpost.dexdrip.UtilityModels.BgSendQueue;
-import com.google.android.gms.wearable.DataMap;
-import com.ustwo.clockwise.wearable.WatchFace;
-import com.ustwo.clockwise.common.WatchFaceTime;
+import androidx.localbroadcastmanager.content.*;
 
-import java.text.DecimalFormat;
-import java.util.ArrayList;
-import java.util.Calendar;
-import java.util.Collections;
-import java.util.Date;
-import java.util.HashSet;
-import java.util.TreeSet;
+import com.eveningoutpost.dexdrip.models.*;
+import com.eveningoutpost.dexdrip.utilitymodels.*;
+import com.google.android.gms.wearable.*;
+import com.ustwo.clockwise.common.*;
+import com.ustwo.clockwise.wearable.*;
 
+import java.text.*;
+import java.util.*;
 
 public class CircleWatchface extends WatchFace implements SharedPreferences.OnSharedPreferenceChangeListener {
     private final static String TAG = CircleWatchface.class.getSimpleName();
@@ -107,7 +83,7 @@ public class CircleWatchface extends WatchFace implements SharedPreferences.OnSh
         super.onCreate();
 
         PowerManager powerManager = (PowerManager) getSystemService(POWER_SERVICE);
-        final PowerManager.WakeLock wakeLock = powerManager.newWakeLock(PowerManager.PARTIAL_WAKE_LOCK, "CreateWakelock");
+        final PowerManager.WakeLock wakeLock = powerManager.newWakeLock(PowerManager.PARTIAL_WAKE_LOCK, ":CreateWakelock");
         wakeLock.acquire(30000);
         try {
 
@@ -211,7 +187,7 @@ public class CircleWatchface extends WatchFace implements SharedPreferences.OnSh
         String previous = "";
         if (sharedPrefs.getBoolean("showSteps", false)) {
             stepsButton.setVisibility(View.VISIBLE);
-            current = String.format("%d", mStepsCount);
+            current = String.format(Locale.getDefault(), "%d", mStepsCount);
             previous = String.valueOf(stepsButton.getText());
             if (!previous.equals(current)) {
                 changed = true;
@@ -420,9 +396,7 @@ public class CircleWatchface extends WatchFace implements SharedPreferences.OnSh
         removePaint.setAntiAlias(true);
         removePaint.setColor(getBackgroundColor());
 
-        ;
-
-        rect = new RectF(PADDING, PADDING, (float) (displaySize.x - PADDING), (float) (displaySize.y - PADDING));
+	    rect = new RectF(PADDING, PADDING, (float) (displaySize.x - PADDING), (float) (displaySize.y - PADDING));
         rectDelete = new RectF(PADDING - CIRCLE_WIDTH / 2, PADDING - CIRCLE_WIDTH / 2, (float) (displaySize.x - PADDING + CIRCLE_WIDTH / 2), (float) (displaySize.y - PADDING + CIRCLE_WIDTH / 2));
         overlapping = ALWAYS_HIGHLIGT_SMALL || areOverlapping(angleSMALL, angleSMALL + SMALL_HAND_WIDTH + NEAR, angleBig, angleBig + BIG_HAND_WIDTH + NEAR);
         Log.d(TAG, "CircleWatchface end prepareDrawTime");
@@ -448,7 +422,7 @@ public class CircleWatchface extends WatchFace implements SharedPreferences.OnSh
     protected void onTimeChanged(WatchFaceTime oldTime, WatchFaceTime newTime) {
         if (oldTime.hasMinuteChanged(newTime)) {
             PowerManager powerManager = (PowerManager) getSystemService(POWER_SERVICE);
-            PowerManager.WakeLock wakeLock = powerManager.newWakeLock(PowerManager.PARTIAL_WAKE_LOCK, "TimeChangedWakelock");
+            PowerManager.WakeLock wakeLock = powerManager.newWakeLock(PowerManager.PARTIAL_WAKE_LOCK, ":TimeChangedWakelock");
             wakeLock.acquire(30000);
             /*Preparing the layout just on every minute tick:
             *  - hopefully better battery life

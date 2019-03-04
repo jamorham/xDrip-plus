@@ -11,9 +11,9 @@ import android.widget.Toast;
 
 import com.activeandroid.Cache;
 import com.activeandroid.Configuration;
-import com.eveningoutpost.dexdrip.Models.JoH;
-import com.eveningoutpost.dexdrip.Models.UserError.Log;
-import com.eveningoutpost.dexdrip.UtilityModels.Pref;
+import com.eveningoutpost.dexdrip.models.JoH;
+import com.eveningoutpost.dexdrip.models.UserError.Log;
+import com.eveningoutpost.dexdrip.utilitymodels.Pref;
 
 import java.io.BufferedInputStream;
 import java.io.BufferedOutputStream;
@@ -41,12 +41,7 @@ public class DatabaseUtil {
     private static final Handler handler = new Handler(Looper.getMainLooper());
 
     private static void toastText(final Context context, final String text) {
-        handler.post(new Runnable() {
-            @Override
-            public void run() {
-                Toast.makeText(context, text, Toast.LENGTH_LONG).show();
-            }
-        });
+        handler.post(() -> Toast.makeText(context, text, Toast.LENGTH_LONG).show());
     }
 
     public static String saveSql(Context context) {
@@ -71,15 +66,10 @@ public class DatabaseUtil {
             final String dir = getExternalDir();
             makeSureDirectoryExists(dir);
 
-            final StringBuilder sb = new StringBuilder();
-            sb.append(dir);
-            //sb.append("/export");
+	        //sb.append("/export");
             // TecMunky 6/23/17 replace "/export" with "/" and prefix
-            sb.append("/");
-            sb.append(prefix);
-            sb.append(DateFormat.format("yyyyMMdd-kkmmss", System.currentTimeMillis()));
-            sb.append(".zip");
-            zipFilename = sb.toString();
+	        String sb = dir + "/" + prefix + DateFormat.format("yyyyMMdd-kkmmss", System.currentTimeMillis()) + ".zip";
+	        zipFilename = sb;
             final File sd = Environment.getExternalStorageDirectory();
             if (sd.canWrite()) {
                 final File currentDB = context.getDatabasePath(databaseName);
@@ -92,7 +82,7 @@ public class DatabaseUtil {
                     zipOutputStream = new ZipOutputStream(new BufferedOutputStream(foStream));
                     zipOutputStream.putNextEntry(new ZipEntry(prefix + DateFormat.format("yyyyMMdd-kkmmss", System.currentTimeMillis()) + ".sqlite"));
 
-                    byte buffer[] = new byte[BUFFER_SIZE];
+	                byte[] buffer = new byte[BUFFER_SIZE];
                     int count;
                     while ((count = biStream.read(buffer, 0, BUFFER_SIZE)) != -1) {
                         zipOutputStream.write(buffer, 0, count);
@@ -144,13 +134,8 @@ public class DatabaseUtil {
             final String dir = getExternalDir();
             makeSureDirectoryExists(dir);
 
-            final StringBuilder sb = new StringBuilder();
-            sb.append(dir);
-            sb.append("/export");
-            sb.append(DateFormat.format("yyyyMMdd-kkmmss", System.currentTimeMillis()));
-            sb.append(".sqlite");
-
-            filename = sb.toString();
+            String sb = dir + "/export" + DateFormat.format("yyyyMMdd-kkmmss", System.currentTimeMillis()) + ".sqlite";
+            filename = sb;
             final File sd = Environment.getExternalStorageDirectory();
             if (sd.canWrite()) {
                 final File currentDB = context.getDatabasePath(databaseName);
@@ -215,12 +200,8 @@ public class DatabaseUtil {
             final String dir = getExternalDir();
             makeSureDirectoryExists(dir);
 
-            final StringBuilder sb = new StringBuilder();
-            sb.append(dir);
-            sb.append("/exportCSV");
-            sb.append(DateFormat.format("yyyyMMdd-kkmmss", System.currentTimeMillis()));
-            sb.append(".zip");
-            zipFilename = sb.toString();
+            String sb = dir + "/exportCSV" + DateFormat.format("yyyyMMdd-kkmmss", System.currentTimeMillis()) + ".zip";
+            zipFilename = sb;
             final File sd = Environment.getExternalStorageDirectory();
             if (sd.canWrite()) {
                 final File zipOutputFile = new File(zipFilename);

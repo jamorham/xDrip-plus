@@ -1,10 +1,10 @@
 <?xml version="1.0" encoding="utf-8"?>
-<android.support.constraint.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".profileeditor.BasalProfileEditor">
+    tools:context=".profileEditor.BasalProfileEditor">
 
 
     <EditText
@@ -13,8 +13,8 @@
         android:layout_height="wrap_content"
         android:layout_marginEnd="8dp"
         android:ems="4"
-        android:minWidth="50dp"
         android:inputType="numberDecimal"
+        android:minWidth="50dp"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintTop_toTopOf="parent"
         tools:layout_editor_absoluteY="0dp" />
@@ -24,10 +24,10 @@
         android:id="@+id/basalPlusButton"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:minWidth="10dp"
         android:layout_marginEnd="4dp"
-        android:text="+X"
+        android:minWidth="10dp"
         android:onClick="basalButtonPlus"
+        android:text="+X"
         app:layout_constraintEnd_toStartOf="@+id/basalMinusButton"
         app:layout_constraintTop_toTopOf="parent"
         tools:layout_editor_absoluteY="0dp" />
@@ -37,9 +37,9 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginEnd="4dp"
-        android:text="-X"
         android:minWidth="10dp"
         android:onClick="basalButtonMinus"
+        android:text="-X"
         app:layout_constraintEnd_toStartOf="@+id/basalSetButton"
         app:layout_constraintTop_toTopOf="parent"
         tools:layout_editor_absoluteY="0dp" />
@@ -49,8 +49,8 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginEnd="4dp"
-        android:text="@string/set"
         android:onClick="onBasalSet"
+        android:text="@string/set"
         app:layout_constraintEnd_toStartOf="@+id/basalSetText"
         app:layout_constraintTop_toTopOf="parent"
         tools:layout_editor_absoluteY="0dp" />
@@ -60,9 +60,9 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginStart="8dp"
+        app:layout_constraintEnd_toStartOf="@+id/basalStepLabel"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintEnd_toStartOf="@+id/basalStepLabel"/>
+        app:layout_constraintTop_toTopOf="parent" />
 
     <TextView
         android:id="@+id/basalStepLabel"
@@ -79,9 +79,8 @@
         android:id="@+id/basalStepSpinner"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintStart_toEndOf="@+id/basalStepLabel"
-         />
+        app:layout_constraintTop_toTopOf="parent" />
 
     <LinearLayout
         android:layout_width="match_parent"
@@ -101,4 +100,4 @@
             app:layout_constraintTop_toBottomOf="@+id/basalSetButton" />
     </LinearLayout>
 
-</android.support.constraint.ConstraintLayout>
+</androidx.constraintlayout.widget.ConstraintLayout>

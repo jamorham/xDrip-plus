@@ -4,8 +4,8 @@ package com.eveningoutpost.dexdrip.tidepool;
 
 // lightweight class entry point
 
-import com.eveningoutpost.dexdrip.Models.JoH;
-import com.eveningoutpost.dexdrip.UtilityModels.Pref;
+import com.eveningoutpost.dexdrip.models.JoH;
+import com.eveningoutpost.dexdrip.utilitymodels.Pref;
 
 public class TidepoolEntry {
 

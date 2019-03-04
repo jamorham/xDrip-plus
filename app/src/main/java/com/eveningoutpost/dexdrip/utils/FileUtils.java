@@ -1,16 +1,14 @@
 package com.eveningoutpost.dexdrip.utils;
 
-import android.content.Context;
-import android.os.Environment;
+import android.content.*;
+import android.os.*;
 
-import java.io.File;
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.text.SimpleDateFormat;
-import java.util.Date;
+import com.eveningoutpost.dexdrip.models.*;
+import com.eveningoutpost.dexdrip.*;
 
-import com.eveningoutpost.dexdrip.xdrip;
-import com.eveningoutpost.dexdrip.Models.UserError;
+import java.io.*;
+import java.text.*;
+import java.util.*;
 
 public class FileUtils {
 
@@ -20,11 +18,8 @@ public class FileUtils {
 	}
 
 	public static String getExternalDir() {
-		final StringBuilder sb = new StringBuilder();
-		sb.append( Environment.getExternalStorageDirectory().getAbsolutePath() );
-		sb.append( "/xdrip" );
 
-		final String dir = sb.toString();
+		final String dir = Environment.getExternalStorageDirectory().getAbsolutePath() + "/xdrip";
 		return dir;
 	}
 

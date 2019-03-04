@@ -3,8 +3,8 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical"
-    android:paddingEnd="15dp"
-    android:paddingStart="15dp">
+    android:paddingStart="15dp"
+    android:paddingEnd="15dp">
 
     <EditText
         android:id="@+id/dialogTextEntryeditText"

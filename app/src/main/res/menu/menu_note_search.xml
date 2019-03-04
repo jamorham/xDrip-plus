@@ -1,14 +1,16 @@
 <?xml version="1.0" encoding="utf-8"?>
 <menu xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:xdrip="http://schemas.android.com/apk/res-auto">
-    <item android:id="@+id/menu_searchnote"
-        android:title="@string/note_search_button"
+    <item
+        android:id="@+id/menu_searchnote"
         android:checkable="false"
         android:orderInCategory="1"
-        android:showAsAction="ifRoom|withText"/>
-    <item android:id="@+id/menu_allnote"
+        android:title="@string/note_search_button"
+        xdrip:showAsAction="ifRoom|withText" />
+    <item
+        android:id="@+id/menu_allnote"
         android:checkable="false"
-        android:title="@string/all_note_button"
         android:orderInCategory="100"
-        android:showAsAction="ifRoom|withText"/>
+        android:title="@string/all_note_button"
+        xdrip:showAsAction="ifRoom|withText" />
 </menu>

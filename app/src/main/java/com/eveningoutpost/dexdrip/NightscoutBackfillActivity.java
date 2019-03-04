@@ -1,27 +1,21 @@
 package com.eveningoutpost.dexdrip;
 
-import android.os.Bundle;
-import android.os.PowerManager;
-import android.support.v4.widget.DrawerLayout;
-import android.support.v7.app.AppCompatActivity;
-import android.view.View;
-import android.widget.Button;
+import android.os.*;
+import android.view.*;
+import android.widget.*;
 
-import com.eveningoutpost.dexdrip.Models.BgReading;
-import com.eveningoutpost.dexdrip.Models.JoH;
-import com.eveningoutpost.dexdrip.Models.Treatments;
-import com.eveningoutpost.dexdrip.Services.SyncService;
-import com.eveningoutpost.dexdrip.UtilityModels.Constants;
-import com.eveningoutpost.dexdrip.UtilityModels.UploaderTask;
-import com.eveningoutpost.dexdrip.UtilityModels.PersistentStore;
-import com.eveningoutpost.dexdrip.UtilityModels.UploaderQueue;
-import com.eveningoutpost.dexdrip.profileeditor.DatePickerFragment;
-import com.eveningoutpost.dexdrip.profileeditor.ProfileAdapter;
+import androidx.appcompat.app.*;
+import androidx.drawerlayout.widget.*;
 
-import java.text.SimpleDateFormat;
-import java.util.Calendar;
-import java.util.List;
-import static com.eveningoutpost.dexdrip.xdrip.gs;
+import com.eveningoutpost.dexdrip.models.*;
+import com.eveningoutpost.dexdrip.services.*;
+import com.eveningoutpost.dexdrip.utilitymodels.*;
+import com.eveningoutpost.dexdrip.profileEditor.*;
+
+import java.text.*;
+import java.util.*;
+
+import static com.eveningoutpost.dexdrip.xdrip.*;
 
 /**
  * Created by jamorham on 23/05/2017.
@@ -61,7 +55,7 @@ public class NightscoutBackfillActivity extends AppCompatActivity implements Nav
         xdrip.checkForcedEnglish(this);
         setTitle("Nightscout Backfill");
         super.onResume();
-        mNavigationDrawerFragment = (NavigationDrawerFragment) getFragmentManager().findFragmentById(R.id.navigation_drawer);
+        mNavigationDrawerFragment = (NavigationDrawerFragment) getSupportFragmentManager().findFragmentById(R.id.navigation_drawer);
         mNavigationDrawerFragment.setUp(R.id.navigation_drawer, (DrawerLayout) findViewById(R.id.drawer_layout), "Nightscout Backfill", this);
 
         if (JoH.msSince(locked) < Constants.HOUR_IN_MS) {
@@ -85,53 +79,47 @@ public class NightscoutBackfillActivity extends AppCompatActivity implements Nav
         datePickerFragment.setAllowFuture(false);
         datePickerFragment.setInitiallySelectedDate(calendar.getTimeInMillis());
         datePickerFragment.setTitle("How far back?");
-        datePickerFragment.setDateCallback(new ProfileAdapter.DatePickerCallbacks() {
-            @Override
-            public void onDateSet(int year, int month, int day) {
-                calendar.set(year, month, day);
-                updateDateButton();
-            }
+        datePickerFragment.setDateCallback((year, month, day) -> {
+            calendar.set(year, month, day);
+            updateDateButton();
         });
-        datePickerFragment.show(this.getFragmentManager(), "DatePicker");
+        datePickerFragment.show(this.getSupportFragmentManager(), "DatePicker");
     }
 
     public synchronized void backfillRun(View v) {
         locked = JoH.tsl();
         doitButton.setVisibility(View.INVISIBLE);
         JoH.static_toast_long(gs(R.string.please_wait));
-        new Thread(new Runnable() {
-            @Override
-            public void run() {
-                final PowerManager.WakeLock wl = JoH.getWakeLock("nightscout-backfill", 600000);
-                try {
-                    final List<BgReading> the_readings = BgReading.latestForGraphAsc(500000, calendar.getTimeInMillis(), JoH.tsl());
-                    if ((the_readings != null) && (the_readings.size() > 0)) {
-                        PersistentStore.setBoolean(UploaderTask.BACKFILLING_BOOSTER, true);
-                        long bgcount = the_readings.size();
-                        long trcount = 0;
-                        for (BgReading bg : the_readings) {
-                            UploaderQueue.newEntry("update", bg);
-                        }
-
-                        final List<Treatments> the_treatments = Treatments.latestForGraph(50000, calendar.getTimeInMillis(), JoH.tsl());
-                        if ((the_treatments != null) && (the_treatments.size() > 0)) {
-                            trcount = the_treatments.size();
-                            for (Treatments tr : the_treatments) {
-                                UploaderQueue.newEntry("update", tr);
-                            }
-                        }
-
-                        // TODO Calibrations? Blood tests?
-
-                        JoH.static_toast_long("Queued " + bgcount + " glucose readings and " + trcount + " treatments!");
-                        SyncService.startSyncService(500);
-                        locked = 0; // clear lock
-                    } else {
-                        JoH.static_toast_long(gs(R.string.didnt_find_any_glucose_readings_in_that_time_period));
+        new Thread(() -> {
+            final PowerManager.WakeLock wl = JoH.getWakeLock("nightscout-backfill", 600000);
+            try {
+                final List<BgReading> the_readings = BgReading.latestForGraphAsc(500000, calendar.getTimeInMillis(), JoH.tsl());
+                if ((the_readings != null) && (the_readings.size() > 0)) {
+                    PersistentStore.setBoolean(UploaderTask.BACKFILLING_BOOSTER, true);
+                    long bgcount = the_readings.size();
+                    long trcount = 0;
+                    for (BgReading bg : the_readings) {
+                        UploaderQueue.newEntry("update", bg);
                     }
-                } finally {
-                    JoH.releaseWakeLock(wl);
+
+                    final List<Treatments> the_treatments = Treatments.latestForGraph(50000, calendar.getTimeInMillis(), JoH.tsl());
+                    if ((the_treatments != null) && (the_treatments.size() > 0)) {
+                        trcount = the_treatments.size();
+                        for (Treatments tr : the_treatments) {
+                            UploaderQueue.newEntry("update", tr);
+                        }
+                    }
+
+                    // TODO Calibrations? Blood tests?
+
+                    JoH.static_toast_long("Queued " + bgcount + " glucose readings and " + trcount + " treatments!");
+                    SyncService.startSyncService(500);
+                    locked = 0; // clear lock
+                } else {
+                    JoH.static_toast_long(gs(R.string.didnt_find_any_glucose_readings_in_that_time_period));
                 }
+            } finally {
+                JoH.releaseWakeLock(wl);
             }
         }).start();
 

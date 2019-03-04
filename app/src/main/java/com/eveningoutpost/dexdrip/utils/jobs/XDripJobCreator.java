@@ -1,19 +1,21 @@
 package com.eveningoutpost.dexdrip.utils.jobs;
 
-import android.support.annotation.NonNull;
-import android.support.annotation.Nullable;
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 
-import com.eveningoutpost.dexdrip.Models.JoH;
-import com.eveningoutpost.dexdrip.Models.UserError;
+import com.eveningoutpost.dexdrip.models.JoH;
+import com.eveningoutpost.dexdrip.models.UserError;
 import com.evernote.android.job.Job;
 import com.evernote.android.job.JobCreator;
 import com.evernote.android.job.JobManager;
+
+
 
 // jamorham
 
 public class XDripJobCreator implements JobCreator {
 
-    private static final String TAG = "XDripJobCreator";
+    private static final String TAG = XDripJobCreator.class.getSimpleName();
     private static final boolean D = false;
 
     public XDripJobCreator() {

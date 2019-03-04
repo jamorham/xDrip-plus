@@ -12,12 +12,12 @@
 
 package com.eveningoutpost.dexdrip.localeTasker;
 
-import android.annotation.TargetApi;
-import android.app.Application;
-import android.os.Build;
-import android.util.Log;
+import android.annotation.*;
+import android.app.*;
+import android.os.*;
+import android.util.*;
 
-import com.eveningoutpost.dexdrip.BuildConfig;
+import com.eveningoutpost.dexdrip.*;
 
 /**
  * Implements an application object for the plug-in.
@@ -67,6 +67,6 @@ public final class PluginApplication extends Application
     private static void enableApiLevel11Debugging()
     {
         android.app.LoaderManager.enableDebugLogging(true);
-        android.app.FragmentManager.enableDebugLogging(true);
+        FragmentManager.enableDebugLogging(true);
     }
 }

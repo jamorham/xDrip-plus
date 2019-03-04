@@ -116,11 +116,11 @@
                     android:title="@string/hours_between_calibrations" />
                 <RingtonePreference
                     android:defaultValue="content://settings/system/notification_sound"
+                    android:dependency="calibration_notifications"
                     android:key="calibration_notification_sound"
                     android:ringtoneType="all"
                     android:showSilent="true"
                     android:summary="@string/calibrations_sound"
-                    android:dependency="calibration_notifications"
                     android:title="@string/calibration_request_sound" />
                 <CheckBoxPreference
                     android:defaultValue="true"
@@ -186,18 +186,18 @@
                         android:summary="@string/alert_minutes_reraise"
                         android:title="@string/alert_snooze" />
                     <CheckBoxPreference
+                        android:defaultValue="false"
                         android:dependency="bg_unclear_readings_alerts"
                         android:key="bg_unclear_readings_alert_enable_alerts_reraise"
-                        android:title="@string/reraise_before_snooze"
                         android:summary="@string/reraise_not_snoozed_sooner"
-                        android:defaultValue="false" />
+                        android:title="@string/reraise_before_snooze" />
                     <EditTextPreference
+                        android:defaultValue="60"
                         android:dependency="bg_unclear_readings_alert_enable_alerts_reraise"
                         android:key="bg_unclear_readings_alert_reraise_sec"
-                        android:title="@string/alert_reraise_time"
                         android:numeric="integer"
                         android:summary="@string/alert_seconds_reraise"
-                        android:defaultValue="60" />
+                        android:title="@string/alert_reraise_time" />
                 </PreferenceCategory>
 
                 <PreferenceCategory android:title="@string/category_falling_rising_bg">

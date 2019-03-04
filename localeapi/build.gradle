@@ -1,13 +1,13 @@
 apply plugin: 'com.android.library'
+
 android {
-    compileSdkVersion 23
-    buildToolsVersion '27.0.3'
+    compileSdkVersion 28
 
     defaultConfig {
         minSdkVersion 18
-        targetSdkVersion 18
+        targetSdkVersion 28
+        multiDexEnabled = true
     }
-
 
     buildTypes {
         release {
@@ -15,7 +15,12 @@ android {
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.txt'
         }
     }
+    compileOptions {
+        sourceCompatibility = '1.8'
+        targetCompatibility = '1.8'
+    }
 }
 
 dependencies {
+implementation 'androidx.appcompat:appcompat:1.1.0-alpha02'
 }

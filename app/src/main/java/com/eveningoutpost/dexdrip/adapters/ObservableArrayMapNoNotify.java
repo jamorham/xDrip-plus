@@ -15,9 +15,10 @@ package com.eveningoutpost.dexdrip.adapters;
  * limitations under the License.
  */
 
-import android.databinding.MapChangeRegistry;
-import android.databinding.ObservableMap;
-import android.support.v4.util.ArrayMap;
+import androidx.annotation.*;
+import androidx.databinding.MapChangeRegistry;
+import androidx.databinding.ObservableMap;
+import androidx.collection.ArrayMap;
 
 import java.util.Collection;
 
@@ -51,7 +52,7 @@ public class ObservableArrayMapNoNotify<K, V> extends ArrayMap<K, V> implements 
         }
     }
 
-    public V put(K k, V v) {
+    public V put(@NonNull K k, @NonNull V v) {
         V val = super.put(k, v);
         notifyChange(k);
         return v;
@@ -64,7 +65,7 @@ public class ObservableArrayMapNoNotify<K, V> extends ArrayMap<K, V> implements 
     }
 
     @Override
-    public boolean removeAll(Collection<?> collection) {
+    public boolean removeAll(@NonNull Collection<?> collection) {
         boolean removed = false;
         for (Object key : collection) {
             int index = indexOfKey(key);
@@ -77,7 +78,7 @@ public class ObservableArrayMapNoNotify<K, V> extends ArrayMap<K, V> implements 
     }
 
     @Override
-    public boolean retainAll(Collection<?> collection) {
+    public boolean retainAll(@NonNull Collection<?> collection) {
         boolean removed = false;
         for (int i = size() - 1; i >= 0; i--) {
             Object key = keyAt(i);

@@ -236,12 +236,12 @@
     <string name="xdrip_scanning_nfc">xDrip+ Scanning NFC</string>
     <string name="still_processing_previous_backfill_request">Still processing previous back-fill request!</string>
     <string name="please_wait">Please wait..</string>
-    <string name="didnt_find_any_glucose_readings_in_that_time_period">Didn't find any glucose readings in that time period</string>
+    <string name="didnt_find_any_glucose_readings_in_that_time_period">Didn\'t find any glucose readings in that time period</string>
     <string name="got_calibration_in_the_future__cannot_process">Got calibration in the future - cannot process!</string>
     <string name="remote_snooze">Remote snooze..</string>
     <string name="sensor_stopped">Sensor stopped</string>
     <string name="restarting_collector">Restarting Collector!</string>
-    <string name="follower_deleted_succesfully">Follower deleted succesfully</string>
+    <string name="follower_deleted_succesfully">Follower deleted successfully</string>
     <string name="failed_to_delete_follower">Failed to delete follower</string>
     <string name="input_not_found_cancelled">Input not found! Cancelled!</string>
     <string name="cancelled">Cancelled!</string>

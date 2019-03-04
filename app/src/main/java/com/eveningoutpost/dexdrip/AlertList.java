@@ -1,44 +1,31 @@
 package com.eveningoutpost.dexdrip;
 
-import android.app.Activity;
-import android.app.AlertDialog;
-import android.content.Context;
-import android.content.DialogInterface;
-import android.content.Intent;
-import android.content.SharedPreferences;
-import android.content.pm.PackageManager;
-import android.graphics.Paint;
-import android.media.Ringtone;
-import android.media.RingtoneManager;
-import android.net.Uri;
-import android.os.Build;
-import android.os.Bundle;
-import android.preference.PreferenceManager;
-import android.support.v4.app.ActivityCompat;
-import android.support.v4.content.ContextCompat;
-import android.view.View;
-import android.view.animation.Animation;
-import android.view.animation.AnimationUtils;
-import android.widget.AdapterView;
-import android.widget.Button;
-import android.widget.ListView;
-import android.widget.SimpleAdapter;
-import android.widget.TextView;
+import android.content.*;
+import android.content.DialogInterface.*;
+import android.content.pm.*;
+import android.graphics.*;
+import android.media.*;
+import android.net.*;
+import android.os.*;
+import android.preference.*;
+import android.view.*;
+import android.view.animation.*;
+import android.widget.*;
 
-import com.eveningoutpost.dexdrip.Models.AlertType;
-import com.eveningoutpost.dexdrip.Models.JoH;
-import com.eveningoutpost.dexdrip.Models.UserError.Log;
-import com.eveningoutpost.dexdrip.UtilityModels.AlertPlayer;
-import com.eveningoutpost.dexdrip.utils.ActivityWithMenu;
+import androidx.appcompat.app.*;
+import androidx.core.app.*;
+import androidx.core.content.*;
+
+import com.eveningoutpost.dexdrip.models.*;
+import com.eveningoutpost.dexdrip.models.UserError.*;
+import com.eveningoutpost.dexdrip.utilitymodels.*;
+import com.eveningoutpost.dexdrip.utils.*;
 
 import java.text.ParseException;
-import java.text.SimpleDateFormat;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.List;
+import java.text.*;
+import java.util.*;
 
-import static com.eveningoutpost.dexdrip.xdrip.gs;
+import static com.eveningoutpost.dexdrip.xdrip.*;
 
 public class AlertList extends ActivityWithMenu {
     ListView listViewLow;
@@ -63,9 +50,9 @@ public class AlertList extends ActivityWithMenu {
     }
 
     HashMap<String, String> createAlertMap(AlertType alert) {
-        HashMap<String, String> map = new HashMap<String, String>();
+        HashMap<String, String> map = new HashMap<>();
         String overrideSilentMode = "Override Silent Mode";
-        if (alert.override_silent_mode == false) {
+        if (!alert.override_silent_mode) {
             overrideSilentMode = "No Alert in Silent Mode";
         }
         // We use a - sign to tell that this text should be stiked through
@@ -86,7 +73,7 @@ public class AlertList extends ActivityWithMenu {
     }
 
     ArrayList<HashMap<String, String>> createAlertsMap(boolean above) {
-        ArrayList<HashMap<String, String>> feedList = new ArrayList<HashMap<String, String>>();
+        ArrayList<HashMap<String, String>> feedList = new ArrayList<>();
 
         List<AlertType> alerts = AlertType.getAll(above);
         for (AlertType alert : alerts) {
@@ -166,45 +153,32 @@ public class AlertList extends ActivityWithMenu {
         createLowAlert = (Button) findViewById(R.id.button_create_low);
         createHighAlert = (Button) findViewById(R.id.button_create_high);
 
-        createLowAlert.setOnClickListener(new View.OnClickListener() {
-            public void onClick(View v) {
-                xdrip.checkForcedEnglish(xdrip.getAppContext());
-                Intent myIntent = new Intent(AlertList.this, EditAlertActivity.class);
-                myIntent.putExtra("above", "false");
-                AlertList.this.startActivityForResult(myIntent, ADD_ALERT);
-            }
-
+        createLowAlert.setOnClickListener(v -> {
+            xdrip.checkForcedEnglish(xdrip.getAppContext());
+            Intent myIntent = new Intent(AlertList.this, EditAlertActivity.class);
+            myIntent.putExtra("above", "false");
+            AlertList.this.startActivityForResult(myIntent, ADD_ALERT);
         });
 
-        createHighAlert.setOnClickListener(new View.OnClickListener() {
-            public void onClick(View v) {
-                xdrip.checkForcedEnglish(xdrip.getAppContext());
-                Intent myIntent = new Intent(AlertList.this, EditAlertActivity.class);
-                myIntent.putExtra("above", "true");
-                AlertList.this.startActivityForResult(myIntent, ADD_ALERT);
-            }
+        createHighAlert.setOnClickListener(v -> {
+            xdrip.checkForcedEnglish(xdrip.getAppContext());
+            Intent myIntent = new Intent(AlertList.this, EditAlertActivity.class);
+            myIntent.putExtra("above", "true");
+            AlertList.this.startActivityForResult(myIntent, ADD_ALERT);
         });
     }
 
     void displayWarning() {
-        runOnUiThread(new Runnable() {
-            @Override
-            public void run() {
+        runOnUiThread(() -> {
 
-                if (!isFinishing()) {
-                    new AlertDialog.Builder(AlertList.this)
-                            .setTitle("Warning !")
-                            .setMessage("No active Low Alert exists, without this there will be no alert on low glucose! Please add or enable a low alert.")
-                            .setCancelable(false)
-                            .setPositiveButton(
-                                    "Ok",
-                                    new DialogInterface.OnClickListener() {
-                                        public void onClick(DialogInterface dialog, int id) {
-                                            dialog.cancel();
-                                        }
-                                    })
-                            .create().show();
-                }
+            if (!isFinishing()) {
+                new AlertDialog.Builder(AlertList.this)
+                        .setTitle("Warning !")
+                        .setMessage("No active Low Alert exists, without this there will be no alert on low glucose! Please add or enable a low alert.")
+                        .setCancelable(false)
+                        .setPositiveButton(
+                                "Ok", (OnClickListener) (dialog, id) -> dialog.cancel())
+                        .create().show();
             }
         });
 
@@ -229,15 +203,13 @@ public class AlertList extends ActivityWithMenu {
 
     void FillLists() {
         // We use a - sign to tell that this text should be stiked through
-        SimpleAdapter.ViewBinder vb = new SimpleAdapter.ViewBinder() {
-            public boolean setViewValue(View view, Object data, String textRepresentation) {
-                TextView tv = (TextView) view;
-                tv.setText(textRepresentation.substring(1));
-                if (textRepresentation.substring(0, 1).equals("-")) {
-                    tv.setPaintFlags(tv.getPaintFlags() | Paint.STRIKE_THRU_TEXT_FLAG);
-                }
-                return true;
+        SimpleAdapter.ViewBinder vb = (view, data, textRepresentation) -> {
+            TextView tv = (TextView) view;
+            tv.setText(textRepresentation.substring(1));
+            if (textRepresentation.substring(0, 1).equals("-")) {
+                tv.setPaintFlags(tv.getPaintFlags() | Paint.STRIKE_THRU_TEXT_FLAG);
             }
+            return true;
         };
 
         ArrayList<HashMap<String, String>> feedList;
@@ -285,7 +257,7 @@ public class AlertList extends ActivityWithMenu {
             if (ContextCompat.checkSelfPermission(getApplicationContext(),
                     android.Manifest.permission.WRITE_EXTERNAL_STORAGE)
                     != PackageManager.PERMISSION_GRANTED) {
-                final Activity activity = this;
+                final AppCompatActivity activity = this;
                 JoH.show_ok_dialog(activity, gs(R.string.please_allow_permission), msg, () -> ActivityCompat.requestPermissions(activity,
                         new String[]{android.Manifest.permission.WRITE_EXTERNAL_STORAGE}, MY_PERMISSIONS_REQUEST_STORAGE));
                 return false;

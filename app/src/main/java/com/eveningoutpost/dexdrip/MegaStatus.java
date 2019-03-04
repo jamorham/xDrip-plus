@@ -6,70 +6,43 @@ package com.eveningoutpost.dexdrip;
  * Multi-page plugin style status entry lists
  */
 
-import android.app.Activity;
-import android.app.Fragment;
-import android.app.FragmentManager;
-import android.app.PendingIntent;
-import android.content.BroadcastReceiver;
-import android.content.Context;
-import android.content.Intent;
-import android.content.IntentFilter;
-import android.graphics.Color;
-import android.os.Bundle;
-import android.support.v13.app.FragmentStatePagerAdapter;
-import android.support.v4.content.LocalBroadcastManager;
-import android.support.v4.view.ViewPager;
-import android.view.Gravity;
-import android.view.LayoutInflater;
-import android.view.Menu;
-import android.view.MenuItem;
-import android.view.View;
-import android.view.ViewGroup;
-import android.widget.BaseAdapter;
-import android.widget.LinearLayout;
-import android.widget.ListView;
-import android.widget.TextView;
+import android.app.*;
+import android.content.*;
+import android.graphics.*;
+import android.os.*;
+import android.view.*;
+import android.widget.*;
 
-import com.eveningoutpost.dexdrip.Models.DesertSync;
-import com.eveningoutpost.dexdrip.Models.JoH;
-import com.eveningoutpost.dexdrip.Models.RollCall;
-import com.eveningoutpost.dexdrip.Models.UserError;
-import com.eveningoutpost.dexdrip.Services.DexCollectionService;
-import com.eveningoutpost.dexdrip.Services.DoNothingService;
-import com.eveningoutpost.dexdrip.Services.G5CollectionService;
-import com.eveningoutpost.dexdrip.Services.Ob1G5CollectionService;
-import com.eveningoutpost.dexdrip.Services.WifiCollectionService;
-import com.eveningoutpost.dexdrip.UtilityModels.JamorhamShowcaseDrawer;
-import com.eveningoutpost.dexdrip.UtilityModels.PersistentStore;
-import com.eveningoutpost.dexdrip.UtilityModels.Pref;
-import com.eveningoutpost.dexdrip.UtilityModels.ShotStateStore;
-import com.eveningoutpost.dexdrip.UtilityModels.StatusItem;
-import com.eveningoutpost.dexdrip.UtilityModels.UploaderQueue;
-import com.eveningoutpost.dexdrip.cgm.medtrum.MedtrumCollectionService;
-import com.eveningoutpost.dexdrip.insulin.inpen.InPen;
-import com.eveningoutpost.dexdrip.insulin.inpen.InPenEntry;
-import com.eveningoutpost.dexdrip.insulin.inpen.InPenService;
-import com.eveningoutpost.dexdrip.utils.ActivityWithMenu;
-import com.eveningoutpost.dexdrip.utils.DexCollectionType;
-import com.eveningoutpost.dexdrip.watch.lefun.LeFunEntry;
-import com.eveningoutpost.dexdrip.watch.lefun.LeFunService;
-import com.eveningoutpost.dexdrip.wearintegration.WatchUpdaterService;
-import com.github.amlcurran.showcaseview.ShowcaseView;
-import com.github.amlcurran.showcaseview.targets.ViewTarget;
-import com.google.android.gms.wearable.DataMap;
+import androidx.annotation.*;
+import androidx.appcompat.app.*;
+import androidx.fragment.app.Fragment;
+import androidx.fragment.app.FragmentManager;
+import androidx.fragment.app.*;
+import androidx.localbroadcastmanager.content.*;
+import androidx.viewpager.widget.*;
 
-import java.util.ArrayList;
-import java.util.List;
+import com.eveningoutpost.dexdrip.models.*;
+import com.eveningoutpost.dexdrip.services.*;
+import com.eveningoutpost.dexdrip.utilitymodels.ShotStateStore;
+import com.eveningoutpost.dexdrip.utilitymodels.*;
+import com.eveningoutpost.dexdrip.cgm.medtrum.*;
+import com.eveningoutpost.dexdrip.insulin.inpen.*;
+import com.eveningoutpost.dexdrip.utils.*;
+import com.eveningoutpost.dexdrip.watch.lefun.*;
+import com.eveningoutpost.dexdrip.wearintegration.*;
+import com.github.amlcurran.showcaseview.*;
+import com.github.amlcurran.showcaseview.targets.*;
+import com.google.android.gms.wearable.*;
 
-import static com.eveningoutpost.dexdrip.Home.startWatchUpdaterService;
-import static com.eveningoutpost.dexdrip.utils.DexCollectionType.DexcomG5;
-import static com.eveningoutpost.dexdrip.utils.DexCollectionType.Medtrum;
-import static com.eveningoutpost.dexdrip.utils.DexCollectionType.isLibreOOPAlgorithm;
+import java.util.*;
+
+import static com.eveningoutpost.dexdrip.Home.*;
+import static com.eveningoutpost.dexdrip.utils.DexCollectionType.*;
 
 public class MegaStatus extends ActivityWithMenu {
 
 
-    private static Activity mActivity;
+    private static AppCompatActivity mActivity;
     private SectionsPagerAdapter mSectionsPagerAdapter;
 
     private static final String menu_name = "Mega Status";
@@ -227,7 +200,7 @@ public class MegaStatus extends ActivityWithMenu {
         sectionTitles.clear();
         populateSectionList();
 
-        mSectionsPagerAdapter = new SectionsPagerAdapter(getFragmentManager());
+        mSectionsPagerAdapter = new SectionsPagerAdapter(getSupportFragmentManager());
 
         mViewPager = (ViewPager) findViewById(R.id.container);
         mViewPager.setAdapter(mSectionsPagerAdapter);
@@ -374,47 +347,39 @@ public class MegaStatus extends ActivityWithMenu {
         final String title = "Swipe for Different Pages";
         final String message = "Swipe left and right to see different status tabs.\n\n";
         final ViewTarget target = new ViewTarget(R.id.pager_title_strip, this);
-        final Activity activity = this;
+        final AppCompatActivity activity = this;
 
-        JoH.runOnUiThreadDelayed(new Runnable() {
-                                     @Override
-                                     public void run() {
-                                         final ShowcaseView myShowcase = new ShowcaseView.Builder(activity)
+        JoH.runOnUiThreadDelayed(() -> {
+            final ShowcaseView myShowcase = new ShowcaseView.Builder(activity)
 
-                                                 .setTarget(target)
-                                                 .setStyle(R.style.CustomShowcaseTheme2)
-                                                 .setContentTitle(title)
-                                                 .setContentText("\n" + message)
-                                                 .setShowcaseDrawer(new JamorhamShowcaseDrawer(getResources(), getTheme(), size1, size2, 255))
-                                                 .singleShot(oneshot ? option : -1)
-                                                 .build();
-                                         myShowcase.setBackgroundColor(Color.TRANSPARENT);
-                                         myShowcase.show();
-                                     }
-                                 }
-                , 1500);
+                    .setTarget(target)
+                    .setStyle(R.style.CustomShowcaseTheme2)
+                    .setContentTitle(title)
+                    .setContentText("\n" + message)
+                    .setShowcaseDrawer(new JamorhamShowcaseDrawer(getResources(), getTheme(), size1, size2, 255))
+                    .singleShot(oneshot ? option : -1)
+                    .build();
+            myShowcase.setBackgroundColor(Color.TRANSPARENT);
+            myShowcase.show();
+        }, 1500);
     }
 
     private synchronized void startAutoFresh() {
         if (autoFreshRunning) return;
         autoStart = false;
-        if (autoRunnable == null) autoRunnable = new Runnable() {
-
-            @Override
-            public void run() {
-                try {
-                    if ((activityVisible) && (autoFreshRunning) && (currentPage != 0)) {
-                        MegaStatus.populate(MegaStatusAdapters.get(currentPage), sectionList.get(currentPage));
-                        requestWearCollectorStatus();
-                        JoH.runOnUiThreadDelayed(autoRunnable, autoFreshDelay);
-                    } else {
-                        UserError.Log.d(TAG, "AutoFresh shutting down");
-                        autoFreshRunning = false;
-                    }
-                } catch (Exception e) {
-                    UserError.Log.e(TAG, "Exception in auto-fresh: " + e);
+        if (autoRunnable == null) autoRunnable = () -> {
+            try {
+                if ((activityVisible) && (autoFreshRunning) && (currentPage != 0)) {
+                    MegaStatus.populate(MegaStatusAdapters.get(currentPage), sectionList.get(currentPage));
+                    requestWearCollectorStatus();
+                    JoH.runOnUiThreadDelayed(autoRunnable, autoFreshDelay);
+                } else {
+                    UserError.Log.d(TAG, "AutoFresh shutting down");
                     autoFreshRunning = false;
                 }
+            } catch (Exception e) {
+                UserError.Log.e(TAG, "Exception in auto-fresh: " + e);
+                autoFreshRunning = false;
             }
         };
         autoFreshRunning = true;
@@ -440,7 +405,7 @@ public class MegaStatus extends ActivityWithMenu {
         }
 
         @Override
-        public View onCreateView(LayoutInflater inflater, ViewGroup container,
+        public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container,
                                  Bundle savedInstanceState) {
 
 
@@ -618,16 +583,13 @@ public class MegaStatus extends ActivityWithMenu {
                             return true;
                         }
                     });*/
-                    view.setOnClickListener(new View.OnClickListener() {
-                        @Override
-                        public void onClick(View v) {
-                            try {
-                                runOnUiThread(row.runnable);
-                            } catch (Exception e) {
-                                //
-                            }
-
+                    view.setOnClickListener(v -> {
+                        try {
+                            runOnUiThread(row.runnable);
+                        } catch (Exception e) {
+                            //
                         }
+
                     });
                 } else {
                     view.setLongClickable(false);

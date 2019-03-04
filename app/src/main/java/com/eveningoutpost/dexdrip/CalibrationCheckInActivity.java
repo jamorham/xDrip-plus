@@ -1,17 +1,13 @@
 package com.eveningoutpost.dexdrip;
 
-import android.content.Intent;
-import android.os.Bundle;
+import android.content.*;
+import android.os.*;
+import android.widget.*;
 
-import com.eveningoutpost.dexdrip.Models.UserError.Log;
-
-import android.view.View;
-import android.widget.Button;
-import android.widget.Toast;
-
-import com.eveningoutpost.dexdrip.ImportedLibraries.dexcom.SyncingService;
-import com.eveningoutpost.dexdrip.Models.Sensor;
-import com.eveningoutpost.dexdrip.utils.ActivityWithMenu;
+import com.eveningoutpost.dexdrip.importedLibraries.dexcom.*;
+import com.eveningoutpost.dexdrip.models.*;
+import com.eveningoutpost.dexdrip.models.UserError.*;
+import com.eveningoutpost.dexdrip.utils.*;
 
 public class CalibrationCheckInActivity extends ActivityWithMenu {
     public static String menu_name = "Check in calibration";
@@ -33,18 +29,16 @@ public class CalibrationCheckInActivity extends ActivityWithMenu {
 
         button = (Button) findViewById(R.id.check_in_calibrations);
 
-        button.setOnClickListener(new View.OnClickListener() {
-            public void onClick(View v) {
+        button.setOnClickListener(v -> {
 
-                if (Sensor.isActive()) {
-                    SyncingService.startActionCalibrationCheckin(getApplicationContext());
-                    Toast.makeText(getApplicationContext(), "Checked in all calibrations", Toast.LENGTH_LONG).show();
-                    Intent tableIntent = new Intent(v.getContext(), Home.class);
-                    startActivity(tableIntent);
-                    finish();
-                } else {
-                    Log.d("CALIBRATION", "ERROR, sensor not active");
-                }
+            if (Sensor.isActive()) {
+                SyncingService.startActionCalibrationCheckin(getApplicationContext());
+                Toast.makeText(getApplicationContext(), "Checked in all calibrations", Toast.LENGTH_LONG).show();
+                Intent tableIntent = new Intent(v.getContext(), Home.class);
+                startActivity(tableIntent);
+                finish();
+            } else {
+                Log.d("CALIBRATION", "ERROR, sensor not active");
             }
         });
 

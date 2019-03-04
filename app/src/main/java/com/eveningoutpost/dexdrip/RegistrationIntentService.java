@@ -4,25 +4,23 @@ package com.eveningoutpost.dexdrip;
  * Created by jamorham on 11/01/16.
  */
 
-import android.app.IntentService;
-import android.content.Intent;
-import android.content.SharedPreferences;
-import android.os.PowerManager;
-import android.preference.PreferenceManager;
-import android.support.v4.content.LocalBroadcastManager;
-import android.util.Log;
+import android.app.*;
+import android.content.*;
+import android.os.*;
+import android.preference.*;
+import android.util.*;
 
-import com.eveningoutpost.dexdrip.Models.JoH;
-import com.eveningoutpost.dexdrip.Services.PlusSyncService;
-import com.google.android.gms.gcm.GcmNetworkManager;
-import com.google.android.gms.gcm.PeriodicTask;
-import com.google.android.gms.gcm.Task;
-import com.google.firebase.iid.FirebaseInstanceId;
-import com.google.firebase.messaging.FirebaseMessaging;
+import androidx.localbroadcastmanager.content.*;
 
-import org.json.JSONObject;
+import com.eveningoutpost.dexdrip.models.*;
+import com.eveningoutpost.dexdrip.services.*;
+import com.google.android.gms.gcm.*;
+import com.google.firebase.iid.*;
+import com.google.firebase.messaging.*;
 
-import java.io.IOException;
+import org.json.*;
+
+import java.io.*;
 
 public class RegistrationIntentService extends IntentService {
     private static final String TAG = "jamorham regService";

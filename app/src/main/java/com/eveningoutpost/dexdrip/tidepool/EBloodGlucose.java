@@ -2,7 +2,7 @@ package com.eveningoutpost.dexdrip.tidepool;
 
 // jamorham
 
-import com.eveningoutpost.dexdrip.Models.BloodTest;
+import com.eveningoutpost.dexdrip.models.BloodTest;
 import com.google.gson.annotations.Expose;
 
 import java.util.LinkedList;

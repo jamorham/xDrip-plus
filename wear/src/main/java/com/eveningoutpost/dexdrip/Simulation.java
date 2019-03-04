@@ -1,38 +1,27 @@
 package com.eveningoutpost.dexdrip;
 
-import android.app.Activity;
-import android.content.ActivityNotFoundException;
-import android.content.Context;
-import android.content.Intent;
-import android.os.Bundle;
-import android.os.Handler;
-import android.speech.RecognizerIntent;
-import android.support.wearable.view.WatchViewStub;
-import android.util.Log;
-import android.view.View;
-import android.widget.ImageButton;
-import android.widget.TextView;
-import android.widget.Toast;
+import android.content.*;
+import android.os.*;
+import android.speech.*;
+import android.support.wearable.view.*;
+import android.util.*;
+import android.view.*;
+import android.widget.*;
 
-import com.eveningoutpost.dexdrip.Models.JoH;
-import com.google.android.gms.wearable.DataMap;
+import androidx.appcompat.app.*;
 
-import java.nio.charset.StandardCharsets;
-import java.text.DecimalFormat;
-import java.text.NumberFormat;
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
-import java.util.ArrayList;
-import java.util.Calendar;
-import java.util.Date;
-import java.util.Locale;
-import java.util.Objects;
+import com.eveningoutpost.dexdrip.models.*;
+import com.google.android.gms.wearable.*;
 
-import static com.eveningoutpost.dexdrip.ListenerService.SendData;
+import java.nio.charset.*;
+import java.text.*;
+import java.util.*;
+
+import static com.eveningoutpost.dexdrip.ListenerService.*;
 
 // xDrip+ spoken treatments jamorham
 
-public class Simulation extends Activity {
+public class Simulation extends AppCompatActivity {
 
     private static final String WEARABLE_VOICE_PAYLOAD = "/xdrip_plus_voice_payload";
     private static final String WEARABLE_APPROVE_TREATMENT = "/xdrip_plus_approve_treatment";
@@ -76,7 +65,7 @@ public class Simulation extends Activity {
 
     public static void static_toast(final Context context, final String msg, final int length) {
         try {
-            Activity activity = (Activity) context;
+            AppCompatActivity activity = (AppCompatActivity) context;
             activity.runOnUiThread(() -> Toast.makeText(context, msg, length).show());
             Log.d(TAG, "Toast msg: " + msg);
         } catch (Exception e) {
@@ -202,7 +191,7 @@ public class Simulation extends Activity {
                                 createTreatment(thisnotes);
                             insulin = dataMap.getDouble("insulin", thisinsulinnumber);
                             if (insulin > 0) {
-                                mInsulinText.setText(Double.toString(insulin) + " units");
+                                mInsulinText.setText(insulin + " units");
                                 mInsulinText.setVisibility(View.VISIBLE);
                                 btnInsulinDose.setVisibility(View.VISIBLE);
                                 hascontent = true;
@@ -213,7 +202,7 @@ public class Simulation extends Activity {
 
                             carbs = dataMap.getDouble("carbs", thiscarbsnumber);
                             if (carbs > 0) {
-                                mCarbsText.setText(Integer.toString((int) carbs) + " carbs");
+                                mCarbsText.setText((int) carbs + " carbs");
                                 mCarbsText.setVisibility(View.VISIBLE);
                                 btnCarbohydrates.setVisibility(View.VISIBLE);
                                 hascontent = true;
@@ -224,7 +213,7 @@ public class Simulation extends Activity {
 
                             bloodtest = dataMap.getDouble("bloodtest", thisglucosenumber);
                             if (bloodtest > 0) {
-                                mBloodText.setText(Double.toString(bloodtest) + " " + (dataMap.getBoolean("ismgdl") ? "mgdl" : "mmol"));
+                                mBloodText.setText(bloodtest + " " + (dataMap.getBoolean("ismgdl") ? "mgdl" : "mmol"));
                                 mBloodText.setVisibility(View.VISIBLE);
                                 btnBloodGlucose.setVisibility(View.VISIBLE);
                                 hascontent = true;
@@ -380,7 +369,7 @@ public class Simulation extends Activity {
                 if ((!watchkeypadset) && (thisnumber > 0)) {
                     watchkeypad = true;
                     watchkeypadset = true;
-                    Log.d(TAG, "Treatment entered on watchkeypad: " + Double.toString(thisnumber));
+                    Log.d(TAG, "Treatment entered on watchkeypad: " + thisnumber);
                 } else {
                     Log.d(TAG, "watchkeypad already set");
                 }
@@ -390,7 +379,7 @@ public class Simulation extends Activity {
             case "units":
                 if ((!insulinset) && (thisnumber > 0)) {
                     thisinsulinnumber = thisnumber;
-                    Log.d(TAG, "Rapid dose: " + Double.toString(thisnumber));
+                    Log.d(TAG, "Rapid dose: " + thisnumber);
                     insulinset = true;
                 } else {
                     Log.d(TAG, "Rapid dose already set");
@@ -401,7 +390,7 @@ public class Simulation extends Activity {
                 if ((!carbsset) && (thisnumber > 0)) {
                     thiscarbsnumber = thisnumber;
                     carbsset = true;
-                    Log.d(TAG, "Carbs eaten: " + Double.toString(thisnumber));
+                    Log.d(TAG, "Carbs eaten: " + thisnumber);
                 } else {
                     Log.d(TAG, "Carbs already set");
                 }
@@ -410,7 +399,7 @@ public class Simulation extends Activity {
             case "blood":
                 if ((!glucoseset) && (thisnumber > 0)) {
                     thisglucosenumber = thisnumber;
-                    Log.d(TAG, "Blood test: " + Double.toString(thisnumber));
+                    Log.d(TAG, "Blood test: " + thisnumber);
                     glucoseset = true;
                 } else {
                     Log.d(TAG, "Blood glucose already set");

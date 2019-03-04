@@ -56,7 +56,7 @@
 -keep class org.slf4j.** { *; }
 -keep class rx.internal.util.** { *; }
 -keep class sun.misc.Unsafe { *; }
--keep class com.eveningoutpost.dexdrip.Models.** { *; }
+-keep class com.eveningoutpost.dexdrip.models.** { *; }
 -keep class com.eveningoutpost.dexdrip.ImportedLibraries.usbserial.** { *; }
 -keep class ar.com.hjg.pngj.** { *; }
 -keep class android.support.v7.widget.SearchView { *; }
@@ -122,3 +122,27 @@
 -dontwarn **$$Lambda$*
 
 -dontwarn com.google.devtools.build.android.desugar.runtime.**
+
+-dontwarn javax.annotation.**
+
+#-keepclasseswithmembers class * {
+#    @com.squareup.moshi.* <methods>;
+#}
+
+#https://github.com/square/moshi/issues/738#issuecomment-437281870
+-keep @com.squareup.moshi.JsonQualifier interface *
+
+# Enum field names are used by the integrated EnumJsonAdapter.
+# Annotate enums with @JsonClass(generateAdapter = false) to use them with Moshi.
+-keepclassmembers @com.squareup.moshi.JsonClass class * extends java.lang.Enum {
+    <fields>;
+}
+
+# The name of @JsonClass types is used to look up the generated adapter.
+-keepnames @com.squareup.moshi.JsonClass class *
+
+# Retain generated JsonAdapters if annotated type is retained.
+-keep class **JsonAdapter {
+    <init>(...);
+    <fields>;
+}

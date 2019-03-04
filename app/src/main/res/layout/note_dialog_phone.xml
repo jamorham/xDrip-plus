@@ -1,56 +1,56 @@
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:tools="http://schemas.android.com/tools"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:padding="10dp"
-    android:orientation="vertical">
+    android:orientation="vertical"
+    android:padding="10dp">
 
     <EditText
         android:id="@+id/treatment_note_edit_text"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:inputType="textMultiLine"
-        android:linksClickable="false"
         android:lines="4"
-        android:minLines="2"
-        android:maxLines="5" />
+        android:linksClickable="false"
+        android:maxLines="5"
+        android:minLines="2" />
 
     <LinearLayout
-        android:orientation="horizontal"
         android:layout_width="match_parent"
         android:layout_height="50dp"
-        android:layout_gravity="center_horizontal">
+        android:layout_gravity="center_horizontal"
+        android:orientation="horizontal">
 
         <RelativeLayout
             android:layout_width="match_parent"
             android:layout_height="match_parent">
 
             <CheckBox
+                android:id="@+id/default_to_voice_input"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="@string/default_to_voice_input_next_time"
-                android:id="@+id/default_to_voice_input"
-                android:layout_gravity="center_horizontal|center_vertical"
-                android:onClick="noteDefaultMethodChanged"
-                android:button="@null"
-                android:drawableRight="?android:attr/listChoiceIndicatorMultiple"
-                android:checked="false"
-                android:visibility="visible"
+                android:layout_alignParentStart="true"
                 android:layout_alignParentBottom="true"
-                android:layout_alignParentStart="true" />
+                android:layout_gravity="center_horizontal|center_vertical"
+                android:button="@null"
+                android:checked="false"
+                android:drawableRight="?android:attr/listChoiceIndicatorMultiple"
+                android:onClick="noteDefaultMethodChanged"
+                android:text="@string/default_to_voice_input_next_time"
+                android:visibility="visible" />
 
             <ImageButton
+                android:id="@+id/note_dialog_speak"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:id="@+id/note_dialog_speak"
-                android:src="@android:drawable/ic_btn_speak_now"
-                android:onClick="promptSpeechNoteInput"
-                android:gravity="right"
-                android:layout_gravity="right"
-                android:visibility="visible"
-                android:background="#8d636363"
                 android:layout_alignParentTop="true"
-                android:layout_alignParentEnd="true" />
+                android:layout_alignParentEnd="true"
+                android:layout_gravity="right"
+                android:background="#8d636363"
+                android:gravity="right"
+                android:onClick="promptSpeechNoteInput"
+                android:visibility="visible"
+                app:srcCompat="@android:drawable/ic_btn_speak_now" />
 
         </RelativeLayout>
 

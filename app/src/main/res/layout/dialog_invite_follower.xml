@@ -1,71 +1,81 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout
-    xmlns:android="http://schemas.android.com/apk/res/android"
-    android:orientation="vertical"
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:orientation="vertical"
     android:padding="15dp">
 
     <LinearLayout
-        android:orientation="horizontal"
         android:layout_width="fill_parent"
-        android:layout_height="wrap_content">
+        android:layout_height="wrap_content"
+        android:orientation="horizontal">
+
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="@string/followers_name"
-            android:labelFor="@+id/followerNameField"/>
+            android:labelFor="@+id/followerNameField"
+            android:text="@string/followers_name" />
+
         <EditText
+            android:id="@+id/followerNameField"
             android:layout_width="0dp"
-            android:layout_weight="1"
             android:layout_height="wrap_content"
-            android:id="@+id/followerNameField"/>
+            android:layout_weight="1" />
     </LinearLayout>
+
     <LinearLayout
-        android:orientation="horizontal"
         android:layout_width="fill_parent"
-        android:layout_height="wrap_content">
+        android:layout_height="wrap_content"
+        android:orientation="horizontal">
+
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="@string/your_display_name"
-            android:labelFor="@+id/followerDisplayNameField"/>
+            android:labelFor="@+id/followerDisplayNameField"
+            android:text="@string/your_display_name" />
+
         <EditText
+            android:id="@+id/followerDisplayNameField"
             android:layout_width="0dp"
-            android:layout_weight="1"
             android:layout_height="wrap_content"
-            android:id="@+id/followerDisplayNameField"/>
+            android:layout_weight="1" />
     </LinearLayout>
+
     <LinearLayout
-        android:orientation="horizontal"
         android:layout_width="fill_parent"
-        android:layout_height="wrap_content">
+        android:layout_height="wrap_content"
+        android:orientation="horizontal">
+
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="@string/followers_email"
-            android:labelFor="@+id/followerEmailField"/>
+            android:labelFor="@+id/followerEmailField"
+            android:text="@string/followers_email" />
+
         <EditText
+            android:id="@+id/followerEmailField"
             android:layout_width="0dp"
-            android:layout_weight="1"
             android:layout_height="wrap_content"
-            android:id="@+id/followerEmailField"/>
+            android:layout_weight="1" />
     </LinearLayout>
+
     <LinearLayout
-        android:orientation="horizontal"
         android:layout_width="fill_parent"
-        android:layout_height="wrap_content">
+        android:layout_height="wrap_content"
+        android:orientation="horizontal">
+
         <Button
+            android:id="@+id/cancelButton"
             android:layout_width="0dp"
-            android:layout_weight="1"
             android:layout_height="wrap_content"
-            android:text="@string/cancel"
-            android:id="@+id/cancelButton"/>
+            android:layout_weight="1"
+            android:text="@string/cancel" />
+
         <Button
+            android:id="@+id/saveButton"
             android:layout_width="0dp"
-            android:layout_weight="1"
             android:layout_height="wrap_content"
-            android:text="@string/send_invite"
-            android:id="@+id/saveButton"/>
+            android:layout_weight="1"
+            android:text="@string/send_invite" />
     </LinearLayout>
 </LinearLayout>

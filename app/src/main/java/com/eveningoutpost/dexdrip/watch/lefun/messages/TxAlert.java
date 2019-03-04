@@ -2,7 +2,7 @@ package com.eveningoutpost.dexdrip.watch.lefun.messages;
 
 // jamorham
 
-import java.io.UnsupportedEncodingException;
+import java.nio.charset.*;
 
 public class TxAlert extends BaseTx {
 
@@ -11,13 +11,9 @@ public class TxAlert extends BaseTx {
     public TxAlert(final String msg) {
 
         byte[] messageBytes = new byte[1];
-        try {
-            messageBytes = msg.getBytes("UTF-8");
-        } catch (UnsupportedEncodingException e) {
-            //
-        }
+	    messageBytes = msg.getBytes(StandardCharsets.UTF_8);
 
-        init(4 + messageBytes.length);
+	    init(4 + messageBytes.length);
 
         data.put(opcode);
         data.put((byte) 0x08); // icon

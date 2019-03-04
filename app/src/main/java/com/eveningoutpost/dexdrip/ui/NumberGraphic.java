@@ -11,15 +11,15 @@ import android.graphics.Typeface;
 import android.graphics.drawable.Icon;
 import android.os.Build;
 
-import com.eveningoutpost.dexdrip.Models.JoH;
-import com.eveningoutpost.dexdrip.Models.UserError;
-import com.eveningoutpost.dexdrip.UtilityModels.ColorCache;
-import com.eveningoutpost.dexdrip.UtilityModels.Constants;
-import com.eveningoutpost.dexdrip.UtilityModels.Pref;
+import com.eveningoutpost.dexdrip.models.JoH;
+import com.eveningoutpost.dexdrip.models.UserError;
+import com.eveningoutpost.dexdrip.utilitymodels.ColorCache;
+import com.eveningoutpost.dexdrip.utilitymodels.Constants;
+import com.eveningoutpost.dexdrip.utilitymodels.Pref;
 import com.eveningoutpost.dexdrip.xdrip;
 
 import static android.content.Context.NOTIFICATION_SERVICE;
-import static com.eveningoutpost.dexdrip.UtilityModels.ColorCache.getCol;
+import static com.eveningoutpost.dexdrip.utilitymodels.ColorCache.getCol;
 import static com.eveningoutpost.dexdrip.ui.activities.NumberWallPreview.ViewModel.PREF_numberwall_multi_param;
 import static com.eveningoutpost.dexdrip.ui.helpers.BitmapUtil.getScreenDpi;
 
@@ -45,12 +45,7 @@ public class NumberGraphic {
                 if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
                     mBuilder.setTimeoutAfter(Constants.SECOND_IN_MS * 30);
                 } else {
-                    JoH.runOnUiThreadDelayed(new Runnable() {
-                        @Override
-                        public void run() {
-                            JoH.cancelNotification(Constants.NUMBER_TEXT_TEST_ID);
-                        }
-                    }, Constants.SECOND_IN_MS * 30);
+                    JoH.runOnUiThreadDelayed(() -> JoH.cancelNotification(Constants.NUMBER_TEXT_TEST_ID), Constants.SECOND_IN_MS * 30);
                 }
                 mBuilder.setOngoing(false);
                 mBuilder.setVibrate(vibratePattern);
@@ -58,12 +53,7 @@ public class NumberGraphic {
                 int mNotificationId = Constants.NUMBER_TEXT_TEST_ID;
                 final NotificationManager mNotifyMgr = (NotificationManager) xdrip.getAppContext().getSystemService(NOTIFICATION_SERVICE);
                 mNotifyMgr.notify(mNotificationId, mBuilder.build());
-                JoH.runOnUiThreadDelayed(new Runnable() {
-                    @Override
-                    public void run() {
-                        mNotifyMgr.notify(mNotificationId, mBuilder.build());
-                    }
-                }, 1000);
+                JoH.runOnUiThreadDelayed(() -> mNotifyMgr.notify(mNotificationId, mBuilder.build()), 1000);
             } else {
                 JoH.static_toast_long("Not supported below Android 6");
             }

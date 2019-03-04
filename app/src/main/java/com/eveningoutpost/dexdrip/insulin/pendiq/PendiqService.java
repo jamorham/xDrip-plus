@@ -5,15 +5,15 @@ import android.content.Intent;
 import android.os.PowerManager;
 
 import com.eveningoutpost.dexdrip.Home;
-import com.eveningoutpost.dexdrip.ImportedLibraries.usbserial.util.HexDump;
-import com.eveningoutpost.dexdrip.Models.JoH;
-import com.eveningoutpost.dexdrip.Models.Treatments;
-import com.eveningoutpost.dexdrip.Models.UserError;
+import com.eveningoutpost.dexdrip.importedLibraries.usbserial.util.HexDump;
+import com.eveningoutpost.dexdrip.models.JoH;
+import com.eveningoutpost.dexdrip.models.Treatments;
+import com.eveningoutpost.dexdrip.models.UserError;
 import com.eveningoutpost.dexdrip.R;
-import com.eveningoutpost.dexdrip.Services.JamBaseBluetoothService;
-import com.eveningoutpost.dexdrip.UtilityModels.Constants;
-import com.eveningoutpost.dexdrip.UtilityModels.Inevitable;
-import com.eveningoutpost.dexdrip.UtilityModels.RxBleProvider;
+import com.eveningoutpost.dexdrip.services.JamBaseBluetoothService;
+import com.eveningoutpost.dexdrip.utilitymodels.Constants;
+import com.eveningoutpost.dexdrip.utilitymodels.Inevitable;
+import com.eveningoutpost.dexdrip.utilitymodels.RxBleProvider;
 import com.eveningoutpost.dexdrip.insulin.pendiq.messages.InjectionStatusTx;
 import com.eveningoutpost.dexdrip.insulin.pendiq.messages.InsulinLogRx;
 import com.eveningoutpost.dexdrip.insulin.pendiq.messages.InsulinLogTx;
@@ -43,8 +43,8 @@ import lombok.RequiredArgsConstructor;
 import rx.Subscription;
 import rx.schedulers.Schedulers;
 
-import static com.eveningoutpost.dexdrip.Models.JoH.msSince;
-import static com.eveningoutpost.dexdrip.Models.JoH.ratelimit;
+import static com.eveningoutpost.dexdrip.models.JoH.msSince;
+import static com.eveningoutpost.dexdrip.models.JoH.ratelimit;
 import static com.eveningoutpost.dexdrip.insulin.pendiq.Const.INCOMING_CHAR;
 import static com.eveningoutpost.dexdrip.insulin.pendiq.Const.INSULIN_CLASSIFIER;
 import static com.eveningoutpost.dexdrip.insulin.pendiq.Const.OUTGOING_CHAR;
@@ -447,9 +447,7 @@ public class PendiqService extends JamBaseBluetoothService {
                 stateSubscription = bleDevice.observeConnectionStateChanges()
                         // .observeOn(AndroidSchedulers.mainThread())
                         .subscribeOn(Schedulers.io())
-                        .subscribe(this::onConnectionStateChange, throwable -> {
-                            UserError.Log.wtf(TAG, "Got Error from state subscription: " + throwable);
-                        });
+                        .subscribe(this::onConnectionStateChange, throwable -> UserError.Log.wtf(TAG, "Got Error from state subscription: " + throwable));
 
                 // Attempt to establish a connection
                 connectionSubscription = bleDevice.establishConnection(auto)
@@ -851,16 +849,13 @@ public class PendiqService extends JamBaseBluetoothService {
 
     private void expectReply(final ConcurrentLinkedQueue<QueueItem> queue, final QueueItem item) {
         final long wait_time = 3000;
-        Inevitable.task("pendiq-expect-reply-" + item.description, wait_time, new Runnable() {
-            @Override
-            public void run() {
-                if (JoH.msSince(lastProcessedIncomingData) > wait_time) {
-                    UserError.Log.d(TAG, "GOT NO REPLY FOR: " + item.description + " @ " + item.retries);
-                    item.retries++;
-                    if (item.retries <= MAX_QUEUE_RETRIES) {
-                        UserError.Log.d(TAG, "Retrying due to no reply: " + item.description);
-                        writeQueueItem(queue, item);
-                    }
+        Inevitable.task("pendiq-expect-reply-" + item.description, wait_time, () -> {
+            if (JoH.msSince(lastProcessedIncomingData) > wait_time) {
+                UserError.Log.d(TAG, "GOT NO REPLY FOR: " + item.description + " @ " + item.retries);
+                item.retries++;
+                if (item.retries <= MAX_QUEUE_RETRIES) {
+                    UserError.Log.d(TAG, "Retrying due to no reply: " + item.description);
+                    writeQueueItem(queue, item);
                 }
             }
         });

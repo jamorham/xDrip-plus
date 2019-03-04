@@ -1,25 +1,22 @@
 package com.eveningoutpost.dexdrip;
 
-import android.app.NotificationManager;
-import android.app.PendingIntent;
-import android.content.Context;
-import android.content.Intent;
-import android.graphics.BitmapFactory;
-import android.media.RingtoneManager;
-import android.net.Uri;
-import android.preference.PreferenceManager;
-import android.support.v4.app.NotificationCompat;
-import android.util.Log;
-import android.widget.Toast;
+import android.annotation.*;
+import android.app.*;
+import android.content.*;
+import android.graphics.*;
+import android.media.*;
+import android.net.*;
+import android.preference.*;
+import android.util.*;
+import android.widget.*;
 
-import com.eveningoutpost.dexdrip.Models.JoH;
-import com.eveningoutpost.dexdrip.UtilityModels.NotificationChannels;
-import com.eveningoutpost.dexdrip.UtilityModels.Notifications;
-import com.eveningoutpost.dexdrip.UtilityModels.Pref;
-import com.eveningoutpost.dexdrip.UtilityModels.XdripNotificationCompat;
-import com.eveningoutpost.dexdrip.utils.PowerStateReceiver;
-import com.eveningoutpost.dexdrip.utils.Preferences;
-import com.eveningoutpost.dexdrip.utils.WebAppHelper;
+import androidx.core.app.*;
+
+import com.eveningoutpost.dexdrip.models.*;
+import com.eveningoutpost.dexdrip.utilitymodels.*;
+import com.eveningoutpost.dexdrip.utils.*;
+
+import java.nio.charset.*;
 
 /**
  * Created by jamorham on 17/02/2016.
@@ -201,11 +198,12 @@ public class ParakeetHelper {
         return (!parakeet_not_checking_in);
     }
 
+    @SuppressLint("NewApi")
     public static class ServiceCallback implements Preferences.OnServiceTaskCompleted {
         @Override
         public void onTaskCompleted(byte[] result) {
             try {
-                String string_result = new String(result, "UTF-8");
+                String string_result = new String(result, StandardCharsets.UTF_8);
                 if (string_result.startsWith("OK")) {
                     notifyOnNextCheckin(true);
                     String[] results = string_result.split(" ");

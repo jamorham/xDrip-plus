@@ -2,6 +2,8 @@ package com.eveningoutpost.dexdrip.watch.lefun.messages;
 
 // jamorham
 
+import androidx.annotation.*;
+
 import lombok.Getter;
 
 public class RxPong extends BaseRx {
@@ -62,6 +64,7 @@ public class RxPong extends BaseRx {
     }
 
 
+    @NonNull
     @Override
     public String toString() {
         return String.format("Pong: manu: %s : model: %s : hw: %s sw: %s", manufacturer, model, hwVersion, swVersion);

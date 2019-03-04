@@ -1,44 +1,34 @@
 package com.eveningoutpost.dexdrip.stats;
 
+import android.*;
+import android.content.pm.*;
+import android.content.res.*;
+import android.graphics.*;
+import android.os.*;
+import android.view.*;
+import android.widget.*;
 
-import android.Manifest;
-import android.app.Activity;
-import android.content.pm.PackageManager;
-import android.content.res.ColorStateList;
-import android.graphics.Color;
-import android.os.Build;
-import android.os.Bundle;
-import android.os.Environment;
-import android.support.annotation.NonNull;
-import android.support.v4.app.ActivityCompat;
-import android.support.v4.app.Fragment;
-import android.support.v4.app.FragmentManager;
-import android.support.v4.app.FragmentStatePagerAdapter;
-import android.support.v4.content.ContextCompat;
-import android.support.v4.view.ViewPager;
-import android.view.Menu;
-import android.view.MenuItem;
-import android.view.View;
-import android.view.ViewGroup;
-import android.widget.Button;
-import android.widget.LinearLayout;
-import android.widget.TextView;
+import androidx.annotation.*;
+import androidx.appcompat.app.*;
+import androidx.core.app.*;
+import androidx.core.content.*;
+import androidx.fragment.app.*;
+import androidx.viewpager.widget.*;
 
-import com.eveningoutpost.dexdrip.Home;
-import com.eveningoutpost.dexdrip.Models.JoH;
-import com.eveningoutpost.dexdrip.Models.UserError.Log;
+import com.eveningoutpost.dexdrip.*;
+import com.eveningoutpost.dexdrip.models.*;
 import com.eveningoutpost.dexdrip.R;
-import com.eveningoutpost.dexdrip.UtilityModels.JamorhamShowcaseDrawer;
-import com.eveningoutpost.dexdrip.UtilityModels.Pref;
-import com.eveningoutpost.dexdrip.UtilityModels.ShotStateStore;
-import com.eveningoutpost.dexdrip.utils.ActivityWithMenu;
-import com.github.amlcurran.showcaseview.ShowcaseView;
-import com.github.amlcurran.showcaseview.targets.ViewTarget;
+import com.eveningoutpost.dexdrip.models.UserError.*;
+import com.eveningoutpost.dexdrip.utilitymodels.ShotStateStore;
+import com.eveningoutpost.dexdrip.utilitymodels.*;
+import com.eveningoutpost.dexdrip.utils.*;
+import com.github.amlcurran.showcaseview.*;
+import com.github.amlcurran.showcaseview.targets.*;
 
-import java.io.File;
+import java.io.*;
 
-import static com.eveningoutpost.dexdrip.Models.JoH.goFullScreen;
-import static com.eveningoutpost.dexdrip.R.id.pager;
+import static com.eveningoutpost.dexdrip.models.JoH.*;
+import static com.eveningoutpost.dexdrip.R.id.*;
 
 public class StatsActivity extends ActivityWithMenu {
 
@@ -98,26 +88,22 @@ public class StatsActivity extends ActivityWithMenu {
         final String title = "Swipe for Different Reports";
         final String message = "Swipe left and right to see different report tabs.\n\nChoose time period for Today, Yesterday, 7 Days etc.\n\nFull screen mode, print colors and Sharing are supported from the butttons and 3 dot menu.";
         final ViewTarget target = new ViewTarget(R.id.button_stats_7d, this);
-        final Activity activity = this;
+        final AppCompatActivity activity = this;
 
 
-        JoH.runOnUiThreadDelayed(new Runnable() {
-                                     @Override
-                                     public void run() {
-                                         final ShowcaseView myShowcase = new ShowcaseView.Builder(activity)
+        JoH.runOnUiThreadDelayed(() -> {
+            final ShowcaseView myShowcase = new ShowcaseView.Builder(activity)
 
-                                                 .setTarget(target)
-                                                 .setStyle(R.style.CustomShowcaseTheme2)
-                                                 .setContentTitle(title)
-                                                 .setContentText("\n" + message)
-                                                 .setShowcaseDrawer(new JamorhamShowcaseDrawer(getResources(), getTheme(), size1, size2))
-                                                 .singleShot(oneshot ? option : -1)
-                                                 .build();
-                                         myShowcase.setBackgroundColor(Color.TRANSPARENT);
-                                         myShowcase.show();
-                                     }
-                                 }
-                , 3000);
+                    .setTarget(target)
+                    .setStyle(R.style.CustomShowcaseTheme2)
+                    .setContentTitle(title)
+                    .setContentText("\n" + message)
+                    .setShowcaseDrawer(new JamorhamShowcaseDrawer(getResources(), getTheme(), size1, size2))
+                    .singleShot(oneshot ? option : -1)
+                    .build();
+            myShowcase.setBackgroundColor(Color.TRANSPARENT);
+            myShowcase.show();
+        }, 3000);
 
         // TextView tv = new TextView(this);
         //  tv.setText("Swipe left/right to switch between reports!");
@@ -170,9 +156,9 @@ public class StatsActivity extends ActivityWithMenu {
                 //    swipeInfoNotNeeded = true;
                 //}
 
-                for (int i = 0; i < indicationDots.length; i++) {
-                    indicationDots[i].setText("\u25EF"); //U+2B24
-                }
+	            for (TextView indicationDot : indicationDots) {
+		            indicationDot.setText("\u25EF"); //U+2B24
+	            }
                 indicationDots[position].setText("\u26AB");
             }
 
@@ -322,16 +308,13 @@ public class StatsActivity extends ActivityWithMenu {
     {
         try {
         if (checkPermissions()) {
-            final Activity context = this;
-            JoH.runOnUiThreadDelayed(new Runnable() {
-                @Override
-                public void run() {
-                    View rootView = getWindow().getDecorView().findViewWithTag(mViewPager.getCurrentItem()); // search by tag :(
-                    String file_name = "xDrip-Screenshot-" + JoH.dateTimeText(JoH.tsl()).replace(" ", "-").replace(":", "-").replace(".", "-") + ".png";
-                    final String dirPath = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_PICTURES).getAbsolutePath() + "/Screenshots";
-                    JoH.bitmapToFile(JoH.screenShot(rootView,"xDrip+ Statistics for "+stateString+"   @ "+JoH.dateText(JoH.tsl())), dirPath, file_name);
-                    JoH.shareImage(context, new File(dirPath + "/" + file_name));
-                }
+            final AppCompatActivity context = this;
+            JoH.runOnUiThreadDelayed(() -> {
+                View rootView = getWindow().getDecorView().findViewWithTag(mViewPager.getCurrentItem()); // search by tag :(
+                String file_name = "xDrip-Screenshot-" + JoH.dateTimeText(JoH.tsl()).replace(" ", "-").replace(":", "-").replace(".", "-") + ".png";
+                final String dirPath = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_PICTURES).getAbsolutePath() + "/Screenshots";
+                JoH.bitmapToFile(JoH.screenShot(rootView,"xDrip+ Statistics for "+stateString+"   @ "+JoH.dateText(JoH.tsl())), dirPath, file_name);
+                JoH.shareImage(context, new File(dirPath + "/" + file_name));
             }, 250);
 
         }
@@ -374,28 +357,25 @@ public class StatsActivity extends ActivityWithMenu {
 
     private void registerButtonListeners() {
 
-        View.OnClickListener myListener = new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
+        View.OnClickListener myListener = v -> {
 
-                if (v == buttonTD) {
-                    state = TODAY;
-                } else if (v == buttonYTD) {
-                    state = YESTERDAY;
-                } else if (v == button7d) {
-                    state = D7;
-                } else if (v == button30d) {
-                    state = D30;
-                } else if (v == button90d) {
-                    state = D90;
-                }
-
-                Log.d("DrawStats", "button pressed, invalidating");
-                mStatisticsPageAdapter.notifyDataSetChanged();
-                mViewPager.invalidate();
-                setButtonColors();
-
+            if (v == buttonTD) {
+                state = TODAY;
+            } else if (v == buttonYTD) {
+                state = YESTERDAY;
+            } else if (v == button7d) {
+                state = D7;
+            } else if (v == button30d) {
+                state = D30;
+            } else if (v == button90d) {
+                state = D90;
             }
+
+            Log.d("DrawStats", "button pressed, invalidating");
+            mStatisticsPageAdapter.notifyDataSetChanged();
+            mViewPager.invalidate();
+            setButtonColors();
+
         };
         buttonTD.setOnClickListener(myListener);
         buttonYTD.setOnClickListener(myListener);
@@ -448,7 +428,7 @@ public class StatsActivity extends ActivityWithMenu {
         }
 
         @Override
-        public int getItemPosition(Object object) {
+        public int getItemPosition(@NonNull Object object) {
             // return POSITION_NONE to update/repaint the views if notifyDataSetChanged()+invalidate() is called
             return POSITION_NONE;
         }

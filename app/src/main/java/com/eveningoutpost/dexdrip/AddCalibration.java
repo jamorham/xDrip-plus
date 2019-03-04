@@ -1,28 +1,19 @@
 package com.eveningoutpost.dexdrip;
 
-import android.content.Intent;
-import android.os.Bundle;
-import android.os.PowerManager;
-import android.support.v4.widget.DrawerLayout;
-import android.support.v7.app.AppCompatActivity;
-import android.text.TextUtils;
-import android.view.View;
-import android.widget.Button;
-import android.widget.EditText;
+import android.content.*;
+import android.os.*;
+import android.text.*;
+import android.widget.*;
 
-import com.eveningoutpost.dexdrip.G5Model.Ob1G5StateMachine;
-import com.eveningoutpost.dexdrip.Models.Calibration;
-import com.eveningoutpost.dexdrip.Models.JoH;
-import com.eveningoutpost.dexdrip.Models.Sensor;
-import com.eveningoutpost.dexdrip.Models.UserError;
-import com.eveningoutpost.dexdrip.Models.UserError.Log;
-import com.eveningoutpost.dexdrip.UtilityModels.CollectionServiceStarter;
-import com.eveningoutpost.dexdrip.UtilityModels.Constants;
-import com.eveningoutpost.dexdrip.UtilityModels.PersistentStore;
-import com.eveningoutpost.dexdrip.UtilityModels.UndoRedo;
-import com.eveningoutpost.dexdrip.calibrations.NativeCalibrationPipe;
+import androidx.appcompat.app.*;
+import androidx.drawerlayout.widget.*;
 
-import java.util.UUID;
+import com.eveningoutpost.dexdrip.models.*;
+import com.eveningoutpost.dexdrip.models.UserError.*;
+import com.eveningoutpost.dexdrip.utilitymodels.*;
+import com.eveningoutpost.dexdrip.calibrations.*;
+
+import java.util.*;
 
 public class AddCalibration extends AppCompatActivity implements NavigationDrawerFragment.NavigationDrawerCallbacks {
     Button button;
@@ -50,7 +41,7 @@ public class AddCalibration extends AppCompatActivity implements NavigationDrawe
     protected void onResume() {
         xdrip.checkForcedEnglish(this);
         super.onResume();
-        mNavigationDrawerFragment = (NavigationDrawerFragment) getFragmentManager().findFragmentById(R.id.navigation_drawer);
+        mNavigationDrawerFragment = (NavigationDrawerFragment) getSupportFragmentManager().findFragmentById(R.id.navigation_drawer);
         mNavigationDrawerFragment.setUp(R.id.navigation_drawer, (DrawerLayout) findViewById(R.id.drawer_layout), getString(R.string.add_calibration), this);
         automatedCalibration();
     }
@@ -175,49 +166,47 @@ public class AddCalibration extends AppCompatActivity implements NavigationDrawe
 
         button = (Button) findViewById(R.id.save_calibration_button);
 
-        button.setOnClickListener(new View.OnClickListener() {
-            public void onClick(final View v) {
+        button.setOnClickListener(v -> {
 
-                if ((Sensor.isActive() || Home.get_follower())) {
-                    final EditText value = (EditText) findViewById(R.id.bg_value);
-                    final String string_value = value.getText().toString();
-                    if (!TextUtils.isEmpty(string_value)) {
+            if ((Sensor.isActive() || Home.get_follower())) {
+                final EditText value = (EditText) findViewById(R.id.bg_value);
+                final String string_value = value.getText().toString();
+                if (!TextUtils.isEmpty(string_value)) {
 
-                        try {
-                            final double calValue = JoH.tolerantParseDouble(string_value);
+                    try {
+                        final double calValue = JoH.tolerantParseDouble(string_value);
 
-                            if (!Home.get_follower()) {
-                                Calibration calibration = Calibration.create(calValue, getApplicationContext());
-                                if (calibration != null) {
-                                    UndoRedo.addUndoCalibration(calibration.uuid);
-                                    //startWatchUpdaterService(v.getContext(), WatchUpdaterService.ACTION_SYNC_CALIBRATION, TAG);
-                                    //Ob1G5StateMachine.addCalibration((int)calibration.bg, calibration.timestamp);
-                                    NativeCalibrationPipe.addCalibration((int)calibration.bg, calibration.timestamp);
-                                } else {
-                                    Log.e(TAG, "Calibration creation resulted in null");
-                                    JoH.static_toast_long("Could not create calibration!");
-                                    // TODO probably follower must ensure it has a valid sensor regardless..
-                                }
-                            } else if (Home.get_follower()) {
-                                // Sending the data for the master to update the main tables.
-                                sendFollowerCalibration(calValue, 0); // default offset is 0
+                        if (!Home.get_follower()) {
+                            Calibration calibration = Calibration.create(calValue, getApplicationContext());
+                            if (calibration != null) {
+                                UndoRedo.addUndoCalibration(calibration.uuid);
+                                //startWatchUpdaterService(v.getContext(), WatchUpdaterService.ACTION_SYNC_CALIBRATION, TAG);
+                                //Ob1G5StateMachine.addCalibration((int)calibration.bg, calibration.timestamp);
+                                NativeCalibrationPipe.addCalibration((int)calibration.bg, calibration.timestamp);
+                            } else {
+                                Log.e(TAG, "Calibration creation resulted in null");
+                                JoH.static_toast_long("Could not create calibration!");
+                                // TODO probably follower must ensure it has a valid sensor regardless..
                             }
-                            Intent tableIntent = new Intent(v.getContext(), Home.class);
-                            startActivity(tableIntent);
-
-                        } catch (NumberFormatException e) {
-                            Log.e(TAG, "Number format exception ", e);
-                            Home.toaststatic("Got error parsing number in calibration");
+                        } else if (Home.get_follower()) {
+                            // Sending the data for the master to update the main tables.
+                            sendFollowerCalibration(calValue, 0); // default offset is 0
                         }
-                        // }
-                        // }.start();
-                        finish();
-                    } else {
-                        value.setError("Calibration Can Not be blank");
+                        Intent tableIntent = new Intent(v.getContext(), Home.class);
+                        startActivity(tableIntent);
+
+                    } catch (NumberFormatException e) {
+                        Log.e(TAG, "Number format exception ", e);
+                        Home.toaststatic("Got error parsing number in calibration");
                     }
+                    // }
+                    // }.start();
+                    finish();
                 } else {
-                    Log.w("CALERROR", "Sensor is not active, cannot calibrate");
+                    value.setError("Calibration Can Not be blank");
                 }
+            } else {
+                Log.w("CALERROR", "Sensor is not active, cannot calibrate");
             }
         });
 

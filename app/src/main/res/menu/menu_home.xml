@@ -1,175 +1,197 @@
 <?xml version="1.0" encoding="utf-8"?>
-<menu xmlns:android="http://schemas.android.com/apk/res/android">
-    <item android:id="@+id/showhelp"
-        android:title="@string/show_help"
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+    <item
+        android:id="@+id/showhelp"
         android:checkable="false"
-        android:orderInCategory="1"
-        android:visible="false"
         android:onClick="showHelpFromMenu"
-        android:showAsAction="never"/>
-
-    <item android:id="@+id/showreminders"
-        android:title="@string/reminders"
-        android:checkable="false"
         android:orderInCategory="1"
+        android:title="@string/show_help"
         android:visible="false"
-        android:onClick="showRemindersFromMenu"
-        android:showAsAction="never"/>
+        app:showAsAction="never" />
 
-    <item android:id="@+id/showassist"
-        android:title="@string/emergency_messages"
+    <item
+        android:id="@+id/showreminders"
         android:checkable="false"
+        android:onClick="showRemindersFromMenu"
         android:orderInCategory="1"
-        android:visible="true"
-        android:onClick="showAssistFromMenu"
-        android:showAsAction="never"/>
+        android:title="@string/reminders"
+        android:visible="false"
+        app:showAsAction="never" />
 
-    <item android:id="@+id/export_submenu"
-        android:title="@string/export_submenu"
-        android:orderInCategory="1">
+    <item
+        android:id="@+id/showassist"
+        android:checkable="false"
+        android:onClick="showAssistFromMenu"
+        android:orderInCategory="1"
+        android:title="@string/emergency_messages"
+        android:visible="true"
+        app:showAsAction="never" />
+
+    <item
+        android:id="@+id/export_submenu"
+        android:orderInCategory="1"
+        android:title="@string/export_submenu">
 
         <menu>
-    <item android:id="@+id/action_export_database"
-        android:title="@string/menu_export_database"
-        android:checkable="false"
-        android:orderInCategory="1"
-        android:showAsAction="never"/>
+            <item
+                android:id="@+id/action_export_database"
+                android:checkable="false"
+                android:orderInCategory="1"
+                android:title="@string/menu_export_database"
+                app:showAsAction="never" />
 
-    <item android:id="@+id/action_import_db"
-        android:title="@string/menu_import_db"
-        android:checkable="false"
-        android:orderInCategory="1"
-        android:showAsAction="never"/>
+            <item
+                android:id="@+id/action_import_db"
+                android:checkable="false"
+                android:orderInCategory="1"
+                android:title="@string/menu_import_db"
+                app:showAsAction="never" />
 
-    <item android:id="@+id/action_export_csv_sidiary"
-        android:title="@string/menu_export_csv_sidiary"
-        android:checkable="false"
-        android:orderInCategory="1"
-        android:showAsAction="never"/>
+            <item
+                android:id="@+id/action_export_csv_sidiary"
+                android:checkable="false"
+                android:orderInCategory="1"
+                android:title="@string/menu_export_csv_sidiary"
+                app:showAsAction="never" />
 
-    <item android:id="@+id/importsettings"
-        android:title="@string/load_save_settings_on_sdcard"
-        android:checkable="false"
-        android:onClick="settingsSDcardExport"
-        android:visible="true"
-        android:orderInCategory="1"
-        android:showAsAction="never"/>
-</menu>
+            <item
+                android:id="@+id/importsettings"
+                android:checkable="false"
+                android:onClick="settingsSDcardExport"
+                android:orderInCategory="1"
+                android:title="@string/load_save_settings_on_sdcard"
+                android:visible="true"
+                app:showAsAction="never" />
+        </menu>
     </item>
-    <item android:id="@+id/showmap"
-        android:title="@string/show_parakeet_map"
+    <item
+        android:id="@+id/showmap"
         android:checkable="false"
         android:onClick="showMapFromMenu"
-        android:visible="true"
         android:orderInCategory="1"
-        android:showAsAction="never"/>
+        android:title="@string/show_parakeet_map"
+        android:visible="true"
+        app:showAsAction="never" />
 
-    <item android:id="@+id/parakeetsetup"
-        android:title="@string/switch_parakeet_to_setup_mode"
+    <item
+        android:id="@+id/parakeetsetup"
         android:checkable="false"
         android:onClick="parakeetSetupMode"
-        android:visible="true"
         android:orderInCategory="1"
-        android:showAsAction="never"/>
+        android:title="@string/switch_parakeet_to_setup_mode"
+        android:visible="true"
+        app:showAsAction="never" />
 
     <item
         android:id="@+id/action_resend_last_bg"
         android:orderInCategory="100"
         android:title="@string/action_resend_to_watch"
-        android:showAsAction="never" />
+        app:showAsAction="never" />
     <item
         android:id="@+id/action_open_watch_settings"
         android:orderInCategory="100"
         android:title="@string/action_open_watch_setting"
-        android:showAsAction="never" />
+        app:showAsAction="never" />
     <item
         android:id="@+id/action_sync_watch_db"
         android:orderInCategory="100"
         android:title="@string/action_sync_watch_db"
-        android:showAsAction="never" />
+        app:showAsAction="never" />
 
 
-    <item android:id="@+id/deleteAllBG"
-        android:title="@string/delete_all_bg_readings"
+    <item
+        android:id="@+id/deleteAllBG"
         android:checkable="false"
-        android:orderInCategory="1"
         android:onClick="deleteAllBG"
-        android:visible="false"
-        android:showAsAction="never"/>
-
-    <item android:id="@+id/testFeature"
-        android:title="@string/debugging_test_feature"
-        android:checkable="false"
         android:orderInCategory="1"
+        android:title="@string/delete_all_bg_readings"
+        android:visible="false"
+        app:showAsAction="never" />
+
+    <item
+        android:id="@+id/testFeature"
+        android:checkable="false"
         android:onClick="testFeature"
-        android:visible="false"
-        android:showAsAction="never"/>
-
-    <item android:id="@+id/crowdtranslate"
-        android:title="@string/crowd_sourced_translation"
-        android:checkable="false"
         android:orderInCategory="1"
+        android:title="@string/debugging_test_feature"
+        android:visible="false"
+        app:showAsAction="never" />
+
+    <item
+        android:id="@+id/crowdtranslate"
+        android:checkable="false"
         android:onClick="crowdTranslate"
-        android:visible="true"
-        android:showAsAction="never"/>
-
-    <item android:id="@+id/userEvents"
-        android:title="@string/view_events_log"
-        android:checkable="false"
         android:orderInCategory="1"
+        android:title="@string/crowd_sourced_translation"
+        android:visible="true"
+        app:showAsAction="never" />
+
+    <item
+        android:id="@+id/userEvents"
+        android:checkable="false"
         android:onClick="viewEventLog"
-        android:visible="true"
-        android:showAsAction="never"/>
-
-    <item android:id="@+id/libreLastMinutes"
-        android:title="@string/show_libre_trend"
-        android:checkable="false"
         android:orderInCategory="1"
+        android:title="@string/view_events_log"
+        android:visible="true"
+        app:showAsAction="never" />
+
+    <item
+        android:id="@+id/libreLastMinutes"
+        android:checkable="false"
         android:onClick="ShowLibreTrend"
+        android:orderInCategory="1"
+        android:title="@string/show_libre_trend"
         android:visible="true"
-        android:showAsAction="never"/>
-    
-    <item android:id="@+id/synctreatments"
+        app:showAsAction="never" />
+
+    <item
+        android:id="@+id/synctreatments"
+        android:checkable="false"
+        android:orderInCategory="1"
         android:title="@string/sync_treatments"
-        android:checkable="false"
-        android:orderInCategory="1"
         android:visible="false"
-        android:showAsAction="never"/>
+        app:showAsAction="never" />
 
-    <item android:id="@+id/sharemyconfig"
-        android:title="@string/share_config_via_qr_code"
+    <item
+        android:id="@+id/sharemyconfig"
+        android:checkable="false"
         android:icon="@drawable/ic_qrcode_grey600_48dp"
-        android:checkable="false"
-        android:orderInCategory="1"
         android:onClick="shareMyConfig"
-        android:showAsAction="never"/>
-
-    <item android:id="@+id/sendbackfill"
-        android:title="@string/send_bg_readings_to_backfill"
-        android:checkable="false"
         android:orderInCategory="1"
+        android:title="@string/share_config_via_qr_code"
+        app:showAsAction="never" />
+
+    <item
+        android:id="@+id/sendbackfill"
+        android:checkable="false"
         android:onClick="doBackFillBroadcast"
+        android:orderInCategory="1"
+        android:title="@string/send_bg_readings_to_backfill"
         android:visible="false"
-        android:showAsAction="never"/>
+        app:showAsAction="never" />
 
-    <item android:id="@+id/checkforupdate"
-        android:title="@string/check_for_updated_version"
+    <item
+        android:id="@+id/checkforupdate"
         android:checkable="false"
-        android:orderInCategory="1"
         android:onClick="checkForUpdate"
-        android:showAsAction="never"/>
-
-    <item android:id="@+id/sendfeedback"
-        android:title="@string/send_feedback_to_developer"
-        android:checkable="false"
         android:orderInCategory="1"
-        android:onClick="sendFeedback"
-        android:showAsAction="never"/>
+        android:title="@string/check_for_updated_version"
+        app:showAsAction="never" />
 
-    <item android:id="@+id/action_toggle_speakreadings"
-        android:title="@string/speak_readings"
+    <item
+        android:id="@+id/sendfeedback"
+        android:checkable="false"
+        android:onClick="sendFeedback"
+        android:orderInCategory="1"
+        android:title="@string/send_feedback_to_developer"
+        app:showAsAction="never" />
+
+    <item
+        android:id="@+id/action_toggle_speakreadings"
         android:checkable="true"
         android:orderInCategory="2"
+        android:title="@string/speak_readings"
         android:visible="false"
-        android:showAsAction="never"/>
+        app:showAsAction="never" />
 </menu>

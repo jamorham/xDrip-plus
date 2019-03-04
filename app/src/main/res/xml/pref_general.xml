@@ -1,33 +1,33 @@
 <?xml version="1.0" encoding="utf-8"?>
-    <PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android">
+<PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android">
     <PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android"
+        android:icon="@drawable/ic_ruler_grey600_48dp"
         android:key="xdrip_units_settings"
         android:summary="@string/mmol_or_mgdl_high_and_low"
-        android:icon="@drawable/ic_ruler_grey600_48dp"
         android:title="@string/glucose_units">
         <PreferenceCategory
-            android:title="@string/general_settings"
-            android:key="bgRange">
+            android:key="bgRange"
+            android:title="@string/general_settings">
             <ListPreference
-                android:key="units"
-                android:title="@string/glucose_units"
+                android:defaultValue="mgdl"
                 android:entries="@array/bgUnitEntries"
                 android:entryValues="@array/bgUnitValues"
-                android:defaultValue="mgdl"/>
+                android:key="units"
+                android:title="@string/glucose_units" />
             <EditTextPreference
+                android:defaultValue="170"
+                android:inputType="numberDecimal"
                 android:key="highValue"
-                android:title="@string/high_value"
                 android:numeric="decimal"
-                android:inputType="numberDecimal"
                 android:summary="@string/maximum_value"
-                android:defaultValue="170" />
+                android:title="@string/high_value" />
             <EditTextPreference
-                android:key="lowValue"
-                android:title="@string/low_value"
-                android:numeric="decimal"
+                android:defaultValue="70"
                 android:inputType="numberDecimal"
+                android:key="lowValue"
+                android:numeric="decimal"
                 android:summary="@string/minimum_value"
-                android:defaultValue="70" />
+                android:title="@string/low_value" />
         </PreferenceCategory>
     </PreferenceScreen>
 </PreferenceScreen>

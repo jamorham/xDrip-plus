@@ -10,16 +10,16 @@
 
         <LinearLayout
             android:layout_width="fill_parent"
-            android:layout_height="fill_parent"
-            android:orientation="vertical"
-            android:layout_gravity="center_horizontal">
+            android:layout_height="wrap_content"
+            android:layout_gravity="center_horizontal"
+            android:orientation="vertical">
 
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
+                android:layout_gravity="center_horizontal"
                 android:orientation="horizontal"
-                android:padding="5dp"
-                android:layout_gravity="center_horizontal">
+                android:padding="5dp">
 
                 <TextView
                     android:id="@+id/textView4"
@@ -41,9 +41,9 @@
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
+                android:layout_gravity="center_horizontal"
                 android:orientation="horizontal"
-                android:padding="5dp"
-                android:layout_gravity="center_horizontal">
+                android:padding="5dp">
 
                 <TextView
                     android:layout_width="wrap_content"
@@ -64,9 +64,9 @@
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
+                android:layout_gravity="center_horizontal"
                 android:orientation="horizontal"
-                android:padding="5dp"
-                android:layout_gravity="center_horizontal">
+                android:padding="5dp">
 
                 <TextView
                     android:id="@+id/textView11"
@@ -88,9 +88,9 @@
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
+                android:layout_gravity="center_horizontal"
                 android:orientation="horizontal"
-                android:padding="5dp"
-                android:layout_gravity="center_horizontal">
+                android:padding="5dp">
 
                 <TextView
                     android:id="@+id/textView13"
@@ -112,9 +112,9 @@
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
+                android:layout_gravity="center_horizontal"
                 android:orientation="horizontal"
-                android:padding="5dp"
-                android:layout_gravity="center_horizontal">
+                android:padding="5dp">
 
                 <TextView
                     android:id="@+id/textView14"
@@ -129,16 +129,16 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:padding="5dp"
-                    android:text= "-- mmol/mol\n --%"
+                    android:text="-- mmol/mol\n --%"
                     android:textAppearance="?android:attr/textAppearanceLarge" />
             </LinearLayout>
 
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
+                android:layout_gravity="center_horizontal"
                 android:orientation="horizontal"
-                android:padding="5dp"
-                android:layout_gravity="center_horizontal">
+                android:padding="5dp">
 
                 <TextView
                     android:id="@+id/textView17"
@@ -156,12 +156,13 @@
                     android:text="---"
                     android:textAppearance="?android:attr/textAppearanceLarge" />
             </LinearLayout>
+
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
+                android:layout_gravity="center_horizontal"
                 android:orientation="horizontal"
-                android:padding="5dp"
-                android:layout_gravity="center_horizontal">
+                android:padding="5dp">
 
                 <TextView
                     android:id="@+id/textView18"
@@ -170,20 +171,22 @@
                     android:padding="5dp"
                     android:text="@string/relative_sd_cv"
                     android:textAppearance="?android:attr/textAppearanceLarge" />
+
                 <TextView
                     android:id="@+id/textView_coefficient_of_variation"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:padding="5dp"
-                    android:text= "--%"
+                    android:text="--%"
                     android:textAppearance="?android:attr/textAppearanceLarge" />
             </LinearLayout>
+
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
+                android:layout_gravity="center_horizontal"
                 android:orientation="horizontal"
-                android:padding="5dp"
-                android:layout_gravity="center_horizontal">
+                android:padding="5dp">
 
                 <TextView
                     android:id="@+id/textView19"
@@ -192,12 +195,13 @@
                     android:padding="5dp"
                     android:text="GVI: "
                     android:textAppearance="?android:attr/textAppearanceLarge" />
+
                 <TextView
                     android:id="@+id/textView_gvi"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:padding="5dp"
-                    android:text= "--"
+                    android:text="--"
                     android:textAppearance="?android:attr/textAppearanceLarge" />
             </LinearLayout>
         </LinearLayout>

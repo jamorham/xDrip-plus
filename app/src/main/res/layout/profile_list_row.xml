@@ -1,16 +1,16 @@
 <?xml version="1.0" encoding="utf-8"?>
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/profile_list_row_block"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:background="?android:attr/selectableItemBackground"
+    android:background="?attr/selectableItemBackground"
     android:clickable="true"
     android:focusable="true"
-    android:id="@+id/profile_list_row_block"
     android:orientation="vertical"
-    android:paddingBottom="10dp"
     android:paddingLeft="16dp"
+    android:paddingTop="10dp"
     android:paddingRight="16dp"
-    android:paddingTop="10dp">
+    android:paddingBottom="10dp">
 
     <TextView
         android:id="@+id/title"
@@ -19,7 +19,7 @@
         android:layout_alignParentTop="true"
         android:text="00:00 -> 23:59"
         android:textColor="@color/title"
-        android:textSize="16dp"
+        android:textSize="16sp"
         android:textStyle="bold"
         android:visibility="gone" />
 
@@ -27,10 +27,11 @@
         android:id="@+id/genre"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_alignStart="@+id/carbsSeekBar"
         android:layout_below="@+id/whichday"
+        android:layout_alignStart="@+id/carbsSeekBar"
         android:clickable="true"
-        android:text="@string/carbs_per_unit" />
+        android:text="@string/carbs_per_unit"
+        android:focusable="true" />
 
     <TextView
         android:id="@+id/whichday"
@@ -44,22 +45,22 @@
         android:id="@+id/carbsSeekBar"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:layout_below="@+id/genre"
         android:layout_alignEnd="@+id/sensitivitySeekBar"
         android:layout_alignParentStart="true"
-        android:layout_below="@+id/genre"
         android:indeterminate="false"
         android:max="40"
-        android:paddingBottom="5dp"
         android:paddingLeft="20dp"
         android:paddingTop="5dp"
+        android:paddingBottom="5dp"
         android:progress="10" />
 
     <EditText
         android:id="@+id/profileCarbsText"
         android:layout_width="35dp"
         android:layout_height="wrap_content"
-        android:layout_alignParentEnd="true"
         android:layout_below="@+id/genre"
+        android:layout_alignParentEnd="true"
         android:imeOptions="actionDone"
         android:inputType="numberDecimal"
         android:singleLine="true"
@@ -71,8 +72,8 @@
         android:id="@+id/sensitivityLabel"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_alignParentStart="true"
         android:layout_below="@+id/carbsSeekBar"
+        android:layout_alignParentStart="true"
         android:layout_marginTop="5dp"
         android:clickable="true"
         android:text="@string/insulin_sensitivity_glucose_drop_per_unit" />
@@ -81,22 +82,22 @@
         android:id="@+id/sensitivitySeekBar"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_alignParentStart="true"
         android:layout_below="@+id/sensitivityLabel"
+        android:layout_alignParentStart="true"
         android:layout_marginBottom="6dp"
         android:layout_toStartOf="@+id/profileSensText"
         android:max="90"
-        android:paddingBottom="5dp"
         android:paddingLeft="20dp"
         android:paddingTop="5dp"
+        android:paddingBottom="5dp"
         android:progress="30" />
 
     <EditText
         android:id="@+id/profileSensText"
         android:layout_width="35dp"
         android:layout_height="wrap_content"
-        android:layout_alignEnd="@+id/sensitivityLabel"
         android:layout_alignTop="@+id/sensitivitySeekBar"
+        android:layout_alignEnd="@+id/sensitivityLabel"
         android:imeOptions="actionDone"
         android:inputType="numberDecimal"
         android:singleLine="true"
@@ -112,8 +113,8 @@
         android:layout_height="wrap_content"
         android:layout_alignTop="@+id/profileTextClockStart"
         android:layout_centerHorizontal="true"
-        android:paddingEnd="8dp"
         android:paddingStart="8dp"
+        android:paddingEnd="8dp"
         android:text="\u2192"
         android:textAlignment="center"
         android:textColor="@color/title"

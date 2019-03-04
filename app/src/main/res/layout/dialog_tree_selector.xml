@@ -1,14 +1,13 @@
-<?xml version="1.0" encoding="utf-8"?>
-<layout xmlns:android="http://schemas.android.com/apk/res/android"
+<!--?xml version="1.0" encoding="utf-8"?-->
+
+    <layout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto">
 
     <data>
-
-        <import type="me.tatarka.bindingcollectionadapter2.LayoutManagers" />
-
+        <!--import type="me.tatarka.bindingcollectionadapter2.LayoutManagers" /-->
         <variable
             name="viewModel"
-            type="com.eveningoutpost.dexdrip.UtilityModels.SourceWizard.ViewModel" />
+            type="com.eveningoutpost.dexdrip.utilitymodels.SourceWizard.ViewModel" />
     </data>
 
     <LinearLayout
@@ -16,13 +15,13 @@
         android:layout_height="wrap_content"
         android:orientation="vertical">
 
-        <android.support.v7.widget.RecyclerView
+        <androidx.recyclerview.widget.RecyclerView
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:paddingBottom="10dp"
             app:itemBinding="@{viewModel.itemBinding}"
             app:items="@{viewModel.items}"
-            app:layoutManager="@{LayoutManagers.linear()}" />
+            app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager" />
 
         <ImageButton
             android:id="@+id/imageButton8"

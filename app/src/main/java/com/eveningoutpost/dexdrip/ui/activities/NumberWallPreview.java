@@ -1,38 +1,27 @@
 package com.eveningoutpost.dexdrip.ui.activities;
 
-import android.app.Activity;
-import android.content.Intent;
-import android.content.pm.PackageManager;
-import android.graphics.Bitmap;
-import android.net.Uri;
-import android.os.Bundle;
-import android.support.annotation.NonNull;
-import android.support.v7.app.AppCompatActivity;
-import android.view.View;
+import android.content.*;
+import android.content.pm.*;
+import android.graphics.*;
+import android.net.*;
+import android.os.*;
+import android.view.*;
 
-import com.eveningoutpost.dexdrip.BestGlucose;
-import com.eveningoutpost.dexdrip.Models.JoH;
-import com.eveningoutpost.dexdrip.Models.UserError;
-import com.eveningoutpost.dexdrip.UtilityModels.ColorCache;
-import com.eveningoutpost.dexdrip.UtilityModels.Inevitable;
-import com.eveningoutpost.dexdrip.UtilityModels.Pref;
-import com.eveningoutpost.dexdrip.UtilityModels.PrefsViewImpl;
-import com.eveningoutpost.dexdrip.UtilityModels.PrefsViewString;
-import com.eveningoutpost.dexdrip.UtilityModels.Unitized;
-import com.eveningoutpost.dexdrip.adapters.ObservableBackground;
-import com.eveningoutpost.dexdrip.databinding.ActivityNumberWallPreviewBinding;
-import com.eveningoutpost.dexdrip.ui.LockScreenWallPaper;
-import com.eveningoutpost.dexdrip.ui.NumberGraphic;
-import com.eveningoutpost.dexdrip.ui.dialog.ColorPreferenceDialog;
-import com.eveningoutpost.dexdrip.ui.helpers.BitmapUtil;
-import com.eveningoutpost.dexdrip.utils.SdcardImportExport;
+import androidx.appcompat.app.*;
 
-import lombok.AllArgsConstructor;
-import lombok.RequiredArgsConstructor;
+import com.eveningoutpost.dexdrip.*;
+import com.eveningoutpost.dexdrip.models.*;
+import com.eveningoutpost.dexdrip.utilitymodels.*;
+import com.eveningoutpost.dexdrip.adapters.*;
+import com.eveningoutpost.dexdrip.ui.*;
+import com.eveningoutpost.dexdrip.ui.dialog.*;
+import com.eveningoutpost.dexdrip.ui.helpers.*;
+import com.eveningoutpost.dexdrip.utils.*;
 
-import static com.eveningoutpost.dexdrip.ui.NumberGraphic.isLockScreenBitmapTiled;
-import static com.eveningoutpost.dexdrip.ui.helpers.BitmapUtil.getScreenHeight;
-import static com.eveningoutpost.dexdrip.ui.helpers.BitmapUtil.getScreenWidth;
+import lombok.*;
+
+import static com.eveningoutpost.dexdrip.ui.NumberGraphic.*;
+import static com.eveningoutpost.dexdrip.ui.helpers.BitmapUtil.*;
 
 /**
  * jamorham
@@ -47,12 +36,12 @@ public class NumberWallPreview extends AppCompatActivity {
     private static final int LOAD_IMAGE_RESULTS = 35021;
     private static final int ASK_FILE_PERMISSION = 35020;
 
-    private ActivityNumberWallPreviewBinding binding;
+    private com.eveningoutpost.dexdrip.databinding.ActivityNumberWallPreviewBinding binding;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        binding = ActivityNumberWallPreviewBinding.inflate(getLayoutInflater());
+        binding = com.eveningoutpost.dexdrip.databinding.ActivityNumberWallPreviewBinding.inflate(getLayoutInflater());
         binding.setPrefs(new PrefsViewImpl().setRefresh(() -> {
             try {
                 binding.getVm().refreshBitmap();
@@ -81,7 +70,7 @@ public class NumberWallPreview extends AppCompatActivity {
     }
 
     @Override
-    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
+    public void onRequestPermissionsResult(int requestCode, @androidx.annotation.NonNull @NonNull String[] permissions, @androidx.annotation.NonNull @NonNull int[] grantResults) {
 
         super.onRequestPermissionsResult(requestCode, permissions, grantResults);
         if (requestCode == ASK_FILE_PERMISSION) {
@@ -104,7 +93,7 @@ public class NumberWallPreview extends AppCompatActivity {
         public static final String PREF_numberwall_multi_param = "numberwall_multi_param";
         public static final String PREF_numberwall_background = "numberwall_background";
 
-        private final Activity activity;
+        private final AppCompatActivity activity;
         public ObservableBackground background = new ObservableBackground();
 
         {
@@ -162,7 +151,7 @@ public class NumberWallPreview extends AppCompatActivity {
         public String get(Object key) {
             final String original = super.get(key);
             String result = original;
-            Integer value = 0;
+            int value = 0;
             try {
                 value = Integer.parseInt(result);
             } catch (NumberFormatException e) {

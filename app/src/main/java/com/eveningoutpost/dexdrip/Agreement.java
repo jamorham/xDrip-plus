@@ -1,17 +1,13 @@
 package com.eveningoutpost.dexdrip;
 
-import android.content.Intent;
-import android.content.SharedPreferences;
-import android.os.Bundle;
-import android.preference.PreferenceManager;
-import android.support.v7.app.AppCompatActivity;
-import android.view.View;
-import android.widget.Button;
-import android.widget.CheckBox;
+import android.content.*;
+import android.os.*;
+import android.preference.*;
+import android.widget.*;
 
-import com.eveningoutpost.dexdrip.Models.JoH;
+import com.eveningoutpost.dexdrip.models.*;
 
-public class Agreement extends BaseAppCompatActivity {
+public class Agreement extends BaseActivity {
 
     final static String prefmarker = "warning_agreed_to";
     boolean IUnderstand;
@@ -36,18 +32,15 @@ public class Agreement extends BaseAppCompatActivity {
     }
 
     public void addListenerOnButton() {
-        saveButton.setOnClickListener(new View.OnClickListener() {
-            public void onClick(View v) {
+        saveButton.setOnClickListener(v -> {
 
-                prefs.edit().putBoolean(prefmarker, agreeCheckBox.isChecked()).apply();
-                IUnderstand = prefs.getBoolean(prefmarker, false);
-                if (IUnderstand) {
-                    Intent intent = new Intent(getApplicationContext(), Home.class);
-                    startActivity(intent);
-                    finish();
-                }
+            prefs.edit().putBoolean(prefmarker, agreeCheckBox.isChecked()).apply();
+            IUnderstand = prefs.getBoolean(prefmarker, false);
+            if (IUnderstand) {
+                Intent intent = new Intent(getApplicationContext(), Home.class);
+                startActivity(intent);
+                finish();
             }
-
         });
     }
 }

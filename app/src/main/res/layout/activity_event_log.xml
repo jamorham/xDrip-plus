@@ -6,7 +6,7 @@
 
     <data>
 
-        <import type="me.tatarka.bindingcollectionadapter2.LayoutManagers" />
+        <!--import type="me.tatarka.bindingcollectionadapter2.LayoutManagers" /-->
 
         <variable
             name="viewModel"
@@ -22,7 +22,7 @@
          android:layout_height="match_parent">
          -->
 
-    <android.support.constraint.ConstraintLayout
+    <androidx.constraintlayout.widget.ConstraintLayout
         android:id="@+id/log_main_layout"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
@@ -96,35 +96,35 @@
             app:showIfTrue="@{viewModel.showLoading}" />
 
 
-        <android.support.v7.widget.RecyclerView
+        <androidx.recyclerview.widget.RecyclerView
             android:id="@+id/event_log_recycler"
             android:layout_width="0dp"
             android:layout_height="0dp"
-            android:layout_marginBottom="0dp"
-            android:layout_marginEnd="8dp"
             android:layout_marginStart="8dp"
+            android:layout_marginEnd="8dp"
+            android:layout_marginBottom="0dp"
             android:layout_weight="1"
             android:onViewAttachedToWindow="@{viewModel::initRecycler}"
             android:paddingBottom="0dp"
             app:adapter="@{viewModel.adapterChain}"
             app:itemBinding="@{viewModel.itemBinding}"
             app:items="@{viewModel.visible}"
-            app:layoutManager="@{LayoutManagers.linear()}"
+            app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
             app:layout_constraintBottom_toTopOf="@+id/event_log_buttons"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@+id/severityHolder">
 
-        </android.support.v7.widget.RecyclerView>
+        </androidx.recyclerview.widget.RecyclerView>
 
         <LinearLayout
             android:id="@+id/event_log_buttons"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginBottom="0dp"
+            android:layout_marginStart="8dp"
             android:layout_marginTop="0dp"
             android:layout_marginEnd="8dp"
-            android:layout_marginStart="8dp"
+            android:layout_marginBottom="0dp"
             android:layout_weight="100"
             android:gravity="center_vertical|center_horizontal"
             android:orientation="horizontal"
@@ -153,9 +153,7 @@
         </LinearLayout>
 
 
-
-
-    </android.support.constraint.ConstraintLayout>
+    </androidx.constraintlayout.widget.ConstraintLayout>
 
     <!--
       <fragment

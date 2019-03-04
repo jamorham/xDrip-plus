@@ -4,49 +4,26 @@ package com.eveningoutpost.dexdrip;
  * Created by jamorham on 01/10/2017.
  */
 
+import android.content.*;
+import androidx.test.*;
+import androidx.test.espresso.*;
+import androidx.test.rule.*;
+import androidx.appcompat.app.*;
+import android.view.*;
 
-import android.app.Activity;
-import android.content.Context;
-import android.support.test.InstrumentationRegistry;
-import android.support.test.annotation.UiThreadTest;
-import android.support.test.espresso.NoActivityResumedException;
-import android.support.test.espresso.ViewInteraction;
-import android.support.test.rule.ActivityTestRule;
-import android.support.test.runner.AndroidJUnit4;
-import android.view.WindowManager;
+import com.schibsted.spain.barista.flakyespresso.*;
 
-import com.schibsted.spain.barista.cleardata.ClearDatabaseRule;
-import com.schibsted.spain.barista.cleardata.ClearFilesRule;
-import com.schibsted.spain.barista.cleardata.ClearPreferencesRule;
-import com.schibsted.spain.barista.flakyespresso.AllowFlaky;
+import org.junit.*;
+import org.junit.runner.*;
+import org.junit.runners.*;
 
-import org.junit.After;
-import org.junit.Before;
-import org.junit.FixMethodOrder;
-import org.junit.Rule;
-import org.junit.Test;
-import org.junit.runner.RunWith;
-import org.junit.runners.MethodSorters;
+import java.io.*;
 
-import java.io.File;
-import java.util.concurrent.TimeUnit;
-
-import static android.support.test.espresso.Espresso.onView;
-import static android.support.test.espresso.Espresso.pressBack;
-import static android.support.test.espresso.action.ViewActions.click;
-import static android.support.test.espresso.assertion.ViewAssertions.matches;
-import static android.support.test.espresso.matcher.ViewMatchers.withId;
-import static android.support.test.espresso.matcher.ViewMatchers.withText;
-import static com.schibsted.spain.barista.custom.NestedEnabledScrollToAction.scrollTo;
-import static org.hamcrest.core.AllOf.allOf;
-
-
-import static com.schibsted.spain.barista.BaristaAssertions.assertDisplayed;
-import static com.schibsted.spain.barista.BaristaClickActions.click;
-import static com.schibsted.spain.barista.BaristaClickActions.clickBack;
-import static com.schibsted.spain.barista.BaristaAssertions.assertDisplayed;
-import static com.schibsted.spain.barista.BaristaAssertions.assertNotDisplayed;
-import static com.schibsted.spain.barista.BaristaScrollActions.scrollTo;
+import static androidx.test.espresso.Espresso.*;
+import static androidx.test.espresso.assertion.ViewAssertions.*;
+import static androidx.test.espresso.matcher.ViewMatchers.*;
+import static com.schibsted.spain.barista.BaristaClickActions.*;
+import static com.schibsted.spain.barista.BaristaScrollActions.*;
 
 @RunWith(AndroidJUnit4.class)
 @FixMethodOrder(MethodSorters.NAME_ASCENDING)
@@ -61,7 +38,7 @@ public class HomeEspressoTest {
             clearAllPrefs();
         }
 
-        final Activity activity = mActivityRule.getActivity();
+        final AppCompatActivity activity = mActivityRule.getActivity();
         activity.getWindow().addFlags(WindowManager.LayoutParams.FLAG_SHOW_WHEN_LOCKED
                 | WindowManager.LayoutParams.FLAG_DISMISS_KEYGUARD
                 | WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON

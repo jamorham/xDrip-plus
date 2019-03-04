@@ -2,52 +2,31 @@ package com.eveningoutpost.dexdrip;
 
 //KS import android.app.NotificationManager;
 
-import android.app.ActivityManager;
-import android.content.BroadcastReceiver;
-import android.content.Context;
-import android.content.Intent;
-import android.content.IntentFilter;
-import android.content.SharedPreferences;
-import android.graphics.Canvas;
-import android.graphics.Color;
-import android.graphics.Paint;
-import android.graphics.Point;
-import android.graphics.Rect;
-import android.os.BatteryManager;
-import android.os.Bundle;
-import android.os.PowerManager;
-import android.preference.PreferenceManager;
-import android.support.v4.content.LocalBroadcastManager;
-import android.support.wearable.view.WatchViewStub;
-import android.text.TextUtils;
-import android.view.Display;
-import android.view.View;
-import android.view.WindowInsets;
-import android.view.WindowManager;
-import android.widget.Button;
-import android.widget.LinearLayout;
-import android.widget.RelativeLayout;
-import android.widget.TextView;
+import android.app.*;
+import android.content.*;
+import android.graphics.*;
+import android.os.*;
+import android.preference.*;
+import android.support.wearable.view.*;
+import android.text.*;
+import android.view.*;
+import android.widget.*;
 
-import com.eveningoutpost.dexdrip.Models.JoH;
-import com.eveningoutpost.dexdrip.Models.UserError.Log;
-import com.eveningoutpost.dexdrip.Services.HeartRateService;
-import com.eveningoutpost.dexdrip.UtilityModels.BgSendQueue;
-import com.eveningoutpost.dexdrip.UtilityModels.Pref;
-import com.eveningoutpost.dexdrip.utils.DexCollectionType;
-import com.google.android.gms.wearable.DataMap;
-import com.ustwo.clockwise.common.WatchFaceTime;
-import com.ustwo.clockwise.common.WatchMode;
-import com.ustwo.clockwise.common.WatchShape;
-import com.ustwo.clockwise.wearable.WatchFace;
+import androidx.localbroadcastmanager.content.*;
 
-import java.text.DecimalFormat;
-import java.text.SimpleDateFormat;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.Locale;
+import com.eveningoutpost.dexdrip.models.*;
+import com.eveningoutpost.dexdrip.models.UserError.*;
+import com.eveningoutpost.dexdrip.services.*;
+import com.eveningoutpost.dexdrip.utilitymodels.*;
+import com.eveningoutpost.dexdrip.utils.*;
+import com.google.android.gms.wearable.*;
+import com.ustwo.clockwise.common.*;
+import com.ustwo.clockwise.wearable.*;
 
-import lecho.lib.hellocharts.view.LineChartView;
+import java.text.*;
+import java.util.*;
+
+import lecho.lib.hellocharts.view.*;
 
 /**
  * Created by Emma Black on 12/29/14.
@@ -124,7 +103,7 @@ public  abstract class BaseWatchFace extends WatchFace implements SharedPreferen
         Display display = ((WindowManager) getSystemService(Context.WINDOW_SERVICE))
                 .getDefaultDisplay();
         display.getSize(displaySize);
-        wakeLock = ((PowerManager) getSystemService(Context.POWER_SERVICE)).newWakeLock(PowerManager.PARTIAL_WAKE_LOCK, "Clock");
+        wakeLock = ((PowerManager) getSystemService(Context.POWER_SERVICE)).newWakeLock(PowerManager.PARTIAL_WAKE_LOCK, ":Clock");
 
         specW = View.MeasureSpec.makeMeasureSpec(displaySize.x,
                 View.MeasureSpec.EXACTLY);
@@ -151,50 +130,47 @@ public  abstract class BaseWatchFace extends WatchFace implements SharedPreferen
         localBroadcastManager = LocalBroadcastManager.getInstance(this);
         localBroadcastManager.registerReceiver(messageReceiver, messageFilter);
 
-        stub.setOnLayoutInflatedListener(new WatchViewStub.OnLayoutInflatedListener() {
-            @Override
-            public void onLayoutInflated(WatchViewStub stub) {
-                mTime = (TextView) stub.findViewById(R.id.watch_time);
-                mDate = (TextView) stub.findViewById(R.id.watch_date);
-                mSgv = (TextView) stub.findViewById(R.id.sgv);
-                mDirection = (TextView) stub.findViewById(R.id.direction);
-                mTimestamp = (TextView) stub.findViewById(R.id.timestamp);
-                mStatus = (TextView) stub.findViewById(R.id.externaltstatus);
-                mRaw = (TextView) stub.findViewById(R.id.raw);
-                mUploaderBattery = (TextView) stub.findViewById(R.id.uploader_battery);
-                mUploaderXBattery = (TextView) stub.findViewById(R.id.uploader_xbattery);
-                mDelta = (TextView) stub.findViewById(R.id.delta);
-                stepsButton=(Button)stub.findViewById(R.id.walkButton);
-                try {
-                    heartButton=(Button)stub.findViewById(R.id.heartButton);
-                } catch (Exception e) {
-                    //
-                }
-                mStepsLinearLayout = (LinearLayout) stub.findViewById(R.id.steps_layout);
-                menuButton=(Button)stub.findViewById(R.id.menuButton);
-                mMenuLinearLayout = (LinearLayout) stub.findViewById(R.id.menu_layout);
-                mRelativeLayout = (RelativeLayout) stub.findViewById(R.id.main_layout);
-                mLinearLayout = (LinearLayout) stub.findViewById(R.id.secondary_layout);
-                mDirectionDelta = (LinearLayout) stub.findViewById(R.id.directiondelta_layout);
-                setSmallFontsize(false);
-                chart = (LineChartView) stub.findViewById(R.id.chart);
-                layoutSet = true;
-                Context context = xdrip.getAppContext();
-                if (Home.get_forced_wear()) {
-                    if (d) Log.d(TAG, "performViewSetup FORCE WEAR init BGs for graph");
-                    BgSendQueue.resendData(context);
-                }
-                if ((chart != null) && sharedPrefs.getBoolean("show_wear_treatments", false)) {
-                    if (d) Log.d(TAG, "performViewSetup init Treatments for graph");
-                    ListenerService.showTreatments(context, "all");
-                }
-                showAgoRawBattStatus();
-                mRelativeLayout.measure(specW, specH);
-                mRelativeLayout.layout(0, 0, mRelativeLayout.getMeasuredWidth(),
-                        mRelativeLayout.getMeasuredHeight());
-                showSteps();
-                showHeartRate();
+        stub.setOnLayoutInflatedListener(stub1 -> {
+            mTime = (TextView) stub1.findViewById(R.id.watch_time);
+            mDate = (TextView) stub1.findViewById(R.id.watch_date);
+            mSgv = (TextView) stub1.findViewById(R.id.sgv);
+            mDirection = (TextView) stub1.findViewById(R.id.direction);
+            mTimestamp = (TextView) stub1.findViewById(R.id.timestamp);
+            mStatus = (TextView) stub1.findViewById(R.id.externaltstatus);
+            mRaw = (TextView) stub1.findViewById(R.id.raw);
+            mUploaderBattery = (TextView) stub1.findViewById(R.id.uploader_battery);
+            mUploaderXBattery = (TextView) stub1.findViewById(R.id.uploader_xbattery);
+            mDelta = (TextView) stub1.findViewById(R.id.delta);
+            stepsButton=(Button) stub1.findViewById(R.id.walkButton);
+            try {
+                heartButton=(Button) stub1.findViewById(R.id.heartButton);
+            } catch (Exception e) {
+                //
             }
+            mStepsLinearLayout = (LinearLayout) stub1.findViewById(R.id.steps_layout);
+            menuButton=(Button) stub1.findViewById(R.id.menuButton);
+            mMenuLinearLayout = (LinearLayout) stub1.findViewById(R.id.menu_layout);
+            mRelativeLayout = (RelativeLayout) stub1.findViewById(R.id.main_layout);
+            mLinearLayout = (LinearLayout) stub1.findViewById(R.id.secondary_layout);
+            mDirectionDelta = (LinearLayout) stub1.findViewById(R.id.directiondelta_layout);
+            setSmallFontsize(false);
+            chart = (LineChartView) stub1.findViewById(R.id.chart);
+            layoutSet = true;
+            Context context = xdrip.getAppContext();
+            if (Home.get_forced_wear()) {
+                if (d) Log.d(TAG, "performViewSetup FORCE WEAR init BGs for graph");
+                BgSendQueue.resendData(context);
+            }
+            if ((chart != null) && sharedPrefs.getBoolean("show_wear_treatments", false)) {
+                if (d) Log.d(TAG, "performViewSetup init Treatments for graph");
+                ListenerService.showTreatments(context, "all");
+            }
+            showAgoRawBattStatus();
+            mRelativeLayout.measure(specW, specH);
+            mRelativeLayout.layout(0, 0, mRelativeLayout.getMeasuredWidth(),
+                    mRelativeLayout.getMeasuredHeight());
+            showSteps();
+            showHeartRate();
         });
         Log.d(TAG, "performViewSetup requestData");
         ListenerService.requestData(this);
@@ -216,7 +192,7 @@ public  abstract class BaseWatchFace extends WatchFace implements SharedPreferen
             mStatus.setMaxLines(Integer.MAX_VALUE);
             mStatus.setEllipsize(null);
         }
-        if (toggle) sharedPrefs.edit().putString("toggle_fontsize", "" + fontvalue).commit();
+        if (toggle) sharedPrefs.edit().putString("toggle_fontsize", "" + fontvalue).apply();
     }
 
     private void setStatusTextSize(int size) {
@@ -377,7 +353,7 @@ public  abstract class BaseWatchFace extends WatchFace implements SharedPreferen
                 dataMap = DataMap.fromBundle(bundle);
                 String localeStr = dataMap.getString("locale", "");
                 if (d) Log.d(TAG, "MessageReceiver locale=" + localeStr);
-                String locale[] = localeStr.split("_");
+                String[] locale = localeStr.split("_");
                 final Locale newLocale = locale == null ? new Locale(localeStr) : locale.length > 1 ? new Locale(locale[0], locale[1]) : new Locale(locale[0]);//eg"en", "en_AU"
                 final Locale curLocale = Locale.getDefault();
                 if (newLocale != null && !curLocale.equals(newLocale)) {
@@ -532,7 +508,7 @@ public  abstract class BaseWatchFace extends WatchFace implements SharedPreferen
     private void showSteps() {
         if (sharedPrefs.getBoolean("showSteps", false)) {
             stepsButton.setVisibility(View.VISIBLE);
-            stepsButton.setText(String.format("%d", mStepsCount));
+            stepsButton.setText(String.format(Locale.getDefault(), "%d", mStepsCount));
             if (mStepsCount > 0) {
                 DecimalFormat df = new DecimalFormat("#.##");
                 Double km = (((double) mStepsCount) / 2000.0d) * 1.6d;
@@ -561,7 +537,7 @@ public  abstract class BaseWatchFace extends WatchFace implements SharedPreferen
         if ((mHeartBPM > 0) && (JoH.msSince(mTimeHeartRcvd) <= HeartRateService.READING_PERIOD * 2)
                 && (sharedPrefs.getBoolean("showHeartRate", false) && (heartButton != null))) {
             heartButton.setVisibility(View.VISIBLE);
-            heartButton.setText(String.format("%d", mHeartBPM));
+            heartButton.setText(String.format(Locale.getDefault(), "%d", mHeartBPM));
         } else {
             if (heartButton != null) heartButton.setVisibility(View.GONE);
         }

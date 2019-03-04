@@ -4,22 +4,18 @@ package com.eveningoutpost.dexdrip.utils;
  * Created by jamorham on 06/01/16.
  */
 
-import android.util.Base64;
-import android.util.Log;
+import android.util.*;
+
+import com.eveningoutpost.dexdrip.models.*;
+
+import java.nio.charset.*;
+import java.security.*;
+import java.security.spec.*;
+
+import javax.crypto.*;
+import javax.crypto.spec.*;
 
 //KS import com.eveningoutpost.dexdrip.GoogleDriveInterface;
-import com.eveningoutpost.dexdrip.Models.JoH;
-
-import java.io.UnsupportedEncodingException;
-import java.nio.charset.Charset;
-import java.security.MessageDigest;
-import java.security.NoSuchAlgorithmException;
-import java.security.SecureRandom;
-import java.security.spec.AlgorithmParameterSpec;
-
-import javax.crypto.Cipher;
-import javax.crypto.spec.IvParameterSpec;
-import javax.crypto.spec.SecretKeySpec;
 
 public class CipherUtils {
 
@@ -164,10 +160,7 @@ public class CipherUtils {
 
     public static String decryptString(String cipherData) {
         try {
-            return new String(decryptStringToBytes(cipherData), "UTF-8");
-        } catch (UnsupportedEncodingException e) {
-            Log.e(TAG, "Got unsupported encoding on UTF8 " + e.toString());
-            return "";
+            return new String(decryptStringToBytes(cipherData), StandardCharsets.UTF_8);
         } catch (IllegalArgumentException e) {
             Log.e(TAG, "Got IllegalArgumentException encoding on UTF8 ", e);
             return "";

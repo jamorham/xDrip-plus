@@ -1,8 +1,8 @@
 package com.eveningoutpost.dexdrip.webservices;
 
-import com.eveningoutpost.dexdrip.Models.JoH;
-import com.eveningoutpost.dexdrip.Models.StepCounter;
-import com.eveningoutpost.dexdrip.Models.UserError;
+import com.eveningoutpost.dexdrip.models.JoH;
+import com.eveningoutpost.dexdrip.models.StepCounter;
+import com.eveningoutpost.dexdrip.models.UserError;
 
 import java.util.List;
 
@@ -17,7 +17,7 @@ import java.util.List;
 
 public class WebServiceSteps extends BaseWebService {
 
-    private static String TAG = "WebServiceSteps";
+    private static String TAG = WebServiceSteps.class.getSimpleName();
 
     // process the request and produce a response object
     public WebResponse request(String query) {

@@ -1,130 +1,130 @@
 <?xml version="1.0" encoding="utf-8"?>
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:paddingBottom="@dimen/activity_vertical_margin"
     android:paddingLeft="@dimen/activity_horizontal_margin"
-    android:paddingRight="@dimen/activity_horizontal_margin"
     android:paddingTop="@dimen/activity_vertical_margin"
-    tools:context="com.eveningoutpost.dexdrip.UtilityModels.UpdateActivity">
+    android:paddingRight="@dimen/activity_horizontal_margin"
+    android:paddingBottom="@dimen/activity_vertical_margin"
+    tools:context="com.eveningoutpost.dexdrip.utilitymodels.UpdateActivity">
 
     <ScrollView
+        android:id="@+id/updateScrollView"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:id="@+id/updateScrollView"
         android:layout_above="@+id/imageButton2"
-        android:layout_alignParentEnd="true"
+        android:layout_alignParentStart="true"
         android:layout_alignParentTop="true"
-        android:layout_alignParentStart="true">
+        android:layout_alignParentEnd="true">
 
         <LinearLayout
-            android:orientation="vertical"
+            android:id="@+id/linearLayout2"
             android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:layout_alignParentBottom="true"
+            android:layout_height="wrap_content"
             android:layout_alignParentEnd="true"
-            android:id="@+id/linearLayout2">
+            android:layout_alignParentBottom="true"
+            android:orientation="vertical">
 
             <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:textAppearance="?android:attr/textAppearanceLarge"
-                android:text="@string/update_channel_colon_space"
                 android:id="@+id/update_channel"
-
-                android:layout_gravity="center_horizontal" />
-
-            <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:textAppearance="?android:attr/textAppearanceMedium"
-                android:text="@string/a_new_version_is_available"
+                android:layout_gravity="center_horizontal"
+                android:text="@string/update_channel_colon_space"
+
+                android:textAppearance="?android:attr/textAppearanceLarge" />
+
+            <TextView
                 android:id="@+id/anewversionisavailable"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
                 android:layout_alignParentTop="true"
                 android:layout_gravity="center_horizontal"
-                android:layout_marginTop="37dp" />
+                android:layout_marginTop="37dp"
+                android:text="@string/a_new_version_is_available"
+                android:textAppearance="?android:attr/textAppearanceMedium" />
 
             <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:textAppearance="?android:attr/textAppearanceMedium"
-                android:text="@string/version_details"
-                android:layout_marginTop="15dp"
                 android:id="@+id/updatedetail"
-                android:layout_gravity="center_horizontal"
-                />
-
-            <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:textAppearance="?android:attr/textAppearanceSmall"
-                android:text="Lorem ipsum dolor sit amet, cu porro dissentiunt eos. Sed ea modus mundi vocent, id duo timeam civibus. Dicit deserunt explicari in usu, elit corrumpit per ex."
-                android:id="@+id/updatemessage"
-                android:layout_marginTop="5dp"
                 android:layout_gravity="center_horizontal"
+                android:layout_marginTop="15dp"
+                android:text="@string/version_details"
+                android:textAppearance="?android:attr/textAppearanceMedium" />
+
+            <TextView
+                android:id="@+id/updatemessage"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center_horizontal"
+                android:layout_marginTop="5dp"
+                android:text="Lorem ipsum dolor sit amet, cu porro dissentiunt eos. Sed ea modus mundi vocent, id duo timeam civibus. Dicit deserunt explicari in usu, elit corrumpit per ex."
+                android:textAppearance="?android:attr/textAppearanceSmall"
                 android:textColor="#f9fbe7" />
 
             <Button
+                android:id="@+id/downloadbutton"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="@string/download_now"
-                android:id="@+id/downloadbutton"
                 android:layout_below="@+id/autoupdate"
+                android:layout_gravity="center_horizontal"
 
-                android:onClick="downloadNow"
                 android:layout_marginTop="20dp"
-                android:layout_gravity="center_horizontal" />
+                android:onClick="downloadNow"
+                android:text="@string/download_now" />
 
             <Switch
+                android:id="@+id/autoupdate"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="@string/automatically_check_for_updates"
-                android:id="@+id/autoupdate"
-                android:layout_marginTop="28dp"
                 android:layout_gravity="center_horizontal"
+                android:layout_marginTop="28dp"
+                android:checked="true"
 
-                android:checked="true" />
+                android:text="@string/automatically_check_for_updates" />
 
             <CheckBox
+                android:id="@+id/internaldownloadercheckBox"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="@string/use_internal_downloader"
-                android:id="@+id/internaldownloadercheckBox"
                 android:layout_gravity="center_horizontal"
+                android:layout_marginTop="10dp"
                 android:checked="true"
-                android:layout_marginTop="10dp" />
+                android:text="@string/use_internal_downloader" />
 
             <ProgressBar
+                android:id="@+id/progressBar"
                 style="?android:attr/progressBarStyleHorizontal"
                 android:layout_width="fill_parent"
                 android:layout_height="wrap_content"
-                android:id="@+id/progressBar"
                 android:layout_alignBottom="@+id/internaldownloadercheckBox"
                 android:layout_alignParentStart="true" />
 
             <TextView
+                android:id="@+id/progresstext"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:textAppearance="?android:attr/textAppearanceSmall"
-                android:text="@string/progress"
-                android:id="@+id/progresstext"
-                android:layout_marginTop="10dp"
                 android:layout_alignBottom="@+id/progressBar"
                 android:layout_centerHorizontal="true"
-                android:layout_gravity="right" />
+                android:layout_gravity="right"
+                android:layout_marginTop="10dp"
+                android:text="@string/progress"
+                android:textAppearance="?android:attr/textAppearanceSmall" />
 
         </LinearLayout>
     </ScrollView>
 
     <ImageButton
+        android:id="@+id/imageButton2"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:id="@+id/imageButton2"
-        android:onClick="closeActivity"
-        android:src="@android:drawable/ic_delete"
+        android:layout_alignEnd="@+id/updateScrollView"
         android:layout_alignParentBottom="true"
-        android:layout_alignEnd="@+id/updateScrollView" />
+        android:onClick="closeActivity"
+        app:srcCompat="@android:drawable/ic_delete" />
 
 
 </RelativeLayout>

@@ -1,22 +1,20 @@
 package com.eveningoutpost.dexdrip;
 
-import android.app.AlertDialog;
-import android.content.DialogInterface;
-import android.content.Intent;
-import android.os.Bundle;
-import android.view.View;
-import android.widget.Button;
+import android.content.DialogInterface.*;
+import android.content.*;
+import android.os.*;
+import android.view.*;
+import android.widget.*;
 
-import com.eveningoutpost.dexdrip.G5Model.Ob1G5StateMachine;
-import com.eveningoutpost.dexdrip.Models.Calibration;
-import com.eveningoutpost.dexdrip.Models.JoH;
-import com.eveningoutpost.dexdrip.Models.Sensor;
-import com.eveningoutpost.dexdrip.UtilityModels.AlertPlayer;
-import com.eveningoutpost.dexdrip.UtilityModels.CollectionServiceStarter;
-import com.eveningoutpost.dexdrip.UtilityModels.Inevitable;
-import com.eveningoutpost.dexdrip.calibrations.PluggableCalibration;
-import com.eveningoutpost.dexdrip.utils.ActivityWithMenu;
-import static com.eveningoutpost.dexdrip.xdrip.gs;
+import androidx.appcompat.app.*;
+
+import com.eveningoutpost.dexdrip.g5Model.*;
+import com.eveningoutpost.dexdrip.models.*;
+import com.eveningoutpost.dexdrip.utilitymodels.*;
+import com.eveningoutpost.dexdrip.calibrations.*;
+import com.eveningoutpost.dexdrip.utils.*;
+
+import static com.eveningoutpost.dexdrip.xdrip.*;
 
 public class StopSensor extends ActivityWithMenu {
    public Button button;
@@ -24,7 +22,7 @@ public class StopSensor extends ActivityWithMenu {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        if(Sensor.isActive() == false) {
+        if(!Sensor.isActive()) {
             Intent intent = new Intent(this, StartNewSensor.class);
             startActivity(intent);
             finish();
@@ -45,13 +43,10 @@ public class StopSensor extends ActivityWithMenu {
 
         button = (Button)findViewById(R.id.stop_sensor);
 
-        button.setOnClickListener(new View.OnClickListener() {
-            public void onClick(View v) {
-                stop();
-                JoH.startActivity(Home.class);
-                finish();
-            }
-
+        button.setOnClickListener(v -> {
+            stop();
+            JoH.startActivity(Home.class);
+            finish();
         });
     }
 
@@ -77,20 +72,12 @@ public class StopSensor extends ActivityWithMenu {
         builder.setTitle(gs(R.string.are_you_sure));
         builder.setMessage(gs(R.string.do_you_want_to_delete_and_reset_the_calibrations_for_this_sensor));
 
-        builder.setNegativeButton("No", new DialogInterface.OnClickListener() {
-            public void onClick(DialogInterface dialog, int which) {
-                dialog.dismiss();
+        builder.setNegativeButton("No", (OnClickListener) (dialog, which) -> dialog.dismiss());
 
-            }
-        });
-
-        builder.setPositiveButton("Yes", new DialogInterface.OnClickListener() {
-            @Override
-            public void onClick(DialogInterface dialog, int which) {
-                Calibration.invalidateAllForSensor();
-                dialog.dismiss();
-                finish();
-            }
+        builder.setPositiveButton("Yes", (OnClickListener) (dialog, which) -> {
+            Calibration.invalidateAllForSensor();
+            dialog.dismiss();
+            finish();
         });
         builder.create().show();
 

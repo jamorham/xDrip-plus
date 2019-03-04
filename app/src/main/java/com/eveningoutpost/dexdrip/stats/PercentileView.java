@@ -1,29 +1,17 @@
 package com.eveningoutpost.dexdrip.stats;
 
-import android.content.Context;
-import android.content.SharedPreferences;
-import android.content.res.Resources;
-import android.graphics.Canvas;
-import android.graphics.Color;
-import android.graphics.CornerPathEffect;
-import android.graphics.DashPathEffect;
-import android.graphics.Paint;
-import android.graphics.Path;
-import android.preference.PreferenceManager;
-import android.util.DisplayMetrics;
+import android.content.*;
+import android.content.res.*;
+import android.graphics.*;
+import android.preference.*;
+import android.util.*;
+import android.view.*;
 
-import com.eveningoutpost.dexdrip.Models.UserError.Log;
-import android.view.View;
+import com.eveningoutpost.dexdrip.models.UserError.Log;
+import com.eveningoutpost.dexdrip.*;
+import com.eveningoutpost.dexdrip.utilitymodels.*;
 
-import com.eveningoutpost.dexdrip.R;
-import com.eveningoutpost.dexdrip.UtilityModels.Constants;
-import com.eveningoutpost.dexdrip.UtilityModels.Pref;
-
-import java.util.Calendar;
-import java.util.Collections;
-import java.util.GregorianCalendar;
-import java.util.List;
-import java.util.Vector;
+import java.util.*;
 
 /**
  * Created by adrian on 30/06/15.
@@ -282,7 +270,7 @@ public class PercentileView extends View {
                     for (int i = 0; i < NO_TIMESLOTS; i++) {
                         int begin = i * timeslot;
                         int end = begin + timeslot;
-                        List<Double> filtered = new Vector<Double>();
+                        List<Double> filtered = new Vector<>();
 
                         for (BgReadingStats reading : readings) {
                             long timeOfDay = (reading.timestamp - offset) % day;
@@ -291,7 +279,7 @@ public class PercentileView extends View {
                             }
                         }
                         Collections.sort(filtered);
-                        if (filtered.size() > 0) {
+                        if (!filtered.isEmpty()) {
                             q10[i] = filtered.get((int) (filtered.size() * 0.1));
                             q25[i] = filtered.get((int) (filtered.size() * 0.25));
                             q50[i] = filtered.get((int) (filtered.size() * 0.50));

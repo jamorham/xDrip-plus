@@ -15,7 +15,7 @@ import dagger.Component;
  */
 
 @Singleton
-@Component(modules = {HomeShelfModule.class})
+@Component(modules = HomeShelfModule.class)
 public interface HomeShelfComponent {
 
     void inject(Home target);

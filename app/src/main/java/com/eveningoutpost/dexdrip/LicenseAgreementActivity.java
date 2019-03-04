@@ -1,22 +1,18 @@
 package com.eveningoutpost.dexdrip;
 
-import android.content.Intent;
-import android.content.SharedPreferences;
-import android.graphics.Color;
-import android.os.Bundle;
-import android.preference.PreferenceManager;
-import android.support.v7.app.AppCompatActivity;
-import android.view.View;
-import android.webkit.WebView;
-import android.widget.Button;
-import android.widget.CheckBox;
+import android.content.*;
+import android.graphics.*;
+import android.os.*;
+import android.preference.*;
+import android.view.*;
+import android.webkit.*;
+import android.widget.*;
 
-import com.eveningoutpost.dexdrip.Models.JoH;
-import com.eveningoutpost.dexdrip.Models.UserError;
-import com.google.android.gms.common.GoogleApiAvailability;
+import com.eveningoutpost.dexdrip.models.*;
+import com.google.android.gms.common.*;
 
 
-public class LicenseAgreementActivity extends BaseAppCompatActivity {
+public class LicenseAgreementActivity extends BaseActivity {
     boolean IUnderstand;
     boolean appended = false;
     CheckBox agreeCheckBox;
@@ -53,10 +49,18 @@ public class LicenseAgreementActivity extends BaseAppCompatActivity {
         }*/
     }
 
+    /**
+     * TODO
+     * getOpenSourceSoftwareLicenseInfo(Context context)
+     * This method was deprecated. This license information is displayed in Settings > Google > Open
+     * Source on any device running Google Play services.
+     * Applications do not need to display this license text, and this method will be removed in a future version of Google Play services.
+     */
+    @Deprecated
     public void viewGoogleLicenses(View myview) {
         try {
             if (!appended) {
-                final String googleLicense = GoogleApiAvailability.getInstance().getOpenSourceSoftwareLicenseInfo(getApplicationContext());
+                final String googleLicense = null; //GoogleApiAvailability.getInstance().getOpenSourceSoftwareLicenseInfo(getApplicationContext());
                 if (googleLicense != null) {
                     String whiteheader = "<font size=-2 color=white><pre>";
                     String whitefooter = "</font></pre>";
@@ -83,16 +87,13 @@ public class LicenseAgreementActivity extends BaseAppCompatActivity {
     }
 
     public void addListenerOnButton() {
-        saveButton.setOnClickListener(new View.OnClickListener() {
-            public void onClick(View v) {
+        saveButton.setOnClickListener(v -> {
 
-                prefs.edit().putBoolean("I_understand", agreeCheckBox.isChecked()).apply();
+            prefs.edit().putBoolean("I_understand", agreeCheckBox.isChecked()).apply();
 
-                Intent intent = new Intent(getApplicationContext(), Home.class);
-                startActivity(intent);
-                finish();
-            }
-
+            Intent intent = new Intent(getApplicationContext(), Home.class);
+            startActivity(intent);
+            finish();
         });
     }
 }

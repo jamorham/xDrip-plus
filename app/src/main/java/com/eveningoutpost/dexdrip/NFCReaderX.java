@@ -1,43 +1,28 @@
 package com.eveningoutpost.dexdrip;
 
-import android.annotation.SuppressLint;
-import android.app.Activity;
-import android.app.PendingIntent;
-import android.content.ComponentName;
-import android.content.Context;
-import android.content.Intent;
-import android.content.IntentFilter;
-import android.content.pm.PackageManager;
-import android.nfc.NfcAdapter;
-import android.nfc.NfcManager;
-import android.nfc.Tag;
-import android.nfc.tech.NfcV;
-import android.os.AsyncTask;
-import android.os.Build;
-import android.os.Bundle;
-import android.os.Handler;
-import android.os.PowerManager;
-import android.os.Vibrator;
-import android.view.View;
+import android.annotation.*;
+import android.app.*;
+import android.content.*;
+import android.content.pm.*;
+import android.nfc.*;
+import android.nfc.NfcAdapter.*;
+import android.nfc.tech.*;
+import android.os.*;
+import android.view.*;
 
-import com.eveningoutpost.dexdrip.ImportedLibraries.usbserial.util.HexDump;
-import com.eveningoutpost.dexdrip.Models.GlucoseData;
-import com.eveningoutpost.dexdrip.Models.JoH;
-import com.eveningoutpost.dexdrip.Models.LibreBlock;
-import com.eveningoutpost.dexdrip.Models.LibreOOPAlgorithm;
-import com.eveningoutpost.dexdrip.Models.ReadingData;
-import com.eveningoutpost.dexdrip.Models.UserError.Log;
-import com.eveningoutpost.dexdrip.UtilityModels.LibreUtils;
-import com.eveningoutpost.dexdrip.UtilityModels.PersistentStore;
-import com.eveningoutpost.dexdrip.UtilityModels.Pref;
-import com.eveningoutpost.dexdrip.utils.DexCollectionType;
+import androidx.appcompat.app.*;
 
-import java.io.IOException;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.concurrent.locks.Lock;
-import java.util.concurrent.locks.ReentrantLock;
-import static com.eveningoutpost.dexdrip.xdrip.gs;
+import com.eveningoutpost.dexdrip.importedLibraries.usbserial.util.*;
+import com.eveningoutpost.dexdrip.models.*;
+import com.eveningoutpost.dexdrip.models.UserError.*;
+import com.eveningoutpost.dexdrip.utilitymodels.*;
+import com.eveningoutpost.dexdrip.utils.*;
+
+import java.io.*;
+import java.util.*;
+import java.util.concurrent.locks.*;
+
+import static com.eveningoutpost.dexdrip.xdrip.*;
 
 // From LibreAlarm et al
 
@@ -61,7 +46,7 @@ public class NFCReaderX {
     private static boolean nfc_enabled = false;
 
 
-    public static void stopNFC(Activity context) {
+    public static void stopNFC(AppCompatActivity context) {
         if (foreground_enabled) {
             try {
                 NfcAdapter.getDefaultAdapter(context).disableForegroundDispatch(context);
@@ -77,7 +62,7 @@ public class NFCReaderX {
     }
 
     @SuppressLint("NewApi")
-    public static void disableNFC(final Activity context) {
+    public static void disableNFC(final AppCompatActivity context) {
         if (nfc_enabled) {
             try {
                 if ((Build.VERSION.SDK_INT >= 19) && (useReaderMode)) {
@@ -93,7 +78,7 @@ public class NFCReaderX {
     }
 
     @SuppressLint("NewApi")
-    public static void doNFC(final Activity context) {
+    public static void doNFC(final AppCompatActivity context) {
 
         if (!useNFC()) return;
 
@@ -140,12 +125,9 @@ public class NFCReaderX {
                     mNfcAdapter.disableReaderMode(context);
                     final Bundle options = new Bundle();
                     options.putInt(NfcAdapter.EXTRA_READER_PRESENCE_CHECK_DELAY, 5000);
-                    mNfcAdapter.enableReaderMode(context, new NfcAdapter.ReaderCallback() {
-                        @Override
-                        public void onTagDiscovered(Tag tag) {
-                            Log.d(TAG, "Reader mode tag discovered");
-                            doTheScan(context, tag, false);
-                        }
+                    mNfcAdapter.enableReaderMode(context, (ReaderCallback) tag -> {
+                        Log.d(TAG, "Reader mode tag discovered");
+                        doTheScan(context, tag, false);
                     }, NfcAdapter.FLAG_READER_NFC_V | NfcAdapter.FLAG_READER_SKIP_NDEF_CHECK | NfcAdapter.FLAG_READER_NO_PLATFORM_SOUNDS, options);
                 } catch (NullPointerException e) {
                     Log.wtf(TAG, "Null pointer exception from NFC subsystem: " + e.toString());
@@ -174,7 +156,7 @@ public class NFCReaderX {
 
     }
 
-    private static synchronized void doTheScan(final Activity context, Tag tag, boolean showui) {
+    private static synchronized void doTheScan(final AppCompatActivity context, Tag tag, boolean showui) {
         synchronized (tag_lock) {
             if (!tag_discovered) {
                 if (!useNFC()) return;
@@ -207,7 +189,7 @@ public class NFCReaderX {
 
 
     // via intents
-    public static void tagFound(Activity context, Intent data) {
+    public static void tagFound(AppCompatActivity context, Intent data) {
 
         if (NfcAdapter.ACTION_TECH_DISCOVERED.equals(data.getAction())) {
             Tag tag = data.getParcelableExtra(NfcAdapter.EXTRA_TAG);
@@ -256,10 +238,10 @@ public class NFCReaderX {
 
     private static class NfcVReaderTask extends AsyncTask<Tag, Void, Tag> {
 
-        Activity context;
+        AppCompatActivity context;
         boolean succeeded = false;
 
-        public NfcVReaderTask(Activity context) {
+        public NfcVReaderTask(AppCompatActivity context) {
             this.context = context;
             last_read_succeeded = false;
             JoH.ratelimit("nfc-debounce", 1); // ping the timer
@@ -366,7 +348,7 @@ public class NFCReaderX {
                                 }
 
                                 byte[] replyBlock;
-                                Long time = System.currentTimeMillis();
+                                long time = System.currentTimeMillis();
                                 while (true) {
                                     try {
                                         replyBlock = nfcvTag.transceive(cmd);
@@ -413,7 +395,7 @@ public class NFCReaderX {
                                 final byte[] cmd = new byte[]{0x60, 0x20, 0, 0, 0, 0, 0, 0, 0, 0, (byte) i, 0};
                                 System.arraycopy(uid, 0, cmd, 2, 8);
                                 byte[] oneBlock;
-                                Long time = System.currentTimeMillis();
+                                long time = System.currentTimeMillis();
                                 while (true) {
                                     try {
                                         oneBlock = nfcvTag.transceive(cmd);
@@ -587,18 +569,15 @@ public class NFCReaderX {
         }
     }
 
-    public static synchronized void scanFromActivity(final Activity context, final Intent intent) {
+    public static synchronized void scanFromActivity(final AppCompatActivity context, final Intent intent) {
         if (NFCReaderX.useNFC()) {
             // sanity checking is in onward function
             final Handler handler = new Handler();
-            handler.postDelayed(new Runnable() {
-                @Override
-                public void run() {
-                    try {
-                        context.finish();
-                    } catch (Exception e) {
-                        //
-                    }
+            handler.postDelayed(() -> {
+                try {
+                    context.finish();
+                } catch (Exception e) {
+                    //
                 }
             }, 10000);
             if (JoH.ratelimit("nfc-filterx", 5)) {
@@ -613,7 +592,7 @@ public class NFCReaderX {
         }
     }
 
-    public static void windowFocusChange(final Activity context, boolean hasFocus, View decorView) {
+    public static void windowFocusChange(final AppCompatActivity context, boolean hasFocus, View decorView) {
         if (hasFocus) {
             if (Build.VERSION.SDK_INT >= 19) {
                 decorView.setSystemUiVisibility(
@@ -633,14 +612,11 @@ public class NFCReaderX {
             }
         } else {
             final Handler handler = new Handler();
-            handler.postDelayed(new Runnable() {
-                @Override
-                public void run() {
-                    try {
-                        context.finish();
-                    } catch (Exception e) {
-                        //
-                    }
+            handler.postDelayed(() -> {
+                try {
+                    context.finish();
+                } catch (Exception e) {
+                    //
                 }
             }, 1000);
         }

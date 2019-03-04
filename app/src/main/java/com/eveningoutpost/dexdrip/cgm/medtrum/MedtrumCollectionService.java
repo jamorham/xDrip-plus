@@ -9,22 +9,22 @@ import android.text.SpannableString;
 import android.util.Pair;
 
 import com.eveningoutpost.dexdrip.Home;
-import com.eveningoutpost.dexdrip.ImportedLibraries.usbserial.util.HexDump;
-import com.eveningoutpost.dexdrip.Models.ActiveBluetoothDevice;
-import com.eveningoutpost.dexdrip.Models.BgReading;
-import com.eveningoutpost.dexdrip.Models.JoH;
-import com.eveningoutpost.dexdrip.Models.Prediction;
-import com.eveningoutpost.dexdrip.Models.TransmitterData;
-import com.eveningoutpost.dexdrip.Models.UserError;
+import com.eveningoutpost.dexdrip.importedLibraries.usbserial.util.HexDump;
+import com.eveningoutpost.dexdrip.models.ActiveBluetoothDevice;
+import com.eveningoutpost.dexdrip.models.BgReading;
+import com.eveningoutpost.dexdrip.models.JoH;
+import com.eveningoutpost.dexdrip.models.Prediction;
+import com.eveningoutpost.dexdrip.models.TransmitterData;
+import com.eveningoutpost.dexdrip.models.UserError;
 import com.eveningoutpost.dexdrip.R;
-import com.eveningoutpost.dexdrip.Services.JamBaseBluetoothService;
-import com.eveningoutpost.dexdrip.UtilityModels.BgGraphBuilder;
-import com.eveningoutpost.dexdrip.UtilityModels.Constants;
-import com.eveningoutpost.dexdrip.UtilityModels.Inevitable;
-import com.eveningoutpost.dexdrip.UtilityModels.PersistentStore;
-import com.eveningoutpost.dexdrip.UtilityModels.Pref;
-import com.eveningoutpost.dexdrip.UtilityModels.RxBleProvider;
-import com.eveningoutpost.dexdrip.UtilityModels.StatusItem;
+import com.eveningoutpost.dexdrip.services.JamBaseBluetoothService;
+import com.eveningoutpost.dexdrip.utilitymodels.BgGraphBuilder;
+import com.eveningoutpost.dexdrip.utilitymodels.Constants;
+import com.eveningoutpost.dexdrip.utilitymodels.Inevitable;
+import com.eveningoutpost.dexdrip.utilitymodels.PersistentStore;
+import com.eveningoutpost.dexdrip.utilitymodels.Pref;
+import com.eveningoutpost.dexdrip.utilitymodels.RxBleProvider;
+import com.eveningoutpost.dexdrip.utilitymodels.StatusItem;
 import com.eveningoutpost.dexdrip.cgm.medtrum.messages.AnnexARx;
 import com.eveningoutpost.dexdrip.cgm.medtrum.messages.AuthRx;
 import com.eveningoutpost.dexdrip.cgm.medtrum.messages.AuthTx;
@@ -58,18 +58,18 @@ import java.util.concurrent.TimeUnit;
 import rx.Subscription;
 import rx.schedulers.Schedulers;
 
-import static com.eveningoutpost.dexdrip.Models.BgReading.bgReadingInsertMedtrum;
-import static com.eveningoutpost.dexdrip.Models.JoH.msSince;
-import static com.eveningoutpost.dexdrip.Models.JoH.msTill;
-import static com.eveningoutpost.dexdrip.Models.JoH.quietratelimit;
-import static com.eveningoutpost.dexdrip.UtilityModels.Constants.HOUR_IN_MS;
-import static com.eveningoutpost.dexdrip.UtilityModels.Constants.MEDTRUM_SERVICE_FAILOVER_ID;
-import static com.eveningoutpost.dexdrip.UtilityModels.Constants.MEDTRUM_SERVICE_RETRY_ID;
-import static com.eveningoutpost.dexdrip.UtilityModels.Constants.MINUTE_IN_MS;
-import static com.eveningoutpost.dexdrip.UtilityModels.StatusItem.Highlight.BAD;
-import static com.eveningoutpost.dexdrip.UtilityModels.StatusItem.Highlight.CRITICAL;
-import static com.eveningoutpost.dexdrip.UtilityModels.StatusItem.Highlight.GOOD;
-import static com.eveningoutpost.dexdrip.UtilityModels.StatusItem.Highlight.NORMAL;
+import static com.eveningoutpost.dexdrip.models.BgReading.bgReadingInsertMedtrum;
+import static com.eveningoutpost.dexdrip.models.JoH.msSince;
+import static com.eveningoutpost.dexdrip.models.JoH.msTill;
+import static com.eveningoutpost.dexdrip.models.JoH.quietratelimit;
+import static com.eveningoutpost.dexdrip.utilitymodels.Constants.HOUR_IN_MS;
+import static com.eveningoutpost.dexdrip.utilitymodels.Constants.MEDTRUM_SERVICE_FAILOVER_ID;
+import static com.eveningoutpost.dexdrip.utilitymodels.Constants.MEDTRUM_SERVICE_RETRY_ID;
+import static com.eveningoutpost.dexdrip.utilitymodels.Constants.MINUTE_IN_MS;
+import static com.eveningoutpost.dexdrip.utilitymodels.StatusItem.Highlight.BAD;
+import static com.eveningoutpost.dexdrip.utilitymodels.StatusItem.Highlight.CRITICAL;
+import static com.eveningoutpost.dexdrip.utilitymodels.StatusItem.Highlight.GOOD;
+import static com.eveningoutpost.dexdrip.utilitymodels.StatusItem.Highlight.NORMAL;
 import static com.eveningoutpost.dexdrip.cgm.medtrum.Const.CGM_CHARACTERISTIC_INDICATE;
 import static com.eveningoutpost.dexdrip.cgm.medtrum.Const.OPCODE_AUTH_REPLY;
 import static com.eveningoutpost.dexdrip.cgm.medtrum.Const.OPCODE_BACK_REPLY;
@@ -307,12 +307,7 @@ public class MedtrumCollectionService extends JamBaseBluetoothService implements
             notificationSubscription = connection.setupNotification(Const.CGM_CHARACTERISTIC_NOTIFY)
                     .timeout(LISTEN_STASIS_SECONDS, TimeUnit.SECONDS) // WARN
                     .observeOn(Schedulers.newThread())
-                    .doOnNext(notificationObservable -> {
-
-                        UserError.Log.d(TAG, "Notifications enabled");
-
-
-                    })
+                    .doOnNext(notificationObservable -> UserError.Log.d(TAG, "Notifications enabled"))
                     .flatMap(notificationObservable -> notificationObservable)
                     .subscribe(bytes -> {
                                 final PowerManager.WakeLock wl = JoH.getWakeLock("medtrum-receive-n", 60000);
@@ -328,9 +323,7 @@ public class MedtrumCollectionService extends JamBaseBluetoothService implements
                                 } finally {
                                     JoH.releaseWakeLock(wl);
                                 }
-                            }, throwable -> {
-                                UserError.Log.d(TAG, "notification throwable: " + throwable);
-                            }
+                            }, throwable -> UserError.Log.d(TAG, "notification throwable: " + throwable)
                     );
 
 
@@ -369,9 +362,7 @@ public class MedtrumCollectionService extends JamBaseBluetoothService implements
                                 } finally {
                                     JoH.releaseWakeLock(wl);
                                 }
-                            }, throwable -> {
-                                UserError.Log.d(TAG, "indication throwable: " + throwable);
-                            }
+                            }, throwable -> UserError.Log.d(TAG, "indication throwable: " + throwable)
                     );
         } else {
             UserError.Log.e(TAG, "Connection null when trying to set notifications");
@@ -404,9 +395,7 @@ public class MedtrumCollectionService extends JamBaseBluetoothService implements
                 stateSubscription = bleDevice.observeConnectionStateChanges()
                         // .observeOn(AndroidSchedulers.mainThread())
                         .subscribeOn(Schedulers.io())
-                        .subscribe(this::onConnectionStateChange, throwable -> {
-                            UserError.Log.wtf(TAG, "Got Error from state subscription: " + throwable);
-                        });
+                        .subscribe(this::onConnectionStateChange, throwable -> UserError.Log.wtf(TAG, "Got Error from state subscription: " + throwable));
 
                 // Attempt to establish a connection
                 listen_connected = false;
@@ -456,11 +445,7 @@ public class MedtrumCollectionService extends JamBaseBluetoothService implements
             try {
                 connection.writeCharacteristic(CGM_CHARACTERISTIC_INDICATE, nn(msg.getByteSequence()))
                         .subscribe(
-                                characteristicValue -> {
-                                    UserError.Log.d(TAG, "Wrote " + msg.getClass().getSimpleName() + " request: ");
-                                }, throwable -> {
-                                    UserError.Log.e(TAG, "Failed to write " + msg.getClass().getSimpleName() + " " + throwable);
-                                });
+                                characteristicValue -> UserError.Log.d(TAG, "Wrote " + msg.getClass().getSimpleName() + " request: "), throwable -> UserError.Log.e(TAG, "Failed to write " + msg.getClass().getSimpleName() + " " + throwable));
             } catch (NullPointerException e) {
                 UserError.Log.e(TAG, "Race condition when writing characteristic: " + e);
             }
@@ -645,7 +630,7 @@ public class MedtrumCollectionService extends JamBaseBluetoothService implements
             if (startTick < 62) startTick = 62; // after warmup only
             if (endTick < 1) endTick = 1;
             startTick += offset;
-            if ((startTick != endTick) && (endTick > startTick)) {
+            if ((endTick > startTick)) {
                 if (endTick - startTick > MAX_BACKFILL_ENTRIES) {
                     endTick = startTick + MAX_BACKFILL_ENTRIES; // only ask this many at once
                 }

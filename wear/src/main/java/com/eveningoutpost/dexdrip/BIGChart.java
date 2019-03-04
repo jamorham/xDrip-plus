@@ -1,56 +1,31 @@
 package com.eveningoutpost.dexdrip;
 
 //import android.app.NotificationManager;
-import android.content.BroadcastReceiver;
-import android.content.Context;
-import android.content.Intent;
-import android.content.IntentFilter;
-import android.content.SharedPreferences;
-import android.graphics.Canvas;
-import android.graphics.Color;
-import android.graphics.LinearGradient;
-import android.graphics.Matrix;
-import android.graphics.Paint;
-import android.graphics.Point;
-import android.graphics.Rect;
-import android.graphics.Shader;
-import android.os.Bundle;
-import android.os.PowerManager;
-import android.preference.PreferenceManager;
+import android.content.*;
+import android.graphics.*;
+import android.os.*;
+import android.preference.*;
+import android.support.wearable.view.*;
+import android.support.wearable.watchface.*;
+import android.util.*;
+import android.view.*;
+import android.widget.*;
+
+import androidx.core.content.*;
+import androidx.localbroadcastmanager.content.*;
+
+import com.eveningoutpost.dexdrip.models.*;
+import com.eveningoutpost.dexdrip.utilitymodels.*;
+import com.google.android.gms.wearable.*;
+import com.ustwo.clockwise.common.*;
+import com.ustwo.clockwise.wearable.*;
+
+import java.text.*;
+import java.util.*;
+
+import lecho.lib.hellocharts.view.*;
+
 //import android.support.v4.app.NotificationCompat;
-import android.support.v4.content.ContextCompat;
-import android.support.v4.content.LocalBroadcastManager;
-import android.support.wearable.view.WatchViewStub;
-import android.support.wearable.watchface.WatchFaceStyle;
-import android.text.format.DateFormat;
-import android.util.Log;
-import android.view.Display;
-import android.view.Gravity;
-import android.view.LayoutInflater;
-import android.view.View;
-import android.view.WindowInsets;
-import android.view.WindowManager;
-import android.widget.Button;
-import android.widget.LinearLayout;
-import android.widget.RelativeLayout;
-import android.widget.TextView;
-
-import com.eveningoutpost.dexdrip.Models.JoH;
-import com.eveningoutpost.dexdrip.UtilityModels.BgSendQueue;
-import com.google.android.gms.wearable.DataMap;
-import com.ustwo.clockwise.wearable.WatchFace;
-import com.ustwo.clockwise.common.WatchFaceTime;
-import com.ustwo.clockwise.common.WatchMode;
-import com.ustwo.clockwise.common.WatchShape;
-
-import java.text.DecimalFormat;
-import java.text.SimpleDateFormat;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.Locale;
-
-import lecho.lib.hellocharts.util.ChartUtils;
-import lecho.lib.hellocharts.view.LineChartView;
 
 /**
  * Created by Emma Black on 12/29/14.
@@ -109,7 +84,7 @@ public class BIGChart extends WatchFace implements SharedPreferences.OnSharedPre
     private String sgvString = "--";
     private String externalStatusString = "no status";
     private TextView statusView;
-    private long chartTapTime = 0l;
+    private long chartTapTime = 0L;
     private Rect mCardRect = new Rect(0,0,0,0);
 
     @Override
@@ -118,7 +93,7 @@ public class BIGChart extends WatchFace implements SharedPreferences.OnSharedPre
         Display display = ((WindowManager) getSystemService(Context.WINDOW_SERVICE))
                 .getDefaultDisplay();
         display.getSize(displaySize);
-        wakeLock = ((PowerManager) getSystemService(Context.POWER_SERVICE)).newWakeLock(PowerManager.PARTIAL_WAKE_LOCK, "Clock");
+        wakeLock = ((PowerManager) getSystemService(Context.POWER_SERVICE)).newWakeLock(PowerManager.PARTIAL_WAKE_LOCK, ":Clock");
 
         specW = View.MeasureSpec.makeMeasureSpec(displaySize.x,
                 View.MeasureSpec.EXACTLY);
@@ -146,37 +121,34 @@ public class BIGChart extends WatchFace implements SharedPreferences.OnSharedPre
         localBroadcastManager = LocalBroadcastManager.getInstance(this);
         localBroadcastManager.registerReceiver(messageReceiver, messageFilter);
 
-        stub.setOnLayoutInflatedListener(new WatchViewStub.OnLayoutInflatedListener() {
-            @Override
-            public void onLayoutInflated(WatchViewStub stub) {
-                mTime = (TextView) stub.findViewById(R.id.watch_time);
-                mDate = (TextView) stub.findViewById(R.id.watch_date);
-                mSgv = (TextView) stub.findViewById(R.id.sgv);
-                mTimestamp = (TextView) stub.findViewById(R.id.timestamp);
-                mDelta = (TextView) stub.findViewById(R.id.delta);
-                mRelativeLayout = (RelativeLayout) stub.findViewById(R.id.main_layout);
-                chart = (LineChartView) stub.findViewById(R.id.chart);
-                statusView = (TextView) stub.findViewById(R.id.aps_status);
-                stepsButton=(Button)stub.findViewById(R.id.walkButton);
-                mStepsLinearLayout = (LinearLayout) stub.findViewById(R.id.steps_layout);
-                menuButton=(Button)stub.findViewById(R.id.menuButton);
-                mMenuLinearLayout = (LinearLayout) stub.findViewById(R.id.menu_layout);
-                mDirectionDelta = (LinearLayout) stub.findViewById(R.id.directiondelta_layout);
-                layoutSet = true;
-                Context context = xdrip.getAppContext();
-                if (Home.get_forced_wear()) {
-                    if (d) Log.d(TAG, "performViewSetup FORCE WEAR init BGs for graph");
-                    BgSendQueue.resendData(context);
-                }
-                if ((chart != null) && sharedPrefs.getBoolean("show_wear_treatments", false)) {
-                    if (d) Log.d(TAG, "performViewSetup init Treatments for graph");
-                    ListenerService.showTreatments(context, "all");
-                }
-                showAgeAndStatus();
-                mRelativeLayout.measure(specW, specH);
-                mRelativeLayout.layout(0, 0, mRelativeLayout.getMeasuredWidth(),
-                        mRelativeLayout.getMeasuredHeight());
+        stub.setOnLayoutInflatedListener(stub1 -> {
+            mTime = (TextView) stub1.findViewById(R.id.watch_time);
+            mDate = (TextView) stub1.findViewById(R.id.watch_date);
+            mSgv = (TextView) stub1.findViewById(R.id.sgv);
+            mTimestamp = (TextView) stub1.findViewById(R.id.timestamp);
+            mDelta = (TextView) stub1.findViewById(R.id.delta);
+            mRelativeLayout = (RelativeLayout) stub1.findViewById(R.id.main_layout);
+            chart = (LineChartView) stub1.findViewById(R.id.chart);
+            statusView = (TextView) stub1.findViewById(R.id.aps_status);
+            stepsButton=(Button) stub1.findViewById(R.id.walkButton);
+            mStepsLinearLayout = (LinearLayout) stub1.findViewById(R.id.steps_layout);
+            menuButton=(Button) stub1.findViewById(R.id.menuButton);
+            mMenuLinearLayout = (LinearLayout) stub1.findViewById(R.id.menu_layout);
+            mDirectionDelta = (LinearLayout) stub1.findViewById(R.id.directiondelta_layout);
+            layoutSet = true;
+            Context context = xdrip.getAppContext();
+            if (Home.get_forced_wear()) {
+                if (d) Log.d(TAG, "performViewSetup FORCE WEAR init BGs for graph");
+                BgSendQueue.resendData(context);
             }
+            if ((chart != null) && sharedPrefs.getBoolean("show_wear_treatments", false)) {
+                if (d) Log.d(TAG, "performViewSetup init Treatments for graph");
+                ListenerService.showTreatments(context, "all");
+            }
+            showAgeAndStatus();
+            mRelativeLayout.measure(specW, specH);
+            mRelativeLayout.layout(0, 0, mRelativeLayout.getMeasuredWidth(),
+                    mRelativeLayout.getMeasuredHeight());
         });
         Log.d(TAG, "performViewSetup requestData");
         ListenerService.requestData(this);
@@ -226,7 +198,7 @@ public class BIGChart extends WatchFace implements SharedPreferences.OnSharedPre
     private void changeChartTimeframe() {
         int timeframe = Integer.parseInt(sharedPrefs.getString("chart_timeframe", "3"));
         timeframe = (timeframe%5) + 1;
-        sharedPrefs.edit().putString("chart_timeframe", "" + timeframe).commit();
+        sharedPrefs.edit().putString("chart_timeframe", "" + timeframe).apply();
     }
 
     @Override
@@ -242,7 +214,7 @@ public class BIGChart extends WatchFace implements SharedPreferences.OnSharedPre
     }
 
     private boolean isLowRes(WatchMode watchMode) {
-        return (watchMode == WatchMode.LOW_BIT) || (watchMode == WatchMode.LOW_BIT_BURN_IN) || (watchMode == WatchMode.LOW_BIT_BURN_IN);
+        return (watchMode == WatchMode.LOW_BIT) || (watchMode == WatchMode.LOW_BIT_BURN_IN);
     }
 
 
@@ -395,7 +367,7 @@ public class BIGChart extends WatchFace implements SharedPreferences.OnSharedPre
                 dataMap = DataMap.fromBundle(bundle);
                 String localeStr = dataMap.getString("locale", "");
                 if (d) Log.d(TAG, "MessageReceiver locale=" + localeStr);
-                String locale[] = localeStr.split("_");
+                String[] locale = localeStr.split("_");
                 final Locale newLocale = locale == null ? new Locale(localeStr) : locale.length > 1 ? new Locale(locale[0], locale[1]) : new Locale(locale[0]);//eg"en", "en_AU"
                 final Locale curLocale = Locale.getDefault();
                 if (newLocale != null && !curLocale.equals(newLocale)) {
@@ -538,7 +510,7 @@ public class BIGChart extends WatchFace implements SharedPreferences.OnSharedPre
     private void showSteps() {
         if (sharedPrefs.getBoolean("showSteps", false)) {
             stepsButton.setVisibility(View.VISIBLE);
-            stepsButton.setText(String.format("%d", mStepsCount));
+            stepsButton.setText(String.format(Locale.getDefault(), "%d", mStepsCount));
             if (mStepsCount > 0) {
                 DecimalFormat df = new DecimalFormat("#.##");
                 Double km = (((double) mStepsCount) / 2000.0d) * 1.6d;

@@ -1,11 +1,12 @@
 package com.eveningoutpost.dexdrip.utils;
 
-import com.eveningoutpost.dexdrip.Models.UserError;
-import com.eveningoutpost.dexdrip.UtilityModels.WholeHouse;
+import com.eveningoutpost.dexdrip.models.UserError;
+import com.eveningoutpost.dexdrip.utilitymodels.WholeHouse;
 
 import java.io.DataOutputStream;
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
+import java.nio.charset.*;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -36,7 +37,7 @@ public class Root {
 
         final String shell = "su";
 
-        final List<String> res = Collections.synchronizedList(new ArrayList<String>());
+        final List<String> res = Collections.synchronizedList(new ArrayList<>());
 
         try {
             final Process process = Runtime.getRuntime().exec(shell);
@@ -76,6 +77,6 @@ public class Root {
     }
 
     private static byte[] bytesNewLine(final String str) throws UnsupportedEncodingException {
-        return (str + "\n").getBytes("UTF-8");
+        return (str + "\n").getBytes(StandardCharsets.UTF_8);
     }
 }

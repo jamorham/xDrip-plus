@@ -1,23 +1,17 @@
 package com.eveningoutpost.dexdrip;
 
-import android.graphics.Color;
-import android.os.Bundle;
-import android.util.DisplayMetrics;
-import android.util.Log;
-import android.view.View;
-import android.view.WindowManager;
-import android.widget.Button;
-import android.widget.ImageButton;
-import android.widget.TextView;
+import android.graphics.*;
+import android.os.*;
+import android.util.*;
+import android.view.*;
+import android.widget.*;
 
-import com.eveningoutpost.dexdrip.UtilityModels.PersistentStore;
-import com.eveningoutpost.dexdrip.UtilityModels.Pref;
-import com.eveningoutpost.dexdrip.wearintegration.WatchUpdaterService;
+import com.eveningoutpost.dexdrip.utilitymodels.*;
+import com.eveningoutpost.dexdrip.wearintegration.*;
 
-import java.util.HashMap;
-import java.util.Map;
+import java.util.*;
 
-import static com.eveningoutpost.dexdrip.Home.startHomeWithExtra;
+import static com.eveningoutpost.dexdrip.Home.*;
 
 
 /**
@@ -40,7 +34,7 @@ public class PhoneKeypadInputActivity extends BaseActivity {
     private static String currenttab = "insulin";
     private static final String LAST_TAB_STORE = "phone-keypad-treatment-last-tab";
     private static final String TAG = "KeypadInput";
-    private static Map<String, String> values = new HashMap<String, String>();
+    private static Map<String, String> values = new HashMap<>();
     private String bgUnits;
 
     @Override
@@ -85,19 +79,9 @@ public class PhoneKeypadInputActivity extends BaseActivity {
 
         mDialTextView.setText("");
 
-        mDialTextView.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                submitAll();
-            }
-        });
+        mDialTextView.setOnClickListener(v -> submitAll());
 
-        zeroButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                appCurrent("0");
-            }
-        });
+        zeroButton.setOnClickListener(v -> appCurrent("0"));
 
         //zeroButton.setOnLongClickListener(new View.OnLongClickListener() {
         //    @Override
@@ -107,93 +91,37 @@ public class PhoneKeypadInputActivity extends BaseActivity {
         //    }
         //});
 
-        oneButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                appCurrent("1");
-            }
+        oneButton.setOnClickListener(v -> appCurrent("1"));
+
+        twoButton.setOnClickListener(v -> appCurrent("2"));
+
+        threeButton.setOnClickListener(v -> appCurrent("3"));
+
+        fourButton.setOnClickListener(v -> appCurrent("4"));
+
+        fiveButton.setOnClickListener(v -> appCurrent("5"));
+
+        sixButton.setOnClickListener(v -> appCurrent("6"));
+
+        sevenButton.setOnClickListener(v -> appCurrent("7"));
+
+        eightButton.setOnClickListener(v -> appCurrent("8"));
+
+        nineButton.setOnClickListener(v -> appCurrent("9"));
+
+        starButton.setOnClickListener(v -> {
+            if (!getValue(currenttab).contains(".")) appCurrent(".");
         });
 
-        twoButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                appCurrent("2");
-            }
+        speakbutton.setOnClickListener(v -> {
+            startHomeWithExtra(getApplicationContext(), Home.START_SPEECH_RECOGNITION, "ok");
+            finish();
         });
-
-        threeButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                appCurrent("3");
-            }
+        speakbutton.setOnLongClickListener(v -> {
+            startHomeWithExtra(getApplicationContext(), Home.START_TEXT_RECOGNITION, "ok");
+            finish();
+            return true;
         });
-
-        fourButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                appCurrent("4");
-            }
-        });
-
-        fiveButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                appCurrent("5");
-            }
-        });
-
-        sixButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                appCurrent("6");
-            }
-        });
-
-        sevenButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                appCurrent("7");
-            }
-        });
-
-        eightButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                appCurrent("8");
-            }
-        });
-
-        nineButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                appCurrent("9");
-            }
-        });
-
-        starButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                if (!getValue(currenttab).contains(".")) appCurrent(".");
-            }
-        });
-
-        speakbutton.setOnClickListener(
-                new View.OnClickListener() {
-                    @Override
-                    public void onClick(View v) {
-                        startHomeWithExtra(getApplicationContext(), Home.START_SPEECH_RECOGNITION, "ok");
-                        finish();
-                    }
-                });
-        speakbutton.setOnLongClickListener(
-                new View.OnLongClickListener() {
-                    @Override
-                    public boolean onLongClick(View v) {
-                        startHomeWithExtra(getApplicationContext(), Home.START_TEXT_RECOGNITION, "ok");
-                        finish();
-                        return true;
-                    }
-                });
 
         //hashButton.setOnClickListener(new View.OnClickListener() {
         //    @Override
@@ -202,48 +130,28 @@ public class PhoneKeypadInputActivity extends BaseActivity {
         //    }
         //});
 
-        backSpaceButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                appBackSpace();
-            }
-        });
-        backSpaceButton.setOnLongClickListener(new View.OnLongClickListener() {
-            @Override
-            public boolean onLongClick(View v) {
-                values.put(currenttab, "");
-                updateTab();
-                return true;
-            }
+        backSpaceButton.setOnClickListener(v -> appBackSpace());
+        backSpaceButton.setOnLongClickListener(v -> {
+            values.put(currenttab, "");
+            updateTab();
+            return true;
         });
 
-        bloodtesttabbutton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                currenttab = "bloodtest";
-                updateTab();
-            }
+        bloodtesttabbutton.setOnClickListener(v -> {
+            currenttab = "bloodtest";
+            updateTab();
         });
-        insulintabbutton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                currenttab = "insulin";
-                updateTab();
-            }
+        insulintabbutton.setOnClickListener(v -> {
+            currenttab = "insulin";
+            updateTab();
         });
-        carbstabbutton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                currenttab = "carbs";
-                updateTab();
-            }
+        carbstabbutton.setOnClickListener(v -> {
+            currenttab = "carbs";
+            updateTab();
         });
-        timetabbutton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                currenttab = "time";
-                updateTab();
-            }
+        timetabbutton.setOnClickListener(v -> {
+            currenttab = "time";
+            updateTab();
         });
 
         if (Pref.getString("units", "mgdl").equals("mgdl")) {
@@ -256,7 +164,7 @@ public class PhoneKeypadInputActivity extends BaseActivity {
     }
 
     public static void resetValues() {
-        values = new HashMap<String, String>();
+        values = new HashMap<>();
     }
 
     private static String getValue(String tab) {

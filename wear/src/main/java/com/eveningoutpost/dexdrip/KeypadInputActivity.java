@@ -1,26 +1,16 @@
 package com.eveningoutpost.dexdrip;
 
-import android.app.Activity;
-import android.graphics.Color;
-import android.os.Bundle;
-import android.support.wearable.view.WatchViewStub;
-import android.view.View;
-import android.widget.Button;
-import android.widget.ImageButton;
-import android.widget.TextView;
+import android.graphics.*;
+import android.os.*;
+import android.support.wearable.view.*;
+import android.widget.*;
 
-import com.eveningoutpost.dexdrip.Models.JoH;
+import androidx.appcompat.app.*;
 
-import java.nio.charset.StandardCharsets;
-import java.text.DecimalFormat;
-import java.text.NumberFormat;
-import java.text.SimpleDateFormat;
-import java.util.Calendar;
-import java.util.HashMap;
-import java.util.Locale;
-import java.util.Map;
+import com.eveningoutpost.dexdrip.models.*;
 
-import static com.eveningoutpost.dexdrip.ListenerService.SendData;
+import java.text.*;
+import java.util.*;
 
 /**
  * Adapted from WearDialer which is:
@@ -31,7 +21,7 @@ import static com.eveningoutpost.dexdrip.ListenerService.SendData;
 
 // jamorham xdrip plus
 
-public class KeypadInputActivity extends Activity {
+public class KeypadInputActivity extends AppCompatActivity {
 
     private final static String TAG = "jamorham " + KeypadInputActivity.class.getSimpleName();
     private TextView mDialTextView;
@@ -41,7 +31,7 @@ public class KeypadInputActivity extends Activity {
             bloodtesttabbutton, timetabbutton;
     //private GoogleApiClient mApiClient;
     private static String currenttab = "insulin";
-    private static Map<String, String> values = new HashMap<String, String>();
+    private static Map<String, String> values = new HashMap<>();
     private static final String WEARABLE_VOICE_PAYLOAD = "/xdrip_plus_voice_payload";
 
     @Override
@@ -50,195 +40,114 @@ public class KeypadInputActivity extends Activity {
         setContentView(R.layout.activity_main);
 
         final WatchViewStub stub = (WatchViewStub) findViewById(R.id.watch_view_stub);
-        stub.setOnLayoutInflatedListener(new WatchViewStub.OnLayoutInflatedListener() {
-            @Override
-            public void onLayoutInflated(WatchViewStub stub) {
-                mDialTextView = (TextView) stub.findViewById(R.id.dialed_no_textview);
-                zeroButton = (Button) stub.findViewById(R.id.zero_button);
-                oneButton = (Button) stub.findViewById(R.id.one_button);
-                twoButton = (Button) stub.findViewById(R.id.two_button);
-                threeButton = (Button) stub.findViewById(R.id.three_button);
-                fourButton = (Button) stub.findViewById(R.id.four_button);
-                fiveButton = (Button) stub.findViewById(R.id.five_button);
-                sixButton = (Button) stub.findViewById(R.id.six_button);
-                sevenButton = (Button) stub.findViewById(R.id.seven_button);
-                eightButton = (Button) stub.findViewById(R.id.eight_button);
-                nineButton = (Button) stub.findViewById(R.id.nine_button);
-                starButton = (Button) stub.findViewById(R.id.star_button);
-                backSpaceButton = (Button) stub.findViewById(R.id.backspace_button);
-                // callImageButton = (ImageButton) stub.findViewById(R.id.call_image_button);
-                // backspaceImageButton = (ImageButton) stub.findViewById(R.id.backspace_image_button);
+        stub.setOnLayoutInflatedListener(stub1 -> {
+            mDialTextView = (TextView) stub1.findViewById(R.id.dialed_no_textview);
+            zeroButton = (Button) stub1.findViewById(R.id.zero_button);
+            oneButton = (Button) stub1.findViewById(R.id.one_button);
+            twoButton = (Button) stub1.findViewById(R.id.two_button);
+            threeButton = (Button) stub1.findViewById(R.id.three_button);
+            fourButton = (Button) stub1.findViewById(R.id.four_button);
+            fiveButton = (Button) stub1.findViewById(R.id.five_button);
+            sixButton = (Button) stub1.findViewById(R.id.six_button);
+            sevenButton = (Button) stub1.findViewById(R.id.seven_button);
+            eightButton = (Button) stub1.findViewById(R.id.eight_button);
+            nineButton = (Button) stub1.findViewById(R.id.nine_button);
+            starButton = (Button) stub1.findViewById(R.id.star_button);
+            backSpaceButton = (Button) stub1.findViewById(R.id.backspace_button);
+            // callImageButton = (ImageButton) stub.findViewById(R.id.call_image_button);
+            // backspaceImageButton = (ImageButton) stub.findViewById(R.id.backspace_image_button);
 
-                insulintabbutton = (ImageButton) stub.findViewById(R.id.insulintabbutton);
-                bloodtesttabbutton = (ImageButton) stub.findViewById(R.id.bloodtesttabbutton);
-                timetabbutton = (ImageButton) stub.findViewById(R.id.timetabbutton);
-                carbstabbutton = (ImageButton) stub.findViewById(R.id.carbstabbutton);
+            insulintabbutton = (ImageButton) stub1.findViewById(R.id.insulintabbutton);
+            bloodtesttabbutton = (ImageButton) stub1.findViewById(R.id.bloodtesttabbutton);
+            timetabbutton = (ImageButton) stub1.findViewById(R.id.timetabbutton);
+            carbstabbutton = (ImageButton) stub1.findViewById(R.id.carbstabbutton);
 
 
-                mDialTextView.setText("");
+            mDialTextView.setText("");
 
-                mDialTextView.setOnClickListener(new View.OnClickListener() {
-                    @Override
-                    public void onClick(View v) {
-                        submitAll();
-                    }
-                });
+            mDialTextView.setOnClickListener(v -> submitAll());
 
-                zeroButton.setOnClickListener(new View.OnClickListener() {
-                    @Override
-                    public void onClick(View v) {
-                        appCurrent("0");
-                    }
-                });
+            zeroButton.setOnClickListener(v -> appCurrent("0"));
 
-                //zeroButton.setOnLongClickListener(new View.OnLongClickListener() {
-                //    @Override
-                //    public boolean onLongClick(View v) {
-                //        mDialTextView.setText(mDialTextView.getText() + "+");
-                //        return true;
-                //    }
-                //});
+            //zeroButton.setOnLongClickListener(new View.OnLongClickListener() {
+            //    @Override
+            //    public boolean onLongClick(View v) {
+            //        mDialTextView.setText(mDialTextView.getText() + "+");
+            //        return true;
+            //    }
+            //});
 
-                oneButton.setOnClickListener(new View.OnClickListener() {
-                    @Override
-                    public void onClick(View v) {
-                        appCurrent("1");
-                    }
-                });
+            oneButton.setOnClickListener(v -> appCurrent("1"));
 
-                twoButton.setOnClickListener(new View.OnClickListener() {
-                    @Override
-                    public void onClick(View v) {
-                        appCurrent("2");
-                    }
-                });
+            twoButton.setOnClickListener(v -> appCurrent("2"));
 
-                threeButton.setOnClickListener(new View.OnClickListener() {
-                    @Override
-                    public void onClick(View v) {
-                        appCurrent("3");
-                    }
-                });
+            threeButton.setOnClickListener(v -> appCurrent("3"));
 
-                fourButton.setOnClickListener(new View.OnClickListener() {
-                    @Override
-                    public void onClick(View v) {
-                        appCurrent("4");
-                    }
-                });
+            fourButton.setOnClickListener(v -> appCurrent("4"));
 
-                fiveButton.setOnClickListener(new View.OnClickListener() {
-                    @Override
-                    public void onClick(View v) {
-                        appCurrent("5");
-                    }
-                });
+            fiveButton.setOnClickListener(v -> appCurrent("5"));
 
-                sixButton.setOnClickListener(new View.OnClickListener() {
-                    @Override
-                    public void onClick(View v) {
-                        appCurrent("6");
-                    }
-                });
+            sixButton.setOnClickListener(v -> appCurrent("6"));
 
-                sevenButton.setOnClickListener(new View.OnClickListener() {
-                    @Override
-                    public void onClick(View v) {
-                        appCurrent("7");
-                    }
-                });
+            sevenButton.setOnClickListener(v -> appCurrent("7"));
 
-                eightButton.setOnClickListener(new View.OnClickListener() {
-                    @Override
-                    public void onClick(View v) {
-                        appCurrent("8");
-                    }
-                });
+            eightButton.setOnClickListener(v -> appCurrent("8"));
 
-                nineButton.setOnClickListener(new View.OnClickListener() {
-                    @Override
-                    public void onClick(View v) {
-                        appCurrent("9");
-                    }
-                });
+            nineButton.setOnClickListener(v -> appCurrent("9"));
 
-                starButton.setOnClickListener(new View.OnClickListener() {
-                    @Override
-                    public void onClick(View v) {
-                        if (!getValue(currenttab).contains(".")) appCurrent(".");
-                    }
-                });
+            starButton.setOnClickListener(v -> {
+                if (!getValue(currenttab).contains(".")) appCurrent(".");
+            });
 
-                //hashButton.setOnClickListener(new View.OnClickListener() {
-                //    @Override
-                //    public void onClick(View v) {
-                //        mDialTextView.setText(mDialTextView.getText() + "#");
-                //    }
-                //});
+            //hashButton.setOnClickListener(new View.OnClickListener() {
+            //    @Override
+            //    public void onClick(View v) {
+            //        mDialTextView.setText(mDialTextView.getText() + "#");
+            //    }
+            //});
 
-                backSpaceButton.setOnClickListener(new View.OnClickListener() {
-                    @Override
-                    public void onClick(View v) {
-                        appBackSpace();
-                    }
-                });
-                backSpaceButton.setOnLongClickListener(new View.OnLongClickListener() {
-                    @Override
-                    public boolean onLongClick(View v) {
-                        values.put(currenttab, "");
-                        updateTab();
-                        return true;
-                    }
-                });
-
-                bloodtesttabbutton.setOnClickListener(new View.OnClickListener() {
-                    @Override
-                    public void onClick(View v) {
-                        currenttab = "bloodtest";
-                        updateTab();
-                    }
-                });
-                insulintabbutton.setOnClickListener(new View.OnClickListener() {
-                    @Override
-                    public void onClick(View v) {
-                        currenttab = "insulin";
-                        updateTab();
-                    }
-                });
-                carbstabbutton.setOnClickListener(new View.OnClickListener() {
-                    @Override
-                    public void onClick(View v) {
-                        currenttab = "carbs";
-                        updateTab();
-                    }
-                });
-                timetabbutton.setOnClickListener(new View.OnClickListener() {
-                    @Override
-                    public void onClick(View v) {
-                        currenttab = "time";
-                        updateTab();
-                    }
-                });
-
-
+            backSpaceButton.setOnClickListener(v -> appBackSpace());
+            backSpaceButton.setOnLongClickListener(v -> {
+                values.put(currenttab, "");
                 updateTab();
+                return true;
+            });
 
-             /*   callImageButton.setOnClickListener(new View.OnClickListener() {
-                    @Override
-                    public void onClick(View v) {
-                        if (!mDialTextView.getText().toString().isEmpty()) {
-                            sendMessage(mDialTextView.getText().toString(), null);
-                            Toast.makeText(getApplicationContext(), "Calling " + mDialTextView.getText(), Toast.LENGTH_SHORT).show();
-                            mDialTextView.setText(null);
-                        }
+            bloodtesttabbutton.setOnClickListener(v -> {
+                currenttab = "bloodtest";
+                updateTab();
+            });
+            insulintabbutton.setOnClickListener(v -> {
+                currenttab = "insulin";
+                updateTab();
+            });
+            carbstabbutton.setOnClickListener(v -> {
+                currenttab = "carbs";
+                updateTab();
+            });
+            timetabbutton.setOnClickListener(v -> {
+                currenttab = "time";
+                updateTab();
+            });
+
+
+            updateTab();
+
+         /*   callImageButton.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    if (!mDialTextView.getText().toString().isEmpty()) {
+                        sendMessage(mDialTextView.getText().toString(), null);
+                        Toast.makeText(getApplicationContext(), "Calling " + mDialTextView.getText(), Toast.LENGTH_SHORT).show();
+                        mDialTextView.setText(null);
                     }
-                });*/
-            }
+                }
+            });*/
         });
     }
 
     public static void resetValues() {
-        values = new HashMap<String, String>();
+        values = new HashMap<>();
     }
 
     private static String getValue(String tab) {

@@ -9,7 +9,7 @@ import android.os.Bundle;
 import android.preference.PreferenceManager;
 import android.util.Log;
 
-import com.eveningoutpost.dexdrip.Models.UserError;
+import com.eveningoutpost.dexdrip.models.UserError;
 import com.eveningoutpost.dexdrip.utils.CipherUtils;
 import com.google.android.gms.common.api.GoogleApiClient;
 
@@ -281,7 +281,7 @@ public class GoogleDriveInterface extends FauxActivity {
         //if ((prefs != null) && (prefs.getBoolean("use_custom_sync_key", true))) {
         if ((prefs != null) && (true)) {
             if (prefs.getString("custom_sync_key", "").equals("")) {
-                prefs.edit().putString("custom_sync_key", CipherUtils.getRandomHexKey()).commit();
+                prefs.edit().putString("custom_sync_key", CipherUtils.getRandomHexKey()).apply();
             }
             final String mykey = prefs.getString("custom_sync_key", "");
             if ((mykey.length() > 16)) {

@@ -1,9 +1,7 @@
 package com.eveningoutpost.dexdrip.cgm.nsfollow.messages;
 
-import com.eveningoutpost.dexdrip.Models.JoH;
-
-import okhttp3.MediaType;
-import okhttp3.RequestBody;
+import com.eveningoutpost.dexdrip.models.JoH;
+import com.squareup.okhttp.*;
 
 /**
  * jamorham

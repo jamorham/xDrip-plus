@@ -1,45 +1,29 @@
 package com.eveningoutpost.dexdrip;
 
-import android.app.Activity;
-import android.app.AlertDialog;
-import android.content.DialogInterface;
-import android.content.Intent;
-import android.content.SharedPreferences;
-import android.content.pm.PackageManager;
-import android.os.Build;
-import android.os.Bundle;
-import android.preference.PreferenceManager;
-import android.support.annotation.NonNull;
-import android.view.View;
-import android.widget.Button;
-import android.widget.Toast;
+import android.content.DialogInterface.*;
+import android.content.*;
+import android.content.pm.*;
+import android.os.*;
+import android.widget.*;
 
-import com.eveningoutpost.dexdrip.G5Model.Ob1G5StateMachine;
-import com.eveningoutpost.dexdrip.Models.JoH;
-import com.eveningoutpost.dexdrip.Models.Sensor;
-import com.eveningoutpost.dexdrip.Models.Treatments;
-import com.eveningoutpost.dexdrip.Models.UserError;
-import com.eveningoutpost.dexdrip.Models.UserError.Log;
-import com.eveningoutpost.dexdrip.Services.Ob1G5CollectionService;
-import com.eveningoutpost.dexdrip.UtilityModels.CollectionServiceStarter;
-import com.eveningoutpost.dexdrip.UtilityModels.Experience;
-import com.eveningoutpost.dexdrip.UtilityModels.Pref;
-import com.eveningoutpost.dexdrip.profileeditor.DatePickerFragment;
-import com.eveningoutpost.dexdrip.profileeditor.ProfileAdapter;
-import com.eveningoutpost.dexdrip.profileeditor.TimePickerFragment;
-import com.eveningoutpost.dexdrip.ui.dialog.G6CalibrationCodeDialog;
-import com.eveningoutpost.dexdrip.utils.ActivityWithMenu;
-import com.eveningoutpost.dexdrip.utils.DexCollectionType;
-import com.eveningoutpost.dexdrip.utils.LocationHelper;
-import com.eveningoutpost.dexdrip.wearintegration.WatchUpdaterService;
+import androidx.annotation.*;
+import androidx.appcompat.app.*;
 
-import java.util.Calendar;
-import java.util.Date;
+import com.eveningoutpost.dexdrip.g5Model.*;
+import com.eveningoutpost.dexdrip.models.*;
+import com.eveningoutpost.dexdrip.models.UserError.*;
+import com.eveningoutpost.dexdrip.services.*;
+import com.eveningoutpost.dexdrip.utilitymodels.*;
+import com.eveningoutpost.dexdrip.profileEditor.*;
+import com.eveningoutpost.dexdrip.ui.dialog.*;
+import com.eveningoutpost.dexdrip.utils.*;
+import com.eveningoutpost.dexdrip.wearintegration.*;
 
-import static com.eveningoutpost.dexdrip.Home.startWatchUpdaterService;
-import static com.eveningoutpost.dexdrip.Models.BgReading.AGE_ADJUSTMENT_TIME;
+import java.util.*;
 
-import static com.eveningoutpost.dexdrip.xdrip.gs;
+import static com.eveningoutpost.dexdrip.Home.*;
+import static com.eveningoutpost.dexdrip.models.BgReading.*;
+import static com.eveningoutpost.dexdrip.xdrip.*;
 
 public class StartNewSensor extends ActivityWithMenu {
     // public static String menu_name = "Start Sensor";
@@ -47,7 +31,7 @@ public class StartNewSensor extends ActivityWithMenu {
     private Button button;
     //private DatePicker dp;
     // private TimePicker tp;
-    final Activity activity = this;
+    final AppCompatActivity activity = this;
     Calendar ucalendar = Calendar.getInstance();
 
     @Override
@@ -75,23 +59,16 @@ public class StartNewSensor extends ActivityWithMenu {
     public void addListenerOnButton() {
         button = (Button) findViewById(R.id.startNewSensor);
 
-        button.setOnClickListener(new View.OnClickListener() {
-            public void onClick(View v) {
+        button.setOnClickListener(v -> {
 
-                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M && DexCollectionType.hasBluetooth()) {
-                    if (!LocationHelper.locationPermission(StartNewSensor.this)) {
-                        JoH.show_ok_dialog(activity, gs(R.string.please_allow_permission), gs(R.string.location_permission_needed_to_use_bluetooth), new Runnable() {
-                            @Override
-                            public void run() {
-                                activity.requestPermissions(new String[]{android.Manifest.permission.ACCESS_FINE_LOCATION}, 0);
-                            }
-                        });
-                    } else {
-                        sensorButtonClick();
-                    }
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M && DexCollectionType.hasBluetooth()) {
+                if (!LocationHelper.locationPermission(StartNewSensor.this)) {
+                    JoH.show_ok_dialog(activity, gs(R.string.please_allow_permission), gs(R.string.location_permission_needed_to_use_bluetooth), () -> activity.requestPermissions(new String[]{android.Manifest.permission.ACCESS_FINE_LOCATION}, 0));
                 } else {
                     sensorButtonClick();
                 }
+            } else {
+                sensorButtonClick();
             }
         });
     }
@@ -104,40 +81,33 @@ public class StartNewSensor extends ActivityWithMenu {
         final AlertDialog.Builder builder = new AlertDialog.Builder(activity);
         builder.setTitle(gs(R.string.did_you_insert_it_today));
         builder.setMessage(gs(R.string.we_need_to_know_when_the_sensor_was_inserted_to_improve_calculation_accuracy__was_it_inserted_today));
-        builder.setPositiveButton(gs(R.string.yes_today), new DialogInterface.OnClickListener() {
-            public void onClick(DialogInterface dialog, int which) {
-                dialog.dismiss();
-                askSesorInsertionTime();
-            }
+        builder.setPositiveButton(gs(R.string.yes_today), (OnClickListener) (dialog, which) -> {
+            dialog.dismiss();
+            askSesorInsertionTime();
         });
-        builder.setNegativeButton(gs(R.string.not_today), new DialogInterface.OnClickListener() {
-            public void onClick(DialogInterface dialog, int which) {
-                dialog.dismiss();
-                if (DexCollectionType.hasLibre()) {
-                    ucalendar.add(Calendar.DAY_OF_MONTH, -1);
-                    realStartSensor();
-                } else {
-                    final DatePickerFragment datePickerFragment = new DatePickerFragment();
-                    datePickerFragment.setAllowFuture(false);
-                    if (!Home.get_engineering_mode()) {
-                        datePickerFragment.setEarliestDate(JoH.tsl() - (30L * 24 * 60 * 60 * 1000)); // 30 days
-                    }
-                    datePickerFragment.setTitle(gs(R.string.which_day_was_it_inserted));
-                    datePickerFragment.setDateCallback(new ProfileAdapter.DatePickerCallbacks() {
-                        @Override
-                        public void onDateSet(int year, int month, int day) {
-                            ucalendar.set(year, month, day);
-                            // Long enough in the past for age adjustment to be meaningless? Skip asking time
-                            if ((!Home.get_engineering_mode()) && (JoH.tsl() - ucalendar.getTimeInMillis() > (AGE_ADJUSTMENT_TIME + (1000 * 60 * 60 * 24)))) {
-                                realStartSensor();
-                            } else {
-                                askSesorInsertionTime();
-                            }
-                        }
-                    });
-
-                    datePickerFragment.show(activity.getFragmentManager(), "DatePicker");
+        builder.setNegativeButton(gs(R.string.not_today), (OnClickListener) (dialog, which) -> {
+            dialog.dismiss();
+            if (DexCollectionType.hasLibre()) {
+                ucalendar.add(Calendar.DAY_OF_MONTH, -1);
+                realStartSensor();
+            } else {
+                final DatePickerFragment datePickerFragment = new DatePickerFragment();
+                datePickerFragment.setAllowFuture(false);
+                if (!get_engineering_mode()) {
+                    datePickerFragment.setEarliestDate(JoH.tsl() - (30L * 24 * 60 * 60 * 1000)); // 30 days
                 }
+                datePickerFragment.setTitle(gs(R.string.which_day_was_it_inserted));
+                datePickerFragment.setDateCallback((year, month, day) -> {
+	                ucalendar.set(year, month, day);
+	                // Long enough in the past for age adjustment to be meaningless? Skip asking time
+	                if ((!get_engineering_mode()) && (JoH.tsl() - ucalendar.getTimeInMillis() > (AGE_ADJUSTMENT_TIME + (1000 * 60 * 60 * 24)))) {
+		                realStartSensor();
+	                } else {
+		                askSesorInsertionTime();
+	                }
+                });
+
+                datePickerFragment.show(/*activity.*/getSupportFragmentManager(), "DatePicker");
             }
         });
         builder.create().show();
@@ -149,20 +119,17 @@ public class StartNewSensor extends ActivityWithMenu {
         TimePickerFragment timePickerFragment = new TimePickerFragment();
         timePickerFragment.setTime(calendar.get(Calendar.HOUR_OF_DAY), calendar.get(Calendar.MINUTE));
         timePickerFragment.setTitle(gs(R.string.what_time_was_it_inserted));
-        timePickerFragment.setTimeCallback(new ProfileAdapter.TimePickerCallbacks() {
-            @Override
-            public void onTimeUpdated(int newmins) {
-                int min = newmins % 60;
-                int hour = (newmins - min) / 60;
-                ucalendar.set(ucalendar.get(Calendar.YEAR), ucalendar.get(Calendar.MONTH), ucalendar.get(Calendar.DAY_OF_MONTH), hour, min);
-                if (DexCollectionType.hasLibre()) {
-                    ucalendar.add(Calendar.HOUR_OF_DAY, -1); // hack for warmup time
-                }
-
-                realStartSensor();
+        timePickerFragment.setTimeCallback(newmins -> {
+            int min = newmins % 60;
+            int hour = (newmins - min) / 60;
+            ucalendar.set(ucalendar.get(Calendar.YEAR), ucalendar.get(Calendar.MONTH), ucalendar.get(Calendar.DAY_OF_MONTH), hour, min);
+            if (DexCollectionType.hasLibre()) {
+                ucalendar.add(Calendar.HOUR_OF_DAY, -1); // hack for warmup time
             }
+
+            realStartSensor();
         });
-        timePickerFragment.show(activity.getFragmentManager(), "TimePicker");
+        timePickerFragment.show(/*activity.*/getSupportFragmentManager(), "TimePicker");
     }
 
     private void realStartSensor() {

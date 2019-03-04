@@ -1,15 +1,18 @@
 <?xml version="1.0" encoding="utf-8"?>
 <menu xmlns:android="http://schemas.android.com/apk/res/android">
-    <item android:id="@+id/action_overwrite_slope"
+    <item
+        android:id="@+id/action_overwrite_slope"
+        android:orderInCategory="1"
         android:title="@string/overwrite_slope_engineering_only"
+        android:visible="false" />
+    <item
+        android:id="@+id/action_overwrite_intercept"
         android:orderInCategory="1"
-        android:visible="false"/>
-    <item android:id="@+id/action_overwrite_intercept"
         android:title="@string/overwrite_intercept_engineering_only"
+        android:visible="false" />
+    <item
+        android:id="@+id/action_overwrite_calibration_impossible"
         android:orderInCategory="1"
-        android:visible="false"/>
-    <item android:id="@+id/action_overwrite_calibration_impossible"
         android:title="@string/manual_overwrite_not_possible"
-        android:orderInCategory="1"
-        android:visible="true"/>
+        android:visible="true" />
 </menu>

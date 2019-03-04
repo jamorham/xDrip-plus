@@ -1,56 +1,62 @@
-<android.support.v4.widget.DrawerLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:tools="http://schemas.android.com/tools" android:id="@+id/drawer_layout"
-    android:layout_width="match_parent" android:layout_height="match_parent"
+<androidx.drawerlayout.widget.DrawerLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/drawer_layout"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
     tools:context="com.eveningoutpost.dexdrip.Home">
 
-    <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
-        xmlns:tools="http://schemas.android.com/tools" android:layout_width="match_parent"
-        android:layout_height="match_parent" android:paddingLeft="@dimen/activity_horizontal_margin"
-        android:paddingRight="@dimen/activity_horizontal_margin"
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:paddingLeft="@dimen/activity_horizontal_margin"
         android:paddingTop="@dimen/activity_vertical_margin"
+        android:paddingRight="@dimen/activity_horizontal_margin"
         android:paddingBottom="@dimen/activity_vertical_margin"
         tools:context="com.eveningoutpost.dexdrip.CalibrationOverride">
 
         <EditText
+            android:id="@+id/bg_value"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:inputType="numberDecimal"
-            android:ems="10"
-            android:id="@+id/bg_value"
-            android:autoText="false"
-            android:text=""
-            android:singleLine="true"
-            android:textAlignment="center"
-            android:textSize="24dp"
-            android:hint="@string/enter_blood_glucose_value"
-            android:layout_marginTop="51dp"
             android:layout_below="@+id/textView5"
-            android:layout_centerHorizontal="true" />
+            android:layout_centerHorizontal="true"
+            android:layout_marginTop="51dp"
+            android:autoText="false"
+            android:ems="10"
+            android:hint="@string/enter_blood_glucose_value"
+            android:inputType="numberDecimal"
+            android:singleLine="true"
+            android:text=""
+            android:textAlignment="center"
+            android:textSize="24sp" />
 
         <Button
+            android:id="@+id/save_calibration_button"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="@string/done"
-            android:id="@+id/save_calibration_button"
+            android:layout_centerHorizontal="true"
             android:layout_centerVertical="true"
-            android:layout_centerHorizontal="true" />
+            android:text="@string/done" />
 
         <TextView
+            android:id="@+id/textView5"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:textAppearance="?android:attr/textAppearanceLarge"
-            android:text="@string/entering_a_calibration_now_will_override_your_previously_entered_calibration"
-            android:id="@+id/textView5"
-            android:textSize="20dp"
+            android:layout_alignParentStart="true"
             android:layout_alignParentTop="true"
-            android:layout_alignParentStart="true" />
+            android:text="@string/entering_a_calibration_now_will_override_your_previously_entered_calibration"
+            android:textAppearance="?android:attr/textAppearanceLarge"
+            android:textSize="20sp" />
 
     </RelativeLayout>
-    <fragment android:id="@+id/navigation_drawer"
-        android:layout_width="@dimen/navigation_drawer_width" android:layout_height="match_parent"
-        android:layout_gravity="start"
+
+    <fragment
+        android:id="@+id/navigation_drawer"
         android:name="com.eveningoutpost.dexdrip.NavigationDrawerFragment"
+        android:layout_width="@dimen/navigation_drawer_width"
+        android:layout_height="match_parent"
+        android:layout_gravity="start"
         tools:layout="@layout/fragment_navigation_drawer" />
 
-</android.support.v4.widget.DrawerLayout>
+</androidx.drawerlayout.widget.DrawerLayout>
 

@@ -1,38 +1,25 @@
 package com.eveningoutpost.dexdrip.utils;
 
-import android.os.Bundle;
-import android.support.v7.app.AppCompatActivity;
-import android.view.View;
-import android.widget.TextView;
+import android.os.*;
+import android.view.*;
+import android.widget.*;
 
-import com.eveningoutpost.dexdrip.BaseAppCompatActivity;
-import com.eveningoutpost.dexdrip.Models.BgReading;
-import com.eveningoutpost.dexdrip.Models.GlucoseData;
-import com.eveningoutpost.dexdrip.Models.JoH;
-import com.eveningoutpost.dexdrip.Models.LibreBlock;
-import com.eveningoutpost.dexdrip.Models.ReadingData;
-import com.eveningoutpost.dexdrip.Models.UserError.Log;
-import com.eveningoutpost.dexdrip.NFCReaderX;
-import com.eveningoutpost.dexdrip.R;
-import com.eveningoutpost.dexdrip.UtilityModels.Constants;
-import com.eveningoutpost.dexdrip.UtilityModels.Pref;
+import com.eveningoutpost.dexdrip.*;
+import com.eveningoutpost.dexdrip.models.*;
+import com.eveningoutpost.dexdrip.models.UserError.*;
+import com.eveningoutpost.dexdrip.utilitymodels.*;
 
-import java.text.DateFormat;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.List;
+import java.text.*;
+import java.util.*;
 
-import lecho.lib.hellocharts.model.Axis;
-import lecho.lib.hellocharts.model.Line;
-import lecho.lib.hellocharts.model.LineChartData;
-import lecho.lib.hellocharts.model.PointValue;
-import lecho.lib.hellocharts.util.ChartUtils;
-import lecho.lib.hellocharts.view.LineChartView;
+import lecho.lib.hellocharts.model.*;
+import lecho.lib.hellocharts.util.*;
+import lecho.lib.hellocharts.view.*;
 
-import static com.eveningoutpost.dexdrip.UtilityModels.BgGraphBuilder.FUZZER;
+import static com.eveningoutpost.dexdrip.utilitymodels.BgGraphBuilder.*;
 
 
-public class LibreTrendGraph extends BaseAppCompatActivity {
+public class LibreTrendGraph extends BaseActivity {
     private static final String TAG = "LibreTrendGraph";
     
     private static LibreTrendGraph mInstance;
@@ -56,11 +43,11 @@ public class LibreTrendGraph extends BaseAppCompatActivity {
             return null;
         }
         
-        if(readingData.trend.size() == 0 || readingData.trend.get(0).glucoseLevelRaw == 0) {
+        if(readingData.trend.isEmpty() || readingData.trend.get(0).glucoseLevelRaw == 0) {
             Log.e(TAG, "libreBlock exists but no trend data exists, or first value is zero ");
             return null;
         }
-        ArrayList<Float> ret = new ArrayList<Float>();
+        ArrayList<Float> ret = new ArrayList<>();
 
         double factor = libreBlock.calculated_bg / readingData.trend.get(0).glucoseLevelRaw;
         if(factor == 0) {
@@ -68,7 +55,7 @@ public class LibreTrendGraph extends BaseAppCompatActivity {
             // I want to show raw data.
             Log.w(TAG, "Bg data was not calculated, working on raw data");
             List<BgReading> latestReading = BgReading.latestForGraph (1, libreBlock.timestamp - 1000, libreBlock.timestamp + 1000);
-            if(latestReading == null || latestReading.size() == 0) {
+            if(latestReading == null || latestReading.isEmpty()) {
                 Log.e(TAG, "libreBlock exists but no matching bg record exists");
                 return null;
             }
@@ -77,7 +64,7 @@ public class LibreTrendGraph extends BaseAppCompatActivity {
         }
         
         for (GlucoseData data : readingData.trend) {
-            ret.add(new Float(factor * data.glucoseLevelRaw));
+            ret.add((float) (factor * data.glucoseLevelRaw));
         }
         
         return ret;
@@ -88,7 +75,7 @@ public class LibreTrendGraph extends BaseAppCompatActivity {
         Log.i(TAG, "getLatestBgForXMinutes number of minutes = " + NumberOfMinutes);
         
         List<LibreTrendPoint> LibreTrendPoints = LibreTrendUtil.getInstance().getData(JoH.tsl() - NumberOfMinutes * 60 * 1000, JoH.tsl());
-        if(LibreTrendPoints == null || LibreTrendPoints.size() == 0) {
+        if(LibreTrendPoints == null || LibreTrendPoints.isEmpty()) {
             Log.e(TAG, "Error getting data from getLatestBgForXMinutes");
             return null;
         }
@@ -98,7 +85,7 @@ public class LibreTrendGraph extends BaseAppCompatActivity {
             Log.e(TAG, "libreBlock exists but libreTrendLatest.glucoseLevelRaw is zero ");
             return null;
         }
-        ArrayList<Float> ret = new ArrayList<Float>();
+        ArrayList<Float> ret = new ArrayList<>();
         
         double factor = libreTrendLatest.bg / libreTrendLatest.glucoseLevelRaw;
         if(factor == 0) {
@@ -106,7 +93,7 @@ public class LibreTrendGraph extends BaseAppCompatActivity {
             // I want to show raw data.
             Log.w(TAG, "Bg data was not calculated, working on raw data");
             List<BgReading> latestReading = BgReading.latestForGraph (1, libreTrendLatest.timestamp - 1000, libreTrendLatest.timestamp + 1000);
-            if(latestReading == null || latestReading.size() == 0) {
+            if(latestReading == null || latestReading.isEmpty()) {
                 Log.e(TAG, "libreBlock exists but no matching bg record exists");
                 return null;
             }
@@ -117,7 +104,7 @@ public class LibreTrendGraph extends BaseAppCompatActivity {
         int count = 0;
         for(int i = libreTrendLatest.id ; i >= 0 && count < NumberOfMinutes; i--) {
             count ++;
-            ret.add(new Float(factor * LibreTrendPoints.get(i).rawSensorValue));
+            ret.add((float) (factor * LibreTrendPoints.get(i).rawSensorValue));
         }
             
         return ret;
@@ -203,9 +190,9 @@ public class LibreTrendGraph extends BaseAppCompatActivity {
        final TextView trendView = (TextView) findViewById(R.id.textLibreHeader);
          
         chart = (LineChartView) findViewById(R.id.libre_chart);
-        List<Line> lines = new ArrayList<Line>();
+        List<Line> lines = new ArrayList<>();
 
-        List<PointValue> lineValues = new ArrayList<PointValue>();
+        List<PointValue> lineValues = new ArrayList<>();
         final float conversion_factor_mmol = (float) (doMgdl ? 1 : Constants.MGDL_TO_MMOLL);
 
         LibreBlock libreBlock= LibreBlock.getLatestForTrend();
@@ -257,7 +244,7 @@ public class LibreTrendGraph extends BaseAppCompatActivity {
             // On relative flat trend the graph can look very noise althouth with the right resolution it is not that way.
             // I will add two dummy invisible points that will cause the graph to look with bigger Y range.
             float average = (max + min) /2;
-            List<PointValue> dummyPointValues = new ArrayList<PointValue>();
+            List<PointValue> dummyPointValues = new ArrayList<>();
             Line dummyPointLine = new Line(dummyPointValues);
             dummyPointValues.add(new PointValue(0, (average - MIN_GRAPH / 2) * conversion_factor_mmol));
             dummyPointValues.add(new PointValue(0, (average + MIN_GRAPH / 2) * conversion_factor_mmol));
@@ -285,7 +272,7 @@ public class LibreTrendGraph extends BaseAppCompatActivity {
     // This can be supper confusing for users, so I'm drawing an empty graph just in case.
     void setupEmptyCharts() {
         chart = (LineChartView) findViewById(R.id.libre_chart);
-        List<Line> lines = new ArrayList<Line>();
+        List<Line> lines = new ArrayList<>();
         data = new LineChartData(lines);
         chart.setLineChartData(data);
     }

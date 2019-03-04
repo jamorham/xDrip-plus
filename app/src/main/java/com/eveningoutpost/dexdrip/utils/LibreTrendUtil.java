@@ -1,16 +1,11 @@
 package com.eveningoutpost.dexdrip.utils;
 
-import java.text.DateFormat;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.List;
+import com.eveningoutpost.dexdrip.models.*;
+import com.eveningoutpost.dexdrip.models.UserError.*;
+import com.eveningoutpost.dexdrip.*;
 
-import com.eveningoutpost.dexdrip.NFCReaderX;
-import com.eveningoutpost.dexdrip.Models.GlucoseData;
-import com.eveningoutpost.dexdrip.Models.LibreBlock;
-import com.eveningoutpost.dexdrip.Models.ReadingData;
-
-import com.eveningoutpost.dexdrip.Models.UserError.Log;
+import java.text.*;
+import java.util.*;
 
 /* 
     This class helps to retrieve the latest libre trend points. It holds data of one sensor only.
@@ -66,7 +61,7 @@ public class LibreTrendUtil {
     }
     
     void ResetPoints() {
-        m_points = new ArrayList<LibreTrendPoint>(MAX_POINTS);
+        m_points = new ArrayList<>(MAX_POINTS);
         while(m_points.size() < MAX_POINTS) {
             m_points.add(m_points.size(), new LibreTrendPoint());
         }
@@ -91,7 +86,7 @@ public class LibreTrendUtil {
         Log.i(TAG, "Size of latestBlocks is " + latestBlocks.size());
         
         // Go for the last libreBlock and get calculated bg and timestamp.
-        if (latestBlocks.size() > 0) {
+        if (!latestBlocks.isEmpty()) {
             LibreBlock lastBlock = latestBlocks.get(latestBlocks.size() - 1);
             // 
             ReadingData readingData = NFCReaderX.getTrend(lastBlock);
@@ -99,7 +94,7 @@ public class LibreTrendUtil {
                 Log.e(TAG, "Error: NFCReaderX.getTrend retuned null for latest block");
                 return m_points;
             }
-            if(readingData.trend.size() > 0 ) {
+            if(!readingData.trend.isEmpty()) {
                 m_libreTrendLatest.id = (int)readingData.trend.get(0).sensorTime;
                 m_libreTrendLatest.glucoseLevelRaw = readingData.trend.get(0).glucoseLevelRaw;
             } else {

@@ -1,18 +1,14 @@
 package com.eveningoutpost.dexdrip.adapters;
 
-import android.databinding.BaseObservable;
-import android.databinding.BindingAdapter;
-import android.graphics.Bitmap;
-import android.graphics.drawable.BitmapDrawable;
-import android.graphics.drawable.Drawable;
-import android.support.annotation.ColorRes;
-import android.support.annotation.DrawableRes;
-import android.support.annotation.Nullable;
-import android.support.v4.content.ContextCompat;
-import android.view.View;
+import android.graphics.*;
+import android.graphics.drawable.*;
+import android.view.*;
 
-import lombok.Getter;
-import lombok.Setter;
+import androidx.annotation.*;
+import androidx.core.content.*;
+import androidx.databinding.*;
+
+import lombok.*;
 
 public final class ObservableBackground extends BaseObservable {
     @Nullable
@@ -60,7 +56,7 @@ public final class ObservableBackground extends BaseObservable {
         this.notifyChange();
     }
 
-    @BindingAdapter(value = "background")
+    @BindingAdapter("background")
     public static void setBackground(View view, ObservableBackground observable) {
         Integer resource;
         if (observable.getMDrawableResource() != null) {

@@ -1,18 +1,20 @@
 package com.eveningoutpost.dexdrip.tidepool;
 
+import androidx.annotation.*;
+
+
+
 import java.io.IOException;
 
-import okhttp3.Interceptor;
-import okhttp3.MediaType;
-import okhttp3.Request;
-import okhttp3.RequestBody;
+import okhttp3.*;
 import okio.BufferedSink;
 import okio.GzipSink;
 import okio.Okio;
 
 class GzipRequestInterceptor implements Interceptor {
+        @NonNull
         @Override
-        public okhttp3.Response intercept(Chain chain) throws IOException {
+        public Response intercept(@NonNull Chain chain) throws IOException {
             final Request originalRequest = chain.request();
             if (originalRequest.body() == null
                     || originalRequest.header("Content-Encoding") != null)
@@ -37,7 +39,7 @@ class GzipRequestInterceptor implements Interceptor {
                     return -1; // We don't know the compressed length in advance!
                 }
 
-                @Override public void writeTo(BufferedSink sink) throws IOException {
+                @Override public void writeTo(@NonNull BufferedSink sink) throws IOException {
                     BufferedSink gzipSink = Okio.buffer(new GzipSink(sink));
                     body.writeTo(gzipSink);
                     gzipSink.close();

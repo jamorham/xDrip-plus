@@ -1,23 +1,15 @@
 package com.eveningoutpost.dexdrip.wearintegration;
 
-import android.os.AsyncTask;
-import android.util.Log;
+import android.os.*;
+import android.util.*;
 
-import com.eveningoutpost.dexdrip.Home;
-import com.eveningoutpost.dexdrip.Models.JoH;
-import com.eveningoutpost.dexdrip.Models.UserError;
-import com.google.android.gms.common.api.GoogleApiClient;
-import com.google.android.gms.wearable.DataApi;
-import com.google.android.gms.wearable.DataMap;
-import com.google.android.gms.wearable.Node;
-import com.google.android.gms.wearable.NodeApi;
-import com.google.android.gms.wearable.PutDataMapRequest;
-import com.google.android.gms.wearable.PutDataRequest;
-import com.google.android.gms.wearable.Wearable;
+import com.eveningoutpost.dexdrip.*;
+import com.eveningoutpost.dexdrip.models.*;
+import com.google.android.gms.common.api.*;
+import com.google.android.gms.wearable.*;
 
-import java.util.concurrent.TimeUnit;
-import java.util.concurrent.locks.Lock;
-import java.util.concurrent.locks.ReentrantLock;
+import java.util.concurrent.*;
+import java.util.concurrent.locks.*;
 
 /**
  * Created by Emma Black on 12/26/14.
@@ -57,7 +49,7 @@ class SendToDataLayerThread extends AsyncTask<DataMap,Void,Void> {
             try {
                 UserError.Log.e(TAG,"WARNING RUNNING TEST LOCK UP CODE - NEVER FOR PRODUCTION");
                 Thread.sleep(1000000); // DEEEBBUUGGGG
-            } catch (Exception e) {
+            } catch (Exception ignored) {
             }
         }
         sendToWear(params);

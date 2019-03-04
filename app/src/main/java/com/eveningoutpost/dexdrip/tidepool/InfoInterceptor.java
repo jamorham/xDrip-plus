@@ -1,15 +1,14 @@
 package com.eveningoutpost.dexdrip.tidepool;
 
-import android.support.annotation.NonNull;
+import androidx.annotation.NonNull;
 
-import com.eveningoutpost.dexdrip.Models.UserError;
+import com.eveningoutpost.dexdrip.models.UserError;
+
 
 import java.io.IOException;
 
 import lombok.RequiredArgsConstructor;
-import okhttp3.Interceptor;
-import okhttp3.Request;
-import okhttp3.Response;
+import okhttp3.*;
 
 // jamorham
 
@@ -18,6 +17,7 @@ public class InfoInterceptor implements Interceptor {
 
     private final String tag;
 
+    @NonNull
     @Override
     public Response intercept(@NonNull final Chain chain) throws IOException {
         final Request request = chain.request();

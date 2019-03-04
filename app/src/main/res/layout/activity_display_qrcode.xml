@@ -1,97 +1,98 @@
 <?xml version="1.0" encoding="utf-8"?>
 <layout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto">
+
     <data>
+
         <variable
             name="prefs"
-            type="com.eveningoutpost.dexdrip.UtilityModels.PrefsView" />
+            type="com.eveningoutpost.dexdrip.utilitymodels.PrefsView" />
     </data>
 
-<RelativeLayout
-    xmlns:tools="http://schemas.android.com/tools"
-    android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    android:paddingBottom="@dimen/activity_vertical_margin"
-    android:paddingLeft="@dimen/activity_horizontal_margin"
-    android:paddingRight="@dimen/activity_horizontal_margin"
-    android:paddingTop="@dimen/activity_vertical_margin"
-    tools:context="com.eveningoutpost.dexdrip.utils.DisplayQRCode">
-
-    <ScrollView
+    <RelativeLayout xmlns:tools="http://schemas.android.com/tools"
         android:layout_width="match_parent"
-        android:layout_height="match_parent">
+        android:layout_height="match_parent"
+        android:paddingLeft="@dimen/activity_horizontal_margin"
+        android:paddingTop="@dimen/activity_vertical_margin"
+        android:paddingRight="@dimen/activity_horizontal_margin"
+        android:paddingBottom="@dimen/activity_vertical_margin"
+        tools:context="com.eveningoutpost.dexdrip.utils.DisplayQRCode">
 
-        <LinearLayout
+        <ScrollView
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:orientation="vertical" >
+            android:layout_height="match_parent">
 
             <LinearLayout
                 android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                android:layout_centerHorizontal="true"
+                android:layout_height="wrap_content"
                 android:orientation="vertical">
 
-                <TextView
-                    android:id="@+id/textView15"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="@string/use_qr_codes_to_transfer_settings_using_settings_auto_configure_feature"
-                    android:textAppearance="?android:attr/textAppearanceMedium" />
-
-                <Button
-                    android:id="@+id/button3"
+                <LinearLayout
                     android:layout_width="match_parent"
-                    android:layout_height="0dp"
-                    android:layout_marginTop="28dp"
-                    android:layout_weight="1"
-                    android:onClick="xdripPlusSyncSettings"
-                    android:text="@string/xdrip_plus_security_key_settings_only" />
+                    android:layout_height="match_parent"
+                    android:layout_centerHorizontal="true"
+                    android:orientation="vertical">
+
+                    <TextView
+                        android:id="@+id/textView15"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="@string/use_qr_codes_to_transfer_settings_using_settings_auto_configure_feature"
+                        android:textAppearance="?android:attr/textAppearanceMedium" />
+
+                    <Button
+                        android:id="@+id/button3"
+                        android:layout_width="match_parent"
+                        android:layout_height="0dp"
+                        android:layout_marginTop="28dp"
+                        android:layout_weight="1"
+                        android:onClick="xdripPlusSyncSettings"
+                        android:text="@string/xdrip_plus_security_key_settings_only" />
 
 
-                <Button
-                    app:showIfTrue="@{prefs.getbool(`desert_sync_enabled`)}"
-                    android:id="@+id/button44"
-                    android:layout_width="match_parent"
-                    android:layout_height="0dp"
-                    android:layout_marginTop="28dp"
-                    android:layout_weight="1"
-                    android:onClick="desertSyncSettings"
-                    android:text="@string/set_up_desert_sync_follower" />
+                    <Button
+                        android:id="@+id/button44"
+                        android:layout_width="match_parent"
+                        android:layout_height="0dp"
+                        android:layout_marginTop="28dp"
+                        android:layout_weight="1"
+                        android:onClick="desertSyncSettings"
+                        android:text="@string/set_up_desert_sync_follower"
+                        app:showIfTrue="@{prefs.getbool(`desert_sync_enabled`)}" />
 
-                <Button
-                    android:id="@+id/button"
-                    android:layout_width="match_parent"
-                    android:layout_height="0dp"
-                    android:layout_marginTop="28dp"
-                    android:layout_weight="1"
-                    android:onClick="connectionSettings"
+                    <Button
+                        android:id="@+id/button"
+                        android:layout_width="match_parent"
+                        android:layout_height="0dp"
+                        android:layout_marginTop="28dp"
+                        android:layout_weight="1"
+                        android:onClick="connectionSettings"
 
-                    android:text="@string/show_general_and_collection_settings" />
+                        android:text="@string/show_general_and_collection_settings" />
 
-                <Button
-                    android:id="@+id/buttonallsettings"
-                    android:layout_width="match_parent"
-                    android:layout_height="0dp"
-                    android:layout_marginTop="28dp"
-                    android:layout_weight="1"
-                    android:onClick="allSettings"
-                    android:text="@string/copy_all_settings" />
+                    <Button
+                        android:id="@+id/buttonallsettings"
+                        android:layout_width="match_parent"
+                        android:layout_height="0dp"
+                        android:layout_marginTop="28dp"
+                        android:layout_weight="1"
+                        android:onClick="allSettings"
+                        android:text="@string/copy_all_settings" />
 
+                </LinearLayout>
             </LinearLayout>
-        </LinearLayout>
-    </ScrollView>
+        </ScrollView>
 
-    <ImageButton
-        android:id="@+id/imageButton"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_alignParentBottom="true"
-        android:layout_alignParentEnd="true"
-        android:layout_gravity="end"
-        android:onClick="closeNow"
-        android:src="@android:drawable/ic_delete" />
+        <ImageButton
+            android:id="@+id/imageButton"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentEnd="true"
+            android:layout_alignParentBottom="true"
+            android:layout_gravity="end"
+            android:onClick="closeNow"
+            app:srcCompat="@android:drawable/ic_delete" />
 
-</RelativeLayout>
+    </RelativeLayout>
 
 </layout>

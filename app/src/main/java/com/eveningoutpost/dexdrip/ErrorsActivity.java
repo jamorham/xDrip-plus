@@ -13,10 +13,10 @@ import android.widget.ListView;
 import android.widget.Switch;
 import android.widget.Toast;
 
-import com.eveningoutpost.dexdrip.Models.JoH;
-import com.eveningoutpost.dexdrip.Models.UserError;
-import com.eveningoutpost.dexdrip.UtilityModels.PersistentStore;
-import com.eveningoutpost.dexdrip.UtilityModels.SendFeedBack;
+import com.eveningoutpost.dexdrip.models.JoH;
+import com.eveningoutpost.dexdrip.models.UserError;
+import com.eveningoutpost.dexdrip.utilitymodels.PersistentStore;
+import com.eveningoutpost.dexdrip.utilitymodels.SendFeedBack;
 import com.eveningoutpost.dexdrip.utils.ActivityWithMenu;
 import com.eveningoutpost.dexdrip.wearintegration.WatchUpdaterService;
 
@@ -110,12 +110,7 @@ public class ErrorsActivity extends ActivityWithMenu {
 
     }
 
-    private View.OnClickListener checkboxListener = new View.OnClickListener() {
-        public void onClick(View v) {
-            updateErrors();
-
-        }
-    };
+    private View.OnClickListener checkboxListener = v -> updateErrors();
 
     public void uploadLogs(View v) {
         StringBuilder tmp = new StringBuilder(20000);

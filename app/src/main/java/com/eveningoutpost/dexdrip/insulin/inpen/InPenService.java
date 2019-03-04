@@ -9,16 +9,16 @@ import android.content.Intent;
 import android.os.Build;
 import android.os.PowerManager;
 
-import com.eveningoutpost.dexdrip.ImportedLibraries.usbserial.util.HexDump;
-import com.eveningoutpost.dexdrip.Models.JoH;
-import com.eveningoutpost.dexdrip.Models.PenData;
-import com.eveningoutpost.dexdrip.Models.UserError;
+import com.eveningoutpost.dexdrip.importedLibraries.usbserial.util.HexDump;
+import com.eveningoutpost.dexdrip.models.JoH;
+import com.eveningoutpost.dexdrip.models.PenData;
+import com.eveningoutpost.dexdrip.models.UserError;
 import com.eveningoutpost.dexdrip.R;
-import com.eveningoutpost.dexdrip.Services.JamBaseBluetoothSequencer;
-import com.eveningoutpost.dexdrip.UtilityModels.Inevitable;
-import com.eveningoutpost.dexdrip.UtilityModels.PersistentStore;
-import com.eveningoutpost.dexdrip.UtilityModels.Pref;
-import com.eveningoutpost.dexdrip.UtilityModels.StatusItem;
+import com.eveningoutpost.dexdrip.services.JamBaseBluetoothSequencer;
+import com.eveningoutpost.dexdrip.utilitymodels.Inevitable;
+import com.eveningoutpost.dexdrip.utilitymodels.PersistentStore;
+import com.eveningoutpost.dexdrip.utilitymodels.Pref;
+import com.eveningoutpost.dexdrip.utilitymodels.StatusItem;
 import com.eveningoutpost.dexdrip.insulin.inpen.messages.AdvertRx;
 import com.eveningoutpost.dexdrip.insulin.inpen.messages.BatteryRx;
 import com.eveningoutpost.dexdrip.insulin.inpen.messages.BondTx;
@@ -54,22 +54,22 @@ import rx.schedulers.Schedulers;
 
 import static android.bluetooth.BluetoothDevice.BOND_BONDED;
 import static android.bluetooth.BluetoothDevice.BOND_NONE;
-import static com.eveningoutpost.dexdrip.ImportedLibraries.usbserial.util.HexDump.dumpHexString;
-import static com.eveningoutpost.dexdrip.Models.JoH.bytesToHex;
-import static com.eveningoutpost.dexdrip.Models.JoH.dateTimeText;
-import static com.eveningoutpost.dexdrip.Models.JoH.emptyString;
-import static com.eveningoutpost.dexdrip.Models.JoH.hourMinuteString;
-import static com.eveningoutpost.dexdrip.Models.JoH.msSince;
-import static com.eveningoutpost.dexdrip.Models.JoH.quietratelimit;
-import static com.eveningoutpost.dexdrip.Models.JoH.ratelimit;
-import static com.eveningoutpost.dexdrip.Services.JamBaseBluetoothSequencer.BaseState.CLOSE;
-import static com.eveningoutpost.dexdrip.Services.JamBaseBluetoothSequencer.BaseState.INIT;
-import static com.eveningoutpost.dexdrip.UtilityModels.Constants.INPEN_SERVICE_FAILOVER_ID;
-import static com.eveningoutpost.dexdrip.UtilityModels.Constants.MINUTE_IN_MS;
-import static com.eveningoutpost.dexdrip.UtilityModels.Constants.SECOND_IN_MS;
-import static com.eveningoutpost.dexdrip.UtilityModels.StatusItem.Highlight.BAD;
-import static com.eveningoutpost.dexdrip.UtilityModels.StatusItem.Highlight.GOOD;
-import static com.eveningoutpost.dexdrip.UtilityModels.StatusItem.Highlight.NORMAL;
+import static com.eveningoutpost.dexdrip.importedLibraries.usbserial.util.HexDump.dumpHexString;
+import static com.eveningoutpost.dexdrip.models.JoH.bytesToHex;
+import static com.eveningoutpost.dexdrip.models.JoH.dateTimeText;
+import static com.eveningoutpost.dexdrip.models.JoH.emptyString;
+import static com.eveningoutpost.dexdrip.models.JoH.hourMinuteString;
+import static com.eveningoutpost.dexdrip.models.JoH.msSince;
+import static com.eveningoutpost.dexdrip.models.JoH.quietratelimit;
+import static com.eveningoutpost.dexdrip.models.JoH.ratelimit;
+import static com.eveningoutpost.dexdrip.services.JamBaseBluetoothSequencer.BaseState.CLOSE;
+import static com.eveningoutpost.dexdrip.services.JamBaseBluetoothSequencer.BaseState.INIT;
+import static com.eveningoutpost.dexdrip.utilitymodels.Constants.INPEN_SERVICE_FAILOVER_ID;
+import static com.eveningoutpost.dexdrip.utilitymodels.Constants.MINUTE_IN_MS;
+import static com.eveningoutpost.dexdrip.utilitymodels.Constants.SECOND_IN_MS;
+import static com.eveningoutpost.dexdrip.utilitymodels.StatusItem.Highlight.BAD;
+import static com.eveningoutpost.dexdrip.utilitymodels.StatusItem.Highlight.GOOD;
+import static com.eveningoutpost.dexdrip.utilitymodels.StatusItem.Highlight.NORMAL;
 import static com.eveningoutpost.dexdrip.insulin.inpen.Constants.AUTHENTICATION;
 import static com.eveningoutpost.dexdrip.insulin.inpen.Constants.BATTERY;
 import static com.eveningoutpost.dexdrip.insulin.inpen.Constants.BONDCONTROL;
@@ -581,41 +581,32 @@ public class InPenService extends JamBaseBluetoothSequencer {
         final int numberOfRecords = lastIndex - firstIndex;
         if (numberOfRecords > 30) {
             I.connection.writeCharacteristic(KEEPALIVE, new KeepAliveTx().getBytes()).subscribe(
-                    value -> {
-                        UserError.Log.d(TAG, "Wrote keep alive for " + numberOfRecords);
-                    }, throwable -> {
-                        UserError.Log.d(TAG, "Got exception in keep alive" + throwable);
-                    });
+                    value -> UserError.Log.d(TAG, "Wrote keep alive for " + numberOfRecords), throwable -> UserError.Log.d(TAG, "Got exception in keep alive" + throwable));
         }
 
         final RecordTx packet = new RecordTx(firstIndex, lastIndex);
         UserError.Log.d(TAG, "getRecords called, loading: " + firstIndex + " to " + lastIndex);
-        I.connection.setupIndication(RECORD_INDICATE).doOnNext(notificationObservable -> {
+        I.connection.setupIndication(RECORD_INDICATE).doOnNext(notificationObservable -> I.connection.writeCharacteristic(RECORD_START, packet.startBytes()).subscribe(valueS -> {
+            UserError.Log.d(TAG, "Wrote record start: " + bytesToHex(valueS));
+            I.connection.writeCharacteristic(RECORD_END, packet.endBytes()).subscribe(valueE -> {
+                UserError.Log.d(TAG, "Wrote record end: " + bytesToHex(valueE));
+                I.connection.writeCharacteristic(RECORD_REQUEST, packet.triggerBytes()).subscribe(
+                        characteristicValue -> {
 
-            I.connection.writeCharacteristic(RECORD_START, packet.startBytes()).subscribe(valueS -> {
-                UserError.Log.d(TAG, "Wrote record start: " + bytesToHex(valueS));
-                I.connection.writeCharacteristic(RECORD_END, packet.endBytes()).subscribe(valueE -> {
-                    UserError.Log.d(TAG, "Wrote record end: " + bytesToHex(valueE));
-                    I.connection.writeCharacteristic(RECORD_REQUEST, packet.triggerBytes()).subscribe(
-                            characteristicValue -> {
-
-                                if (D)
-                                    UserError.Log.d(TAG, "Wrote record request request: " + bytesToHex(characteristicValue));
-                            }, throwable -> {
-                                UserError.Log.e(TAG, "Failed to write record request: " + throwable);
-                                if (throwable instanceof BleGattCharacteristicException) {
-                                    final int status = ((BleGattCharacteristicException) throwable).getStatus();
-                                    UserError.Log.e(TAG, "Got status message: " + Helper.getStatusName(status));
-                                }
-                            });
-                }, throwable -> {
-                    UserError.Log.d(TAG, "Throwable in Record End write: " + throwable);
-                });
-            }, throwable -> {
-                UserError.Log.d(TAG, "Throwable in Record Start write: " + throwable);
-                // throws BleGattCharacteristicException status = 128 for "no resources" eg nothing matches
-            });
-        })
+                            if (D)
+                                UserError.Log.d(TAG, "Wrote record request request: " + bytesToHex(characteristicValue));
+                        }, throwable -> {
+                            UserError.Log.e(TAG, "Failed to write record request: " + throwable);
+                            if (throwable instanceof BleGattCharacteristicException) {
+                                final int status = ((BleGattCharacteristicException) throwable).getStatus();
+                                UserError.Log.e(TAG, "Got status message: " + Helper.getStatusName(status));
+                            }
+                        });
+            }, throwable -> UserError.Log.d(TAG, "Throwable in Record End write: " + throwable));
+        }, throwable -> {
+            UserError.Log.d(TAG, "Throwable in Record Start write: " + throwable);
+            // throws BleGattCharacteristicException status = 128 for "no resources" eg nothing matches
+        }))
                 .flatMap(notificationObservable -> notificationObservable)
                 .timeout(120, TimeUnit.SECONDS)
                 .observeOn(Schedulers.newThread())
@@ -678,9 +669,7 @@ public class InPenService extends JamBaseBluetoothSequencer {
                 value -> {
                     UserError.Log.d(TAG, "Sent KeepAlive ok: ");
                     changeNextState();
-                }, throwable -> {
-                    UserError.Log.e(TAG, "Could not write keepAlive " + throwable);
-                });
+                }, throwable -> UserError.Log.e(TAG, "Could not write keepAlive " + throwable));
     }
 
     private void bondAuthority() {
@@ -738,11 +727,7 @@ public class InPenService extends JamBaseBluetoothSequencer {
                     if (I.connection != null)
                         UserError.Log.d(TAG, "Trying gatt refresh queue");
                     I.connection.queue((new GattRefreshOperation(0))).timeout(2, TimeUnit.SECONDS).subscribe(
-                            readValue -> {
-                                UserError.Log.d(TAG, "Refresh OK: " + readValue);
-                            }, throwable -> {
-                                UserError.Log.d(TAG, "Refresh exception: " + throwable);
-                            });
+                            readValue -> UserError.Log.d(TAG, "Refresh OK: " + readValue), throwable -> UserError.Log.d(TAG, "Refresh exception: " + throwable));
                 } catch (NullPointerException e) {
                     UserError.Log.d(TAG, "Probably harmless gatt refresh exception: " + e);
                 } catch (Exception e) {

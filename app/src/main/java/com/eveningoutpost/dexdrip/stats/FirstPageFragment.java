@@ -1,24 +1,20 @@
 package com.eveningoutpost.dexdrip.stats;
 
-import android.content.Context;
-import android.content.SharedPreferences;
-import android.os.Bundle;
-import android.preference.PreferenceManager;
-import android.support.annotation.NonNull;
-import android.support.annotation.Nullable;
-import android.support.v4.app.Fragment;
-import com.eveningoutpost.dexdrip.Models.UserError.Log;
-import android.view.LayoutInflater;
-import android.view.View;
-import android.view.ViewGroup;
-import android.widget.TextView;
+import android.content.*;
+import android.os.*;
+import android.preference.*;
+import android.view.*;
+import android.widget.*;
 
-import com.eveningoutpost.dexdrip.ImportedLibraries.dexcom.Dex_Constants;
-import com.eveningoutpost.dexdrip.R;
+import androidx.annotation.*;
+import androidx.fragment.app.*;
 
-import java.text.DecimalFormat;
-import java.util.ArrayList;
-import java.util.List;
+import com.eveningoutpost.dexdrip.importedLibraries.dexcom.*;
+import com.eveningoutpost.dexdrip.models.UserError.*;
+import com.eveningoutpost.dexdrip.*;
+
+import java.text.*;
+import java.util.*;
 
 /**
  * Created by adrian on 30/06/15.
@@ -29,7 +25,7 @@ public class FirstPageFragment extends Fragment {
 
     @Nullable
     @Override
-    public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
+    public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         Log.d("DrawStats", "FirstPageFragment onCreateView");
 
         myView = inflater.inflate(
@@ -88,7 +84,7 @@ public class FirstPageFragment extends Fragment {
             updateText(localView, rangesabsolute, inRange + "/" + aboveRange + "/" + belowRange);
 
             List<BgReadingStats> bgList = DBSearchUtil.getReadings(true);
-            if (bgList.size() > 0) {
+            if (!bgList.isEmpty()) {
                 double median = bgList.get(bgList.size() / 2).calculated_value;
                 TextView medianView = (TextView) localView.findViewById(R.id.textView_median);
 
@@ -147,7 +143,7 @@ public class FirstPageFragment extends Fragment {
                 double normalReadingspct= inRange*100/total; //TODO calculate from cleaned data?
 
                 // list size can be 0 after cleaning so cancel if so
-                if (bgListByTime.size() == 0) {
+                if (bgListByTime.isEmpty()) {
                     return;
                 }
 
@@ -181,38 +177,32 @@ public class FirstPageFragment extends Fragment {
 
         private void updateText(final View localView, final TextView tv, final String s) {
             Log.d("DrawStats", "updateText: " + s);
-            Thread thread = new Thread(new Runnable() {
-                @Override
-                public void run() {
+            Thread thread = new Thread(() -> {
 
-                    //Adrian: after screen rotation it might take some time to attach the view to the window
-                    //Wait up to 3 seconds for this to happen.
-                    int i = 0;
-                    while (localView.getHandler() == null && i < 10) {
-                        i++;
-                        try {
-                            Thread.sleep(300);
-                        } catch (InterruptedException e) {
-                        }
-
+                //Adrian: after screen rotation it might take some time to attach the view to the window
+                //Wait up to 3 seconds for this to happen.
+                int i = 0;
+                while (localView.getHandler() == null && i < 10) {
+                    i++;
+                    try {
+                        Thread.sleep(300);
+                    } catch (InterruptedException ignored) {
                     }
 
-                    if (localView.getHandler() == null) {
-                        Log.d("DrawStats", "no Handler found - stopping to update view");
-                        return;
-                    }
-
-
-                    boolean success = localView.post(new Runnable() {
-                        @Override
-                        public void run() {
-                            tv.setText(s);
-                            Log.d("DrawStats", "setText actually called: " + s);
-
-                        }
-                    });
-                    Log.d("DrawStats", "updateText: " + s + " success: " + success);
                 }
+
+                if (localView.getHandler() == null) {
+                    Log.d("DrawStats", "no Handler found - stopping to update view");
+                    return;
+                }
+
+
+                boolean success = localView.post(() -> {
+	                tv.setText(s);
+	                Log.d("DrawStats", "setText actually called: " + s);
+
+                });
+                Log.d("DrawStats", "updateText: " + s + " success: " + success);
             });
             thread.start();
 
@@ -255,7 +245,7 @@ public class FirstPageFragment extends Fragment {
         // data cleaning pass 2 - replace single jumpy measures with interpolated values
         List<BgReadingStats> glucose_data2 = new ArrayList<>(glucose_data.size());
         BgReadingStats prevEntry = null;
-        if(glucose_data.size() > 0) {
+        if(!glucose_data.isEmpty()) {
             glucose_data2.add(glucose_data.get(0));
             prevEntry = glucose_data.get(0);
         }
