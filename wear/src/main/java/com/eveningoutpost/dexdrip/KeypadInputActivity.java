@@ -167,7 +167,7 @@ public class KeypadInputActivity extends AppCompatActivity {
     private static String appendCurrent(String append) {
         String cval = getValue(currenttab);
         if (cval.length() < 6) {
-            if ((cval.length() == 0) && (append.equals("."))) append = "0.";
+            if ((cval.isEmpty()) && (append.equals("."))) append = "0.";
             return appendValue(currenttab, append);
         } else {
             return cval;
@@ -181,7 +181,7 @@ public class KeypadInputActivity extends AppCompatActivity {
 
     private void appBackSpace() {
         String cval = getValue(currenttab);
-        if (cval.length() > 0) {
+        if (!cval.isEmpty()) {
             values.put(currenttab, cval.substring(0, cval.length() - 1));
         }
         updateTab();
@@ -198,10 +198,10 @@ public class KeypadInputActivity extends AppCompatActivity {
 
         String mystring = "";
         mystring += (JoH.tsl()/1000)+" watchkeypad ";
-        mystring += (getValue("time").length() > 0) ? getValue("time") + " time " : getTime() + " time ";
-        mystring += (getValue("bloodtest").length() > 0) ? getValue("bloodtest") + " blood " : "";
-        mystring += (getValue("carbs").length() > 0) ? (!getValue("carbs").equals("0") ? getValue("carbs") + " carbs " : "") : "";
-        mystring += (getValue("insulin").length() > 0) ? (!getValue("insulin").equals("0") ? getValue("insulin") + " units " : "") : "";
+        mystring += (!getValue("time").isEmpty()) ? getValue("time") + " time " : getTime() + " time ";
+        mystring += (!getValue("bloodtest").isEmpty()) ? getValue("bloodtest") + " blood " : "";
+        mystring += (!getValue("carbs").isEmpty()) ? (!getValue("carbs").equals("0") ? getValue("carbs") + " carbs " : "") : "";
+        mystring += (!getValue("insulin").isEmpty()) ? (!getValue("insulin").equals("0") ? getValue("insulin") + " units " : "") : "";
 
         if (mystring.length() > 1) {
             ListenerService.sendTreatment(mystring);
@@ -245,7 +245,7 @@ public class KeypadInputActivity extends AppCompatActivity {
         value = getValue(currenttab);
         mDialTextView.setText(value + append);
         // show green tick
-        if (value.length() > 0) {
+        if (!value.isEmpty()) {
             mDialTextView.getBackground().setAlpha(255);
         } else {
             mDialTextView.getBackground().setAlpha(0);
@@ -253,17 +253,17 @@ public class KeypadInputActivity extends AppCompatActivity {
     }
 
    /* private void sendMessage(final String message, final byte[] payload) {
-        Log.i(KeypadInputActivity.class.getSimpleName(), message);
+       UserError.Log.i(KeypadInputActivity.class.getSimpleName(), message);
         Wearable.NodeApi.getConnectedNodes(mApiClient).setResultCallback(new ResultCallback<NodeApi.GetConnectedNodesResult>() {
             @Override
             public void onResult(NodeApi.GetConnectedNodesResult getConnectedNodesResult) {
                 List<Node> nodes = getConnectedNodesResult.getNodes();
                 for (Node node : nodes) {
-                    Log.i(KeypadInputActivity.class.getSimpleName(), "WEAR sending " + message + " to " + node);
+                   UserError.Log.i(KeypadInputActivity.class.getSimpleName(), "WEAR sending " + message + " to " + node);
                     Wearable.MessageApi.sendMessage(mApiClient, node.getId(), message, payload).setResultCallback(new ResultCallback<MessageApi.SendMessageResult>() {
                         @Override
                         public void onResult(MessageApi.SendMessageResult sendMessageResult) {
-                            Log.i(KeypadInputActivity.class.getSimpleName(), "WEAR Result " + sendMessageResult.getStatus());
+                           UserError.Log.i(KeypadInputActivity.class.getSimpleName(), "WEAR Result " + sendMessageResult.getStatus());
                         }
                     });
                 }
@@ -290,7 +290,7 @@ public class KeypadInputActivity extends AppCompatActivity {
                 .addOnConnectionFailedListener(new GoogleApiClient.OnConnectionFailedListener() {
                     @Override
                     public void onConnectionFailed(ConnectionResult result) {
-                        Log.i(KeypadInputActivity.class.getSimpleName(), "Connection failed");
+                       UserError.Log.i(KeypadInputActivity.class.getSimpleName(), "Connection failed");
                     }
                 })
                 .addApi(Wearable.API)

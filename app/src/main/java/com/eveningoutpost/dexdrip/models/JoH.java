@@ -167,7 +167,7 @@ public class JoH {
             }
             return data;
         } catch (Exception e) {
-            Log.e(TAG, "Exception processing hexString: " + e);
+            UserError.Log.e(TAG, "Exception processing hexString: " + e);
             return null;
         }
     }
@@ -200,7 +200,7 @@ public class JoH {
             output.close();
             return compressed;
         } catch (Exception e) {
-            Log.e(TAG, "Exception in compress: " + e.toString());
+            UserError.Log.e(TAG, "Exception in compress: " + e.toString());
             return new byte[0];
         }
     }
@@ -219,14 +219,14 @@ public class JoH {
             output.close();
             return compressed;
         } catch (Exception e) {
-            Log.e(TAG, "Exception in compress: " + e.toString());
+            UserError.Log.e(TAG, "Exception in compress: " + e.toString());
             return new byte[0];
         }
     }
 
     public static byte[] decompressBytesToBytes(byte[] bytes) {
         try {
-            Log.d(TAG, "Decompressing  bytes size: " + bytes.length);
+            UserError.Log.i(TAG, "Decompressing  bytes size: " + bytes.length);
             byte[] buffer = new byte[8192];
             int bytes_read;
             ByteArrayInputStream input = new ByteArrayInputStream(bytes);
@@ -240,7 +240,7 @@ public class JoH {
             // output.close();
             return output.toByteArray();
         } catch (Exception e) {
-            Log.e(TAG, "Exception in decompress: " + e.toString());
+            UserError.Log.e(TAG, "Exception in decompress: " + e.toString());
             return new byte[0];
         }
     }
@@ -256,10 +256,10 @@ public class JoH {
             byte[] buf = new byte[10000]; // max packet size because not using stream
             int count = inflater.inflate(buf);
             inflater.end();
-            Log.d(TAG, "Inflated bytes: " + count);
+            UserError.Log.i(TAG, "Inflated bytes: " + count);
             return new String(buf, 0, count, StandardCharsets.UTF_8);
         } catch (Exception e) {
-            Log.e(TAG, "Got exception uncompressing string");
+            UserError.Log.e(TAG, "Got exception uncompressing string");
             return null;
         }
     }
@@ -272,7 +272,7 @@ public class JoH {
         try {
             return new String(Base64.decode(input.getBytes(StandardCharsets.UTF_8), Base64.NO_WRAP), StandardCharsets.UTF_8);
         } catch (IllegalArgumentException e) {
-            Log.e(TAG, "Got unsupported encoding: " + e);
+            UserError.Log.e(TAG, "Got unsupported encoding: " + e);
             return "decode-error";
         }
     }
@@ -286,7 +286,7 @@ public class JoH {
         try {
             return Base64.decode(input.getBytes(StandardCharsets.UTF_8), Base64.NO_WRAP);
         } catch (IllegalArgumentException e) {
-            Log.e(TAG, "Got unsupported encoding: " + e);
+            UserError.Log.e(TAG, "Got unsupported encoding: " + e);
             return new byte[0];
         }
     }
@@ -367,14 +367,14 @@ public class JoH {
             if (benchmark_time == 0) {
                 benchmark_time = ts();
             } else {
-                Log.e(TAG, "Cannot start a benchmark as one is already running - cancelling");
+                UserError.Log.e(TAG, "Cannot start a benchmark as one is already running - cancelling");
                 benchmark_time = 0;
             }
         } else {
             if (benchmark_time == 0) {
-                Log.e(TAG, "Benchmark: " + name + " no benchmark set!");
+                UserError.Log.e(TAG, "Benchmark: " + name + " no benchmark set!");
             } else {
-                Log.i(TAG, "Benchmark: " + name + " " + (ts() - benchmark_time) + " ms");
+                UserError.Log.i(TAG, "Benchmark: " + name + " " + (ts() - benchmark_time) + " ms");
                 benchmark_time = 0;
             }
         }
@@ -425,7 +425,7 @@ public class JoH {
             rate_time = rateLimits.get(name);
         }
         if ((rate_time > 0) && (time_now - rate_time) < (seconds * 1000L)) {
-            Log.d(TAG, name + " rate limited: " + seconds + " seconds");
+            UserError.Log.i(TAG, name + " rate limited: " + seconds + " seconds");
             return false;
         }
         // not over limit
@@ -438,7 +438,7 @@ public class JoH {
     public static synchronized boolean ratelimit(String name, int seconds) {
         // check if over limit
         if ((rateLimits.containsKey(name)) && (JoH.tsl() - rateLimits.get(name) < (seconds * 1000L))) {
-            Log.d(TAG, name + " rate limited: " + seconds + " seconds");
+            UserError.Log.i(TAG, name + " rate limited: " + seconds + " seconds");
             return false;
         }
         // not over limit
@@ -461,7 +461,7 @@ public class JoH {
     public static synchronized boolean ratelimitmilli(String name, int milliseconds) {
         // check if over limit
         if ((rateLimits.containsKey(name)) && (JoH.tsl() - rateLimits.get(name) < (milliseconds))) {
-            Log.d(TAG, name + " rate limited: " + milliseconds + " milliseconds");
+            UserError.Log.i(TAG, name + " rate limited: " + milliseconds + " milliseconds");
             return false;
         }
         // not over limit
@@ -494,7 +494,7 @@ public class JoH {
                 if (s.getValue() == 2009579833) return true;
             }
         } catch (Exception e) {
-            Log.d(TAG, "exception: " + e);
+            UserError.Log.i(TAG, "exception: " + e);
         }
         return false;
     }
@@ -502,10 +502,10 @@ public class JoH {
     public static boolean getWifiSleepPolicyNever() {
         try {
             int policy = Settings.Global.getInt(xdrip.getAppContext().getContentResolver(), android.provider.Settings.Global.WIFI_SLEEP_POLICY);
-            Log.d(TAG, "Current WifiPolicy: " + ((policy == Settings.Global.WIFI_SLEEP_POLICY_NEVER) ? "Never" : Integer.toString(policy)) + " " + Settings.Global.WIFI_SLEEP_POLICY_DEFAULT + " " + Settings.Global.WIFI_SLEEP_POLICY_NEVER_WHILE_PLUGGED);
+            UserError.Log.i(TAG, "Current WifiPolicy: " + ((policy == Settings.Global.WIFI_SLEEP_POLICY_NEVER) ? "Never" : Integer.toString(policy)) + " " + Settings.Global.WIFI_SLEEP_POLICY_DEFAULT + " " + Settings.Global.WIFI_SLEEP_POLICY_NEVER_WHILE_PLUGGED);
             return (policy == Settings.Global.WIFI_SLEEP_POLICY_NEVER);
         } catch (Exception e) {
-            Log.e(TAG, "Exception during global settings policy");
+            UserError.Log.e(TAG, "Exception during global settings policy");
             return true; // we don't know anything
         }
     }
@@ -519,9 +519,9 @@ public class JoH {
         try {
 
             double timing = ts() - benchmarks.get(name);
-            Log.i(TAG, "Benchmark: " + name + " " + timing + "ms");
+            UserError.Log.i(TAG, "Benchmark: " + name + " " + timing + "ms");
         } catch (Exception e) {
-            Log.e(TAG, "Benchmark: " + name + " no benchmark set!");
+            UserError.Log.e(TAG, "Benchmark: " + name + " no benchmark set!");
         }
     }
 
@@ -530,7 +530,7 @@ public class JoH {
             context.getSupportActionBar().setDisplayShowHomeEnabled(true);
             context.getSupportActionBar().setIcon(R.drawable.ic_launcher);
         } catch (Exception e) {
-            Log.e(TAG, "Got exception with supportactionbar: " + e.toString());
+            UserError.Log.e(TAG, "Got exception with supportactionbar: " + e.toString());
 
         }
     }
@@ -700,18 +700,18 @@ public class JoH {
         final PowerManager pm = (PowerManager) xdrip.getAppContext().getSystemService(Context.POWER_SERVICE);
         final PowerManager.WakeLock wl = pm.newWakeLock(PowerManager.PARTIAL_WAKE_LOCK, name);
         wl.acquire(millis);
-        if (debug_wakelocks) Log.d(TAG, "getWakeLock: " + name + " " + wl.toString());
+        if (debug_wakelocks) UserError.Log.i(TAG, "getWakeLock: " + name + " " + wl.toString());
         return wl;
     }
 
     public static void releaseWakeLock(PowerManager.WakeLock wl) {
-        if (debug_wakelocks) Log.d(TAG, "releaseWakeLock: " + wl.toString());
+        if (debug_wakelocks) UserError.Log.i(TAG, "releaseWakeLock: " + wl.toString());
         if (wl == null) return;
         if (wl.isHeld()) {
             try {
                 wl.release();
             } catch (Exception e) {
-                Log.e(TAG, "Error releasing wakelock: " + e);
+                UserError.Log.e(TAG, "Error releasing wakelock: " + e);
             }
         }
     }
@@ -720,7 +720,7 @@ public class JoH {
         final PowerManager pm = (PowerManager) xdrip.getAppContext().getSystemService(Context.POWER_SERVICE);
         PowerManager.WakeLock wl = pm.newWakeLock(PowerManager.FULL_WAKE_LOCK | PowerManager.ACQUIRE_CAUSES_WAKEUP | PowerManager.ON_AFTER_RELEASE, name);
         wl.acquire(millis);
-        if (debug_wakelocks) Log.d(TAG, "fullWakeLock: " + name + " " + wl.toString());
+        if (debug_wakelocks) UserError.Log.i(TAG, "fullWakeLock: " + name + " " + wl.toString());
         return wl;
     }
 
@@ -730,7 +730,7 @@ public class JoH {
             ActiveAndroid.dispose();
             ActiveAndroid.initialize(xdrip.getAppContext());
         } catch (Exception e) {
-            Log.e(TAG,"Error restarting active android db");
+            UserError.Log.e(TAG,"Error restarting active android db");
         }
     }
 
@@ -738,7 +738,7 @@ public class JoH {
         try {
             ActiveAndroid.clearCache();
         } catch (Exception e) {
-            Log.e(TAG, "Error clearing active android cache: " + e);
+            UserError.Log.e(TAG, "Error clearing active android cache: " + e);
         }
     }
 
@@ -810,7 +810,7 @@ public class JoH {
                 }
             }
         } catch (Exception e) {
-            Log.e(TAG, "Got exception in getWifiSSID: " + e);
+            UserError.Log.e(TAG, "Got exception in getWifiSSID: " + e);
         }
         return null;
     }
@@ -864,17 +864,17 @@ public class JoH {
             if (!runOnUiThread(() -> {
                 try {
                     Toast.makeText(context, msg, length).show();
-                    Log.i(TAG, "Displaying toast using fallback");
+                    UserError.Log.i(TAG, "Displaying toast using fallback");
                 } catch (Exception e) {
-                    Log.e(TAG, "Exception processing runnable toast ui thread: " + e);
+                    UserError.Log.e(TAG, "Exception processing runnable toast ui thread: " + e);
                     Home.toaststatic(msg);
                 }
             })) {
-                Log.e(TAG, "Couldn't display toast via ui thread: " + msg);
+                UserError.Log.e(TAG, "Couldn't display toast via ui thread: " + msg);
                 Home.toaststatic(msg);
             }
         } catch (Exception e) {
-            Log.e(TAG, "Couldn't display toast due to exception: " + msg + " e: " + e.toString());
+            UserError.Log.e(TAG, "Couldn't display toast due to exception: " + msg + " e: " + e.toString());
             Home.toaststatic(msg);
         }
     }
@@ -910,7 +910,7 @@ public class JoH {
 
                 builder.create().show();
             } catch (Exception e) {
-                Log.wtf(TAG, "show_dialog exception: " + e);
+                UserError.Log.wtf(TAG, "show_dialog exception: " + e);
                 static_toast_long(message);
             }
         });
@@ -932,7 +932,7 @@ public class JoH {
             player.start();
             return player;
         } catch (Exception e) {
-            Log.wtf(TAG, "Failed to play audio: " + soundUri + " exception:" + e);
+            UserError.Log.wtf(TAG, "Failed to play audio: " + soundUri + " exception:" + e);
             return null;
         }
     }
@@ -1025,7 +1025,7 @@ public class JoH {
         }
         final int width = view.getWidth();
         final int height = view.getHeight();
-        Log.d(TAG, "Screenshot called: " + width + "," + height);
+        UserError.Log.i(TAG, "Screenshot called: " + width + "," + height);
         final Bitmap bitmap = Bitmap.createBitmap(width,
                 height, Bitmap.Config.ARGB_8888);
 
@@ -1069,7 +1069,7 @@ public class JoH {
     }
 
     public static Bitmap screenShot2(View view) {
-        Log.d(TAG, "Screenshot2 called: " + view.getWidth() + "," + view.getHeight());
+        UserError.Log.i(TAG, "Screenshot2 called: " + view.getWidth() + "," + view.getHeight());
         view.setDrawingCacheEnabled(true);
         view.buildDrawingCache(true);
         final Bitmap bitmap = view.getDrawingCache(true);
@@ -1080,7 +1080,7 @@ public class JoH {
     public static void bitmapToFile(Bitmap bitmap, String path, String fileName) {
 
         if (bitmap == null) return;
-        Log.d(TAG, "bitmapToFile: " + bitmap.getWidth() + "x" + bitmap.getHeight());
+        UserError.Log.i(TAG, "bitmapToFile: " + bitmap.getWidth() + "x" + bitmap.getHeight());
         File dir = new File(path);
         if (!dir.exists())
             dir.mkdirs();
@@ -1090,9 +1090,9 @@ public class JoH {
             final boolean result = bitmap.compress(Bitmap.CompressFormat.PNG, 80, output);
             output.flush();
             output.close();
-            Log.d(TAG, "Bitmap compress result: " + result);
+            UserError.Log.i(TAG, "Bitmap compress result: " + result);
         } catch (Exception e) {
-            Log.e(TAG, "Got exception writing bitmap to file: " + e);
+            UserError.Log.e(TAG, "Got exception writing bitmap to file: " + e);
         }
     }
 
@@ -1115,22 +1115,22 @@ public class JoH {
         // do we want a try catch block here?
         final AlarmManager alarm = (AlarmManager) context.getSystemService(ALARM_SERVICE);
         if (serviceIntent != null) {
-            Log.d(TAG, "Cancelling alarm " + serviceIntent.getCreatorPackage());
+            UserError.Log.i(TAG, "Cancelling alarm " + serviceIntent.getCreatorPackage());
             alarm.cancel(serviceIntent);
         } else {
-            Log.d(TAG, "Cancelling alarm: serviceIntent is null");
+            UserError.Log.i(TAG, "Cancelling alarm: serviceIntent is null");
         }
     }
 
     public static long wakeUpIntent(Context context, long delayMs, PendingIntent pendingIntent) {
         final long wakeTime = JoH.tsl() + delayMs;
         if (pendingIntent != null) {
-            Log.d(TAG, "Scheduling wakeup intent: " + dateTimeText(wakeTime));
+            UserError.Log.i(TAG, "Scheduling wakeup intent: " + dateTimeText(wakeTime));
             final AlarmManager alarm = (AlarmManager) context.getSystemService(ALARM_SERVICE);
             try {
                 alarm.cancel(pendingIntent);
             } catch (Exception e) {
-                Log.e(TAG, "Exception cancelling alarm in wakeUpIntent: " + e);
+                UserError.Log.e(TAG, "Exception cancelling alarm in wakeUpIntent: " + e);
             }
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
                 if (buggy_samsung && Pref.getBoolean("allow_samsung_workaround", true)) {
@@ -1143,7 +1143,7 @@ public class JoH {
             } else
                 alarm.set(AlarmManager.RTC_WAKEUP, wakeTime, pendingIntent);
         } else {
-            Log.e(TAG, "wakeUpIntent - pending intent was null!");
+            UserError.Log.e(TAG, "wakeUpIntent - pending intent was null!");
         }
         return wakeTime;
     }
@@ -1151,7 +1151,7 @@ public class JoH {
     public static void scheduleNotification(Context context, String title, String body, int delaySeconds, int notification_id) {
         final Intent notificationIntent = new Intent(context, Home.class).putExtra(Home.SHOW_NOTIFICATION, title).putExtra("notification_body", body).putExtra("notification_id", notification_id);
         final PendingIntent pendingIntent = PendingIntent.getActivity(context, notification_id, notificationIntent, PendingIntent.FLAG_UPDATE_CURRENT);
-        Log.d(TAG, "Scheduling notification: " + title + " / " + body);
+        UserError.Log.i(TAG, "Scheduling notification: " + title + " / " + body);
         wakeUpIntent(context, delaySeconds * 1000, pendingIntent);
     }
 
@@ -1289,7 +1289,7 @@ public class JoH {
 
                     if ((type == PAIRING_VARIANT_PIN) && (pinHint != null)) {
                         device.setPin(convertPinToBytes(pinHint));
-                        Log.d(TAG, "Setting pairing pin to " + pinHint);
+                        UserError.Log.i(TAG, "Setting pairing pin to " + pinHint);
                         broadcastReceiver.abortBroadcast();
                     }
                     try {
@@ -1299,7 +1299,7 @@ public class JoH {
                             JoH.static_toast_short("xDrip Pairing");
                             broadcastReceiver.abortBroadcast();
                         } else {
-                            Log.d(TAG, "Attempting to passthrough PIN pairing");
+                            UserError.Log.i(TAG, "Attempting to passthrough PIN pairing");
                         }
 
                     } catch (Exception e) {
@@ -1344,7 +1344,7 @@ public class JoH {
             }
         }
         catch (Exception e) {
-            Log.e(thisTAG, "An exception occured while refreshing gatt device cache: "+e);
+            UserError.Log.e(thisTAG, "An exception occured while refreshing gatt device cache: "+e);
         }
         return false;
     }
@@ -1406,20 +1406,20 @@ public class JoH {
             @Override
             public void run() {
                 final PowerManager.WakeLock wl = getWakeLock("restart-bluetooth", 60000);
-                Log.d(TAG, "Restarting bluetooth");
+                UserError.Log.i(TAG, "Restarting bluetooth");
                 try {
                     if (startInMs > 0) {
                         try {
                             Thread.sleep(startInMs);
                         } catch (InterruptedException e) {
-                            Log.d(TAG, "Got interrupted waiting to start resetBluetooth");
+                            UserError.Log.i(TAG, "Got interrupted waiting to start resetBluetooth");
                         }
                     }
                     setBluetoothEnabled(context, false);
                     try {
                         Thread.sleep(6000);
                     } catch (InterruptedException e) {
-                        Log.d(TAG, "Got interrupted in resetBluetooth");
+                        UserError.Log.i(TAG, "Got interrupted in resetBluetooth");
                     }
                     setBluetoothEnabled(context, true);
                 } finally {
@@ -1515,7 +1515,7 @@ public class JoH {
         try {
             return Integer.parseInt(number, radix);
        } catch (NumberFormatException e) {
-           Log.e(TAG, "Error parsing integer number = " + number + " radix = " + radix);
+           UserError.Log.e(TAG, "Error parsing integer number = " + number + " radix = " + radix);
            return defaultVal;
        }
     }

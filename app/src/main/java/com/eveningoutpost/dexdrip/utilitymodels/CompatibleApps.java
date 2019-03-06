@@ -69,7 +69,7 @@ public class CompatibleApps extends BroadcastReceiver {
             }
 
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-                if (Pref.getString("local_broadcast_specific_package_destination", "").length() == 0) {
+                if (Pref.getString("local_broadcast_specific_package_destination", "").isEmpty()) {
                     if (JoH.pratelimit(package_name + NOTIFY_MARKER + "2", RENOTIFY_TIME)) {
                         id = notify(gs(R.string.androidaps), gs(R.string.broadcast_only_to), id, Feature.ENABLE_ANDROIDAPS_FEATURE2);
                     }

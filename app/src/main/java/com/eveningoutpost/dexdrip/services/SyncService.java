@@ -4,7 +4,7 @@ import android.app.IntentService;
 import android.app.PendingIntent;
 import android.content.Intent;
 
-import com.eveningoutpost.dexdrip.models.JoH;
+import com.eveningoutpost.dexdrip.models.*;
 import com.eveningoutpost.dexdrip.models.UserError.Log;
 import com.eveningoutpost.dexdrip.utilitymodels.Constants;
 import com.eveningoutpost.dexdrip.utilitymodels.Pref;
@@ -22,7 +22,7 @@ public class SyncService extends IntentService {
 
     @Override
     protected void onHandleIntent(Intent intent) {
-        Log.d(TAG, "STARTING INTENT SERVICE");
+        UserError.Log.i(TAG, "STARTING INTENT SERVICE");
         attemptSend();
     }
 
@@ -42,7 +42,7 @@ public class SyncService extends IntentService {
     }
 
     public static void startSyncService(long delay) {
-        Log.d("SyncService", "static starting Sync service delay: " + delay);
+        UserError.Log.i("SyncService", "static starting Sync service delay: " + delay);
         if (delay == 0) {
             xdrip.getAppContext().startService(new Intent(xdrip.getAppContext(), SyncService.class));
         } else {

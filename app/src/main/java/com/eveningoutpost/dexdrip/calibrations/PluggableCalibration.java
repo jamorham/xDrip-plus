@@ -3,8 +3,7 @@ package com.eveningoutpost.dexdrip.calibrations;
 import android.preference.ListPreference;
 import android.util.Log;
 
-import com.eveningoutpost.dexdrip.models.BgReading;
-import com.eveningoutpost.dexdrip.models.JoH;
+import com.eveningoutpost.dexdrip.models.*;
 import com.eveningoutpost.dexdrip.utilitymodels.Pref;
 
 import java.util.HashMap;
@@ -48,7 +47,7 @@ public class PluggableCalibration {
             // add new plugins here and also to the enum below
 
             default:
-                Log.e(TAG, "Unhandled plugin type: " + t.toString()+" "+ JoH.backTrace());
+                UserError.Log.e(TAG, "Unhandled plugin type: " + t.toString()+" "+ JoH.backTrace());
                 break;
         }
         memory_cache.put(t, plugin);
@@ -124,7 +123,7 @@ public class PluggableCalibration {
     public static synchronized void invalidatePluginCache() {
         current_plugin_cache = null;
         memory_cache.clear();
-        Log.d(TAG, "Invalidated Plugin Cache");
+        UserError.Log.i(TAG, "Invalidated Plugin Cache");
     }
 
     // lazy helper function
@@ -194,7 +193,7 @@ public class PluggableCalibration {
                 try {
                     final CalibrationAbstract ca = (CalibrationAbstract) entry.getValue();
                     ca.invalidateCache();
-                    Log.d(TAG,"Invalidate cache for plugin: "+ca.getAlgorithmName());
+                    UserError.Log.i(TAG,"Invalidate cache for plugin: "+ca.getAlgorithmName());
                 } catch (Exception e) {
                     //
                 }

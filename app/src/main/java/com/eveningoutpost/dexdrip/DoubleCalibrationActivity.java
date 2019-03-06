@@ -99,7 +99,7 @@ public class DoubleCalibrationActivity extends ActivityWithMenu {
                     value_1.setError(getString(R.string.calibration_can_not_be_blank));
                 }
             } else {
-                Log.w("DoubleCalibration", "ERROR, sensor is not active");
+                UserError.Log.w("DoubleCalibration", "ERROR, sensor is not active");
             }
         });
 

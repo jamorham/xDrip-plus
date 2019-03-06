@@ -35,7 +35,7 @@ public class DisplayQRCode extends BaseActivity {
         try {
             if (data.startsWith(qrmarker)) {
                 data = data.substring(qrmarker.length());
-                Log.d(TAG, "String to uncompress: " + data);
+                UserError.Log.i(TAG, "String to uncompress: " + data);
                 data = JoH.uncompressString(data);
                 //Log.d(TAG, "Json after decompression: " + data);
                 Map<String, String> mymap = new Gson().fromJson(data, new TypeToken<HashMap<String, String>>() {
@@ -43,11 +43,11 @@ public class DisplayQRCode extends BaseActivity {
                 return mymap;
 
             } else {
-                Log.e(TAG, "No qrmarker on qrcode");
+                UserError.Log.e(TAG, "No qrmarker on qrcode");
                 return null;
             }
         } catch (Exception e) {
-            Log.e(TAG, "Got exception during decodingString: " + e.toString());
+            UserError.Log.e(TAG, "Got exception during decodingString: " + e.toString());
             return null;
         }
 
@@ -137,7 +137,7 @@ public class DisplayQRCode extends BaseActivity {
 
             byte[] crypted_data = CipherUtils.encryptBytes(JoH.compressBytesToBytes(result), mykey);
             if ((crypted_data != null) && (crypted_data.length > 0)) {
-                Log.d(TAG, "Before: " + result.length + " After: " + crypted_data.length);
+                UserError.Log.i(TAG, "Before: " + result.length + " After: " + crypted_data.length);
 
                 final OkHttpClient client = new OkHttpClient();
 
@@ -150,7 +150,7 @@ public class DisplayQRCode extends BaseActivity {
                 try {
                     send_url = xdrip.getAppContext().getString(R.string.wserviceurl) + "/joh-setsw";
                     final String bbody = Base64.encodeToString(crypted_data, Base64.NO_WRAP);
-                    Log.d(TAG, "Upload Body size: " + bbody.length());
+                    UserError.Log.i(TAG, "Upload Body size: " + bbody.length());
                     final RequestBody formBody = new FormEncodingBuilder()
                             .add("data", bbody)
                             .build();
@@ -162,18 +162,18 @@ public class DisplayQRCode extends BaseActivity {
                                     .url(send_url)
                                     .post(formBody)
                                     .build();
-                            Log.i(TAG, "Uploading data");
+                            UserError.Log.i(TAG, "Uploading data");
                             Response response = client.newCall(request).execute();
                             if (response.isSuccessful()) {
                                 final String reply = response.body().string();
-                                Log.d(TAG, "Got success response length: " + reply.length() + " " + reply);
+                                UserError.Log.i(TAG, "Got success response length: " + reply.length() + " " + reply);
                                 if ((reply.length() == 35) && (reply.startsWith("ID:"))) {
                                     switch (callback_option) {
                                         case 1: {
                                             if (mInstance != null) {
                                                 mInstance.display_final_all_settings_qr_code(reply.substring(3, 35), mykey);
                                             } else {
-                                                Log.e(TAG, "mInstance null");
+                                                UserError.Log.e(TAG, "mInstance null");
                                             }
                                             break;
                                         }
@@ -186,21 +186,21 @@ public class DisplayQRCode extends BaseActivity {
                                         }
                                     }
                                 } else {
-                                    Log.d(TAG, "Got unhandled reply: " + reply);
+                                    UserError.Log.i(TAG, "Got unhandled reply: " + reply);
                                     toast(reply);
                                 }
                             } else {
                                 toast("Error please try again");
                             }
                         } catch (Exception e) {
-                            Log.e(TAG, "Got exception in execute: " + e.toString());
+                            UserError.Log.e(TAG, "Got exception in execute: " + e.toString());
                             e.printStackTrace();
                             toast("Error with connection");
                         }
                     }).start();
                 } catch (Exception e) {
                     toast(e.getMessage());
-                    Log.e(TAG, "General exception: " + e.toString());
+                    UserError.Log.e(TAG, "General exception: " + e.toString());
                 } finally {
                     JoH.releaseWakeLock(wl);
                 }
@@ -223,7 +223,7 @@ public class DisplayQRCode extends BaseActivity {
     }
 
     private void display_final_all_settings_qr_code(final String uid, final byte[] mykey) {
-        Log.d(TAG, "Displaying final qr code: " + uid);
+        UserError.Log.i(TAG, "Displaying final qr code: " + uid);
         try {
             runOnUiThread((Runnable) () -> {
                 prefsMap.put(getString(R.string.all_settings_wizard), "t");
@@ -232,15 +232,15 @@ public class DisplayQRCode extends BaseActivity {
                 showQRCode();
             });
         } catch (Exception e) {
-            Log.e(TAG, "Got exception displaying final qrcode: " + e.toString());
+            UserError.Log.e(TAG, "Got exception displaying final qrcode: " + e.toString());
         }
     }
 
     private void showQRCode() {
         String mystring = new JSONObject(prefsMap).toString();
-        Log.d(TAG, "Serialized: " + mystring);
+        UserError.Log.i(TAG, "Serialized: " + mystring);
         String compressedstring = JoH.compressString(mystring);
-        Log.d(TAG, "Compressed: " + compressedstring);
+        UserError.Log.i(TAG, "Compressed: " + compressedstring);
 
         IntentIntegrator integrator = new IntentIntegrator(this);
         integrator.shareText(qrmarker + compressedstring);
@@ -251,7 +251,7 @@ public class DisplayQRCode extends BaseActivity {
             mInstance = null;
             finish();
         } catch (Exception e) {
-            Log.d(TAG, "Error finishing " + e.toString());
+            UserError.Log.i(TAG, "Error finishing " + e.toString());
         }
     }
 

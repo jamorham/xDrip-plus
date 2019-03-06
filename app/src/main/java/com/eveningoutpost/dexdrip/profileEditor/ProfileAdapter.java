@@ -115,7 +115,7 @@ public class ProfileAdapter extends RecyclerView.Adapter<ProfileAdapter.MyViewHo
         final MyViewHolder holder = new MyViewHolder(itemView);
         holder.position = holder.getAdapterPosition();
 
-        Log.d(TAG, "oncreate position: " + holder.position);
+        UserError.Log.i(TAG, "oncreate position: " + holder.position);
         first_run++;
 
         holder.wholeBlock.setOnLongClickListener(v -> {
@@ -227,7 +227,7 @@ public class ProfileAdapter extends RecyclerView.Adapter<ProfileAdapter.MyViewHo
             holder.sensSeekBar.setMax(sensTopMax * holder.sensitivity_scaling);
 
 
-            Log.d(TAG, "first run: " + first_run + " carbTopMax:"+carbTopMax+" Sensitivity: pos:" + position + "  scaling:" + sensTopScale + "/" + holder.sensitivity_scaling + " sensiblemax:" + sensTopMax + "/" + sensibleMax((int) profileItem.sensitivity));
+            UserError.Log.i(TAG, "first run: " + first_run + " carbTopMax:"+carbTopMax+" Sensitivity: pos:" + position + "  scaling:" + sensTopScale + "/" + holder.sensitivity_scaling + " sensiblemax:" + sensTopMax + "/" + sensibleMax((int) profileItem.sensitivity));
 
             first_run--;
 

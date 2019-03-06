@@ -234,7 +234,7 @@ public class Amazfitservice extends Service {
             }
             if (mBluetoothAdapter != null) {
                 Set<BluetoothDevice> pairedDevices = mBluetoothAdapter.getBondedDevices();
-                if ((pairedDevices != null) && (pairedDevices.size() > 0)) {
+                if ((pairedDevices != null) && (!pairedDevices.isEmpty())) {
                     for (BluetoothDevice device : pairedDevices) {
                         if (device.getName() != null) {
 
@@ -296,7 +296,7 @@ public class Amazfitservice extends Service {
 
             return json_data.toString();
         } catch (JSONException e) {
-            Log.w("AmazfitService", e.toString());
+            UserError.Log.w("AmazfitService", e.toString());
         }
         return "";
 
@@ -316,7 +316,7 @@ public class Amazfitservice extends Service {
             json_data.put("default_snooze", default_snooze);
             return json_data.toString();
         } catch (JSONException e) {
-            Log.w("AmazfitService", e.toString());
+            UserError.Log.w("AmazfitService", e.toString());
         }
         return "";
 
@@ -334,7 +334,7 @@ public class Amazfitservice extends Service {
             json_data.put("sgv", dg.unitized + dg.delta_arrow);
             return json_data.toString();
         } catch (JSONException e) {
-            Log.w("AmazfitService", e.toString());
+            UserError.Log.w("AmazfitService", e.toString());
         }
         return "";
     }
@@ -348,7 +348,7 @@ public class Amazfitservice extends Service {
             json_data.put("date", System.currentTimeMillis());
             return json_data.toString();
         } catch (JSONException e) {
-            Log.w("AmazfitService", e.toString());
+            UserError.Log.w("AmazfitService", e.toString());
         }
         return "";
     }

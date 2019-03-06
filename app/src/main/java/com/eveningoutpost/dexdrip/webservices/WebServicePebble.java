@@ -100,7 +100,7 @@ public class WebServicePebble extends BaseWebService {
                 reply.put("cals", cals_array);
 
             }
-            Log.d(TAG, "Output: " + reply.toString());
+            UserError.Log.i(TAG, "Output: " + reply.toString());
 
         } catch (JSONException e) {
             UserError.Log.wtf(TAG, "Got json exception: " + e);

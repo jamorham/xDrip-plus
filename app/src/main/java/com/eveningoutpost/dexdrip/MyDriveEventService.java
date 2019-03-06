@@ -19,25 +19,25 @@ public class MyDriveEventService extends DriveEventService {
 
     @Override
     public void onChange(ChangeEvent event) {
-        Log.i(TAG, "GOT SERVICE ONCHANGE EVENT: " + event.toString());
+        UserError.Log.i(TAG, "GOT SERVICE ONCHANGE EVENT: " + event.toString());
     }
 
     @Override
     public void onCompletion(CompletionEvent event) {
         super.onCompletion(event);
         DriveId driveId = event.getDriveId();
-        Log.d(TAG, "onComplete: " + driveId.getResourceId());
+        UserError.Log.i(TAG, "onComplete: " + driveId.getResourceId());
         switch (event.getStatus()) {
             case CompletionEvent.STATUS_CONFLICT:
-                Log.d(TAG, "STATUS_CONFLICT");
+                UserError.Log.i(TAG, "STATUS_CONFLICT");
                 event.dismiss();
                 break;
             case CompletionEvent.STATUS_FAILURE:
-                Log.d(TAG, "STATUS_FAILURE");
+                UserError.Log.i(TAG, "STATUS_FAILURE");
                 event.dismiss();
                 break;
             case CompletionEvent.STATUS_SUCCESS:
-                Log.d(TAG, "STATUS_SUCCESS ");
+                UserError.Log.i(TAG, "STATUS_SUCCESS ");
                 event.dismiss();
                 break;
         }

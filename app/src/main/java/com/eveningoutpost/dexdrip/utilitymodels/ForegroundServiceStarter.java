@@ -41,11 +41,11 @@ public class ForegroundServiceStarter {
 
     public void start() {
         if (mService == null) {
-            Log.e(TAG, "SERVICE IS NULL - CANNOT START!");
+            UserError.Log.e(TAG, "SERVICE IS NULL - CANNOT START!");
             return;
         }
         if (run_service_in_foreground) {
-            Log.d(TAG, "should be moving to foreground");
+            UserError.Log.i(TAG, "should be moving to foreground");
             // mHandler.post(new Runnable() {
             //     @Override
             //     public void run() {
@@ -53,7 +53,7 @@ public class ForegroundServiceStarter {
             final long end = System.currentTimeMillis() + (60000 * 5);
             final long start = end - (60000 * 60 * 3) - (60000 * 10);
             foregroundStatus();
-            Log.d(TAG, "CALLING START FOREGROUND: " + mService.getClass().getSimpleName());
+            UserError.Log.i(TAG, "CALLING START FOREGROUND: " + mService.getClass().getSimpleName());
             mService.startForeground(ongoingNotificationId, new Notifications().createOngoingNotification(new BgGraphBuilder(mContext, start, end), mContext));
 
             //     }
@@ -63,7 +63,7 @@ public class ForegroundServiceStarter {
 
     public void stop() {
         if (run_service_in_foreground) {
-            Log.d(TAG, "should be moving out of foreground");
+            UserError.Log.i(TAG, "should be moving out of foreground");
             mService.stopForeground(true);
         }
     }

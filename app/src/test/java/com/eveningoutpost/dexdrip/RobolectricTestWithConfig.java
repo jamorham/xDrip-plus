@@ -36,23 +36,23 @@ public abstract class RobolectricTestWithConfig {
     protected void printLogs(String tag) {
         System.out.println("\n\n============================== Start of '" + tag + "' logs ==============================");
         ShadowLog.getLogsForTag(tag)
-                .forEach(log -> System.out.println(logTypeToString(log.type) + ": " + log.msg));
+                .forEach(log -> System.out.println(logTypeToString(log.type) + ": " +UserError.Log.msg));
         System.out.println("==============================  End of '" + tag + "' logs  ==============================\n\n");
     }
 
     private static String logTypeToString(int type) {
         switch (type) {
-            case Log.ASSERT:
+            caseUserError.Log.ASSERT:
                 return "Assert";
-            case Log.DEBUG:
+            caseUserError.Log.DEBUG:
                 return "Debug";
-            case Log.ERROR:
+            caseUserError.Log.ERROR:
                 return "Error";
-            case Log.WARN:
+            caseUserError.Log.WARN:
                 return "Warn";
-            case Log.INFO:
+            caseUserError.Log.INFO:
                 return "Info";
-            case Log.VERBOSE:
+            caseUserError.Log.VERBOSE:
                 return "Verbose";
             default:
                 return "?";

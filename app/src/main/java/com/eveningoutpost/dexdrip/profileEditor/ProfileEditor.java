@@ -112,7 +112,7 @@ public class ProfileEditor extends BaseActivity {
         recyclerView.setItemAnimator(new DefaultItemAnimator());
 
 
-        if (profileItemList.size() == 0) {
+        if (profileItemList.isEmpty()) {
             profileItemList.add(new ProfileItem(0, END_OF_DAY,
                     JoH.tolerantParseDouble(Pref.getString("profile_carb_ratio_default", "10"), 10d),
                     JoH.tolerantParseDouble(Pref.getString("profile_insulin_sensitivity_default", "0.1"), 0.1d)));
@@ -129,7 +129,7 @@ public class ProfileEditor extends BaseActivity {
                     @Override
                     public void onChanged() {
                         super.onChanged();
-                        //  Log.d(TAG, "onChanged");
+                        //  UserError.Log.i(TAG, "onChanged");
 
                     }
 
@@ -137,7 +137,7 @@ public class ProfileEditor extends BaseActivity {
                     public void onItemRangeChanged(final int positionStart, int itemCount, Object payload) {
                         super.onItemRangeChanged(positionStart, itemCount, payload);
 
-                        Log.d(TAG, "onItemRangeChanged: pos:" + positionStart + " cnt:" + itemCount + " p: " + payload.toString());
+                        UserError.Log.i(TAG, "onItemRangeChanged: pos:" + positionStart + " cnt:" + itemCount + " p: " + payload.toString());
 
                         if (payload.toString().equals("time start updated")) {
                             if (positionStart > 0) {
@@ -268,7 +268,7 @@ public class ProfileEditor extends BaseActivity {
 
 
         if (!for_real) {
-            Log.d(TAG, "Saving for real with adjustment factor: " + adjustmentFactor);
+            UserError.Log.i(TAG, "Saving for real with adjustment factor: " + adjustmentFactor);
             // save working set clean of adjustment factor to avoid stacking
             for (ProfileItem item : profileItemList) {
                 profileItemListTmp.add(item.clone());
@@ -294,7 +294,7 @@ public class ProfileEditor extends BaseActivity {
             saveBtn.setVisibility(View.INVISIBLE);
             Pref.setString("saved_profile_list_json", data);
             Pref.setString("saved_profile_list_json_working", "");
-            Log.d(TAG, "Saved final data");
+            UserError.Log.i(TAG, "Saved final data");
             UserError.Log.uel(TAG, "Saved Treatment Profile data, timeblocks:" + profileItemListTmp.size());
             updateAdjustmentFactor(1.0); // reset it
             dataChanged = true;
@@ -304,7 +304,7 @@ public class ProfileEditor extends BaseActivity {
             Pref.setString("saved_profile_list_json_working", data);
             saveBtn.setVisibility(View.VISIBLE);
             undoBtn.setVisibility(View.VISIBLE);
-            Log.d(TAG, "Saved working data");
+            UserError.Log.i(TAG, "Saved working data");
         }
     }
 
@@ -357,16 +357,16 @@ public class ProfileEditor extends BaseActivity {
     public static List<ProfileItem> loadData(boolean buttons) {
         final List<ProfileItem> myprofileItemList = new ArrayList<>();
         String data = Pref.getString("saved_profile_list_json_working", "");
-        if (data.length() == 0) {
+        if (data.isEmpty()) {
             data = Pref.getString("saved_profile_list_json", "");
 
             if (buttons) {
                 saveBtn.setVisibility(View.INVISIBLE);
                 undoBtn.setVisibility(View.INVISIBLE);
             }
-            Log.d(TAG, "Loaded real data");
+            UserError.Log.i(TAG, "Loaded real data");
         } else {
-            Log.d(TAG, "Loaded working data");
+            UserError.Log.i(TAG, "Loaded working data");
             if (buttons) {
                 saveBtn.setVisibility(View.VISIBLE);
                 undoBtn.setVisibility(View.VISIBLE);
@@ -383,9 +383,9 @@ public class ProfileEditor extends BaseActivity {
             }
             Collections.addAll(myprofileItemList, restored);
         }
-        if (myprofileItemList.size() == 0) {
+        if (myprofileItemList.isEmpty()) {
             try {
-                Log.d(TAG,"Creating default profile entries: sens default: "+ Pref.getString("profile_insulin_sensitivity_default", "0.1"));
+                UserError.Log.i(TAG,"Creating default profile entries: sens default: "+ Pref.getString("profile_insulin_sensitivity_default", "0.1"));
                 ProfileItem item = new ProfileItem(0, END_OF_DAY, Double.parseDouble(Pref.getString("profile_carb_ratio_default", "10")),
                         Double.parseDouble(Pref.getString("profile_insulin_sensitivity_default", "0.1")));
                 myprofileItemList.add(item);
@@ -454,7 +454,7 @@ public class ProfileEditor extends BaseActivity {
         }
 
         // shuffle up
-        if (profileItemList.size() > 0) {
+        if (!profileItemList.isEmpty()) {
             for (i = 1; i < profileItemList.size(); i++) {
                 ProfileItem current = profileItemList.get(i);
                 ProfileItem previous = profileItemList.get(i - 1);
@@ -502,7 +502,7 @@ public class ProfileEditor extends BaseActivity {
             }
 
         } catch (Exception e) {
-            Log.e(TAG, "Exception in showcase: " + e.toString());
+            UserError.Log.e(TAG, "Exception in showcase: " + e.toString());
         }
     }
 

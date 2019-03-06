@@ -120,7 +120,7 @@ public class NanoStatus {
         }
     }
 
-
+    //FIXME No nanoStatus method exist !
     static SpannableString collectorNano(final Class<?> service) {
         if (service != null) {
             try {
@@ -133,7 +133,7 @@ public class NanoStatus {
                 }
 
             } catch (Exception e) {
-                Log.d(TAG, "reflection exception: " + e + " " + service.getSimpleName());
+//                UserError.Log.e(TAG, "reflection exception: " + e + " " + service.getSimpleName());
             }
         }
         return null;

@@ -60,7 +60,7 @@ public class PersistentStore {
 
     public static void appendString(String name, String value, String delimiter) {
         String current = getString(name);
-        if (current.length() > 0) current += delimiter;
+        if (!current.isEmpty()) current += delimiter;
         setString(name, current + value);
     }
 

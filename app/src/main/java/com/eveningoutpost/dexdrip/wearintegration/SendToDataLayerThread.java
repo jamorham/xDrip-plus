@@ -61,9 +61,9 @@ class SendToDataLayerThread extends AsyncTask<DataMap,Void,Void> {
     // Debug function to expose where it might be locking up
     private synchronized void sendToWear(final DataMap... params) {
         if (!lock.tryLock()) {
-            Log.d(TAG, "Concurrent access - waiting for thread unlock");
+            UserError.Log.i(TAG, "Concurrent access - waiting for thread unlock");
             lock.lock(); // enforce single threading
-            Log.d(TAG, "Thread unlocked - proceeding");
+            UserError.Log.i(TAG, "Thread unlocked - proceeding");
         }
         lastlock=JoH.tsl();
         try {

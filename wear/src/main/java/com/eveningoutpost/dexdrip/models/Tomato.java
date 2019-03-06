@@ -51,19 +51,19 @@ public class Tomato {
         long now = JoH.tsl();
         if(now - s_lastReceiveTimestamp > 3*1000) {
             // We did not receive data in 3 seconds, moving to init state again
-            Log.e(TAG, "Recieved a buffer after " + (now - s_lastReceiveTimestamp) / 1000 +  " seconds, starting again. "+
+           UserError.Log.e(TAG, "Recieved a buffer after " + (now - s_lastReceiveTimestamp) / 1000 +  " seconds, starting again. "+
             "already acumulated " + s_acumulatedSize + " bytes.");
             s_state = TOMATO_STATES.REQUEST_DATA_SENT;
         }
         
         s_lastReceiveTimestamp = now;
         if (buffer == null) {
-            Log.e(TAG, "null buffer passed to decodeTomatoPacket");
+           UserError.Log.e(TAG, "null buffer passed to decodeTomatoPacket");
             return reply;
         } 
         if (s_state == TOMATO_STATES.REQUEST_DATA_SENT) {
             if(buffer.length == 1 && buffer[0] == 0x32) {
-                Log.e(TAG, "returning allow sensor confirm");
+               UserError.Log.e(TAG, "returning allow sensor confirm");
                 
                 ByteBuffer allowNewSensor = ByteBuffer.allocate(2);
                 allowNewSensor.put(0, (byte) 0xD3);
@@ -84,7 +84,7 @@ public class Tomato {
             }
             
             if(buffer.length == 1 && buffer[0] == 0x34) {
-                Log.e(TAG, "No sensor has been found");
+               UserError.Log.e(TAG, "No sensor has been found");
                 reply.setError_message("No sensor found");
               return reply;
             }
@@ -95,7 +95,7 @@ public class Tomato {
                 
                 // &0xff is needed to convert to hex.
                 int expectedSize = 256 * (int)(buffer[1] & 0xFF) + (int)(buffer[2] & 0xFF);
-                Log.e(TAG, "Starting to acumulate data expectedSize = " + expectedSize);
+               UserError.Log.e(TAG, "Starting to acumulate data expectedSize = " + expectedSize);
                 InitBuffer(expectedSize);
                 addData(buffer);
                 s_state = TOMATO_STATES.RECIEVING_DATA;
@@ -103,7 +103,7 @@ public class Tomato {
                 
             } else {
                 if (JoH.quietratelimit("unknown-initial-packet", 1)) {
-                    Log.d(TAG,"Unknown initial packet makeup received" + HexDump.dumpHexString(buffer));
+                   UserError.Log.d(TAG,"Unknown initial packet makeup received" + HexDump.dumpHexString(buffer));
                 }
                 return reply;
             }
@@ -122,7 +122,7 @@ public class Tomato {
                        reply.getSend().addAll(Tomato.resetTomatoState());
                        reply.setDelay(8000);
                        reply.setError_message("Checksum failed - retrying");
-                       Log.d(TAG,"Asking for retry of data");
+                      UserError.Log.d(TAG,"Asking for retry of data");
                    }
                 } else throw e;
             }
@@ -130,14 +130,14 @@ public class Tomato {
             return reply;
         }
         
-        Log.wtf(TAG, "Very strange, In an unexpected state " + s_state);
+       UserError.Log.wtf(TAG, "Very strange, In an unexpected state " + s_state);
         
         return reply;
     }
     
     static void addData(byte[] buffer) {
         if(s_acumulatedSize + buffer.length > s_full_data.length) {
-            Log.e(TAG, "Error recieving too much data. exiting. s_acumulatedSize = " + s_acumulatedSize + 
+           UserError.Log.e(TAG, "Error recieving too much data. exiting. s_acumulatedSize = " + s_acumulatedSize +
                     "buffer.length = " + buffer.length + " s_full_data.length " + s_full_data.length);
             //??? send something to start back??
             return;
@@ -164,7 +164,7 @@ public class Tomato {
         // Important note, the actual serial number is 8 bytes long and starts at addresses 5.
         String SensorSn = LibreUtils.decodeSerialNumberKey(Arrays.copyOfRange(s_full_data, 5, 13));
         boolean checksum_ok = NFCReaderX.HandleGoodReading(SensorSn, data, now, true);
-        Log.e(TAG, "We have all the data that we need " + s_acumulatedSize + " checksum_ok = " + checksum_ok + HexDump.dumpHexString(data));
+       UserError.Log.e(TAG, "We have all the data that we need " + s_acumulatedSize + " checksum_ok = " + checksum_ok + HexDump.dumpHexString(data));
 
         if(!checksum_ok) {
             throw new RuntimeException(CHECKSUM_FAILED);
@@ -182,20 +182,20 @@ public class Tomato {
     static void AreWeDoneMax() {
         
         if(s_acumulatedSize == s_full_data.length) {
-            Log.e(TAG, "We have a full packet");
+           UserError.Log.e(TAG, "We have a full packet");
         } else {
             return;
         }
         if(s_full_data[s_full_data.length -1] != 0x29) {
-            Log.e(TAG, "recieved full data, but last byte is not 0x29. It is " + s_full_data[s_full_data.length -1]);
+           UserError.Log.e(TAG, "recieved full data, but last byte is not 0x29. It is " + s_full_data[s_full_data.length -1]);
             return;
         }
         // We have all the data
         if(s_full_data.length < 344 + TOMATO_HEADER_LENGTH + 1) {
-            Log.e(TAG, "We have all the data, but it is not enough... s_full_data.length = " + s_full_data.length );
+           UserError.Log.e(TAG, "We have all the data, but it is not enough... s_full_data.length = " + s_full_data.length );
             return;
         }
-        Log.e(TAG, "We have a full packet");
+       UserError.Log.e(TAG, "We have a full packet");
         
     }
 
@@ -208,7 +208,7 @@ public class Tomato {
     }
 
     public static ArrayList<ByteBuffer> initialize() {
-        Log.i(TAG, "initialize!");
+       UserError.Log.i(TAG, "initialize!");
         Pref.setInt("bridge_battery", 0); //force battery to no-value before first reading
         return resetTomatoState();
     }

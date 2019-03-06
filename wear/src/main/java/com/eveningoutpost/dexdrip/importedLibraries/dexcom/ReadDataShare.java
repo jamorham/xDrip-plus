@@ -146,7 +146,7 @@ public class ReadDataShare {
         payload.add(numOfPages);
         accumulatedResponse = null;
         final Action1<byte[]> databasePageReader = s -> {
-            Log.d("ReadDataShare", "Database Page Reader received SIZE: " + s.length);
+           UserError.Log.d("ReadDataShare", "Database Page Reader received SIZE: " + s.length);
             byte[] temp = s;
             if (accumulatedResponse == null) {
                 accumulatedResponse = s;
@@ -156,7 +156,7 @@ public class ReadDataShare {
                     outputStream.write(accumulatedResponse);
                     outputStream.write(temp);
                     accumulatedResponse = outputStream.toByteArray();
-                    Log.d("ReadDataShare", "Combined Response length: " + accumulatedResponse.length);
+                   UserError.Log.d("ReadDataShare", "Combined Response length: " + accumulatedResponse.length);
                 } catch (Exception e) { e.printStackTrace(); }
             }
             if (temp.length < 20) { Observable.just(accumulatedResponse).subscribe(fullPageListener).unsubscribe(); }

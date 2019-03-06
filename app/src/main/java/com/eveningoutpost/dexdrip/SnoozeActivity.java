@@ -288,11 +288,11 @@ public class SnoozeActivity extends ActivityWithMenu {
 
         // aba and activeBgAlert should both either exist ot not exist. all other cases are a bug in another place
         if(aba == null && activeBgAlert!= null) {
-            Log.wtf(TAG, "ERRRO displayStatus: aba == null, but activeBgAlert != null exiting...");
+            UserError.Log.wtf(TAG, "ERRRO displayStatus: aba == null, but activeBgAlert != null exiting...");
             return;
         }
         if(aba != null && activeBgAlert== null) {
-            Log.wtf(TAG, "ERRRO displayStatus: aba != null, but activeBgAlert == null exiting...");
+            UserError.Log.wtf(TAG, "ERRRO displayStatus: aba != null, but activeBgAlert == null exiting...");
             return;
         }
         long now = new Date().getTime();

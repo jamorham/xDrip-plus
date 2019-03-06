@@ -157,7 +157,7 @@ public class UploaderQueue extends Model {
             result.reference_uuid = obj instanceof LibreBlock ? ((LibreBlock) obj).uuid : null;
 
         if (result.reference_uuid == null) {
-            Log.d(TAG, "reference_uuid was null so refusing to create new entry");
+            UserError.Log.i(TAG, "reference_uuid was null so refusing to create new entry");
             return null;
         }
 
@@ -203,7 +203,7 @@ public class UploaderQueue extends Model {
             result.reference_uuid = obj instanceof BloodTest ? ((BloodTest) obj).uuid : null;
 
         if (result.reference_uuid == null) {
-            Log.d(TAG, "reference_uuid was null so refusing to create new entry");
+            UserError.Log.i(TAG, "reference_uuid was null so refusing to create new entry");
             return null;
         }
 
@@ -254,7 +254,7 @@ public class UploaderQueue extends Model {
             if (and != null) where += (and ? " and " : " or ");
             if (mongo != null) where += " mongo_success = " + (mongo ? "1 " : "0 ");
             final String query = new Select("COUNT(*) as total").from(which).toSql();
-            final Cursor resultCursor = Cache.openDatabase().rawQuery(query + ((where.length() > 0) ? " where " + where : ""), null);
+            final Cursor resultCursor = Cache.openDatabase().rawQuery(query + ((!where.isEmpty()) ? " where " + where : ""), null);
             if (resultCursor.moveToNext()) {
                 final int total = resultCursor.getInt(0);
                 resultCursor.close();
@@ -264,7 +264,7 @@ public class UploaderQueue extends Model {
             }
 
         } catch (Exception e) {
-            Log.d(TAG, "Got exception getting count: " + e);
+            UserError.Log.i(TAG, "Got exception getting count: " + e);
             return -1;
         }
     }
@@ -283,7 +283,7 @@ public class UploaderQueue extends Model {
             }
 
         } catch (Exception e) {
-            Log.d(TAG, "Got exception getting count: " + e);
+            UserError.Log.i(TAG, "Got exception getting count: " + e);
             return 0;
         }
     }
@@ -382,7 +382,7 @@ public class UploaderQueue extends Model {
             // per class of data
             for (String type : getClasses()) {
                 if (JoH.quietratelimit("uploader-stats", 10)) {
-                    Log.d(TAG, "Getting stats for class: " + type + " in " + circuits_for_stats.valueAt(i));
+                    UserError.Log.i(TAG, "Getting stats for class: " + type + " in " + circuits_for_stats.valueAt(i));
                 }
                 int count_pending = getQueueSizeByType(type, bitfield, false);
                 int count_completed = getQueueSizeByType(type, bitfield, true);

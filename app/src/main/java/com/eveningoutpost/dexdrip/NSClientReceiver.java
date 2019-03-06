@@ -36,7 +36,7 @@ public class NSClientReceiver extends BroadcastReceiver {
 
     @Override
     public void onReceive(Context context, Intent intent) {
-        Log.d(TAG, "NSRECEIVER onReceiver: " + intent.getAction());
+        UserError.Log.i(TAG, "NSRECEIVER onReceiver: " + intent.getAction());
 
         // check source
         if (prefs == null) prefs = PreferenceManager.getDefaultSharedPreferences(context);
@@ -57,22 +57,22 @@ public class NSClientReceiver extends BroadcastReceiver {
                 if (Home.get_follower()) {
                     if (bundle == null) break;
                     final String sgvs_json = bundle.getString("sgvs", "");
-                    if (sgvs_json.length() > 0) {
+                    if (!sgvs_json.isEmpty()) {
                         try {
                             final JSONArray jsonArray = new JSONArray(sgvs_json);
                             for (int i = 0; i < jsonArray.length(); i++) {
                                 process_SGV_json(jsonArray.getString(i));
                             }
                         } catch (JSONException e) {
-                            Log.e(TAG, "Json exception with sgvs: " + e.toString());
+                            UserError.Log.e(TAG, "Json exception with sgvs: " + e.toString());
                         }
                     }
                     final String sgv_json = bundle.getString("sgv", "");
-                    if (sgv_json.length() > 0) {
+                    if (!sgv_json.isEmpty()) {
                         process_SGV_json(sgv_json);
                     }
                 } else {
-                    Log.d(TAG, "Ignoring SGV data as we are not a follower");
+                    UserError.Log.i(TAG, "Ignoring SGV data as we are not a follower");
                 }
                 break;
 
@@ -80,22 +80,22 @@ public class NSClientReceiver extends BroadcastReceiver {
                 if (bundle == null) break;
                 if (prefs.getBoolean("accept_nsclient_treatments", true)) {
                     final String treatment_json = bundle.getString("treatment", "");
-                    if (treatment_json.length() > 0) {
+                    if (!treatment_json.isEmpty()) {
                         process_TREATMENT_json(treatment_json);
                     }
                     final String treatments_json = bundle.getString("treatments", "");
-                    if (treatments_json.length() > 0) {
+                    if (!treatments_json.isEmpty()) {
                         try {
                             final JSONArray jsonArray = new JSONArray(treatments_json);
                             for (int i = 0; i < jsonArray.length(); i++) {
                                 process_TREATMENT_json(jsonArray.getString(i));
                             }
                         } catch (JSONException e) {
-                            Log.e(TAG, "Json exception with sgvs: " + e.toString());
+                            UserError.Log.e(TAG, "Json exception with sgvs: " + e.toString());
                         }
                     }
                 } else {
-                    Log.d(TAG, "Ignoring nsclient treatment data due to preference");
+                    UserError.Log.i(TAG, "Ignoring nsclient treatment data due to preference");
                 }
                 break;
 
@@ -127,10 +127,10 @@ public class NSClientReceiver extends BroadcastReceiver {
                         final String local_units = Pref.getString("units", "mgdl");
                         if (units.equals("mgdl") && (!local_units.equals("mgdl"))) {
                             glucose_number = glucose_number * Constants.MGDL_TO_MMOLL;
-                            Log.d(TAG, "Converting from mgdl to mmol: " + JoH.qs(glucose_number, 2));
+                            UserError.Log.i(TAG, "Converting from mgdl to mmol: " + JoH.qs(glucose_number, 2));
                         } else if (units.equals("mmol") && (!local_units.equals("mmol"))) {
                             glucose_number = glucose_number * Constants.MMOLL_TO_MGDL;
-                            Log.d(TAG, "Converting from mmol to mgdl: " + JoH.qs(glucose_number, 2));
+                            UserError.Log.i(TAG, "Converting from mmol to mgdl: " + JoH.qs(glucose_number, 2));
                         }
 
                         UserError.Log.ueh(TAG, "Processing broadcasted calibration: " + JoH.qs(glucose_number, 2) + " offset ms: " + JoH.qs(timeoffset, 0));
@@ -144,16 +144,16 @@ public class NSClientReceiver extends BroadcastReceiver {
                         calintent.putExtra("cal_source", "NSClientReceiver");
                         Home.startIntentThreadWithDelayedRefresh(calintent);
                     } else {
-                        Log.e(TAG,"Received broadcast calibration without glucose number");
+                        UserError.Log.e(TAG,"Received broadcast calibration without glucose number");
                     }
 
                 } else {
-                    Log.e(TAG, "Received broadcast calibration, but inter-app preference is set to ignore");
+                    UserError.Log.e(TAG, "Received broadcast calibration, but inter-app preference is set to ignore");
                 }
                 break;
 
             default:
-                Log.e(TAG, "Unknown action! " + action);
+                UserError.Log.e(TAG, "Unknown action! " + action);
                 break;
         }
     }
@@ -171,27 +171,27 @@ public class NSClientReceiver extends BroadcastReceiver {
 
     private void process_TREATMENT_json(String treatment_json) {
         try {
-            Log.i(TAG, "Processing treatment from NS: "+treatment_json);
+            UserError.Log.i(TAG, "Processing treatment from NS: "+treatment_json);
             Treatments.pushTreatmentFromJson(toTreatmentJSON(JoH.JsonStringtoMap(treatment_json)), true); // warning marked as from interactive - watch out for feedback loops
         } catch (Exception e) {
-            Log.e(TAG, "Got exception processing treatment from NS client " + e.toString());
+            UserError.Log.e(TAG, "Got exception processing treatment from NS client " + e.toString());
         }
     }
 
     private void process_SGV_json(String sgv_json) {
         if (sgv_json == null) {
-            Log.e(TAG, "SGV json is null!");
+            UserError.Log.e(TAG, "SGV json is null!");
             return;
         }
         final HashMap<String, Object> sgv_map = JoH.JsonStringtoMap(sgv_json);
         //  if (prefs.getString("dex_collection_method", "").equals("Follower")) {
         if (sgv_map == null) {
-            Log.e(TAG, "SGV map results in null!");
+            UserError.Log.e(TAG, "SGV map results in null!");
             return;
         }
         BgReading.bgReadingInsertFromJson(toBgReadingJSON(sgv_map));
         //  } else {
-        //      Log.i(TAG, "Received nightscout SGV intent but we are not a follower");
+        //      UserError.Log.i(TAG, "Received nightscout SGV intent but we are not a follower");
         //  }
     }
 
@@ -208,7 +208,7 @@ public class NSClientReceiver extends BroadcastReceiver {
                 double filtered_calculated_value = (double) sgv_map.get("filtered") / myslope;
                 jsonObject.put("filtered_calculated_value", filtered_calculated_value);
             } catch (NullPointerException e) {
-                Log.i(TAG, "Cannot calculate raw slope due to null pointer on unfiltered?");
+                UserError.Log.i(TAG, "Cannot calculate raw slope due to null pointer on unfiltered?");
                 jsonObject.put("filtered_calculated_value", sgv_map.get("mgdl")); // use mgdl
             }
 
@@ -222,10 +222,10 @@ public class NSClientReceiver extends BroadcastReceiver {
                 jsonObject.put("hide_slope", true);
             }
             jsonObject.put("noise", sgv_map.get("noise"));
-            //if (d) Log.d(TAG, "deebug: " + jsonObject.toString());
+            //if (d) UserError.Log.i(TAG, "deebug: " + jsonObject.toString());
             return jsonObject.toString();
         } catch (JSONException | NullPointerException e) {
-            Log.e(TAG, "JSON or Null Exception in toBgReadingJSON: " + e);
+            UserError.Log.e(TAG, "JSON or Null Exception in toBgReadingJSON: " + e);
             return "";
         }
     }

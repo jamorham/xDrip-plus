@@ -36,7 +36,7 @@ public class LanguageAdapter extends RecyclerView.Adapter<LanguageAdapter.MyView
     public LanguageAdapter(Context ctx, List<LanguageItem> languageList) {
         this.languageList = languageList;
         this.context = ctx;
-        Log.d(TAG, "New adapter, size: " + languageList.size());
+        UserError.Log.i(TAG, "New adapter, size: " + languageList.size());
     }
 
     public class MyViewHolder extends RecyclerView.ViewHolder {
@@ -61,12 +61,12 @@ public class LanguageAdapter extends RecyclerView.Adapter<LanguageAdapter.MyView
     private void informThisRowChanged(MyViewHolder holder, TextView v) {
         final int pos = holder.getAdapterPosition();
         try {
-            Log.d(TAG, "informThisRowChanged: " + pos);
+            UserError.Log.i(TAG, "informThisRowChanged: " + pos);
             if (pos > -1) {
                 LanguageAdapter.this.notifyItemChanged(pos, new LanguageItem(languageList.get(pos).item_name, languageList.get(pos).english_text, v.getText().toString().replace(" ^ ", "\n")));
             }
         } catch (IllegalStateException e) {
-            Log.d(TAG,"informThisRowChanged - cannot calculate during scroll");
+            UserError.Log.i(TAG,"informThisRowChanged - cannot calculate during scroll");
         }
     }
 
@@ -96,7 +96,7 @@ public class LanguageAdapter extends RecyclerView.Adapter<LanguageAdapter.MyView
         });
 
         holder.local_text.setOnFocusChangeListener((v, hasFocus) -> {
-           if (hasFocus == false) {
+           if (!hasFocus) {
                informThisRowChanged(holder, (TextView)v);
            }
         });
@@ -120,7 +120,7 @@ public class LanguageAdapter extends RecyclerView.Adapter<LanguageAdapter.MyView
                 // has it actually changed or was this recycle element just reused?
                 if (!languageList.get(pos).local_text.equals(s.toString()))
                 {
-                    Log.d(TAG,"afterTextChanged: "+pos+" :"+s+":"+languageList.get(pos).local_text);
+                    UserError.Log.i(TAG,"afterTextChanged: "+pos+" :"+s+":"+languageList.get(pos).local_text);
                     LanguageAdapter.this.notifyItemChanged(pos, new LanguageItem(languageList.get(pos).item_name, languageList.get(pos).english_text, s.toString()));
 
                 }
@@ -181,7 +181,7 @@ public class LanguageAdapter extends RecyclerView.Adapter<LanguageAdapter.MyView
         }
 
         if (!showcased_newline) {
-            if (LanguageEditor.last_filter.length()==0) {
+            if (LanguageEditor.last_filter.isEmpty()) {
                 if (holder.local_text.getText().toString().contains(" ^ ")) {
                     if (JoH.ratelimit("language-showcase", 2)) {
                         if (!ShotStateStore.hasShot(LanguageEditor.SHOWCASE_LANGUAGE_ELEMENT_NEWLINE)) {

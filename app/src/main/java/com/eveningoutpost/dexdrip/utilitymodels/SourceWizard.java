@@ -219,9 +219,8 @@ public class SourceWizard {
 	public class ViewModel {
 		public final ObservableList<Item> items = new ObservableArrayList<>();
 
-		//TODO
 		public final ItemBinding<Item> itemBinding = ItemBinding.of(BR.item, R.layout.dialog_tree_item);
-		//        public final ItemBinding<Item> itemBinding = ItemBinding.of(com.eveningoutpost.dexdrip.BR.item, R.layout.dialog_tree_item);
+
 		private String parent_name = null;
 
 		ViewModel(List<Item> items) {

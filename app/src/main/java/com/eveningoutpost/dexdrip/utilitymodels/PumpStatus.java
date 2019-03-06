@@ -110,7 +110,7 @@ public class PumpStatus {
             setBolusIoB(json.getDouble("bolusiob"));
             setBattery(json.getDouble("battery"));
         } catch (Exception e) {
-            Log.e(TAG, "Got exception processing json msg: " + e + " " + msg);
+            UserError.Log.e(TAG, "Got exception processing json msg: " + e + " " + msg);
         }
     }
 
@@ -118,9 +118,9 @@ public class PumpStatus {
         if (Home.get_master()) {
             final String current_json = toJson();
             if (current_json.equals(last_json)) {
-                Log.d(TAG, "No sync as data is identical");
+                UserError.Log.i(TAG, "No sync as data is identical");
             } else {
-                Log.d(TAG, "Sending update: " + current_json);
+                UserError.Log.i(TAG, "Sending update: " + current_json);
                 GcmActivity.sendPumpStatus(current_json);
                 last_json = current_json;
             }

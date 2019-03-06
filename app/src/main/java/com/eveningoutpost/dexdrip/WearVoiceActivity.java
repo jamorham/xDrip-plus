@@ -4,6 +4,8 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
 
+import com.eveningoutpost.dexdrip.models.*;
+
 public class WearVoiceActivity extends BaseActivity {
 
     final static boolean debug = true;
@@ -26,7 +28,7 @@ public class WearVoiceActivity extends BaseActivity {
                 for (String key : bundle.keySet()) {
                     Object value = bundle.get(key);
                     if (value != null) {
-                        Log.d(TAG, String.format("%s %s (%s)", key,
+                        UserError.Log.i(TAG, String.format("%s %s (%s)", key,
                                 value.toString(), value.getClass().getName()));
                     }
                 }

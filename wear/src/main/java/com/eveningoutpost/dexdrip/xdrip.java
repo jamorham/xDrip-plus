@@ -46,7 +46,7 @@ public class xdrip extends Application {
                 initCrashlytics(this);
             }
         } catch (Exception e) {
-            Log.e(TAG, e.toString());
+           UserError.Log.e(TAG, e.toString());
         }
         PreferenceManager.setDefaultValues(this, R.xml.preferences, true);
         ActiveAndroid.initialize(this);
@@ -66,7 +66,7 @@ public class xdrip extends Application {
                         .build();
                 Fabric.with(context, crashlyticsKit);
             } catch (Exception e) {
-                Log.e(TAG, e.toString());
+               UserError.Log.e(TAG, e.toString());
             }
             fabricInited = true;
         }

@@ -104,7 +104,7 @@ public class DexTimeKeeper {
 
 
     public static String extractForStream(String transmitterId) {
-        if (transmitterId == null || transmitterId.length() == 0) return null;
+        if (transmitterId == null || transmitterId.isEmpty()) return null;
         final long result = PersistentStore.getLong(DEX_XMIT_START + transmitterId);
         if (result == 0) return null;
         return transmitterId + "^" + result;

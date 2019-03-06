@@ -90,7 +90,7 @@ public abstract class G5BaseService extends Service {
     }
 
     private static boolean runningStringCheck(String lastStateCheck) {
-        return lastStateCheck.equals("Not Running") || lastStateCheck.contains("Stop") ? false : true;
+        return !lastStateCheck.equals("Not Running") && !lastStateCheck.contains("Stop");
     }
 
     public static boolean isRunning() {

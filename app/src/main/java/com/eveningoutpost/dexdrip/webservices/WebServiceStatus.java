@@ -50,7 +50,7 @@ public class WebServiceStatus extends BaseWebService {
 
             reply.put("settings", settings);
 
-            Log.d(TAG, "Output: " + reply.toString());
+            UserError.Log.i(TAG, "Output: " + reply.toString());
         } catch (JSONException e) {
             UserError.Log.wtf(TAG, "Got json exception: " + e);
         }

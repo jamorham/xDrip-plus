@@ -183,19 +183,11 @@ public class Reminder extends Model {
     }
 
     public boolean isDue() {
-        if ((enabled) && (next_due <= JoH.tsl())) {
-            return true;
-        } else {
-            return false;
-        }
+	    return (enabled) && (next_due <= JoH.tsl());
     }
 
     public boolean isSnoozed() {
-        if (snoozed_till > JoH.tsl()) {
-            return true;
-        } else {
-            return false;
-        }
+	    return snoozed_till > JoH.tsl();
     }
 
     public boolean shouldNotify() {

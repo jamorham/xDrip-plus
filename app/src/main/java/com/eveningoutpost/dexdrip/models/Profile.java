@@ -41,7 +41,7 @@ public class Profile {
 
     public static double getSensitivity(double when) {
         final double sensitivity = findItemListElementForTime(when).sensitivity;
-        // Log.d(TAG,"sensitivity: "+sensitivity);
+        // UserError.Log.i(TAG,"sensitivity: "+sensitivity);
         return sensitivity;
         // expressed in native units lowering effect of 1U
     }
@@ -89,7 +89,7 @@ public class Profile {
     private static void populateProfile() {
         if (profileItemList == null) {
             profileItemList = ProfileEditor.loadData(false);
-            Log.d(TAG, "Loaded profile data, blocks: " + profileItemList.size());
+            UserError.Log.i(TAG, "Loaded profile data, blocks: " + profileItemList.size());
         }
     }
 
@@ -109,25 +109,25 @@ public class Profile {
             if (item.start_min < item.end_min) {
                 // regular
                 if ((item.start_min <= min) && (item.end_min >= min)) {
-                    // Log.d(TAG, "Match on item " + item.getTimePeriod() + " " + profileItemList.indexOf(item));
+                    // UserError.Log.i(TAG, "Match on item " + item.getTimePeriod() + " " + profileItemList.indexOf(item));
                     return item;
                 }
             } else {
                 // item spans midnight
                 if ((min >= item.start_min) || (min <= item.end_min)) {
-                    //  Log.d(TAG, "midnight span Match on item " + item.getTimePeriod() + " " + profileItemList.indexOf(item));
+                    //  UserError.Log.i(TAG, "midnight span Match on item " + item.getTimePeriod() + " " + profileItemList.indexOf(item));
                     return item;
                 }
             }
         }
-        Log.wtf(TAG, "Null return from findItemListElementForTime");
+        UserError.Log.wtf(TAG, "Null return from findItemListElementForTime");
         return null; // should be impossible
     }
 
 
     static public void setDefaultCarbRatio(Double value) {
         if (value <= 0) {
-            Log.e(TAG, "Invalid default carb ratio: " + value);
+            UserError.Log.e(TAG, "Invalid default carb ratio: " + value);
             return;
         }
         the_carb_ratio = value; // g per unit
@@ -198,7 +198,7 @@ public class Profile {
     }
 
     public static void reloadPreferences() {
-        Log.d(TAG, "Reloaded profile preferences");
+        UserError.Log.i(TAG, "Reloaded profile preferences");
         reloadPreferences(PreferenceManager.getDefaultSharedPreferences(xdrip.getAppContext()));
     }
 

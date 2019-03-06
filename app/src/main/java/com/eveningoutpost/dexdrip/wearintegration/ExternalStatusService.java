@@ -84,7 +84,7 @@ public class ExternalStatusService extends IntentService {
                 PersistentStore.setLong(EXTERNAL_STATUS_STORE_TIME, timestamp);
             }
 
-            if (statusline.length() > 0) {
+            if (!statusline.isEmpty()) {
                 final Integer percent = getTBRInt();
                 if (percent != null) {
                     APStatus.createEfficientRecord(timestamp, percent);
@@ -102,12 +102,12 @@ public class ExternalStatusService extends IntentService {
     // adapted from PR submission by JoernL
     public static String getIOB() {
         final String statusLine = getLastStatusLine();
-        if (statusLine.length() == 0) return "";
+        if (statusLine.isEmpty()) return "";
         final String check = statusLine.replaceAll("[^%]", "");
-        if (check.length() > 0) {
+        if (!check.isEmpty()) {
             UserError.Log.v(TAG, statusLine);
             return statusLine.substring((statusLine.lastIndexOf('%') + 2), (statusLine.lastIndexOf('%') + 6));
-        } else if (check.length() == 0) {
+        } else if (check.isEmpty()) {
             UserError.Log.v(TAG, statusLine);
             return statusLine.substring(0, 4);
         } else return "???";
@@ -116,16 +116,16 @@ public class ExternalStatusService extends IntentService {
     // adapted from PR submission by JoernL
     public static String getTBR() {
         final String statusLine = getLastStatusLine();
-        if (statusLine.length() == 0) return "";
+        if (statusLine.isEmpty()) return "";
         final String check = statusLine.replaceAll("[^%]", "");
-        if (check.length() > 0) {
+        if (!check.isEmpty()) {
             int index1 = 0, index2 = 4;
             UserError.Log.v(TAG, statusLine);
             if (statusLine.lastIndexOf('%') == 3) index2 = 4;
             else if (statusLine.lastIndexOf('%') == 2) index2 = 3;
             else if (statusLine.lastIndexOf('%') == 1) index2 = 2;
             return statusLine.substring(index1, index2);
-        } else if (check.length() == 0)
+        } else if (check.isEmpty())
             return "100%";
         else return "???";
     }

@@ -8,6 +8,7 @@ import android.content.SharedPreferences;
 import android.os.BatteryManager;
 import android.util.Log;
 
+import com.eveningoutpost.dexdrip.models.*;
 import com.eveningoutpost.dexdrip.xdrip;
 
 /**
@@ -65,10 +66,10 @@ public class PowerStateReceiver extends BroadcastReceiver {
         if (action == null) return;
         if (action.equals(Intent.ACTION_POWER_CONNECTED)) {
             setInternalPrefsBoolean(PREFS_POWER_STATE, true);
-            Log.d(TAG, "Power connected");
+            UserError.Log.i(TAG, "Power connected");
         } else if (action.equals(Intent.ACTION_POWER_DISCONNECTED)) {
             setInternalPrefsBoolean(PREFS_POWER_STATE, false);
-            Log.d(TAG, "Power disconnected ");
+            UserError.Log.i(TAG, "Power disconnected ");
         }
     }
 }

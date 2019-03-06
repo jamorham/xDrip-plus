@@ -8,8 +8,7 @@ import com.crashlytics.android.answers.Answers;
 import com.crashlytics.android.answers.CustomEvent;
 import com.eveningoutpost.dexdrip.g5Model.Ob1G5StateMachine;
 import com.eveningoutpost.dexdrip.Home;
-import com.eveningoutpost.dexdrip.models.JoH;
-import com.eveningoutpost.dexdrip.models.Sensor;
+import com.eveningoutpost.dexdrip.models.*;
 import com.eveningoutpost.dexdrip.NFCReaderX;
 import com.eveningoutpost.dexdrip.utilitymodels.Pref;
 import com.eveningoutpost.dexdrip.stats.StatsResult;
@@ -45,7 +44,7 @@ public class Telemetry {
     public static void sendFirmwareReport() {
         try {
             if (JoH.ratelimit("firmware-capture-report", 50000)) {
-                Log.d(TAG, "SEND Firmware EVENT START");
+                UserError.Log.i(TAG, "SEND Firmware EVENT START");
 
                 if (Pref.getBooleanDefaultFalse("enable_crashlytics") && Pref.getBooleanDefaultFalse("enable_telemetry")) {
                     if (DexCollectionType.getDexCollectionType() == DexcomG5) {
@@ -60,7 +59,7 @@ public class Telemetry {
             }
 
         } catch (Exception e) {
-            Log.e(TAG, "Got exception sending Firmware Report");
+            UserError.Log.e(TAG, "Got exception sending Firmware Report");
         }
 
     }
@@ -69,7 +68,7 @@ public class Telemetry {
     public static void sendCaptureReport() {
         try {
             if (JoH.ratelimit("capture-report", 50000)) {
-                Log.d(TAG, "SEND EVENT START");
+                UserError.Log.i(TAG, "SEND EVENT START");
 
                 if (Pref.getBooleanDefaultFalse("enable_crashlytics") && Pref.getBooleanDefaultFalse("enable_telemetry")) {
 
@@ -88,7 +87,7 @@ public class Telemetry {
                                 final String subtype = (use_transmiter_pl_bluetooth ? "TR" : "") + (use_rfduino_bluetooth ? "RF" : "") + (Home.get_forced_wear() ? "W" : "") + (NFCReaderX.used_nfc_successfully ? "N" : "");
                                 final String capture_id = DexCollectionType.getDexCollectionType().toString() + subtype + " Captured " + capture_set;
 
-                                Log.d(TAG, "SEND CAPTURE EVENT PROCESS: " + capture_id);
+                                UserError.Log.i(TAG, "SEND CAPTURE EVENT PROCESS: " + capture_id);
                                 StringBuilder watch_model = new StringBuilder();
 
                                 if (Home.get_forced_wear()) {
@@ -120,16 +119,16 @@ public class Telemetry {
                                 }
                             }
                         } else {
-                            Log.d(TAG, "Sensor not running for more than 24 hours yet");
+                            UserError.Log.i(TAG, "Sensor not running for more than 24 hours yet");
                         }
                     } else {
-                        Log.d(TAG, "No sensor active");
+                        UserError.Log.i(TAG, "No sensor active");
                     }
-                    Log.d(TAG, "SEND EVENT DONE");
+                    UserError.Log.i(TAG, "SEND EVENT DONE");
                 }
             }
         } catch (Exception e) {
-            Log.e(TAG, "Got exception sending Capture Report");
+            UserError.Log.e(TAG, "Got exception sending Capture Report");
         }
 
     }

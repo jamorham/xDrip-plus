@@ -83,7 +83,7 @@ public class CustomComplicationProviderService extends ComplicationProviderServi
     @Override
     public void onComplicationActivated(
             int complicationId, int dataType, ComplicationManager complicationManager) {
-        Log.d(TAG, "onComplicationActivated(): " + complicationId);
+       UserError.Log.d(TAG, "onComplicationActivated(): " + complicationId);
 
     }
 
@@ -100,7 +100,7 @@ public class CustomComplicationProviderService extends ComplicationProviderServi
     @Override
     public void onComplicationUpdate(
             int complicationId, int dataType, ComplicationManager complicationManager) {
-        Log.d(TAG, "onComplicationUpdate() id: " + complicationId);
+       UserError.Log.d(TAG, "onComplicationUpdate() id: " + complicationId);
         // Create Tap Action so that the user can trigger an update by tapping the complication.
         final ComponentName thisProvider = new ComponentName(this, getClass());
         // We pass the complication id, so we can only update the specific complication tapped.
@@ -114,7 +114,7 @@ public class CustomComplicationProviderService extends ComplicationProviderServi
             try {
                 ActiveAndroid.clearCache(); // we may be in another process!
             } catch (Exception e) {
-                Log.d(TAG, "Couldn't clear cache: " + e);
+               UserError.Log.d(TAG, "Couldn't clear cache: " + e);
             }
             bgReading = BgReading.last(true);
         }
@@ -132,7 +132,7 @@ public class CustomComplicationProviderService extends ComplicationProviderServi
             }
         }
 
-        Log.d(TAG, "Returning complication text: " + numberText);
+       UserError.Log.d(TAG, "Returning complication text: " + numberText);
 
         COMPLICATION_STATE state = COMPLICATION_STATE.get_enum((int) PersistentStore.getLong(ComplicationTapBroadcastReceiver.COMPLICATION_STORE));
         if (state == null) state = COMPLICATION_STATE.DELTA;
@@ -162,11 +162,11 @@ public class CustomComplicationProviderService extends ComplicationProviderServi
                 break;
             case ComplicationData.TYPE_LONG_TEXT:
                 String numberTextLong = numberText + " " + getDeltaText(bgReading, is_stale) + " (" + niceTimeSinceBgReading(bgReading) + ")";
-                Log.d(TAG, "Returning complication text Long: " + numberTextLong);
+               UserError.Log.d(TAG, "Returning complication text Long: " + numberTextLong);
 
                 //Loop status by @gregorybel
                 String externalStatusString = PersistentStore.getString("remote-status-string");
-                Log.d(TAG, "Returning complication status: " + externalStatusString);
+               UserError.Log.d(TAG, "Returning complication status: " + externalStatusString);
 
                 final ComplicationData.Builder builderLong = new ComplicationData.Builder(ComplicationData.TYPE_LONG_TEXT)
                         .setLongTitle(ComplicationText.plainText(numberTextLong))
@@ -178,8 +178,8 @@ public class CustomComplicationProviderService extends ComplicationProviderServi
 
                 break;
             default:
-                if (Log.isLoggable(TAG, Log.WARN)) {
-                    Log.w(TAG, "Unexpected complication type " + dataType);
+                if (Log.isLoggable(TAG,UserError.Log.WARN)) {
+                   UserError.Log.w(TAG, "Unexpected complication type " + dataType);
                 }
         }
 
@@ -207,18 +207,18 @@ public class CustomComplicationProviderService extends ComplicationProviderServi
      */
     @Override
     public void onComplicationDeactivated(int complicationId) {
-        Log.d(TAG, "onComplicationDeactivated(): " + complicationId);
+       UserError.Log.d(TAG, "onComplicationDeactivated(): " + complicationId);
     }
 
     public static void refresh() {
         Inevitable.task("refresh-complication", 500, () -> {
             if (JoH.ratelimit("complication-refresh", 5)) {
-                Log.d(TAG, "Complication refresh() executing");
+               UserError.Log.d(TAG, "Complication refresh() executing");
                 final ComponentName componentName = new ComponentName(xdrip.getAppContext(), "com.eveningoutpost.dexdrip.Services.CustomComplicationProviderService");
                 final ProviderUpdateRequester providerUpdateRequester = new ProviderUpdateRequester(xdrip.getAppContext(), componentName);
                 providerUpdateRequester.requestUpdateAll();
             }
         });
-        Log.d(TAG, "Complication refresh() called");
+       UserError.Log.d(TAG, "Complication refresh() called");
     }
 }

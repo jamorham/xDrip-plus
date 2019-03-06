@@ -1,6 +1,6 @@
 <!--                        android:targetPackage="@string/target_package" -->
 <PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android">
-    <PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android"
+    <PreferenceScreen
         android:icon="@drawable/ic_add_alert_grey600_48dp"
         android:key="whole_alerts_screen"
         android:summary="@string/glucose_calibration_and_other_alerts"
@@ -17,7 +17,7 @@
                     android:targetPackage="@string/local_target_package" />
             </Preference>
 
-            <PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android"
+            <PreferenceScreen
                 android:key="bg_alerts_screen"
                 android:title="@string/glucose_alerts_settings">
                 <ListPreference
@@ -99,7 +99,7 @@
             </PreferenceScreen>
 
 
-            <PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android"
+            <PreferenceScreen
                 android:key="calibration_alerts_screen"
                 android:title="@string/calibration_alerts">
                 <SwitchPreference
@@ -153,7 +153,7 @@
                     android:title="@string/title_play_sound_for_initial_calibration" />
             </PreferenceScreen>
 
-            <PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android"
+            <PreferenceScreen
                 android:key="missed_readings_screen"
                 android:title="@string/missed_reading_alert">
                 <intent
@@ -162,7 +162,7 @@
                     android:targetPackage="@string/local_target_package" />
             </PreferenceScreen>
 
-            <PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android"
+            <PreferenceScreen
                 android:key="other_alerts_screen"
                 android:title="@string/other_alerts">
 
@@ -240,7 +240,7 @@
                         android:title="@string/override_silent_mode_these" />
                 </PreferenceCategory>
             </PreferenceScreen>
-            <PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android"
+            <PreferenceScreen
                 android:key="smart_alerts_screen"
                 android:title="@string/extra_alerts_xdrip_plus">
                 <PreferenceCategory

@@ -172,7 +172,7 @@ public class BgToSpeech implements NamedSliderProcessor {
                         text = text.replace(",", ".");
                     }
                 } catch (NullPointerException e) {
-                    Log.e(TAG, "Null pointer for TTS in calculateText");
+                    UserError.Log.e(TAG, "Null pointer for TTS in calculateText");
                 }
             }
             if (delta_name != null) text += " " + mungeDeltaName(delta_name);
@@ -182,7 +182,7 @@ public class BgToSpeech implements NamedSliderProcessor {
         } else {
             text = xdrip.getAppContext().getString(R.string.error);
         }
-        Log.d(TAG, "calculated text: " + text);
+        UserError.Log.i(TAG, "calculated text: " + text);
         return text;
     }
 

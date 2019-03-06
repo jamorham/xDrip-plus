@@ -4,13 +4,7 @@ import android.content.Context;
 import android.os.AsyncTask;
 
 import com.eveningoutpost.dexdrip.influxDB.InfluxDBUploader;
-import com.eveningoutpost.dexdrip.models.BgReading;
-import com.eveningoutpost.dexdrip.models.BloodTest;
-import com.eveningoutpost.dexdrip.models.Calibration;
-import com.eveningoutpost.dexdrip.models.JoH;
-import com.eveningoutpost.dexdrip.models.LibreBlock;
-import com.eveningoutpost.dexdrip.models.TransmitterData;
-import com.eveningoutpost.dexdrip.models.Treatments;
+import com.eveningoutpost.dexdrip.models.*;
 import com.eveningoutpost.dexdrip.models.UserError.Log;
 import com.eveningoutpost.dexdrip.wearintegration.WatchUpdaterService;
 import com.eveningoutpost.dexdrip.services.SyncService;
@@ -36,7 +30,7 @@ public class UploaderTask extends AsyncTask<String, Void, Void> {
 
     public Void doInBackground(String... urls) {
         try {
-            Log.d(TAG, "UploaderTask doInBackground called");
+            UserError.Log.i(TAG, "UploaderTask doInBackground called");
             final List<Long> circuits = new ArrayList<>();
             final List<String> types = new ArrayList<>();
 
@@ -58,7 +52,7 @@ public class UploaderTask extends AsyncTask<String, Void, Void> {
                 if ((Pref.getBoolean("cloud_storage_api_use_mobile", true) || (JoH.isLANConnected()))) {
                     circuits.add(UploaderQueue.NIGHTSCOUT_RESTAPI);
                 } else {
-                    Log.e(TAG, "Skipping Nightscout upload due to mobile data only");
+                    UserError.Log.e(TAG, "Skipping Nightscout upload due to mobile data only");
                 }
             }
             if (Pref.getBooleanDefaultFalse("cloud_storage_influxdb_enable")) {
@@ -92,14 +86,14 @@ public class UploaderTask extends AsyncTask<String, Void, Void> {
                                         if (this_bg != null) {
                                             bgReadings.add(this_bg);
                                         } else {
-                                            Log.wtf(TAG, "BgReading with ID: " + up.reference_id + " appears to have been deleted");
+                                            UserError.Log.wtf(TAG, "BgReading with ID: " + up.reference_id + " appears to have been deleted");
                                         }
                                     } else if (type.equals(Calibration.class.getSimpleName())) {
                                         final Calibration this_cal = Calibration.byid(up.reference_id);
                                         if ((this_cal != null) && (this_cal.isValid())) {
                                             calibrations.add(this_cal);
                                         } else {
-                                            Log.wtf(TAG, "Calibration with ID: " + up.reference_id + " appears to have been deleted");
+                                            UserError.Log.wtf(TAG, "Calibration with ID: " + up.reference_id + " appears to have been deleted");
                                         }
 
                                     } else if (type.equals(BloodTest.class.getSimpleName())) {
@@ -107,57 +101,57 @@ public class UploaderTask extends AsyncTask<String, Void, Void> {
                                         if (this_bt != null) {
                                             bloodtests.add(this_bt);
                                         } else {
-                                            Log.wtf(TAG, "Bloodtest with ID: " + up.reference_id + " appears to have been deleted");
+                                            UserError.Log.wtf(TAG, "Bloodtest with ID: " + up.reference_id + " appears to have been deleted");
                                         }
                                     } else if (type.equals(Treatments.class.getSimpleName())) {
                                         final Treatments this_treat = Treatments.byid(up.reference_id);
                                         if (this_treat != null) {
                                             treatmentsAdd.add(this_treat);
                                         } else {
-                                            Log.wtf(TAG, "Treatments with ID: " + up.reference_id + " appears to have been deleted");
+                                            UserError.Log.wtf(TAG, "Treatments with ID: " + up.reference_id + " appears to have been deleted");
                                         }
                                     } else if (type.equals(TransmitterData.class.getSimpleName())) {
                                         final TransmitterData this_transmitterData = TransmitterData.byid(up.reference_id);
                                         if (this_transmitterData != null) {
                                             transmittersData.add(this_transmitterData);
                                         } else {
-                                            Log.wtf(TAG, "TransmitterData with ID: " + up.reference_id + " appears to have been deleted");
+                                            UserError.Log.wtf(TAG, "TransmitterData with ID: " + up.reference_id + " appears to have been deleted");
                                         }
                                     }  else if (type.equals(LibreBlock.class.getSimpleName())) {
                                         final LibreBlock this_LibreBlock = LibreBlock.byid(up.reference_id);
                                         if (this_LibreBlock != null) {
                                             libreBlock.add(this_LibreBlock);
                                         } else {
-                                            Log.wtf(TAG, "LibreBlock with ID: " + up.reference_id + " appears to have been deleted");
+                                            UserError.Log.wtf(TAG, "LibreBlock with ID: " + up.reference_id + " appears to have been deleted");
                                         }
                                     }
                                     break;
                                 case "delete":
                                     if ((THIS_QUEUE == UploaderQueue.WATCH_WEARAPI || THIS_QUEUE == UploaderQueue.NIGHTSCOUT_RESTAPI) && type.equals(Treatments.class.getSimpleName())) {
                                         items.add(up);
-                                        Log.wtf(TAG, "Delete Treatments with ID: " + up.reference_uuid);
+                                        UserError.Log.wtf(TAG, "Delete Treatments with ID: " + up.reference_uuid);
                                         treatmentsDel.add(up.reference_uuid);
                                     }
                                     else
                                     if (up.reference_uuid != null) {
-                                        Log.d(TAG, UploaderQueue.getCircuitName(THIS_QUEUE) + " delete not yet implemented: " + up.reference_uuid);
+                                        UserError.Log.i(TAG, UploaderQueue.getCircuitName(THIS_QUEUE) + " delete not yet implemented: " + up.reference_uuid);
                                         up.completed(THIS_QUEUE); // mark as completed so as not to tie up the queue for now
                                     }
                                     break;
                                 default:
-                                    Log.e(TAG, "Unsupported operation type for " + type + " " + up.action);
+                                    UserError.Log.e(TAG, "Unsupported operation type for " + type + " " + up.action);
                                     break;
                             }
                         }
                     }
                 }
 
-                if ((bgReadings.size() > 0) || (calibrations.size() > 0) || (bloodtests.size() > 0)
-                        || (treatmentsAdd.size() > 0 || treatmentsDel.size() > 0) || (transmittersData.size() > 0) ||
-                        (libreBlock.size() > 0)
-                        || (UploaderQueue.getPendingbyType(Treatments.class.getSimpleName(), THIS_QUEUE, 1).size() > 0)) {
+                if ((!bgReadings.isEmpty()) || (!calibrations.isEmpty()) || (!bloodtests.isEmpty())
+                        || (!treatmentsAdd.isEmpty() || !treatmentsDel.isEmpty()) || (!transmittersData.isEmpty()) ||
+                        (!libreBlock.isEmpty())
+                        || (!UploaderQueue.getPendingbyType(Treatments.class.getSimpleName(), THIS_QUEUE, 1).isEmpty())) {
 
-                    Log.d(TAG, UploaderQueue.getCircuitName(THIS_QUEUE) + " Processing: " + bgReadings.size() + " BgReadings and " + calibrations.size() + " Calibrations " + bloodtests.size() + " bloodtests " + treatmentsAdd.size() + " treatmentsAdd " + treatmentsDel.size() + " treatmentsDel");
+                    UserError.Log.i(TAG, UploaderQueue.getCircuitName(THIS_QUEUE) + " Processing: " + bgReadings.size() + " BgReadings and " + calibrations.size() + " Calibrations " + bloodtests.size() + " bloodtests " + treatmentsAdd.size() + " treatmentsAdd " + treatmentsDel.size() + " treatmentsDel");
                     boolean uploadStatus = false;
 
                     if (THIS_QUEUE == UploaderQueue.MONGO_DIRECT) {
@@ -178,10 +172,10 @@ public class UploaderTask extends AsyncTask<String, Void, Void> {
                         for (UploaderQueue up : items) {
                             up.completed(THIS_QUEUE); // approve all types for this queue
                         }
-                        Log.d(TAG, UploaderQueue.getCircuitName(THIS_QUEUE) + " Marking: " + items.size() + " Items as successful");
+                        UserError.Log.i(TAG, UploaderQueue.getCircuitName(THIS_QUEUE) + " Marking: " + items.size() + " Items as successful");
 
                         if (PersistentStore.getBoolean(BACKFILLING_BOOSTER)) {
-                            Log.d(TAG,"Scheduling boosted repeat query");
+                            UserError.Log.i(TAG,"Scheduling boosted repeat query");
                             SyncService.startSyncService(2000);
                         }
 
@@ -189,16 +183,16 @@ public class UploaderTask extends AsyncTask<String, Void, Void> {
 
 
                 } else {
-                    Log.d(TAG, "Nothing to upload for: " + UploaderQueue.getCircuitName(THIS_QUEUE));
+                    UserError.Log.i(TAG, "Nothing to upload for: " + UploaderQueue.getCircuitName(THIS_QUEUE));
                     if (PersistentStore.getBoolean(BACKFILLING_BOOSTER)) {
                         PersistentStore.setBoolean(BACKFILLING_BOOSTER, false);
-                        Log.d(TAG,"Switched off backfilling booster");
+                        UserError.Log.i(TAG,"Switched off backfilling booster");
                     }
                 }
 
             }
         } catch (Exception e) {
-            Log.e(TAG, "caught exception", e);
+            UserError.Log.e(TAG, "caught exception", e);
             exception = e;
             return null;
         }

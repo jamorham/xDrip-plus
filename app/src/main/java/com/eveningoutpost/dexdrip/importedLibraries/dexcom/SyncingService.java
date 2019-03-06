@@ -10,7 +10,7 @@ import android.hardware.usb.UsbManager;
 import android.os.PowerManager;
 import android.preference.PreferenceManager;
 
-import com.eveningoutpost.dexdrip.models.JoH;
+import com.eveningoutpost.dexdrip.models.*;
 import com.eveningoutpost.dexdrip.models.UserError.Log;
 
 import com.eveningoutpost.dexdrip.importedLibraries.dexcom.records.CalRecord;
@@ -22,7 +22,6 @@ import com.eveningoutpost.dexdrip.importedLibraries.usbserial.driver.CdcAcmSeria
 import com.eveningoutpost.dexdrip.importedLibraries.usbserial.driver.ProbeTable;
 import com.eveningoutpost.dexdrip.importedLibraries.usbserial.driver.UsbSerialDriver;
 import com.eveningoutpost.dexdrip.importedLibraries.usbserial.driver.UsbSerialProber;
-import com.eveningoutpost.dexdrip.models.Calibration;
 
 import org.json.JSONArray;
 
@@ -103,7 +102,7 @@ public class SyncingService extends IntentService {
                 final int param1 = intent.getIntExtra(SYNC_PERIOD, 1);
                 handleActionSync(param1);
             } else if (ACTION_CALIBRATION_CHECKIN.equals(action)) {
-                Log.i("CALIBRATION-CHECK-IN: ", "Beginning check in process");
+                UserError.Log.i("CALIBRATION-CHECK-IN: ", "Beginning check in process");
                 performCalibrationCheckin();
             }
         }
@@ -118,29 +117,29 @@ public class SyncingService extends IntentService {
         PowerManager.WakeLock wl = pm.newWakeLock(PowerManager.PARTIAL_WAKE_LOCK, ":NSDownload");
         wl.acquire();
         try {
-            Log.i("CALIBRATION-CHECK-IN: ", "Wake Lock Acquired");
+            UserError.Log.i("CALIBRATION-CHECK-IN: ", "Wake Lock Acquired");
             if (acquireSerialDevice()) {
                 try {
                     ReadData readData = new ReadData(mSerialDevice, mConnection, dexcom);
 
 //                ReadData readData = new ReadData(mSerialDevice);
                     CalRecord[] calRecords = readData.getRecentCalRecords();
-                    Log.i("CALIBRATION-CHECK-IN: ", "Found " + calRecords.length + " Records!");
+                    UserError.Log.i("CALIBRATION-CHECK-IN: ", "Found " + calRecords.length + " Records!");
                     save_most_recent_cal_record(calRecords);
 
                 } catch (Exception e) {
-                    Log.wtf("Unhandled exception caught", e);
+                    UserError.Log.wtf("Unhandled exception caught", e);
                 } finally {
                     // Close serial
                     try {
                         mSerialDevice.getPorts().get(0).close();
                     } catch (IOException e) {
-                        Log.e(TAG, "Unable to close", e);
+                        UserError.Log.e(TAG, "Unable to close", e);
                     }
 
                 }
             } else {
-                Log.w("CALIBRATION-CHECK-IN: ", "Failed to acquire serial device");
+                UserError.Log.w("CALIBRATION-CHECK-IN: ", "Failed to acquire serial device");
             }
         } finally {
             JoH.releaseWakeLock(wl);
@@ -200,27 +199,27 @@ public class SyncingService extends IntentService {
 //                                 displayTime, array ,batLevel);
                 broadcastSent=true;
             } catch (ArrayIndexOutOfBoundsException e) {
-                Log.wtf("Unable to read from the dexcom, maybe it will work next time", e);
+                UserError.Log.wtf("Unable to read from the dexcom, maybe it will work next time", e);
             } catch (NegativeArraySizeException e) {
-                Log.wtf("Negative array exception from receiver", e);
+                UserError.Log.wtf("Negative array exception from receiver", e);
             } catch (IndexOutOfBoundsException e) {
-                Log.wtf("IndexOutOfBounds exception from receiver", e);
+                UserError.Log.wtf("IndexOutOfBounds exception from receiver", e);
             } catch (CRCFailRuntimeException e){
                 // FIXME: may consider localizing this catch at a lower level (like ReadData) so that
                 // if the CRC check fails on one type of record we can capture the values if it
                 // doesn't fail on other types of records. This means we'd need to broadcast back
                 // partial results to the UI. Adding it to a lower level could make the ReadData class
                 // more difficult to maintain - needs discussion.
-                Log.wtf("CRC failed", e);
+                UserError.Log.wtf("CRC failed", e);
             } catch (Exception e) {
-                Log.wtf("Unhandled exception caught", e);
+                UserError.Log.wtf("Unhandled exception caught", e);
             } finally {
                 // Close serial
                 try {
                     mSerialDevice.getPorts().get(0).close();
                 } catch (IOException e) {
 
-                    Log.e(TAG, "Unable to close", e);
+                    UserError.Log.e(TAG, "Unable to close", e);
                 }
 
             }
@@ -237,12 +236,12 @@ public class SyncingService extends IntentService {
         UsbDevice found_device = findDexcom();
 
         if (mUsbManager == null) {
-            Log.w("CALIBRATION-CHECK-IN: ", "USB manager is null");
+            UserError.Log.w("CALIBRATION-CHECK-IN: ", "USB manager is null");
             return false;
         }
 
         if (dexcom == null) {
-            Log.e(TAG, "dex device == null");
+            UserError.Log.e(TAG, "dex device == null");
             return false;
         }
 
@@ -260,16 +259,16 @@ public class SyncingService extends IntentService {
                         mSerialDevice = driver;
 
                         mConnection = connection;
-                        Log.i("CALIBRATION-CHECK-IN: ", "CONNECTEDDDD!!");
+                        UserError.Log.i("CALIBRATION-CHECK-IN: ", "CONNECTEDDDD!!");
                         return true;
                     }
                 } else {
-                    Log.w("CALIBRATION-CHECK-IN: ", "Driver was no good");
+                    UserError.Log.w("CALIBRATION-CHECK-IN: ", "Driver was no good");
                 }
             }
-            Log.w("CALIBRATION-CHECK-IN: ", "No usable drivers found");
+            UserError.Log.w("CALIBRATION-CHECK-IN: ", "No usable drivers found");
         } else {
-            Log.w("CALIBRATION-CHECK-IN: ", "You dont have permissions for that dexcom!!");
+            UserError.Log.w("CALIBRATION-CHECK-IN: ", "You dont have permissions for that dexcom!!");
         }
         return false;
     }
@@ -277,16 +276,16 @@ public class SyncingService extends IntentService {
     static public boolean isG4Connected(Context c){
         UsbManager manager = (UsbManager) c.getSystemService(Context.USB_SERVICE);
         HashMap<String, UsbDevice> deviceList = manager.getDeviceList();
-        Log.i("USB DEVICES = ", deviceList.toString());
+        UserError.Log.i("USB DEVICES = ", deviceList.toString());
         Iterator<UsbDevice> deviceIterator = deviceList.values().iterator();
-        Log.i("USB DEVICES = ", String.valueOf(deviceList.size()));
+        UserError.Log.i("USB DEVICES = ", String.valueOf(deviceList.size()));
 
         while(deviceIterator.hasNext()){
             UsbDevice device = deviceIterator.next();
             if (device.getVendorId() == 8867 && device.getProductId() == 71
                     && device.getDeviceClass() == 2 && device.getDeviceSubclass() ==0
                     && device.getDeviceProtocol() == 0){
-                Log.i("CALIBRATION-CHECK-IN: ", "Dexcom Found!");
+                UserError.Log.i("CALIBRATION-CHECK-IN: ", "Dexcom Found!");
                 return true;
             }
         }
@@ -294,13 +293,13 @@ public class SyncingService extends IntentService {
     }
 
     public UsbDevice findDexcom() {
-        Log.i("CALIBRATION-CHECK-IN: ", "Searching for dexcom");
+        UserError.Log.i("CALIBRATION-CHECK-IN: ", "Searching for dexcom");
         mUsbManager = (UsbManager) getApplicationContext().getSystemService(Context.USB_SERVICE);
-        Log.i("USB MANAGER = ", mUsbManager.toString());
+        UserError.Log.i("USB MANAGER = ", mUsbManager.toString());
         HashMap<String, UsbDevice> deviceList = mUsbManager.getDeviceList();
-        Log.i("USB DEVICES = ", deviceList.toString());
+        UserError.Log.i("USB DEVICES = ", deviceList.toString());
         Iterator<UsbDevice> deviceIterator = deviceList.values().iterator();
-        Log.i("USB DEVICES = ", String.valueOf(deviceList.size()));
+        UserError.Log.i("USB DEVICES = ", String.valueOf(deviceList.size()));
 
         while(deviceIterator.hasNext()){
             UsbDevice device = deviceIterator.next();
@@ -308,10 +307,10 @@ public class SyncingService extends IntentService {
                     && device.getDeviceClass() == 2 && device.getDeviceSubclass() ==0
                     && device.getDeviceProtocol() == 0){
                 dexcom = device;
-                Log.i("CALIBRATION-CHECK-IN: ", "Dexcom Found!");
+                UserError.Log.i("CALIBRATION-CHECK-IN: ", "Dexcom Found!");
                 return device;
             } else {
-                Log.w("CALIBRATION-CHECK-IN: ", "that was not a dexcom (I dont think)");
+                UserError.Log.w("CALIBRATION-CHECK-IN: ", "that was not a dexcom (I dont think)");
             }
         }
         return null;
@@ -320,7 +319,7 @@ public class SyncingService extends IntentService {
     private void broadcastSGVToUI(EGVRecord egvRecord, boolean uploadStatus,
                                   long nextUploadTime, long displayTime,
                                   JSONArray json, int batLvl) {
-        Log.d(TAG, "Current EGV: " + egvRecord.getBGValue());
+        UserError.Log.i(TAG, "Current EGV: " + egvRecord.getBGValue());
         Intent broadcastIntent = new Intent();
 //        broadcastIntent.setAction(MainActivity.CGMStatusReceiver.PROCESS_RESPONSE);
         broadcastIntent.addCategory(Intent.CATEGORY_DEFAULT);

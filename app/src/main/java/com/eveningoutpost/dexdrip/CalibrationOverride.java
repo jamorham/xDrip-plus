@@ -47,7 +47,7 @@ public class CalibrationOverride extends ActivityWithMenu {
 
                         final Calibration last_calibration = Calibration.lastValid();
                         if (last_calibration == null) {
-                            Log.wtf(TAG, "Last valid calibration is null when trying to cancel it in override!");
+                            UserError.Log.wtf(TAG, "Last valid calibration is null when trying to cancel it in override!");
                         } else {
                             last_calibration.sensor_confidence = 0;
                             last_calibration.slope_confidence = 0;
@@ -65,7 +65,7 @@ public class CalibrationOverride extends ActivityWithMenu {
                             //startWatchUpdaterService(v.getContext(), WatchUpdaterService.ACTION_SYNC_CALIBRATION, TAG);
 
                         } else {
-                            Log.e(TAG, "Calibration creation resulted in null");
+                            UserError.Log.e(TAG, "Calibration creation resulted in null");
                             JoH.static_toast_long("Could not create calibration!");
                         }
                         Intent tableIntent = new Intent(v.getContext(), Home.class);
@@ -78,7 +78,7 @@ public class CalibrationOverride extends ActivityWithMenu {
                     value.setError("Calibration Can Not be blank");
                 }
             } else {
-                Log.w("Calibration", "ERROR, no active sensor");
+                UserError.Log.w("Calibration", "ERROR, no active sensor");
             }
         });
 

@@ -630,8 +630,7 @@ public class Ob1G5CollectionService extends G5BaseService {
             }
         } else {
             // android wear code
-            if (!PersistentStore.getBoolean(CollectionServiceStarter.pref_run_wear_collector))
-                return false;
+            return PersistentStore.getBoolean(CollectionServiceStarter.pref_run_wear_collector);
         }
         return true;
     }
@@ -644,7 +643,7 @@ public class Ob1G5CollectionService extends G5BaseService {
     private static synchronized boolean isDeviceLocallyBonded() {
         if (transmitterMAC == null) return false;
         final Set<RxBleDevice> pairedDevices = rxBleClient.getBondedDevices();
-        if ((pairedDevices != null) && (pairedDevices.size() > 0)) {
+        if ((pairedDevices != null) && (!pairedDevices.isEmpty())) {
             for (RxBleDevice device : pairedDevices) {
                 if ((device.getMacAddress() != null) && (device.getMacAddress().equals(transmitterMAC))) {
                     return true;
@@ -679,7 +678,7 @@ public class Ob1G5CollectionService extends G5BaseService {
         final BluetoothAdapter mBluetoothAdapter = ((BluetoothManager) getSystemService(Context.BLUETOOTH_SERVICE)).getAdapter();
 
         final Set<BluetoothDevice> pairedDevices = mBluetoothAdapter.getBondedDevices();
-        if (pairedDevices.size() > 0) {
+        if (!pairedDevices.isEmpty()) {
             for (BluetoothDevice device : pairedDevices) {
                 if (device.getAddress() != null) {
                     if (device.getAddress().equals(transmitterMAC)) {
@@ -1735,7 +1734,7 @@ public class Ob1G5CollectionService extends G5BaseService {
         // firmware details
         final VersionRequestRxMessage vr = Ob1G5StateMachine.getFirmwareDetails(tx_id);
         try {
-            if ((vr != null) && (vr.firmware_version_string.length() > 0)) {
+            if ((vr != null) && (!vr.firmware_version_string.isEmpty())) {
 
                 l.add(new StatusItem("Firmware Version", vr.firmware_version_string, FirmwareCapability.isG6Rev2(vr.firmware_version_string) ? NOTICE : NORMAL));
                 if (Home.get_engineering_mode()) {

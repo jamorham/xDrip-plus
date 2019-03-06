@@ -8,7 +8,8 @@ buildscript {
 
     }
     dependencies {
-        classpath 'com.android.tools.build:gradle:3.3.0'
+        //DO NOT UPGRADE ERROR: No value has been specified for property 'manifestOutputDirectory'.
+        classpath 'com.android.tools.build:gradle:3.3.1'
         classpath 'com.google.gms:google-services:4.2.0'
 
         apply plugin: 'java'

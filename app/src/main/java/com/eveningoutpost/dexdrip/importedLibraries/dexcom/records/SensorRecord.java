@@ -1,5 +1,6 @@
 package com.eveningoutpost.dexdrip.importedLibraries.dexcom.records;
 
+import com.eveningoutpost.dexdrip.models.*;
 import com.eveningoutpost.dexdrip.models.UserError.Log;
 
 import java.nio.ByteBuffer;
@@ -25,7 +26,7 @@ public class SensorRecord extends GenericTimestampRecord {
         byte [] usRSSI = new byte[]{packet[17],packet[16]};
         rssi = usRSSI[0] << 8 | usRSSI[1];
         //rssi = ByteBuffer.wrap(packet).order(ByteOrder.LITTLE_ENDIAN).getShort(OFFSET_RSSI);
-        Log.d("ShareTest", "filtered: " + filtered + " unfiltered: " + unfiltered);
+        UserError.Log.i("ShareTest", "filtered: " + filtered + " unfiltered: " + unfiltered);
     }
 
     public long getUnfiltered() {

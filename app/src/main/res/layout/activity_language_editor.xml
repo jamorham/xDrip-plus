@@ -20,7 +20,7 @@
             android:layout_height="wrap_content"
             android:layout_alignParentStart="true"
             android:minHeight="?attr/actionBarSize"
-            app:theme="@style/Toolbar" />
+            android:theme="@style/Toolbar" />
 
         <LinearLayout
 

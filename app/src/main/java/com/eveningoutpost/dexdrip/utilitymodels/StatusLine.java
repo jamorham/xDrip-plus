@@ -128,7 +128,7 @@ public class StatusLine {
             if (Pref.getBoolean("status_line_accuracy", false)) {
                 final long accuracy_period = DAY_IN_MS * 3;
                 final String accuracy_report = Accuracy.evaluateAccuracy(accuracy_period);
-                if ((accuracy_report != null) && (accuracy_report.length() > 0)) {
+                if ((accuracy_report != null) && (!accuracy_report.isEmpty())) {
                     append(sb, accuracy_report);
                 } else {
                     final String accuracy = BloodTest.evaluateAccuracy(accuracy_period);

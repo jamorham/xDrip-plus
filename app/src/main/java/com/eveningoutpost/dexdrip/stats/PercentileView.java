@@ -7,6 +7,7 @@ import android.preference.*;
 import android.util.*;
 import android.view.*;
 
+import com.eveningoutpost.dexdrip.models.*;
 import com.eveningoutpost.dexdrip.models.UserError.Log;
 import com.eveningoutpost.dexdrip.*;
 import com.eveningoutpost.dexdrip.utilitymodels.*;
@@ -77,13 +78,13 @@ public class PercentileView extends View {
 
     @Override
     protected void onDraw(Canvas canvas) {
-        Log.d("DrawStats", "PercentileView - onDraw");
+        UserError.Log.i("DrawStats", "PercentileView - onDraw");
         super.onDraw(canvas);
 
         CalculatedData rd = getMaybeCalculatedData();
 
         if (rd == null) {
-            Log.d("DrawStats", "PercentileView - onDraw if");
+            UserError.Log.i("DrawStats", "PercentileView - onDraw if");
 
             Paint myPaint = new Paint();
             myPaint.setColor(Color.WHITE);
@@ -92,7 +93,7 @@ public class PercentileView extends View {
             myPaint.setTextSize(dp2px(15));
             canvas.drawText("Calculating...", dp2px(30), canvas.getHeight() / 2, myPaint);
         } else {
-            Log.d("DrawStats", "PercentileView - onDraw else");
+            UserError.Log.i("DrawStats", "PercentileView - onDraw else");
             drawPolygon(canvas, rd.q10, rd.q90, outerPaint);
             drawPolygon(canvas, rd.q25, rd.q75, innerPaint);
             drawPolygon(canvas, rd.q50, rd.q50, medianPaint);

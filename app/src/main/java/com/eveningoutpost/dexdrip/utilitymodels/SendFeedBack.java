@@ -159,7 +159,7 @@ public class SendFeedBack extends BaseActivity {
                             .url(send_url)
                             .post(formBody)
                             .build();
-                    Log.i(TAG, "Sending feedback request");
+                    UserError.Log.i(TAG, "Sending feedback request");
                     final Response response = client.newCall(request).execute();
                     if (response.isSuccessful()) {
                         JoH.static_toast_long(response.body().string());
@@ -170,22 +170,22 @@ public class SendFeedBack extends BaseActivity {
                         JoH.static_toast_short("Error sending feedback: " + response.message());
                     }
                 } catch (Exception e) {
-                    Log.e(TAG, "Got exception in execute: " + e.toString());
+                    UserError.Log.e(TAG, "Got exception in execute: " + e.toString());
                     JoH.static_toast_short("Error with network connection");
                 }
             }).start();
         } catch (Exception e) {
             JoH.static_toast_short(e.getMessage());
-            Log.e(TAG, "General exception: " + e.toString());
+            UserError.Log.e(TAG, "General exception: " + e.toString());
         }
     }
 
     private void toast(final String msg) {
         try {
             runOnUiThread((Runnable) () -> Toast.makeText(getApplicationContext(), msg, Toast.LENGTH_SHORT).show());
-            Log.d(TAG, "Toast msg: " + msg);
+            UserError.Log.i(TAG, "Toast msg: " + msg);
         } catch (Exception e) {
-            Log.e(TAG, "Couldn't display toast: " + msg);
+            UserError.Log.e(TAG, "Couldn't display toast: " + msg);
         }
     }
 }

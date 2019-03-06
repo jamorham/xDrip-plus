@@ -4,6 +4,8 @@ import android.graphics.Bitmap;
 import android.graphics.Color;
 import android.util.Log;
 
+import com.eveningoutpost.dexdrip.models.*;
+
 import java.io.ByteArrayOutputStream;
 import java.util.TreeMap;
 
@@ -72,7 +74,7 @@ public class SimpleImageEncoder {
         for (int i = 0; i < counts.length; i++) {
             map.put(counts[i], palette[i]);
         }
-        Log.d(TAG, "optimizePalette: map.size() is " + map.size() + ", map.descendingMap().size() is" + map.descendingMap().size());
+        UserError.Log.i(TAG, "optimizePalette: map.size() is " + map.size() + ", map.descendingMap().size() is" + map.descendingMap().size());
         int colorCount = 0;
         int [] colors = new int[maxColors];
 
@@ -85,7 +87,7 @@ public class SimpleImageEncoder {
         for (int color : map.descendingMap().values()) {
             colors[colorCount] = color;
             colorCount++;
-            Log.d(TAG, "optimizePalette: palette index " + (map.size()-colorCount+1) + " of " + (map.size()-1) +" has r:" + Color.red(color) + ", g:" + Color.green(color) + ", b:" + Color.blue(color));
+            UserError.Log.i(TAG, "optimizePalette: palette index " + (map.size()-colorCount+1) + " of " + (map.size()-1) +" has r:" + Color.red(color) + ", g:" + Color.green(color) + ", b:" + Color.blue(color));
 
             if (colorCount >= maxColors) break;
         }
@@ -130,7 +132,7 @@ public class SimpleImageEncoder {
                     bestDistance = distance;
                 }
             }
-//            Log.d(TAG, "getNearestColorIndex: selecting index " + bestIndex + " of " + palette.length + ", a distance of " + bestDistance + " for r:" + Color.red(color) + ", g:" + Color.green(color) + ", b:" + Color.blue(color));
+//            UserError.Log.i(TAG, "getNearestColorIndex: selecting index " + bestIndex + " of " + palette.length + ", a distance of " + bestDistance + " for r:" + Color.red(color) + ", g:" + Color.green(color) + ", b:" + Color.blue(color));
         }
 
         return (byte) bestIndex;

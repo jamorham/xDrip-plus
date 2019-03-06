@@ -471,7 +471,7 @@
     <string name="alert_tone_colon">Tono de alerta:</string>
     <string name="choose_file">Elija el archivo</string>
     <string name="select_time_for_alert_colon">Seleccione el tiempo para la alerta:</string>
-    <string name="all_day">todo el dia</string>
+    <string name="all_day">todo el día</string>
     <string name="tap_to_change">(Pulsar para cambiar)</string>
     <string name="override_phone_silent_mode_colon">Teléfono anulación del modo silencioso:</string>
     <string name="vibrate_on_alert">Vibrar en alerta</string>

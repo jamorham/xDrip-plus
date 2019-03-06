@@ -76,13 +76,13 @@ public class MongoWrapper {
          	coll.insert(bdbo);
 
  		} catch (UnknownHostException e) {
- 		   Log.e(TAG, "WriteToMongo caught UnknownHostException! ",e);
+ 		  UserError.Log.e(TAG, "WriteToMongo caught UnknownHostException! ",e);
  			return false;
  		} catch (MongoException e) {
- 		   Log.e(TAG, "WriteToMongo caught MongoException! ", e);
+ 		  UserError.Log.e(TAG, "WriteToMongo caught MongoException! ", e);
  			return false;
  		} catch (Exception e) {
- 		   Log.e(TAG, "WriteToMongo caught Exception! ", e);
+ 		  UserError.Log.e(TAG, "WriteToMongo caught Exception! ", e);
  			closeMongoDb();
  			return false;
  		}
@@ -120,7 +120,7 @@ public class MongoWrapper {
             try {
                 while(cursor.hasNext() && trd_list.size() < numberOfRecords) {
                     //System.out.println(cursor.next());
-                    Log.d(TAG, "Read an object from mongodb");
+                   UserError.Log.d(TAG, "Read an object from mongodb");
                     TransmitterRawData trd = new TransmitterRawData((BasicDBObject)cursor.next());
                     // Do our best to fix the relative time...
                     trd.RelativeTime = new Date().getTime() - trd.CaptureDateTime;
@@ -142,13 +142,13 @@ public class MongoWrapper {
              }
 
         } catch (UnknownHostException e) {
-            Log.e(TAG, "ReadFromMongo: caught UnknownHostException! ", e);
+           UserError.Log.e(TAG, "ReadFromMongo: caught UnknownHostException! ", e);
             return null;
         } catch (MongoException e) {
-            Log.e(TAG, "ReadFromMongo: caught MongoException! " , e);
+           UserError.Log.e(TAG, "ReadFromMongo: caught MongoException! " , e);
             return trd_list;
         } catch (Exception e) {
-  		      Log.e(TAG, "ReadFromMongo: caught Exception! " , e);
+  		     UserError.Log.e(TAG, "ReadFromMongo: caught Exception! " , e);
   		      closeMongoDb();
  			return null;
  		}finally {

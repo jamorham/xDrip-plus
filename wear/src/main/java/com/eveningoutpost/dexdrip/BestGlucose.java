@@ -241,7 +241,7 @@ public class BestGlucose {
 			// TODO optimize adding units
 			dg.unitized_delta = unitizedDeltaString(true, true, doMgdl, estimate, timestamp, previous_estimate, previous_timestamp);
 			long time_delta = timestamp - previous_timestamp;
-			if (time_delta < 0) Log.wtf(TAG, "Time delta is negative! : " + time_delta);
+			if (time_delta < 0)UserError.Log.wtf(TAG, "Time delta is negative! : " + time_delta);
 			//slope_arrow = lastBgReading.slopeArrow(); // internalize this for plugins
 			double slope = calculateSlope(estimate, timestamp, previous_estimate, previous_timestamp);
 			dg.slope = slope;

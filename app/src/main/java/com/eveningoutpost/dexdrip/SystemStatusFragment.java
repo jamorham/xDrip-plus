@@ -261,7 +261,7 @@ public class SystemStatusFragment extends Fragment {
             version_name_view.setText(versionName);
         } catch (PackageManager.NameNotFoundException e) {
             //e.printStackTrace();
-            Log.e(this.getClass().getSimpleName(), "PackageManager.NameNotFoundException:" + e.getMessage());
+            UserError.Log.e(this.getClass().getSimpleName(), "PackageManager.NameNotFoundException:" + e.getMessage());
         }
     }
 
@@ -284,7 +284,7 @@ public class SystemStatusFragment extends Fragment {
             }
             if (mBluetoothAdapter != null) {
                 Set<BluetoothDevice> pairedDevices = mBluetoothAdapter.getBondedDevices();
-                if ((pairedDevices != null) && (pairedDevices.size() > 0)) {
+                if ((pairedDevices != null) && (!pairedDevices.isEmpty())) {
                     for (BluetoothDevice device : pairedDevices) {
                         if (device.getName() != null) {
 
@@ -347,7 +347,7 @@ public class SystemStatusFragment extends Fragment {
             if (Build.VERSION.SDK_INT >= 18) mBluetoothAdapter = mBluetoothManager.getAdapter();
             if (mBluetoothAdapter != null) {
                 Set<BluetoothDevice> pairedDevices = mBluetoothAdapter.getBondedDevices();
-                if (pairedDevices.size() > 0) {
+                if (!pairedDevices.isEmpty()) {
                     for (BluetoothDevice device : pairedDevices) {
                         if (device.getName() != null) {
 
@@ -385,7 +385,7 @@ public class SystemStatusFragment extends Fragment {
                 }
             }
         } catch (NullPointerException e) {
-            Log.e(TAG, "Got nullpointer exception in setNotes ", e);
+            UserError.Log.e(TAG, "Got nullpointer exception in setNotes ", e);
         }
     }
 
@@ -393,12 +393,12 @@ public class SystemStatusFragment extends Fragment {
         futureDataDeleteButton.setVisibility(View.GONE);
         final List<BgReading> futureReadings = BgReading.futureReadings();
         final List<Calibration> futureCalibrations = Calibration.futureCalibrations();
-        if ((futureReadings != null && futureReadings.size() > 0) || (futureCalibrations != null && futureCalibrations.size() > 0)) {
+        if ((futureReadings != null && !futureReadings.isEmpty()) || (futureCalibrations != null && !futureCalibrations.isEmpty())) {
             notes.append("\n- Your device has future data on it, Please double check the time and timezone on this phone.");
             futureDataDeleteButton.setVisibility(View.VISIBLE);
         }
         futureDataDeleteButton.setOnClickListener(v -> {
-            if (futureReadings != null && futureReadings.size() > 0) {
+            if (futureReadings != null && !futureReadings.isEmpty()) {
                 for (BgReading bgReading : futureReadings) {
                     bgReading.calculated_value = 0;
                     bgReading.raw_data = 0;
@@ -406,7 +406,7 @@ public class SystemStatusFragment extends Fragment {
                     bgReading.save();
                 }
             }
-            if (futureCalibrations != null && futureCalibrations.size() > 0) {
+            if (futureCalibrations != null && !futureCalibrations.isEmpty()) {
                 for (Calibration calibration : futureCalibrations) {
                     calibration.slope_confidence = 0;
                     calibration.sensor_confidence = 0;
@@ -446,7 +446,7 @@ public class SystemStatusFragment extends Fragment {
                                 notes.append("\n- Bluetooth unbonded, if using share tell it to forget your device.");
                                 notes.append("\n- Scan for devices again to set connection back up!");
                             } catch (Exception e) {
-                                Log.e("SystemStatus", e.getMessage(), e);
+                                UserError.Log.e("SystemStatus", e.getMessage(), e);
                             }
                         }
                     }
@@ -472,7 +472,7 @@ public class SystemStatusFragment extends Fragment {
                 mBluetoothAdapter = mBluetoothManager.getAdapter();
 
                 Set<BluetoothDevice> pairedDevices = mBluetoothAdapter.getBondedDevices();
-                if ((pairedDevices != null) && (pairedDevices.size() > 0)) {
+                if ((pairedDevices != null) && (!pairedDevices.isEmpty())) {
                     for (BluetoothDevice device : pairedDevices) {
                         if (device.getName() != null) {
 
@@ -485,7 +485,7 @@ public class SystemStatusFragment extends Fragment {
                                     m.invoke(device, (Object[]) null);
                                     notes.append("\nG5 Transmitter unbonded, switch device mode to prevent re-pairing to G5.");
                                 } catch (Exception e) {
-                                    Log.e("SystemStatus", e.getMessage(), e);
+                                    UserError.Log.e("SystemStatus", e.getMessage(), e);
                                 }
                             }
 

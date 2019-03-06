@@ -110,14 +110,14 @@ public class LanguageEditor extends BaseActivity {
                     @Override
                     public void onChanged() {
                         super.onChanged();
-                        //  Log.d(TAG, "onChanged");
+                        //  UserError.Log.i(TAG, "onChanged");
                     }
 
                     @Override
                     public void onItemRangeChanged(final int positionStart, int itemCount, Object payload) {
                         super.onItemRangeChanged(positionStart, itemCount, payload);
 
-                        Log.d(TAG, "onItemRangeChanged: pos:" + positionStart + " cnt:" + itemCount + " p: " + payload.toString());
+                        UserError.Log.i(TAG, "onItemRangeChanged: pos:" + positionStart + " cnt:" + itemCount + " p: " + payload.toString());
 
                         try {
 
@@ -131,13 +131,13 @@ public class LanguageEditor extends BaseActivity {
                                     languageItemList.get(positionStart).customized = true;
 
                                 } else {
-                                    Log.e(TAG, "Error item at position during update does not match!");
+                                    UserError.Log.e(TAG, "Error item at position during update does not match!");
                                 }
                                 saveBtn.setVisibility(View.VISIBLE);
                                 undoBtn.setVisibility(View.VISIBLE);
                                 forceRefresh();
                             } else {
-                                Log.d(TAG, "Updated element is same as original - ignoring");
+                                UserError.Log.i(TAG, "Updated element is same as original - ignoring");
                             }
                         } catch (ClassCastException e) {
                             if (payload.toString().equals("undo")) {
@@ -145,7 +145,7 @@ public class LanguageEditor extends BaseActivity {
                                 languageItemList.get(positionStart).customized = false;
                                 forceRefresh();
                             } else {
-                                Log.e(TAG, "Could not cast item-change payload to LanguageItem: " + e.toString());
+                                UserError.Log.e(TAG, "Could not cast item-change payload to LanguageItem: " + e.toString());
                             }
                         }
                     }
@@ -165,7 +165,7 @@ public class LanguageEditor extends BaseActivity {
         forceRefresh();
 
         // handle case where we don't know about any translations for current language
-        if (languageItemList.size() == 0 || Locale.getDefault().toString().startsWith("en")) {
+        if (languageItemList.isEmpty() || Locale.getDefault().toString().startsWith("en")) {
             if (Locale.getDefault().toString().startsWith("en")) {
                 AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(this);
 
@@ -194,7 +194,7 @@ public class LanguageEditor extends BaseActivity {
     @Override
     public void onStart() {
         super.onStart();
-        if ((languageItemList.size() > 0) && (!Locale.getDefault().toString().startsWith("en"))) {
+        if ((!languageItemList.isEmpty()) && (!Locale.getDefault().toString().startsWith("en"))) {
             showcasemenu(SHOWCASE_LANGUAGE_INTRO);
         }
     }
@@ -255,7 +255,7 @@ public class LanguageEditor extends BaseActivity {
     private void applyFilter(String filter) {
         last_filter = filter;
         // create initial backup if no filter yet applied
-        if (languageItemListBackup.size() == 0) {
+        if (languageItemListBackup.isEmpty()) {
             languageItemListBackup.addAll(languageItemList);
         } else {
             // restore before new filter
@@ -266,7 +266,7 @@ public class LanguageEditor extends BaseActivity {
         final List<LanguageItem> filteredItemList = new ArrayList<>();
         filter = filter.toLowerCase();
         for (LanguageItem item : languageItemList) {
-            if ((filter.length() == 0)
+            if ((filter.isEmpty())
                     || item.original_text.toLowerCase().contains(filter)
                     || item.english_text.toLowerCase().contains(filter)
                     || item.local_text.toLowerCase().contains(filter)
@@ -350,17 +350,17 @@ public class LanguageEditor extends BaseActivity {
         final String name = LanguageStore.getString(NAME_KEY);
         final String consent = LanguageStore.getString(CONSENT_KEY);
 
-        if (email.length() == 0) {
+        if (email.isEmpty()) {
             toast("No email address stored - cannot send"); // don't translate
             return;
         }
 
-        if (name.length() == 0) {
+        if (name.isEmpty()) {
             toast("No thanks name stored - cannot send"); // don't translate
             return;
         }
 
-        if (consent.length() == 0) {
+        if (consent.isEmpty()) {
             toast("No consent stored - cannot send"); // don't translate
             return;
         }
@@ -389,7 +389,7 @@ public class LanguageEditor extends BaseActivity {
                             .url(send_url)
                             .post(formBody)
                             .build();
-                    Log.i(TAG, "Sending language data");
+                    UserError.Log.i(TAG, "Sending language data");
                     Response response = client.newCall(request).execute();
                     if (response.isSuccessful()) {
                         toast("data sent successfully");
@@ -405,13 +405,13 @@ public class LanguageEditor extends BaseActivity {
                         toast("Error sending data: " + response.message());
                     }
                 } catch (Exception e) {
-                    Log.e(TAG, "Got exception in execute: " + e.toString());
+                    UserError.Log.e(TAG, "Got exception in execute: " + e.toString());
                     toast("Error with network connection"); // don't translate
                 }
             }).start();
         } catch (Exception e) {
             toast(e.getMessage());
-            Log.e(TAG, "General exception: " + e.toString());
+            UserError.Log.e(TAG, "General exception: " + e.toString());
         }
     }
 
@@ -424,7 +424,7 @@ public class LanguageEditor extends BaseActivity {
                             LanguageStore.putString(item.item_name, item.local_text);
                         }
                         final String data = getJsonToSave();
-                        Log.d(TAG, "Data to save: " + data);
+                        UserError.Log.i(TAG, "Data to save: " + data);
                         uploadData(data);
                     }
                 } else {
@@ -497,9 +497,9 @@ public class LanguageEditor extends BaseActivity {
                 final String local_text = getResources().getString(id);
                 final String english_text = getStringFromLocale(id, Locale.ENGLISH);
                 if ((!local_text.equals(english_text) || translatable_index_names.contains(name)) && !name.startsWith("abc_") && !name.startsWith("common_") && !name.startsWith("twofortyfouram_") && !name.startsWith("zxing_")) {
-                    // Log.d(TAG, "name: " + name + " / reflect id:" + id + " english:" + english_text + " / local:" + local_text);
+                    // UserError.Log.i(TAG, "name: " + name + " / reflect id:" + id + " english:" + english_text + " / local:" + local_text);
                     final String alternate_text = LanguageStore.getString(name);
-                    final boolean customized = (alternate_text.length() > 0);
+                    final boolean customized = (!alternate_text.isEmpty());
                     LanguageItem item = new LanguageItem(name, english_text, customized ? alternate_text : local_text, customized, local_text);
                     mylanguageItemList.add(item);
                     if (customized) {
@@ -514,7 +514,7 @@ public class LanguageEditor extends BaseActivity {
             saveBtn.setVisibility(View.INVISIBLE);
             undoBtn.setVisibility(View.INVISIBLE);
         }
-        Log.d(TAG, "Loaded data");
+        UserError.Log.i(TAG, "Loaded data");
         return mylanguageItemList;
     }
 
@@ -582,7 +582,7 @@ public class LanguageEditor extends BaseActivity {
             }, 100);
 
         } catch (Exception e) {
-            Log.e(TAG, "Exception in showcase: " + e.toString());
+            UserError.Log.e(TAG, "Exception in showcase: " + e.toString());
         }
     }
 

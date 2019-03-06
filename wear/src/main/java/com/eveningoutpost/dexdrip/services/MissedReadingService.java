@@ -48,7 +48,7 @@ public class MissedReadingService extends IntentService {
         context = getApplicationContext();
         prefs = PreferenceManager.getDefaultSharedPreferences(context);
 
-        Log.d(TAG, "MissedReadingService onHandleIntent");
+       UserError.Log.d(TAG, "MissedReadingService onHandleIntent");
 
         final long stale_millis = Home.stale_data_millis();
 
@@ -61,7 +61,7 @@ public class MissedReadingService extends IntentService {
         /*if ((Home.get_forced_wear()) && prefs.getBoolean("disable_wearG5_on_missedreadings", false)) {
             int bg_wear_missed_minutes = readPerfsInt(prefs, "disable_wearG5_on_missedreadings_level", 30);
             if (BgReading.getTimeSinceLastReading() >= (bg_wear_missed_minutes * 1000 * 60)) {
-                Log.d(TAG, "Request WatchUpdaterService to disable force_wearG5 when wear is connected");
+               UserError.Log.d(TAG, "Request WatchUpdaterService to disable force_wearG5 when wear is connected");
                 startWatchUpdaterService(context, WatchUpdaterService.ACTION_DISABLE_FORCE_WEAR, TAG);
             }
         }*/
@@ -69,7 +69,7 @@ public class MissedReadingService extends IntentService {
         if ((prefs.getBoolean("aggressive_service_restart", false) || DexCollectionType.isFlakey())) {//!Home.get_enable_wear() &&
             if (!BgReading.last_within_millis(stale_millis) && Sensor.isActive() && (!getLocalServiceCollectingState())) {
                 if (JoH.ratelimit("aggressive-restart", aggressive_backoff_timer)) {
-                    Log.e(TAG, "Aggressively restarting collector service due to lack of reception: backoff: "+aggressive_backoff_timer);
+                   UserError.Log.e(TAG, "Aggressively restarting collector service due to lack of reception: backoff: "+aggressive_backoff_timer);
                     if (aggressive_backoff_timer < 1200) aggressive_backoff_timer+=60;
                     CollectionServiceStarter.startBtService(context);
                 } else {

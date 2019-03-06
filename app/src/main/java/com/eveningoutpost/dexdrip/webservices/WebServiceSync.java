@@ -34,7 +34,7 @@ public class WebServiceSync extends BaseWebService {
 
         final List<String> components = getUrlComponents(query);
 
-        if (components.size() > 0) {
+        if (!components.isEmpty()) {
             UserError.Log.d(TAG, "Processing " + query);
             switch (components.get(0)) {
 
@@ -102,7 +102,7 @@ public class WebServiceSync extends BaseWebService {
     private String getFromPosition(final long since, final String topic) {
         final List<DesertSync> list = DesertSync.since(since, topic);
         if (list != null) {
-            if (list.size() > 0) {
+            if (!list.isEmpty()) {
                 return DesertSync.toJson(list);
             }
         }

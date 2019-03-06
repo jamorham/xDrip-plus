@@ -22,7 +22,7 @@ public class ColorCache {
 
     public static void invalidateCache() {
         the_cache.clear();
-        if (debug) Log.i(TAG, "Cache cleared");
+        if (debug) UserError.Log.i(TAG, "Cache cleared");
     }
 
     public static int getCol(final X color) {

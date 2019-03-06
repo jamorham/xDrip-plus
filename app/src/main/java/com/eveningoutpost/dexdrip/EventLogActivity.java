@@ -8,8 +8,9 @@ import android.view.*;
 import android.view.animation.*;
 import android.widget.*;
 
+import androidx.annotation.LayoutRes;
+
 import androidx.annotation.NonNull;
-import androidx.annotation.*;
 import androidx.appcompat.widget.SearchView;
 import androidx.core.view.*;
 import androidx.databinding.*;
@@ -21,7 +22,8 @@ import com.eveningoutpost.dexdrip.ui.helpers.*;
 import com.eveningoutpost.dexdrip.utils.*;
 import com.eveningoutpost.dexdrip.wearintegration.*;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.List;
 
 import lombok.*;
 import lombok.experimental.*;
@@ -177,7 +179,7 @@ public class EventLogActivity extends BaseActivity {
 	private boolean refreshData() {
 
 		final List<UserError> new_entries = UserError.newerThanID(highest_id, 500);
-		if ((new_entries != null) && (new_entries.size() > 0)) {
+		if ((new_entries != null) && (!new_entries.isEmpty())) {
 			final long new_highest = new_entries.get(0).getId();
 			UserError.Log.d(TAG, "New streamed data size: " + new_entries.size() + " Highest: " + new_highest);
 			if (highest_id == 0) {
@@ -200,7 +202,7 @@ public class EventLogActivity extends BaseActivity {
 		searchView = (SearchView) MenuItemCompat.getActionView(searchItem);
 
 		// show any previous persistent filter
-		if (model.getCurrentFilter().length() > 0) {
+		if (!model.getCurrentFilter().isEmpty()) {
 			pushSearch(model.getCurrentFilter(), false);
 		}
 
@@ -297,7 +299,7 @@ public class EventLogActivity extends BaseActivity {
 		private String last_click_filter = "";
 		private String currentFilter = null;
 
-//TODO
+//FIXME
 public final ItemBinding<UserError> itemBinding = ItemBinding.of(BR.item, R.layout.item_event_log);
 
 		{
@@ -419,14 +421,14 @@ public final ItemBinding<UserError> itemBinding = ItemBinding.of(BR.item, R.layo
 		// check if current filter is the out-of-the-box default
 		public boolean isDefaultFilters() {
 			return currentFilter.isEmpty() && allSeveritiesEnabled();
-//TODO			return ((currentFilter.or("").length() == 0) && allSeveritiesEnabled());
+//FIXME			return ((currentFilter.or("").length() == 0) && allSeveritiesEnabled());
 		}
 
 		// check severity enabled and case insensitive contains match using optimized extension method
 		public boolean filterMatch(final UserError item) {
 			return severities.get(item.severity) && (item.shortError.compareToIgnoreCase(currentFilter) == 0)
 					|| (item.message.compareToIgnoreCase(currentFilter) == 0);
-//TODO			return severities.get(item.severity) && (item.shortError.containsIgnoreCaseF(currentFilter)
+//FIXME			return severities.get(item.severity) && (item.shortError.containsIgnoreCaseF(currentFilter)
 //					|| (item.message.containsIgnoreCaseF(currentFilter)));
 		}
 

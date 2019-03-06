@@ -100,7 +100,7 @@ public class NewSensorLocation extends ActivityWithMenu {
             Toast.makeText(getApplicationContext(), "Sensor locaton is " + location, Toast.LENGTH_LONG).show();
 
 
-            Log.d("NEW SENSOR", "Sensor location is " + location);
+            UserError.Log.i("NEW SENSOR", "Sensor location is " + location);
             Sensor.updateSensorLocation(location);
 
             SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(getApplicationContext());

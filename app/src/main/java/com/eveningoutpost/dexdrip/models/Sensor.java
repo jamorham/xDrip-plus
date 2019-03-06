@@ -57,7 +57,7 @@ public class Sensor extends Model {
 
         sensor.save();
         SensorSendQueue.addToQueue(sensor);
-        Log.d("SENSOR MODEL:", sensor.toString());
+        UserError.Log.i("SENSOR MODEL:", sensor.toString());
         return sensor;
     }
 
@@ -68,7 +68,7 @@ public class Sensor extends Model {
 
         sensor.save();
         SensorSendQueue.addToQueue(sensor);
-        Log.d("SENSOR MODEL:", sensor.toString());
+        UserError.Log.i("SENSOR MODEL:", sensor.toString());
         return sensor;
     }
 
@@ -85,9 +85,9 @@ public class Sensor extends Model {
 
         Sensor sensor = getByTimestamp(started_at);
         if (sensor != null) {
-            Log.d("SENSOR", "updatinga an existing sensor");
+            UserError.Log.i("SENSOR", "updatinga an existing sensor");
         } else {
-            Log.d("SENSOR", "creating a new sensor");
+            UserError.Log.i("SENSOR", "creating a new sensor");
             sensor = new Sensor();
         }
         sensor.started_at = started_at;
@@ -119,7 +119,7 @@ public class Sensor extends Model {
                 .registerTypeAdapter(Date.class, new DateTypeAdapter())
                 .serializeSpecialFloatingPointValues()
                 .create();
-        Log.d("SENSOR", "Sensor toS uuid=" + this.uuid + " started_at=" + this.started_at + " active=" + this.isActive() + " battery=" + this.latest_battery_level + " location=" + this.sensor_location + " stopped_at=" + this.stopped_at);
+        UserError.Log.i("SENSOR", "Sensor toS uuid=" + this.uuid + " started_at=" + this.started_at + " active=" + this.isActive() + " battery=" + this.latest_battery_level + " location=" + this.sensor_location + " stopped_at=" + this.stopped_at);
         return gson.toJson(this);
     }
 
@@ -142,11 +142,7 @@ public class Sensor extends Model {
                 .orderBy("_ID desc")
                 .limit(1)
                 .executeSingle();
-        if(sensor == null) {
-            return false;
-        } else {
-            return true;
-        }
+	    return sensor != null;
     }
 
     public static Sensor getByTimestamp(double started_at) {
@@ -158,10 +154,10 @@ public class Sensor extends Model {
 
     public static Sensor getByUuid(String xDrip_sensor_uuid) {
         if(xDrip_sensor_uuid == null) {
-            Log.e("SENSOR", "xDrip_sensor_uuid is null");
+            UserError.Log.e("SENSOR", "xDrip_sensor_uuid is null");
             return null;
         }
-        Log.d("SENSOR", "xDrip_sensor_uuid is " + xDrip_sensor_uuid);
+        UserError.Log.i("SENSOR", "xDrip_sensor_uuid is " + xDrip_sensor_uuid);
 
         return new Select()
                 .from(Sensor.class)
@@ -173,7 +169,7 @@ public class Sensor extends Model {
         Sensor sensor = Sensor.currentSensor();
         if (sensor == null)
         {
-            Log.d("Sensor","Cant sync battery level from master as sensor data is null");
+            UserError.Log.i("Sensor","Cant sync battery level from master as sensor data is null");
             return;
         }
         updateBatteryLevel(sensor, sensorBatteryLevel, from_sync);
@@ -210,7 +206,7 @@ public class Sensor extends Model {
     public static void updateSensorLocation(String sensor_location) {
         Sensor sensor = currentSensor();
         if (sensor == null) {
-            Log.e("SENSOR MODEL:", "updateSensorLocation called but sensor is null");
+            UserError.Log.e("SENSOR MODEL:", "updateSensorLocation called but sensor is null");
             return;
         }
         sensor.sensor_location = sensor_location;
@@ -219,16 +215,16 @@ public class Sensor extends Model {
     
     public static void upsertFromMaster(Sensor jsonSensor) {
         if (jsonSensor == null) {
-            Log.wtf(TAG,"Got null sensor from json");
+            UserError.Log.wtf(TAG,"Got null sensor from json");
             return;
         }
         try {
             Sensor existingSensor = getByUuid(jsonSensor.uuid);
             if (existingSensor == null) {
-                Log.d(TAG, "saving new sensor record.");
+                UserError.Log.i(TAG, "saving new sensor record.");
                 jsonSensor.save();
             } else {
-                Log.d(TAG, "updating existing sensor record.");
+                UserError.Log.i(TAG, "updating existing sensor record.");
                 existingSensor.started_at = jsonSensor.started_at;
                 existingSensor.stopped_at = jsonSensor.stopped_at;
                 existingSensor.latest_battery_level = jsonSensor.latest_battery_level;
@@ -236,7 +232,7 @@ public class Sensor extends Model {
                 existingSensor.save();
             }
         } catch (Exception e) {
-            Log.e(TAG, "Could not save Sensor: " + e.toString());
+            UserError.Log.e(TAG, "Could not save Sensor: " + e.toString());
         }
     }
 
@@ -250,21 +246,21 @@ public class Sensor extends Model {
             jsonObject.put("sensor_location", sensor_location);
             return jsonObject.toString();
         } catch (JSONException e) {
-            Log.e(TAG,"Got JSONException handeling sensor", e);
+            UserError.Log.e(TAG,"Got JSONException handeling sensor", e);
             return "";
         }
     }
     
     public static Sensor fromJSON(String json) {
         if (json.isEmpty()) {
-            Log.d(TAG,"Empty json received in Sensor fromJson");
+            UserError.Log.i(TAG,"Empty json received in Sensor fromJson");
             return null;
         }
         try {
-            Log.d(TAG, "Processing incoming json: " + json);
+            UserError.Log.i(TAG, "Processing incoming json: " + json);
            return new GsonBuilder().excludeFieldsWithoutExposeAnnotation().create().fromJson(json,Sensor.class);
         } catch (Exception e) {
-            Log.d(TAG, "Got exception parsing Sensor json: " + e.toString());
+            UserError.Log.i(TAG, "Got exception parsing Sensor json: " + e.toString());
             Home.toaststaticnext("Error on Sensor sync.");
             return null;
         }

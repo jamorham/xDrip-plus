@@ -143,10 +143,10 @@ public class BgGraphBuilder {
             long temp = end;
             end = start;
             start = temp;
-            if (d) Log.d(TAG, "Swapping timestamps");
+            if (d) UserError.Log.i(TAG, "Swapping timestamps");
         }
         if (d)
-            Log.d(TAG, "Called timestamps: " + JoH.dateTimeText(start) + " -> " + JoH.dateTimeText(end));
+            UserError.Log.i(TAG, "Called timestamps: " + JoH.dateTimeText(start) + " -> " + JoH.dateTimeText(end));
         this.prefs = PreferenceManager.getDefaultSharedPreferences(context);
         prediction_enabled = show_prediction;
         if (prediction_enabled)
@@ -228,7 +228,7 @@ public class BgGraphBuilder {
             points.remove(1); // replace last
         }
         points.add(new PointValue(x, y));
-        Log.d(TAG,"Extend line size: "+points.size());
+        UserError.Log.i(TAG,"Extend line size: "+points.size());
     }
 
     private List<Line> predictiveLines() {
@@ -238,7 +238,7 @@ public class BgGraphBuilder {
         final boolean medtrum = Pref.getBooleanDefaultFalse("show_medtrum_secondary");
         if (medtrum || g_prediction) {
             final List<Prediction> plist = Prediction.latestForGraph(4000, loaded_start, loaded_end);
-            if (plist.size() > 0) {
+            if (!plist.isEmpty()) {
                 final List<PointValue> gpoints = new ArrayList<>(plist.size());
                 final float yscale = !doMgdl ? (float) Constants.MGDL_TO_MMOLL : 1f;
                 for (Prediction p : plist) {
@@ -254,7 +254,7 @@ public class BgGraphBuilder {
                     }
                 }
 
-                if (gpoints.size() > 0) {
+                if (!gpoints.isEmpty()) {
                     lines.add(new Line(gpoints)
                             .setHasLabels(false)
                             .setHasPoints(true)
@@ -279,7 +279,7 @@ public class BgGraphBuilder {
 
             final List<APStatus> aplist = APStatus.latestForGraph(2000, loaded_start, loaded_end);
 
-            if (aplist.size() > 0) {
+            if (!aplist.isEmpty()) {
 
                 // divider line
 
@@ -344,7 +344,7 @@ public class BgGraphBuilder {
             final List<StepCounter> pmlist = StepCounter.deltaListFromMovementList(StepCounter.latestForGraph(2000, loaded_start, loaded_end));
             PointValue last_point = null;
             final boolean d = false;
-            if (d) Log.d(TAG, "Delta: pmlist size: " + pmlist.size());
+            if (d) UserError.Log.i(TAG, "Delta: pmlist size: " + pmlist.size());
             final float yscale = doMgdl ? (float) Constants.MMOLL_TO_MGDL : 1f;
             final float ypos = 6 * yscale; // TODO Configurable
             //final long last_timestamp = pmlist.get(pmlist.size() - 1).timestamp;
@@ -370,11 +370,11 @@ public class BgGraphBuilder {
                         this_line.setColor((flipper == 0) ? getCol(X.color_step_counter1) : getCol(X.color_step_counter2));
 
                         float stroke_size = Math.min(MAX_SIZE, (float) Math.log1p(((double) (pm.metric + accumulator)) / time_delta) * 4);
-                        if (d) Log.d(TAG, "Delta stroke: " + stroke_size);
+                        if (d) UserError.Log.i(TAG, "Delta stroke: " + stroke_size);
                         this_line.setStrokeWidth((int) stroke_size);
 
                         if (d)
-                            Log.d(TAG, "Delta-Line: " + JoH.dateTimeText(pm.timestamp) + " time delta: " + time_delta + "  total: " + (pm.metric + accumulator) + " lsize: " + stroke_size + " / " + (int) stroke_size);
+                            UserError.Log.i(TAG, "Delta-Line: " + JoH.dateTimeText(pm.timestamp) + " time delta: " + time_delta + "  total: " + (pm.metric + accumulator) + " lsize: " + stroke_size + " / " + (int) stroke_size);
                         accumulator = 0;
 
                         if (this_line.getStrokeWidth() > 0) {
@@ -382,19 +382,19 @@ public class BgGraphBuilder {
                             this_line.setHasPoints(false);
                             this_line.setHasLines(true);
                         } else {
-                            if (d) Log.d(TAG, "Delta skip: " + JoH.dateTimeText(pm.timestamp));
+                            if (d) UserError.Log.i(TAG, "Delta skip: " + JoH.dateTimeText(pm.timestamp));
                         }
                         if (d)
-                            Log.d(TAG, "Delta-List: " + JoH.dateTimeText(pm.timestamp) + " time delta: " + time_delta + "  val: " + pm.metric);
+                            UserError.Log.i(TAG, "Delta-List: " + JoH.dateTimeText(pm.timestamp) + " time delta: " + time_delta + "  val: " + pm.metric);
                     } else {
                         accumulator += pm.metric;
                         if (d)
-                            Log.d(TAG, "Delta: added: " + JoH.dateTimeText(pm.timestamp) + " metric: " + pm.metric + " to accumulator: " + accumulator);
+                            UserError.Log.i(TAG, "Delta: added: " + JoH.dateTimeText(pm.timestamp) + " metric: " + pm.metric + " to accumulator: " + accumulator);
                     }
                 }
             }
             if (d)
-                Log.d(TAG, "Delta returning stepsLines: " + stepsLines.size() + " final accumulator remaining: " + accumulator);
+                UserError.Log.i(TAG, "Delta returning stepsLines: " + stepsLines.size() + " final accumulator remaining: " + accumulator);
         }
         return stepsLines;
     }
@@ -426,8 +426,8 @@ public class BgGraphBuilder {
                 }
             }
 
-            if (d) Log.d(TAG, "heartrate before size: " + heartRates.size());
-            if (d) Log.d(TAG, "heartrate after c size: " + condensedHeartRateList.size());
+            if (d) UserError.Log.i(TAG, "heartrate before size: " + heartRates.size());
+            if (d) UserError.Log.i(TAG, "heartrate after c size: " + condensedHeartRateList.size());
             //final float yscale = doMgdl ? (float) Constants.MMOLL_TO_MGDL : 1f;
             final float yscale = doMgdl ?  10f : 1f;
             float ypos; //
@@ -467,13 +467,13 @@ public class BgGraphBuilder {
 
         final ArrayList<Line> line_array = new ArrayList<>();
 
-        Log.d(TAG,"Motion datas size: "+motion_datas.size());
-        if (motion_datas.size() > 0) {
+        UserError.Log.i(TAG,"Motion datas size: "+motion_datas.size());
+        if (!motion_datas.isEmpty()) {
             motion_datas.add(new ActivityRecognizedService.motionData((long) end_time * FUZZER, DetectedActivity.UNKNOWN)); // terminator
 
             for (ActivityRecognizedService.motionData item : motion_datas) {
 
-                Log.d(TAG, "Motion detail: " + JoH.dateTimeText(item.timestamp) + " activity: " + item.activity);
+                UserError.Log.i(TAG, "Motion detail: " + JoH.dateTimeText(item.timestamp) + " activity: " + item.activity);
                 if ((last_type != -9999) && (last_type != item.activity)) {
                     extend_line(linePoints, item.timestamp / FUZZER, ypos);
                     Line new_line = new Line(linePoints);
@@ -510,13 +510,13 @@ public class BgGraphBuilder {
             }
 
         }
-        Log.d(TAG,"Motion array size: "+line_array.size());
+        UserError.Log.i(TAG,"Motion array size: "+line_array.size());
             return line_array;
     }
 
 
     public LineChartData lineData() {
-       // if (d) Log.d(TAG, "START lineData from: " + JoH.backTrace());
+       // if (d) UserError.Log.i(TAG, "START lineData from: " + JoH.backTrace());
        JoH.benchmark(null);
         LineChartData lineData = new LineChartData(defaultLines(false));
         JoH.benchmark("Default lines create - bggraph builder");
@@ -541,7 +541,7 @@ public class BgGraphBuilder {
                     android.graphics.DashPathEffect.class);
             previewLineData = cloner.deepClone(hint);
             JoH.benchmark("Clone preview data");
-            if (d) Log.d(TAG,"Cloned preview chart data");
+            if (d) UserError.Log.i(TAG,"Cloned preview chart data");
         }
 
         previewLineData.setAxisYLeft(yAxis());
@@ -677,7 +677,7 @@ public class BgGraphBuilder {
 
         } catch (Exception e) {
             e.printStackTrace();
-            Log.e(TAG, "Error in bgbuilder defaultlines: " + e.toString());
+            UserError.Log.e(TAG, "Error in bgbuilder defaultlines: " + e.toString());
         }
         return lines;
     }
@@ -729,14 +729,14 @@ public class BgGraphBuilder {
 
     // auto split a line - jump thresh in minutes
     public ArrayList<Line> autoSplitLine(Line macroline, final float jumpthresh) {
-       // if (d) Log.d(TAG, "Enter autoSplit Line");
+       // if (d) UserError.Log.i(TAG, "Enter autoSplit Line");
         ArrayList<Line> linearray = new ArrayList<>();
         float lastx = -999999;
 
         List<PointValue> macropoints = macroline.getValues();
         List<PointValue> thesepoints = new ArrayList<>();
 
-        if (macropoints.size() > 0) {
+        if (!macropoints.isEmpty()) {
 
             final float endmarker = macropoints.get(macropoints.size() - 1).getX();
             for (PointValue thispoint : macropoints) {
@@ -758,7 +758,7 @@ public class BgGraphBuilder {
                 thesepoints.add(thispoint); // grow current line list
             }
         }
-     //   if (d) Log.d(TAG, "Exit autoSplit Line");
+     //   if (d) UserError.Log.i(TAG, "Exit autoSplit Line");
         return linearray;
     }
     // Produce an array of cubic lines, split as needed
@@ -768,7 +768,7 @@ public class BgGraphBuilder {
         final float jumpthresh = 15; // in minutes
         List<PointValue> thesepoints = new ArrayList<>();
 
-        if (filteredValues.size() > 0) {
+        if (!filteredValues.isEmpty()) {
 
             final float endmarker = filteredValues.get(filteredValues.size() - 1).getX();
 
@@ -948,7 +948,7 @@ public class BgGraphBuilder {
 
 
         } catch (Exception e) {
-            if (d) Log.i(TAG, "Exception making treatment lines: " + e.toString());
+            if (d) UserError.Log.i(TAG, "Exception making treatment lines: " + e.toString());
         }
         return lines;
     }
@@ -959,14 +959,14 @@ public class BgGraphBuilder {
 
     private synchronized void addBgReadingValues(final boolean simple) {
         if (readings_lock.isLocked()) {
-            Log.d(TAG, "BgReadings lock is currently held");
+            UserError.Log.i(TAG, "BgReadings lock is currently held");
         }
         readings_lock.lock();
 
         try {
 
             if (plugin_adjusted) {
-                Log.i(TAG, "Reloading as Plugin modified data: " + JoH.backTrace(1) + " size:" + bgReadings.size());
+                UserError.Log.i(TAG, "Reloading as Plugin modified data: " + JoH.backTrace(1) + " size:" + bgReadings.size());
                 bgReadings.clear();
                 bgReadings.addAll(BgReading.latestForGraph(loaded_numValues, loaded_start, loaded_end));
             } else {
@@ -997,12 +997,12 @@ public class BgGraphBuilder {
             final double now = JoH.ts();
             long highest_bgreading_timestamp = -1; // most recent bgreading timestamp we have
             double trend_start_working = now - (1000 * 60 * 12); // 10 minutes // TODO MAKE PREFERENCE?
-            if (bgReadings.size() > 0) {
+            if (!bgReadings.isEmpty()) {
                 highest_bgreading_timestamp = bgReadings.get(0).timestamp;
                 final double ms_since_last_reading = now - highest_bgreading_timestamp;
                 if (ms_since_last_reading < 500000) {
                     trend_start_working -= ms_since_last_reading; // push back start of trend calc window
-                    Log.d(TAG, "Pushed back trend start by: " + JoH.qs(ms_since_last_reading / 1000) + " secs - last reading: " + JoH.dateTimeText(highest_bgreading_timestamp));
+                    UserError.Log.i(TAG, "Pushed back trend start by: " + JoH.qs(ms_since_last_reading / 1000) + " secs - last reading: " + JoH.dateTimeText(highest_bgreading_timestamp));
                 }
             }
 
@@ -1060,7 +1060,7 @@ public class BgGraphBuilder {
                     }
                 }
             } catch (Exception e) {
-                Log.e(TAG, "Exception doing calibration values in bggraphbuilder: " + e.toString());
+                UserError.Log.e(TAG, "Exception doing calibration values in bggraphbuilder: " + e.toString());
             }
 
             // enumerate blood tests
@@ -1088,7 +1088,7 @@ public class BgGraphBuilder {
                     }
                 }
             } catch (Exception e) {
-                Log.e(TAG, "Exception doing calibration values in bggraphbuilder: " + e.toString());
+                UserError.Log.e(TAG, "Exception doing calibration values in bggraphbuilder: " + e.toString());
             }
 
             final boolean has_filtered = DexCollectionType.hasFiltered();
@@ -1116,11 +1116,11 @@ public class BgGraphBuilder {
             for (final BgReading bgReading : bgReadings) {
                 // jamorham special
 
-                if ((cd != null) && (calibrations.size() > 0)) {
+                if ((cd != null) && (!calibrations.isEmpty())) {
 
                     while ((bgReading.timestamp < calibrations.get(cdposition).timestamp) || (calibrations.get(cdposition).slope == 0)) {
 
-                        Log.d(TAG, "BG reading earlier than calibration at index: " + cdposition + "  " + JoH.dateTimeText(bgReading.timestamp) + " cal: " + JoH.dateTimeText(calibrations.get(cdposition).timestamp));
+                        UserError.Log.i(TAG, "BG reading earlier than calibration at index: " + cdposition + "  " + JoH.dateTimeText(bgReading.timestamp) + " cal: " + JoH.dateTimeText(calibrations.get(cdposition).timestamp));
 
                         if (cdposition < calibrations.size() - 1) {
                             cdposition++;
@@ -1128,12 +1128,12 @@ public class BgGraphBuilder {
                             final CalibrationAbstract.CalibrationData oldcd = cd;
                             cd = plugin.getCalibrationData(calibrations.get(cdposition).timestamp);
                             if (cd == null) {
-                                Log.d(TAG, "cd went to null during adjustment - likely graph spans multiple sensors");
+                                UserError.Log.i(TAG, "cd went to null during adjustment - likely graph spans multiple sensors");
                                 cd = oldcd;
                             }
-                            Log.d(TAG, "Now using calibration from: " + JoH.dateTimeText(calibrations.get(cdposition).timestamp) + " slope: " + cd.slope + " intercept: " + cd.intercept);
+                            UserError.Log.i(TAG, "Now using calibration from: " + JoH.dateTimeText(calibrations.get(cdposition).timestamp) + " slope: " + cd.slope + " intercept: " + cd.intercept);
                         } else {
-                            Log.d(TAG, "No more calibrations to choose from");
+                            UserError.Log.i(TAG, "No more calibrations to choose from");
                             break;
                         }
                     }
@@ -1190,7 +1190,7 @@ public class BgGraphBuilder {
                             noise_polyxList.add(shifted_timestamp);
                             noise_polyyList.add((bgReading.filtered_calculated_value));
                             if (d)
-                                Log.d(TAG, "flt noise poly Added: " + noise_polyxList.size() + " " + JoH.qs(noise_polyxList.get(noise_polyxList.size() - 1)) + " / " + JoH.qs(noise_polyyList.get(noise_polyyList.size() - 1), 2));
+                                UserError.Log.i(TAG, "flt noise poly Added: " + noise_polyxList.size() + " " + JoH.qs(noise_polyxList.get(noise_polyxList.size() - 1)) + " / " + JoH.qs(noise_polyyList.get(noise_polyyList.size() - 1), 2));
                         }
 
                     }
@@ -1204,7 +1204,7 @@ public class BgGraphBuilder {
                         noise_polyxList.add((double) bgReading.timestamp);
                         noise_polyyList.add((bgReading.calculated_value));
                         if (d)
-                            Log.d(TAG, "raw noise poly Added: " + noise_polyxList.size() + " " + JoH.qs(noise_polyxList.get(noise_polyxList.size() - 1)) + " / " + JoH.qs(noise_polyyList.get(noise_polyyList.size() - 1), 2));
+                            UserError.Log.i(TAG, "raw noise poly Added: " + noise_polyxList.size() + " " + JoH.qs(noise_polyxList.get(noise_polyxList.size() - 1)) + " / " + JoH.qs(noise_polyyList.get(noise_polyyList.size() - 1), 2));
                     }
                 }
 
@@ -1219,7 +1219,7 @@ public class BgGraphBuilder {
                         polyyList.add(unitized(bgReading.calculated_value));
                     }
                     if (d)
-                        Log.d(TAG, "poly Added: " + JoH.qs(polyxList.get(polyxList.size() - 1)) + " / " + JoH.qs(polyyList.get(polyyList.size() - 1), 2));
+                        UserError.Log.i(TAG, "poly Added: " + JoH.qs(polyxList.get(polyxList.size() - 1)) + " / " + JoH.qs(polyyList.get(polyyList.size() - 1), 2));
                 }
 
             }
@@ -1235,10 +1235,10 @@ public class BgGraphBuilder {
             // always calculate noise if needed
             if (noise_processed_till_timestamp < highest_bgreading_timestamp) {
                 // noise evaluate
-                Log.d(TAG, "Noise: Processing new data for noise: " + JoH.dateTimeText(noise_processed_till_timestamp) + " vs now: " + JoH.dateTimeText(highest_bgreading_timestamp));
+                UserError.Log.i(TAG, "Noise: Processing new data for noise: " + JoH.dateTimeText(noise_processed_till_timestamp) + " vs now: " + JoH.dateTimeText(highest_bgreading_timestamp));
 
                 try {
-                    if (d) Log.d(TAG, "noise Poly list size: " + noise_polyxList.size());
+                    if (d) UserError.Log.i(TAG, "noise Poly list size: " + noise_polyxList.size());
                     // TODO Impossible to satisfy noise evaluation size with only raw data do we want it with raw only??
                     if (noise_polyxList.size() > 5) {
                         noisePoly = new PolyTrendLine(2);
@@ -1253,9 +1253,9 @@ public class BgGraphBuilder {
                             best_bg_estimate = -99;
                             last_bg_estimate = -99;
                         }
-                        Log.i(TAG, "Noise: Poly Error Varience: " + JoH.qs(last_noise, 5));
+                        UserError.Log.i(TAG, "Noise: Poly Error Varience: " + JoH.qs(last_noise, 5));
                     } else {
-                        Log.i(TAG, "Noise: Not enough data to get sensible noise value");
+                        UserError.Log.i(TAG, "Noise: Not enough data to get sensible noise value");
                         noisePoly = null;
                         last_noise = -9999;
                         best_bg_estimate = -9999;
@@ -1263,16 +1263,16 @@ public class BgGraphBuilder {
                     }
                     noise_processed_till_timestamp = highest_bgreading_timestamp; // store that we have processed up to this timestamp
                 } catch (Exception e) {
-                    Log.e(TAG, " Error with noise poly trend: " + e.toString());
+                    UserError.Log.e(TAG, " Error with noise poly trend: " + e.toString());
                 }
             } else {
-                Log.d(TAG, "Noise Cached noise timestamp: " + JoH.dateTimeText(noise_processed_till_timestamp));
+                UserError.Log.i(TAG, "Noise Cached noise timestamp: " + JoH.dateTimeText(noise_processed_till_timestamp));
             }
 
             if (!simple) {
                 // momentum
                 try {
-                    if (d) Log.d(TAG, "moment Poly list size: " + polyxList.size());
+                    if (d) UserError.Log.i(TAG, "moment Poly list size: " + polyxList.size());
                     if (polyxList.size() > 1) {
                         final double[] polyys = PolyTrendLine.toPrimitiveFromList(polyyList);
                         final double[] polyxs = PolyTrendLine.toPrimitiveFromList(polyxList);
@@ -1286,19 +1286,19 @@ public class BgGraphBuilder {
                                 if (this_poly.errorVarience() < min_errors) {
                                     min_errors = this_poly.errorVarience();
                                     poly = this_poly;
-                                    //if (d) Log.d(TAG, "set forecast best model to: " + poly.getClass().getSimpleName() + " with varience of: " + JoH.qs(poly.errorVarience(),14));
+                                    //if (d) UserError.Log.i(TAG, "set forecast best model to: " + poly.getClass().getSimpleName() + " with varience of: " + JoH.qs(poly.errorVarience(),14));
                                 }
 
                             }
                         }
                         if (d)
-                            Log.i(TAG, "set forecast best model to: " + poly.getClass().getSimpleName() + " with varience of: " + JoH.qs(poly.errorVarience(), 4));
+                            UserError.Log.i(TAG, "set forecast best model to: " + poly.getClass().getSimpleName() + " with varience of: " + JoH.qs(poly.errorVarience(), 4));
                     } else {
-                        if (d) Log.i(TAG, "Not enough data for forecast model");
+                        if (d) UserError.Log.i(TAG, "Not enough data for forecast model");
                     }
 
                 } catch (Exception e) {
-                    Log.e(TAG, " Error with poly trend: " + e.toString());
+                    UserError.Log.e(TAG, " Error with poly trend: " + e.toString());
                 }
 
                 try {
@@ -1308,7 +1308,7 @@ public class BgGraphBuilder {
                             // only show working curve for last x hours to a
                             if (bgReading.timestamp > momentum_illustration_start) {
                                 double polyPredicty = poly.predict(bgReading.timestamp);
-                                //if (d) Log.d(TAG, "Poly predict: "+JoH.qs(polyPredict)+" @ "+JoH.qs(iob.timestamp));
+                                //if (d) UserError.Log.i(TAG, "Poly predict: "+JoH.qs(polyPredict)+" @ "+JoH.qs(iob.timestamp));
                                 if ((polyPredicty < highMark) && (polyPredicty > 0)) {
                                     PointValue zv = new PointValue((float) (bgReading.timestamp / FUZZER), (float) polyPredicty);
                                     polyBgValues.add(zv);
@@ -1317,7 +1317,7 @@ public class BgGraphBuilder {
                         }
                     }
                 } catch (Exception e) {
-                    Log.e(TAG, "Error creating back trend: " + e.toString());
+                    UserError.Log.e(TAG, "Error creating back trend: " + e.toString());
                 }
 
                 // low estimator
@@ -1329,12 +1329,12 @@ public class BgGraphBuilder {
                         final double plow_now = JoH.ts();
                         double plow_timestamp = plow_now + (1000 * 60 * 99); // max look-ahead
                         double polyPredicty = poly.predict(plow_timestamp);
-                        Log.d(TAG, "Low predictor at max lookahead is: " + JoH.qs(polyPredicty));
+                        UserError.Log.i(TAG, "Low predictor at max lookahead is: " + JoH.qs(polyPredicty));
                         low_occurs_at_processed_till_timestamp = highest_bgreading_timestamp; // store that we have processed up to this timestamp
                         if (polyPredicty <= (lowMark + offset)) {
                             low_occurs_at = plow_timestamp;
                             final double lowMarkIndicator = (lowMark - (lowMark / 4));
-                            //if (d) Log.d(TAG, "Poly predict: "+JoH.qs(polyPredict)+" @ "+JoH.qsz(iob.timestamp));
+                            //if (d) UserError.Log.i(TAG, "Poly predict: "+JoH.qs(polyPredict)+" @ "+JoH.qsz(iob.timestamp));
                             while (plow_timestamp > plow_now) {
                                 plow_timestamp = plow_timestamp - FUZZER;
                                 polyPredicty = poly.predict(plow_timestamp);
@@ -1348,7 +1348,7 @@ public class BgGraphBuilder {
                                     }
                                 }
                             }
-                            Log.i(TAG, "LOW PREDICTED AT: " + JoH.dateTimeText((long) low_occurs_at));
+                            UserError.Log.i(TAG, "LOW PREDICTED AT: " + JoH.dateTimeText((long) low_occurs_at));
                             predictivehours = Math.max(predictivehours, (int) ((low_occurs_at - plow_now) / (60 * 60 * 1000)) + 1);
                         }
                     }
@@ -1376,7 +1376,7 @@ public class BgGraphBuilder {
                             if ((bgReading.timestamp > oldest_noise_timestamp) && (bgReading.timestamp > last_calibration)) {
                                 double polyPredicty = unitized(noisePoly.predict(bgReading.timestamp));
                                 if (d)
-                                    Log.d(TAG, "noise Poly predict: " + JoH.qs(polyPredicty) + " @ " + JoH.qs(bgReading.timestamp));
+                                    UserError.Log.i(TAG, "noise Poly predict: " + JoH.qs(polyPredicty) + " @ " + JoH.qs(bgReading.timestamp));
                                 if ((polyPredicty < highMark) && (polyPredicty > 0)) {
                                     PointValue zv = new PointValue((float) (bgReading.timestamp / FUZZER), (float) polyPredicty);
                                     noisePolyBgValues.add(zv);
@@ -1387,7 +1387,7 @@ public class BgGraphBuilder {
 
 
                 } catch (Exception e) {
-                    Log.e(TAG, "Error creating noise working trend: " + e.toString());
+                    UserError.Log.e(TAG, "Error creating noise working trend: " + e.toString());
                 }
 
                 //Log.i(TAG,"Average1 value: "+unitized(avg1value));
@@ -1447,18 +1447,18 @@ public class BgGraphBuilder {
                         final PointValueExtended pv = new PointValueExtended((float) (treatment.timestamp / FUZZER), (float) height);
                         String mylabel = "";
                         if (treatment.insulin > 0) {
-                            if (mylabel.length() > 0)
+                            if (!mylabel.isEmpty())
                                 mylabel = mylabel + System.getProperty("line.separator");
                             mylabel = mylabel + (JoH.qs(treatment.insulin, 2) + "u").replace(".0u", "u");
                         }
                         if (treatment.carbs > 0) {
-                            if (mylabel.length() > 0)
+                            if (!mylabel.isEmpty())
                                 mylabel = mylabel + System.getProperty("line.separator");
                             mylabel = mylabel + (JoH.qs(treatment.carbs, 1) + "g").replace(".0g", "g");
                         }
                         pv.setLabel(mylabel); // standard label
                         //Log.d(TAG, "watchkeypad pv.mylabel: " + mylabel);
-                        if ((treatment.notes != null) && (treatment.notes.length() > 0)) {
+                        if ((treatment.notes != null) && (!treatment.notes.isEmpty())) {
                             pv.note = treatment.notes;
                             //Log.d(TAG, "watchkeypad pv.note: " + pv.note + " mylabel: " + mylabel);
                             try {
@@ -1468,19 +1468,19 @@ public class BgGraphBuilder {
                                     pv.set(pv.getX(), (float) JoH.tolerantParseDouble(m.group(1)));
                                 }
                             } catch (Exception e) {
-                                Log.d(TAG, "Exception matching position: " + e);
+                                UserError.Log.i(TAG, "Exception matching position: " + e);
                             }
                         } else {
                             pv.note = treatment.getBestShortText();
                         }
-                        if (treatmentValues.size() > 0) { // not sure if this >1 is right really - needs a review
+                        if (!treatmentValues.isEmpty()) { // not sure if this >1 is right really - needs a review
                             PointValue lastpv = treatmentValues.get(treatmentValues.size() - 1);
                             if (Math.abs(lastpv.getX() - pv.getX()) < ((10 * 60 * 1000) / FUZZER)) {
                                 // merge label with previous - Intelligent parsing and additions go here
                                 if (d)
-                                    Log.d(TAG, "Merge treatment difference: " + (lastpv.getX() - pv.getX()));
+                                    UserError.Log.i(TAG, "Merge treatment difference: " + (lastpv.getX() - pv.getX()));
                                 String lastlabel = String.valueOf(lastpv.getLabelAsChars());
-                                if (lastlabel.length() > 0) {
+                                if (!lastlabel.isEmpty()) {
                                     lastpv.setLabel(lastlabel + "+" + mylabel);
                                     pv.setLabel("");
                                 }
@@ -1488,12 +1488,12 @@ public class BgGraphBuilder {
                         }
                         treatmentValues.add(pv); // hover
                         if (d)
-                            Log.d(TAG, "Treatment total record: " + height + " " + " timestamp: " + treatment.timestamp);
+                            UserError.Log.i(TAG, "Treatment total record: " + height + " " + " timestamp: " + treatment.timestamp);
                     }
 
                 } catch (Exception e) {
 
-                    Log.e(TAG, "Exception doing treatment values in bggraphbuilder: " + e.toString());
+                    UserError.Log.e(TAG, "Exception doing treatment values in bggraphbuilder: " + e.toString());
                 } finally {
                     readings_lock.unlock();
                 }
@@ -1517,13 +1517,13 @@ public class BgGraphBuilder {
                             } else {
                                 predictedbg = mylastbg.calculated_value_mmol();
                             }
-                            //if (d) Log.d(TAG, "Starting prediction with bg of: " + JoH.qs(predictedbg));
+                            //if (d) UserError.Log.i(TAG, "Starting prediction with bg of: " + JoH.qs(predictedbg));
                             lasttimestamp = mylastbg.timestamp / FUZZER;
 
                             if (d)
-                                Log.d(TAG, "Starting prediction with bg of: " + JoH.qs(predictedbg) + " secs ago: " + (JoH.ts() - mylastbg.timestamp) / 1000);
+                                UserError.Log.i(TAG, "Starting prediction with bg of: " + JoH.qs(predictedbg) + " secs ago: " + (JoH.ts() - mylastbg.timestamp) / 1000);
                         } else {
-                            Log.i(TAG, "COULD NOT GET LAST BG READING FOR PREDICTION!!!");
+                            UserError.Log.i(TAG, "COULD NOT GET LAST BG READING FOR PREDICTION!!!");
                         }
                     } catch (Exception e) {
                         // could not get a bg reading
@@ -1539,13 +1539,13 @@ public class BgGraphBuilder {
 
                     long fuzzed_timestamp = (long) end_time; // initial value in case there are no iob records
                     if (d)
-                        Log.d(TAG, "Internal date timestamp: " + android.text.format.DateFormat.format("yyyy-MM-dd HH:mm:ss", new java.util.Date()));
+                        UserError.Log.i(TAG, "Internal date timestamp: " + android.text.format.DateFormat.format("yyyy-MM-dd HH:mm:ss", new java.util.Date()));
 
 
                     if (d)
-                        Log.d(TAG, "initial Fuzzed end timestamp: " + android.text.format.DateFormat.format("yyyy-MM-dd HH:mm:ss", fuzzed_timestamp * FUZZER));
+                        UserError.Log.i(TAG, "initial Fuzzed end timestamp: " + android.text.format.DateFormat.format("yyyy-MM-dd HH:mm:ss", fuzzed_timestamp * FUZZER));
                     if (d)
-                        Log.d(TAG, "initial Fuzzed start timestamp: " + android.text.format.DateFormat.format("yyyy-MM-dd HH:mm:ss", (long) start_time * FUZZER));
+                        UserError.Log.i(TAG, "initial Fuzzed start timestamp: " + android.text.format.DateFormat.format("yyyy-MM-dd HH:mm:ss", (long) start_time * FUZZER));
                     if ((iobinfo != null) && (prediction_enabled) && (simulation_enabled)) {
 
                         double predict_weight = 0.1;
@@ -1555,7 +1555,7 @@ public class BgGraphBuilder {
                             //double activity = iob.activity;
                             if ((iob.iob > 0) || (iob.cob > 0) || (iob.jActivity > 0) || (iob.jCarbImpact > 0)) {
                                 fuzzed_timestamp = iob.timestamp / FUZZER;
-                                if (d) Log.d(TAG, "iob timestamp: " + iob.timestamp);
+                                if (d) UserError.Log.i(TAG, "iob timestamp: " + iob.timestamp);
                                 if (iob.iob > Profile.minimum_shown_iob) {
                                     double height = iob.iob * iobscale;
                                     if (height > cob_insulin_max_draw_value)
@@ -1575,7 +1575,7 @@ public class BgGraphBuilder {
                                         height = cob_insulin_max_draw_value;
                                     PointValue pv = new PointValue((float) fuzzed_timestamp, (float) height);
                                     if (d)
-                                        Log.d(TAG, "Cob total record: " + JoH.qs(height) + " " + JoH.qs(iob.cob) + " " + pv.getY() + " @ timestamp: " + iob.timestamp);
+                                        UserError.Log.i(TAG, "Cob total record: " + JoH.qs(height) + " " + JoH.qs(iob.cob) + " " + pv.getY() + " @ timestamp: " + iob.timestamp);
                                     cobValues.add(pv); // warning should not be hardcoded
                                 }
 
@@ -1587,7 +1587,7 @@ public class BgGraphBuilder {
                                         try {
                                             polyPredict = poly.predict(iob.timestamp);
                                             if (d)
-                                                Log.d(TAG, "Poly predict: " + JoH.qs(polyPredict) + " @ " + JoH.dateTimeText(iob.timestamp));
+                                                UserError.Log.i(TAG, "Poly predict: " + JoH.qs(polyPredict) + " @ " + JoH.dateTimeText(iob.timestamp));
                                             if (show_moment_working_line) {
                                                 if (((polyPredict < highMark) || (polyPredict < initial_predicted_bg)) && (polyPredict > 0)) {
                                                     PointValue zv = new PointValue((float) fuzzed_timestamp, (float) polyPredict);
@@ -1595,11 +1595,11 @@ public class BgGraphBuilder {
                                                 }
                                             }
                                         } catch (Exception e) {
-                                            Log.e(TAG, "Got exception with poly predict: " + e.toString());
+                                            UserError.Log.e(TAG, "Got exception with poly predict: " + e.toString());
                                         }
                                     }
                                     if (d)
-                                        Log.d(TAG, "Processing prediction: before: " + JoH.qs(predictedbg) + " activity: " + JoH.qs(iob.jActivity) + " jcarbimpact: " + JoH.qs(iob.jCarbImpact));
+                                        UserError.Log.i(TAG, "Processing prediction: before: " + JoH.qs(predictedbg) + " activity: " + JoH.qs(iob.jActivity) + " jcarbimpact: " + JoH.qs(iob.jCarbImpact));
                                     predictedbg -= iob.jActivity; // lower bg by current insulin activity
                                     predictedbg += iob.jCarbImpact;
 
@@ -1611,7 +1611,7 @@ public class BgGraphBuilder {
                                         if (momentum_smoothing) predictedbg = predictedbg_final;
 
                                         if (d)
-                                            Log.d(TAG, "forecast predict_weight: " + JoH.qs(predict_weight));
+                                            UserError.Log.i(TAG, "forecast predict_weight: " + JoH.qs(predict_weight));
                                     }
                                     predict_weight = predict_weight * 2.5; // from 0-infinity - // TODO account for step!!!
                                     // we should pull in actual graph upper and lower limits here
@@ -1623,9 +1623,9 @@ public class BgGraphBuilder {
                                 if (fuzzed_timestamp > end_time) {
                                     predictivehours = (int) (((fuzzed_timestamp - end_time) * FUZZER) / (1000 * 60 * 60)) + 1; // round up to nearest future hour - timestamps in minutes here
                                     if (d)
-                                        Log.d(TAG, "Predictive hours updated to: " + predictivehours);
+                                        UserError.Log.i(TAG, "Predictive hours updated to: " + predictivehours);
                                 } else {
-                                    //KS Log.d(TAG, "IOB DEBUG: " + (fuzzed_timestamp - end_time) + " " + iob.iob);
+                                    //KS UserError.Log.i(TAG, "IOB DEBUG: " + (fuzzed_timestamp - end_time) + " " + iob.iob);
                                     if (!iob_shown_already && (Math.abs(fuzzed_timestamp - end_time) < 5) && (iob.iob > 0)) {
                                         iob_shown_already = true;
                                         // show current iob
@@ -1648,12 +1648,12 @@ public class BgGraphBuilder {
                             }
                         }
                         if (d)
-                            Log.i(TAG, "Size of iob: " + iobinfo.size() + " Predictive hours: " + predictivehours
+                            UserError.Log.i(TAG, "Size of iob: " + iobinfo.size() + " Predictive hours: " + predictivehours
                                     + " Predicted end game change: " + JoH.qs(predictedbg - mylastbg.calculated_value_mmol())
                                     + " Start bg: " + JoH.qs(mylastbg.calculated_value_mmol()) + " Predicted: " + JoH.qs(predictedbg));
                         // calculate bolus or carb adjustment - these should have granularity for injection / pump and thresholds
                     } else {
-                        if (d) Log.i(TAG, "iobinfo was null");
+                        if (d) UserError.Log.i(TAG, "iobinfo was null");
                     }
 
                     double[] evaluation;
@@ -1669,7 +1669,7 @@ public class BgGraphBuilder {
                         String bwp_update = "";
                         keyStore.putL("bwp_last_insulin_timestamp", -1);
                         if (d)
-                            Log.i(TAG, "Predictive BWP: Current prediction: " + JoH.qs(predictedbg) + " / carbs: " + JoH.qs(evaluation[0]) + " insulin: " + JoH.qs(evaluation[1]));
+                            UserError.Log.i(TAG, "Predictive BWP: Current prediction: " + JoH.qs(predictedbg) + " / carbs: " + JoH.qs(evaluation[0]) + " insulin: " + JoH.qs(evaluation[1]));
                         if (!BgReading.isDataStale()) {
                             if (((low_occurs_at < 1) || Pref.getBooleanDefaultFalse("always_show_bwp")) && (Pref.getBooleanDefaultFalse("show_bwp"))) {
                                 if (evaluation[0] > Profile.minimum_carb_recommendation) {
@@ -1691,7 +1691,7 @@ public class BgGraphBuilder {
                     }
 
                 } catch (Exception e) {
-                    Log.e(TAG, "Exception doing iob values in bggraphbuilder: " + e.toString());
+                    UserError.Log.e(TAG, "Exception doing iob values in bggraphbuilder: " + e.toString());
                 }
             } // if !simple
         } finally {
@@ -1704,21 +1704,21 @@ public class BgGraphBuilder {
             final long last_bg_reading_timestamp = BgReading.last().timestamp;
             // TODO remove any duplication by using refreshNoiseIfOlderThan()
             if (low_occurs_at_processed_till_timestamp < last_bg_reading_timestamp) {
-                Log.d(TAG, "Recalculating lowOccursAt: " + JoH.dateTimeText((long) low_occurs_at_processed_till_timestamp) + " vs " + JoH.dateTimeText(last_bg_reading_timestamp));
+                UserError.Log.i(TAG, "Recalculating lowOccursAt: " + JoH.dateTimeText((long) low_occurs_at_processed_till_timestamp) + " vs " + JoH.dateTimeText(last_bg_reading_timestamp));
                 // new only the last hour worth of data for this
                 (new BgGraphBuilder(xdrip.getAppContext(), System.currentTimeMillis() - 60 * 60 * 1000, System.currentTimeMillis() + 5 * 60 * 1000, 24, true)).addBgReadingValues(false);
             } else {
-                Log.d(TAG, "Cached current low timestamp ok: " +  JoH.dateTimeText((long) low_occurs_at_processed_till_timestamp) + " vs " + JoH.dateTimeText(last_bg_reading_timestamp));
+                UserError.Log.i(TAG, "Cached current low timestamp ok: " +  JoH.dateTimeText((long) low_occurs_at_processed_till_timestamp) + " vs " + JoH.dateTimeText(last_bg_reading_timestamp));
             }
         } catch (Exception e) {
-            Log.e(TAG, "Got exception in getCurrentLowOccursAt() " + e);
+            UserError.Log.e(TAG, "Got exception in getCurrentLowOccursAt() " + e);
         }
         return low_occurs_at;
     }
 
     public static synchronized void refreshNoiseIfOlderThan(long timestamp) {
         if (noise_processed_till_timestamp < timestamp) {
-            Log.d(TAG, "Refreshing Noise as Older: " + JoH.dateTimeText(noise_processed_till_timestamp) + " vs " + JoH.dateTimeText(timestamp));
+            UserError.Log.i(TAG, "Refreshing Noise as Older: " + JoH.dateTimeText(noise_processed_till_timestamp) + " vs " + JoH.dateTimeText(timestamp));
             // new only the last hour worth of data for this, simple mode should work for this calculation
             (new BgGraphBuilder(xdrip.getAppContext(), System.currentTimeMillis() - 60 * 60 * 1000, System.currentTimeMillis() + 5 * 60 * 1000, 24, true)).addBgReadingValues(true);
         }
@@ -2186,7 +2186,7 @@ public class BgGraphBuilder {
                 real_timestamp = pve.real_timestamp;
 
             } catch (ClassCastException e) {
-                // Log.e(TAG, "Error casting a point from pointValue to PointValueExtended", e);
+                // UserError.Log.e(TAG, "Error casting a point from pointValue to PointValueExtended", e);
             }
 
             final java.text.DateFormat timeFormat = DateFormat.getTimeFormat(context);
@@ -2196,7 +2196,7 @@ public class BgGraphBuilder {
 
             final String message;
 
-            if (alternate.length() > 0) {
+            if (!alternate.isEmpty()) {
                 message = timeFormat.format(time) + "    " + alternate;
             } else {
                 message = timeFormat.format(time) + "      " + (Math.round(pointValue.getY() * 10) / 10d) + " " + unit() + filtered;

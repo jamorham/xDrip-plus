@@ -1055,7 +1055,7 @@
     <string name="summary_Only_suitable_for_phones_which_support_automatic_pairing">Only suitable for phones which support automatic pairing</string>
     <string name="title_Allow_blucon_unbonding">Allow blucon unbonding</string>
     <string name="summary_Suppress_the_ugly_state_message_if_Problem_appears">Suppress the ugly state message if Problem appears</string>
-    <string name="title_supress_ugly_state_message">supress ugly state message</string>
+    <string name="title_supress_ugly_state_message">suppress ugly state message</string>
     <string name="summary_write_Battery_Information_for_additional_analytic">write the Battery-Information for additional analytic in a file. Please only use this, if you will be asked by a developer!</string>
     <string name="title_Batterylog">Batterylog</string>
     <string name="summary_Choose_to_display_the_bridge_battery_level">Choose to display the bridge battery level</string>

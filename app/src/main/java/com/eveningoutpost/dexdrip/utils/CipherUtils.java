@@ -31,7 +31,7 @@ public class CipherUtils {
             cipher.init(Cipher.ENCRYPT_MODE, newKey, ivSpec);
             return cipher.doFinal(textBytes);
         } catch (Exception e) {
-            Log.e(TAG, "Error during encryption: " + e.toString());
+            UserError.Log.e(TAG, "Error during encryption: " + e.toString());
             return errorbyte;
         }
     }
@@ -55,7 +55,7 @@ public class CipherUtils {
             digest.update(mykey.getBytes(Charset.forName("UTF-8")));
             return digest.digest();
         } catch (NoSuchAlgorithmException e) {
-            Log.e(TAG, "Password creation exception: " + e.toString());
+            UserError.Log.e(TAG, "Password creation exception: " + e.toString());
             return errorbyte;
         }
     }
@@ -79,7 +79,7 @@ public class CipherUtils {
            }
            return bytes;
        } catch (Exception e){
-            Log.e(TAG,"Got Exception: "+e.toString());
+            UserError.Log.e(TAG,"Got Exception: "+e.toString());
            return new byte[0];
         }
     }
@@ -91,7 +91,7 @@ public class CipherUtils {
             digest.update(mydata);
             return bytesToHex(digest.digest()).toLowerCase();
         } catch (NoSuchAlgorithmException e) {
-            Log.e(TAG, "SHA hash exception: " + e.toString());
+            UserError.Log.e(TAG, "SHA hash exception: " + e.toString());
             return null;
         }
     }
@@ -103,7 +103,7 @@ public class CipherUtils {
             digest.update(mykey.getBytes(Charset.forName("UTF-8")));
             return bytesToHex(digest.digest()).toLowerCase();
         } catch (NoSuchAlgorithmException e) {
-            Log.e(TAG, "SHA hash exception: " + e.toString());
+            UserError.Log.e(TAG, "SHA hash exception: " + e.toString());
             return null;
         }
     }
@@ -115,7 +115,7 @@ public class CipherUtils {
             digest.update(mykey.getBytes(Charset.forName("UTF-8")));
             return bytesToHex(digest.digest()).toLowerCase();
         } catch (NoSuchAlgorithmException e) {
-            Log.e(TAG, "MD5 hash exception: " + e.toString());
+            UserError.Log.e(TAG, "MD5 hash exception: " + e.toString());
             return null;
         }
     }
@@ -129,7 +129,7 @@ public class CipherUtils {
         byte[] ivBytes = new byte[16];
 
         if ((keyBytes == null) || (keyBytes.length != 16)) {
-            Log.e(TAG, "Invalid Keybytes length!");
+            UserError.Log.e(TAG, "Invalid Keybytes length!");
             return errorbyte;
         }
         SecureRandom sr = new SecureRandom();
@@ -148,7 +148,7 @@ public class CipherUtils {
         byte[] ivBytes = new byte[16];
         if (cipherData.length < ivBytes.length) return errorbyte;
         if ((keyBytes==null) || (keyBytes.length != 16)) {
-            Log.e(TAG, "Invalid Keybytes length!");
+            UserError.Log.e(TAG, "Invalid Keybytes length!");
             return errorbyte;
         }
         System.arraycopy(cipherData, 0, ivBytes, 0, ivBytes.length);
@@ -161,7 +161,7 @@ public class CipherUtils {
         try {
             return new String(decryptStringToBytes(cipherData), StandardCharsets.UTF_8);
         } catch (IllegalArgumentException e) {
-            Log.e(TAG, "Got IllegalArgumentException encoding on UTF8 ", e);
+            UserError.Log.e(TAG, "Got IllegalArgumentException encoding on UTF8 ", e);
             return "";
         }
     }

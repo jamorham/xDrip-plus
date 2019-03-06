@@ -56,7 +56,7 @@ public class AddCalibration extends AppCompatActivity implements NavigationDrawe
 
         final PowerManager.WakeLock wl = JoH.getWakeLock("xdrip-autocalib", 60000);
         try {
-            Log.d(TAG, "Auto calibration...");
+            UserError.Log.i(TAG, "Auto calibration...");
             final Bundle extras = getIntent().getExtras();
             if (extras != null) {
                 JoH.clearCache();
@@ -120,10 +120,10 @@ public class AddCalibration extends AppCompatActivity implements NavigationDrawe
                                                 } else {
                                                     // follower sends the calibration data onwards only if sourced from interactive request
                                                     if (from_interactive.equals("true")) {
-                                                        Log.d(TAG, "Interactive calibration and we are follower so sending to master");
+                                                        UserError.Log.i(TAG, "Interactive calibration and we are follower so sending to master");
                                                         sendFollowerCalibration(calValue, bgAgeNumber);
                                                     } else {
-                                                        Log.d(TAG, "Not an interactive calibration so not sending to master");
+                                                        UserError.Log.i(TAG, "Not an interactive calibration so not sending to master");
                                                     }
                                                 }
 
@@ -132,12 +132,12 @@ public class AddCalibration extends AppCompatActivity implements NavigationDrawe
                                             }
 
                                             if (from_external.equals("true")) {
-                                                Log.d("jamorham calib", "Relaying tasker pushed calibration");
+                                                UserError.Log.i("jamorham calib", "Relaying tasker pushed calibration");
                                                 GcmActivity.pushCalibration(string_value, bg_age);
                                             }
                                         }
                                     } else {
-                                        Log.wtf("CALERROR", "bg age either in future or older than 1 day: " + bgAgeNumber);
+                                        UserError.Log.wtf("CALERROR", "bg age either in future or older than 1 day: " + bgAgeNumber);
                                     }
 
                                     JoH.releaseWakeLock(wlt);
@@ -145,13 +145,13 @@ public class AddCalibration extends AppCompatActivity implements NavigationDrawe
                             }.start();
 
                         } else {
-                            Log.w("CALERROR", "ERROR during automated calibration - no valid bg age");
+                            UserError.Log.w("CALERROR", "ERROR during automated calibration - no valid bg age");
                         }
                     } else {
-                        Log.w("CALERROR", "ERROR during automated calibration - no valid value");
+                        UserError.Log.w("CALERROR", "ERROR during automated calibration - no valid value");
                     }
                 } else {
-                    Log.w("CALERROR", "ERROR during automated calibration - no active sensor");
+                    UserError.Log.w("CALERROR", "ERROR during automated calibration - no active sensor");
                 }
                 finish();
             }
@@ -184,7 +184,7 @@ public class AddCalibration extends AppCompatActivity implements NavigationDrawe
                                 //Ob1G5StateMachine.addCalibration((int)calibration.bg, calibration.timestamp);
                                 NativeCalibrationPipe.addCalibration((int)calibration.bg, calibration.timestamp);
                             } else {
-                                Log.e(TAG, "Calibration creation resulted in null");
+                                UserError.Log.e(TAG, "Calibration creation resulted in null");
                                 JoH.static_toast_long("Could not create calibration!");
                                 // TODO probably follower must ensure it has a valid sensor regardless..
                             }
@@ -196,7 +196,7 @@ public class AddCalibration extends AppCompatActivity implements NavigationDrawe
                         startActivity(tableIntent);
 
                     } catch (NumberFormatException e) {
-                        Log.e(TAG, "Number format exception ", e);
+                        UserError.Log.e(TAG, "Number format exception ", e);
                         Home.toaststatic("Got error parsing number in calibration");
                     }
                     // }
@@ -206,7 +206,7 @@ public class AddCalibration extends AppCompatActivity implements NavigationDrawe
                     value.setError("Calibration Can Not be blank");
                 }
             } else {
-                Log.w("CALERROR", "Sensor is not active, cannot calibrate");
+                UserError.Log.w("CALERROR", "Sensor is not active, cannot calibrate");
             }
         });
 
@@ -214,7 +214,7 @@ public class AddCalibration extends AppCompatActivity implements NavigationDrawe
 
     // helper function for sending calibrations to master when we are follower
     public static void sendFollowerCalibration(double calValue, long offset) {
-        Log.d(TAG, "sendFollowerCalibration: " + calValue + " " + offset);
+        UserError.Log.i(TAG, "sendFollowerCalibration: " + calValue + " " + offset);
         final String uuid = UUID.randomUUID().toString();
         GcmActivity.pushCalibration2(calValue, uuid, offset);
         UndoRedo.addUndoCalibration(uuid);

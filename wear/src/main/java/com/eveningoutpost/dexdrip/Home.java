@@ -90,16 +90,12 @@ public class Home extends BaseWatchFace {
     }
 
     private boolean linearLayout(LinearLayout layout,int x, int y) {
-        if (x >=layout.getLeft() && x <= layout.getRight()&&
-            y >= layout.getTop() && y <= layout.getBottom()) {
-            return true;
-        }
-        return false;
+	    return x >= layout.getLeft() && x <= layout.getRight() && y >= layout.getTop() && y <= layout.getBottom();
     }
 
     private void changeChartTimeframe() {
         int timeframe = Integer.parseInt(sharedPrefs.getString("chart_timeframe", "3"));
-        Log.e(TAG, "changeChartTimeframe timeframe: " + timeframe);
+       UserError.Log.e(TAG, "changeChartTimeframe timeframe: " + timeframe);
         timeframe = (timeframe%5) + 1;
         sharedPrefs.edit().putString("chart_timeframe", "" + timeframe).apply();
     }
@@ -170,7 +166,7 @@ public class Home extends BaseWatchFace {
                 setupCharts();
             }
         } catch (NullPointerException e) {
-            Log.e(TAG, "Null pointer exception in setColorDark in Home: " + e);
+           UserError.Log.e(TAG, "Null pointer exception in setColorDark in Home: " + e);
         }
     }
 
@@ -199,7 +195,7 @@ public class Home extends BaseWatchFace {
 
 
         } catch (NullPointerException e) {
-            Log.e(TAG, "Null pointer exception in setColorLowRes: " + e);
+           UserError.Log.e(TAG, "Null pointer exception in setColorLowRes: " + e);
         }
 
     }
@@ -269,7 +265,7 @@ public class Home extends BaseWatchFace {
                 setColorDark();
             }
         } catch (NullPointerException e) {
-            Log.e(TAG, "Null pointer exception in setColorBright in home " + e);
+           UserError.Log.e(TAG, "Null pointer exception in setColorBright in home " + e);
         }
     }
 
@@ -296,7 +292,7 @@ public class Home extends BaseWatchFace {
         Intent messageIntent = new Intent();
         messageIntent.setAction(Intent.ACTION_SEND);
         messageIntent.putExtra(extra, text);
-        Log.d(TAG, "startHomeWithExtra extra=" + extra + " text=" + text);
+       UserError.Log.d(TAG, "startHomeWithExtra extra=" + extra + " text=" + text);
         LocalBroadcastManager.getInstance(xdrip.getAppContext()).sendBroadcast(messageIntent);
     }
 
@@ -312,7 +308,7 @@ public class Home extends BaseWatchFace {
 
     public static void toaststaticnext(final String msg) {
         nexttoast = msg;
-        Log.e(TAG, "Toast next: " + msg);
+       UserError.Log.e(TAG, "Toast next: " + msg);
     }
 
     public void toast(final String msg) {
@@ -320,19 +316,19 @@ public class Home extends BaseWatchFace {
             Context context = getApplicationContext();
             Toast toast = Toast.makeText(context, msg, Toast.LENGTH_SHORT);
             toast.show();
-            Log.d(TAG, "toast: " + msg);
+           UserError.Log.d(TAG, "toast: " + msg);
         } catch (Exception e) {
-            Log.d(TAG, "Couldn't display toast: " + msg + " / " + e.toString());
+           UserError.Log.d(TAG, "Couldn't display toast: " + msg + " / " + e.toString());
         }
     }
 
     public static void toastStaticFromUI(final String msg) {
         try {
             Toast.makeText(Home.context, msg, Toast.LENGTH_LONG).show();//mActivity
-            Log.d(TAG, "toast: " + msg);
+           UserError.Log.d(TAG, "toast: " + msg);
         } catch (Exception e) {
             toaststaticnext(msg);
-            Log.d(TAG, "Couldn't display toast (rescheduling): " + msg + " / " + e.toString());
+           UserError.Log.d(TAG, "Couldn't display toast (rescheduling): " + msg + " / " + e.toString());
         }
     }
 
@@ -382,7 +378,7 @@ public class Home extends BaseWatchFace {
             if (!pm.isIgnoringBatteryOptimizations(packageName)) {
                 // &&
                 //            !prefs.getBoolean("requested_ignore_battery_optimizations_new", false)) {
-                Log.d(TAG, "Requesting ignore battery optimization");
+               UserError.Log.d(TAG, "Requesting ignore battery optimization");
 
                 // if (PersistentStore.incrementLong("asked_battery_optimization") < 40) {
                 // JoH.show_ok_dialog(this, gs(R.string.please_allow_permission), gs(R.string.xdrip_needs_whitelisting_for_proper_performance), new Runnable() {

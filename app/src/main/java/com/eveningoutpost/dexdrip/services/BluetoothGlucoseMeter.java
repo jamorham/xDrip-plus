@@ -122,7 +122,7 @@ public class BluetoothGlucoseMeter extends Service {
                         JoH.playResourceAudio(R.raw.bt_meter_connect);
                     }
 
-                    Log.d(TAG, "Delay for settling");
+                    UserError.Log.i(TAG, "Delay for settling");
                     waitFor(600);
                     statusUpdate("Discovering services");
                     service_discovery_count = 0; // reset as new non retried connnection
@@ -130,7 +130,7 @@ public class BluetoothGlucoseMeter extends Service {
                     // Bluetooth_CMD.poll_queue(); // do we poll here or on service discovery - should we clear here?
                 } else {
                     // TODO timeout
-                    Log.e(TAG, "Apparently already connected - ignoring");
+                    UserError.Log.e(TAG, "Apparently already connected - ignoring");
                 }
             } else if (newState == BluetoothProfile.STATE_DISCONNECTED) {
                 final int old_connection_state = mConnectionState;
@@ -167,13 +167,13 @@ public class BluetoothGlucoseMeter extends Service {
                         sendDeviceUpdate(gatt.getDevice());
                     }
                 } else {
-                    Log.d(TAG, "Device is already bonded - good");
+                    UserError.Log.i(TAG, "Device is already bonded - good");
                 }
 
                 if (d) {
                     List<BluetoothGattService> gatts = getSupportedGattServices();
                     for (BluetoothGattService bgs : gatts) {
-                        Log.d(TAG, "DEBUG: " + bgs.getUuid());
+                        UserError.Log.i(TAG, "DEBUG: " + bgs.getUuid());
                     }
                 }
 
@@ -196,10 +196,10 @@ public class BluetoothGlucoseMeter extends Service {
                     Bluetooth_CMD.poll_queue();
 
                 } else {
-                    Log.e(TAG, "Queue is not empty so not scheduling anything..");
+                    UserError.Log.e(TAG, "Queue is not empty so not scheduling anything..");
                 }
             } else {
-                Log.w(TAG, "onServicesDiscovered received: " + status);
+                UserError.Log.w(TAG, "onServicesDiscovered received: " + status);
             }
         }
 
@@ -207,11 +207,11 @@ public class BluetoothGlucoseMeter extends Service {
         public void onDescriptorWrite(BluetoothGatt gatt,
                                       BluetoothGattDescriptor descriptor,
                                       int status) {
-            Log.d(TAG, "Descriptor written to: " + descriptor.getUuid() + " getvalue: " + JoH.bytesToHex(descriptor.getValue()) + " status: " + status);
+            UserError.Log.i(TAG, "Descriptor written to: " + descriptor.getUuid() + " getvalue: " + JoH.bytesToHex(descriptor.getValue()) + " status: " + status);
             if (status == BluetoothGatt.GATT_SUCCESS) {
                 Bluetooth_CMD.poll_queue();
             } else {
-                Log.e(TAG, "Got gatt descriptor write failure: " + status);
+                UserError.Log.e(TAG, "Got gatt descriptor write failure: " + status);
                 Bluetooth_CMD.retry_last_command(status);
             }
         }
@@ -221,16 +221,16 @@ public class BluetoothGlucoseMeter extends Service {
         public void onCharacteristicWrite(BluetoothGatt gatt,
                                           BluetoothGattCharacteristic characteristic,
                                           int status) {
-            Log.d(TAG, "Written to: " + characteristic.getUuid() + " getvalue: " + JoH.bytesToHex(characteristic.getValue()) + " status: " + status);
+            UserError.Log.i(TAG, "Written to: " + characteristic.getUuid() + " getvalue: " + JoH.bytesToHex(characteristic.getValue()) + " status: " + status);
             if (status == BluetoothGatt.GATT_SUCCESS) {
                 if (ack_blocking()) {
                     if (d)
-                        Log.d(TAG, "Awaiting ACK before next command: " + awaiting_ack + ":" + awaiting_data);
+                        UserError.Log.i(TAG, "Awaiting ACK before next command: " + awaiting_ack + ":" + awaiting_data);
                 } else {
                     Bluetooth_CMD.poll_queue();
                 }
             } else {
-                Log.e(TAG, "Got gatt write failure: " + status);
+                UserError.Log.e(TAG, "Got gatt write failure: " + status);
                 Bluetooth_CMD.retry_last_command(status);
             }
         }
@@ -311,12 +311,12 @@ public class BluetoothGlucoseMeter extends Service {
                     }
 
                 } else {
-                    Log.d(TAG, "Got a different charactersitic! " + characteristic.getUuid().toString());
+                    UserError.Log.i(TAG, "Got a different charactersitic! " + characteristic.getUuid().toString());
 
                 }
                 Bluetooth_CMD.poll_queue();
             } else {
-                Log.e(TAG, "Got gatt read failure: " + status);
+                UserError.Log.e(TAG, "Got gatt read failure: " + status);
                 Bluetooth_CMD.retry_last_command(status);
             }
         }
@@ -347,12 +347,12 @@ public class BluetoothGlucoseMeter extends Service {
     // old api
     private BluetoothAdapter.LeScanCallback mLeScanCallback = (device, rssi, scanRecord) -> JoH.runOnUiThreadDelayed(() -> {
 	    if (d)
-		    Log.i(TAG, "old: onLeScan " + device.toString() + " c:" + device.getBluetoothClass().toString());
+		    UserError.Log.i(TAG, "old: onLeScan " + device.toString() + " c:" + device.getBluetoothClass().toString());
 
-	    if (d) Log.i(TAG, "" + device.getName());
+	    if (d) UserError.Log.i(TAG, "" + device.getName());
 
 	    if ((lastScannedDeviceAddress.equals(device.getAddress())) && (!JoH.ratelimit("bt-scan-repeated-address", 2))) {
-		    if (d) Log.d(TAG, "Ignoring repeated address: " + device.getAddress());
+		    if (d) UserError.Log.i(TAG, "Ignoring repeated address: " + device.getAddress());
 	    } else {
 		    lastScannedDeviceAddress = device.getAddress();
 		    sendDeviceUpdate(device);
@@ -379,31 +379,32 @@ public class BluetoothGlucoseMeter extends Service {
     }
 
     private synchronized static void forgetDevice(String address) {
-        Log.d(TAG, "forgetDevice() start");
+        UserError.Log.i(TAG, "forgetDevice() start");
         try {
             if ((mBluetoothAdapter == null) || (address == null)) return;
             final Set<BluetoothDevice> pairedDevices = mBluetoothAdapter.getBondedDevices();
-            if (pairedDevices.size() > 0) {
+            if (!pairedDevices.isEmpty()) {
                 for (BluetoothDevice device : pairedDevices) {
                     if (device.getName() != null) {
                         if (device.getAddress().equals(address)) {
-                            Log.e(TAG, "Unpairing.. " + address);
+                            UserError.Log.e(TAG, "Unpairing.. " + address);
                             JoH.static_toast_long("Unpairing: " + address);
                             try {
+
                                 Method m = device.getClass().getMethod("removeBond", (Class[]) null);
                                 m.invoke(device, (Object[]) null);
 
                             } catch (Exception e) {
-                                Log.e(TAG, e.getMessage(), e);
+                                UserError.Log.e(TAG, e.getMessage(), e);
                             }
                         }
                     }
 
                 }
             }
-            Log.d(TAG, "forgetDevice() finished");
+            UserError.Log.i(TAG, "forgetDevice() finished");
         } catch (Exception e) {
-            Log.wtf(TAG, "Exception forgetting: " + address + " " + e);
+            UserError.Log.wtf(TAG, "Exception forgetting: " + address + " " + e);
         }
     }
 
@@ -416,7 +417,7 @@ public class BluetoothGlucoseMeter extends Service {
         if (mBluetoothGatt == null) {
             return;
         }
-        Log.d(TAG, "Closing gatt");
+        UserError.Log.i(TAG, "Closing gatt");
         mBluetoothGatt.close();
         mBluetoothGatt = null;
     }
@@ -425,10 +426,10 @@ public class BluetoothGlucoseMeter extends Service {
     protected static void waitFor(final int millis) {
         synchronized (mLock) {
             try {
-                Log.e(TAG, "waiting " + millis + "ms");
+                UserError.Log.e(TAG, "waiting " + millis + "ms");
                 mLock.wait(millis);
             } catch (final InterruptedException e) {
-                Log.e(TAG, "Sleeping interrupted", e);
+                UserError.Log.e(TAG, "Sleeping interrupted", e);
             }
         }
     }
@@ -488,7 +489,7 @@ public class BluetoothGlucoseMeter extends Service {
         try {
             unregisterReceiver(mPairingRequestRecevier);
         } catch (Exception e) {
-            Log.e(TAG, "Error unregistering pairing receiver: " + e);
+            UserError.Log.e(TAG, "Error unregistering pairing receiver: " + e);
         }
         started_at = -1;
     }
@@ -511,15 +512,15 @@ public class BluetoothGlucoseMeter extends Service {
                 mBluetoothGatt.discoverServices();
                 JoH.runOnUiThreadDelayed(() -> {
                     if ((!services_discovered) && (service_discovery_count < 10)) {
-                        Log.d(TAG, "Timeout discovering services - retrying...");
+                        UserError.Log.i(TAG, "Timeout discovering services - retrying...");
                         discover_services();
                     }
                 }, (5000 + (500 * service_discovery_count)));
             } else {
-                Log.e(TAG, "Cannot discover services as we are not connected");
+                UserError.Log.e(TAG, "Cannot discover services as we are not connected");
             }
         } else {
-            Log.e(TAG, "mBluetoothGatt is null!");
+            UserError.Log.e(TAG, "mBluetoothGatt is null!");
         }
     }
 
@@ -537,7 +538,7 @@ public class BluetoothGlucoseMeter extends Service {
                 return (Boolean) localMethod.invoke(gatt, new Object[0]);
             }
         } catch (Exception localException) {
-            Log.e(TAG, "An exception occured while refreshing device");
+            UserError.Log.e(TAG, "An exception occured while refreshing device");
         }
         return false;
     }
@@ -556,7 +557,7 @@ public class BluetoothGlucoseMeter extends Service {
     private static boolean ack_blocking() {
         final boolean result = await_acks && (awaiting_ack || awaiting_data);
         if (result) {
-            if (d) Log.d(TAG, "Ack blocking: " + awaiting_ack + ":" + awaiting_data);
+            if (d) UserError.Log.i(TAG, "Ack blocking: " + awaiting_ack + ":" + awaiting_data);
         }
         return result;
     }
@@ -739,7 +740,7 @@ public class BluetoothGlucoseMeter extends Service {
                     // get adjusted timestamp
                     if (lastBloodTest.timestamp > PersistentStore.getLong(timestamp_id)) {
                         PersistentStore.setLong(timestamp_id, lastBloodTest.timestamp);
-                        Log.d(TAG, "evaluateLastRecords: appears to be a new record: sequence:" + lastGlucoseRecord.sequence);
+                        UserError.Log.i(TAG, "evaluateLastRecords: appears to be a new record: sequence:" + lastGlucoseRecord.sequence);
                         JoH.runOnUiThreadDelayed(Home::staticRefreshBGCharts, 300);
                         if (Pref.getBooleanDefaultFalse("bluetooth_meter_for_calibrations")
                                 || Pref.getBooleanDefaultFalse("bluetooth_meter_for_calibrations_auto")) {
@@ -757,7 +758,7 @@ public class BluetoothGlucoseMeter extends Service {
                                             // requires offset in past
 
                                             if ((Pref.getBooleanDefaultFalse("bluetooth_meter_for_calibrations_auto") && isSlopeFlatEnough())) {
-                                                Log.d(TAG, "Slope flat enough for auto calibration");
+                                                UserError.Log.i(TAG, "Slope flat enough for auto calibration");
                                                 if (!delay_calibration) {
                                                     Home.startHomeWithExtra(xdrip.getAppContext(),
                                                             Home.BLUETOOTH_METER_CALIBRATION,
@@ -765,7 +766,7 @@ public class BluetoothGlucoseMeter extends Service {
                                                             Long.toString(time_since),
                                                             "auto");
                                                 } else {
-                                                    Log.d(TAG, "Delaying calibration for later");
+                                                    UserError.Log.i(TAG, "Delaying calibration for later");
                                                     JoH.static_toast_long("Waiting for 15 minutes more sensor data for calibration");
                                                 }
                                             } else {
@@ -777,7 +778,7 @@ public class BluetoothGlucoseMeter extends Service {
                                                             Long.toString(time_since),
                                                             "manual");
                                                 } else {
-                                                    Log.d(TAG, "Not flat enough slope for auto calibration and manual calibration not enabled");
+                                                    UserError.Log.i(TAG, "Not flat enough slope for auto calibration and manual calibration not enabled");
                                                 }
                                             }
                                         }, 500);
@@ -845,12 +846,12 @@ public class BluetoothGlucoseMeter extends Service {
      */
     private synchronized boolean connect(final String address) {
         if ((address == null) || (address.equals("00:00:00:00:00:00"))) {
-            if (d) Log.d(TAG, "ignoring connect with null address");
+            if (d) UserError.Log.i(TAG, "ignoring connect with null address");
             return false;
         }
-        Log.d(TAG, "connect() called with address: " + address);
+        UserError.Log.i(TAG, "connect() called with address: " + address);
         if (mBluetoothAdapter == null) {
-            Log.w(TAG, "BluetoothAdapter not initialized or unspecified address.");
+            UserError.Log.w(TAG, "BluetoothAdapter not initialized or unspecified address.");
             return false;
         }
 
@@ -858,7 +859,7 @@ public class BluetoothGlucoseMeter extends Service {
         if ((mConnectionState == STATE_CONNECTED)
                 && (mLastConnectedDeviceAddress.equals(address))
                 && (JoH.ratelimit("bt-meter-connect-repeat", 7))) {
-            Log.e(TAG, "We are already connected - not connecting");
+            UserError.Log.e(TAG, "We are already connected - not connecting");
             if (service_discovery_count == 0) discover_services();
             return false;
         }
@@ -866,7 +867,7 @@ public class BluetoothGlucoseMeter extends Service {
         // Previously connected device.  Try to reconnect.
         statusUpdate("Trying to connect to: " + address);
         if (address.equals(mBluetoothDeviceAddress) && mBluetoothGatt != null) {
-            if (d) Log.d(TAG, "Trying to use an existing mBluetoothGatt for connection.");
+            if (d) UserError.Log.i(TAG, "Trying to use an existing mBluetoothGatt for connection.");
             if (mBluetoothGatt.connect()) {
                 mConnectionState = STATE_CONNECTING;
                 return true;
@@ -882,7 +883,7 @@ public class BluetoothGlucoseMeter extends Service {
         }
         mBluetoothGatt = device.connectGatt(this, true, mGattCallback);
         refreshDeviceCache(mBluetoothGatt);
-        if (d) Log.d(TAG, "Trying to create a new connection.");
+        if (d) UserError.Log.i(TAG, "Trying to create a new connection.");
         mBluetoothDeviceAddress = address;
         mConnectionState = STATE_CONNECTING;
         return true;
@@ -896,7 +897,7 @@ public class BluetoothGlucoseMeter extends Service {
      */
     private void disconnect() {
         if (mBluetoothAdapter == null || mBluetoothGatt == null) {
-            Log.w(TAG, "BluetoothAdapter not initialized");
+            UserError.Log.w(TAG, "BluetoothAdapter not initialized");
             return;
         }
         mBluetoothGatt.disconnect();
@@ -917,14 +918,14 @@ public class BluetoothGlucoseMeter extends Service {
     // currently not used, will need updating if it is
     @TargetApi(21)
     private void initScanCallback() {
-        Log.d(TAG, "init v21 ScanCallback()");
+        UserError.Log.i(TAG, "init v21 ScanCallback()");
 
         // v21 version
         if (Build.VERSION.SDK_INT >= 21) {
             mScanCallback = new ScanCallback() {
                 @Override
                 public void onScanResult(int callbackType, ScanResult result) {
-                    Log.i(TAG, "onScanResult result: " + result.toString());
+                    UserError.Log.i(TAG, "onScanResult result: " + result.toString());
                     final BluetoothDevice btDevice = result.getDevice();
                     scanLeDevice(false); // stop scanning
                     connect(btDevice.getAddress());
@@ -933,15 +934,15 @@ public class BluetoothGlucoseMeter extends Service {
                 @Override
                 public void onBatchScanResults(List<ScanResult> results) {
                     for (ScanResult sr : results) {
-                        Log.i("ScanResult - Results", sr.toString());
+                        UserError.Log.i("ScanResult - Results", sr.toString());
                     }
                 }
 
                 @Override
                 public void onScanFailed(int errorCode) {
-                    Log.e(TAG, "Scan Failed Error Code: " + errorCode);
+                    UserError.Log.e(TAG, "Scan Failed Error Code: " + errorCode);
                     if (errorCode == 1) {
-                        Log.e(TAG, "Already Scanning: "); // + isScanning);
+                        UserError.Log.e(TAG, "Already Scanning: "); // + isScanning);
                         //isScanning = true;
                     } else if (errorCode == 2) {
                         // reset bluetooth?
@@ -967,11 +968,11 @@ public class BluetoothGlucoseMeter extends Service {
                 // and stop the service if so
             }, SCAN_PERIOD);
             if ((Build.VERSION.SDK_INT < 21) || (force_old)) {
-                Log.d(TAG, "Starting old scan");
+                UserError.Log.i(TAG, "Starting old scan");
                 mBluetoothAdapter.startLeScan(mLeScanCallback);
             } else {
                 mLEScanner.startScan(filters, settings, mScanCallback);
-                Log.d(TAG, "Starting api21 scan");
+                UserError.Log.i(TAG, "Starting api21 scan");
             }
         } else {
             if ((Build.VERSION.SDK_INT < 21) || (force_old)) {
@@ -984,7 +985,7 @@ public class BluetoothGlucoseMeter extends Service {
 
     private void beginScan() {
         if (Build.VERSION.SDK_INT >= 21) {
-            if (d) Log.d(TAG, "Preparing for scan...");
+            if (d) UserError.Log.i(TAG, "Preparing for scan...");
 
             // set up v21 scanner
             mLEScanner = mBluetoothAdapter.getBluetoothLeScanner();
@@ -1011,7 +1012,7 @@ public class BluetoothGlucoseMeter extends Service {
         if (JoH.quietratelimit("bluetooth-recent-check", 1800)) {
             if (Pref.getBoolean("bluetooth_meter_enabled", false)) {
                 final List<BloodTest> btl = BloodTest.lastMatching(1, BLUETOOTH_GLUCOSE_METER_TAG + "%");
-                if ((btl == null) || (btl.size() == 0) || (JoH.msSince(btl.get(0).created_timestamp) > Constants.HOUR_IN_MS * 6)) {
+                if ((btl == null) || (btl.isEmpty()) || (JoH.msSince(btl.get(0).created_timestamp) > Constants.HOUR_IN_MS * 6)) {
                     if (JoH.pratelimit("restart_bluetooth_service", 3600 * 5)) {
                         UserError.Log.uel(TAG, "Restarting Bluetooth Glucose meter service");
                         startIfEnabled();
@@ -1045,7 +1046,7 @@ public class BluetoothGlucoseMeter extends Service {
     public static void start_service(String connect_address) {
         stop_service(); // is this right?
         final Intent start_intent = new Intent(xdrip.getAppContext(), BluetoothGlucoseMeter.class);
-        if ((connect_address != null) && (connect_address.length() > 0)) {
+        if ((connect_address != null) && (!connect_address.isEmpty())) {
             if (connect_address.equals("auto")) {
                 connect_address = Pref.getStringDefaultBlank("selected_bluetooth_meter_address");
             }
@@ -1061,7 +1062,7 @@ public class BluetoothGlucoseMeter extends Service {
     public static void start_forget(String forget_address) {
         stop_service(); // is this right?
         final Intent start_intent = new Intent(xdrip.getAppContext(), BluetoothGlucoseMeter.class);
-        if ((forget_address != null) && (forget_address.length() > 0)) {
+        if ((forget_address != null) && (!forget_address.isEmpty())) {
             start_intent.putExtra("service_action", "forget");
             start_intent.putExtra("forget_address", forget_address);
             xdrip.getAppContext().startService(start_intent);
@@ -1069,7 +1070,7 @@ public class BluetoothGlucoseMeter extends Service {
     }
 
     public static void sendImmediateData(UUID service, UUID characteristic, byte[] data, String notes) {
-        Log.d(TAG, "Sending immediate data: " + notes);
+        UserError.Log.i(TAG, "Sending immediate data: " + notes);
         Bluetooth_CMD.process_queue_entry(Bluetooth_CMD.gen_write(service, characteristic, data, notes));
     }
 
@@ -1164,7 +1165,7 @@ public class BluetoothGlucoseMeter extends Service {
                 final Bluetooth_CMD btc = queue.peek();
                 if (btc != null) {
                     long queue_age = System.currentTimeMillis() - btc.timestamp;
-                    if (d) Log.d(TAG, "check queue age.. " + queue_age + " on " + btc.note);
+                    if (d) UserError.Log.i(TAG, "check queue age.. " + queue_age + " on " + btc.note);
                     if (queue_age > QUEUE_TIMEOUT) {
                         statusUpdate("Timed out on: " + btc.note + (isBonded() ? "" : "\nYou may need to enable the meter's pairing mode by holding the power button when turning it on until it flashes blue"));
                         queue.clear();
@@ -1175,7 +1176,7 @@ public class BluetoothGlucoseMeter extends Service {
                     }
                 }
             } else {
-                if (d) Log.d(TAG, "check queue age - queue is empty");
+                if (d) UserError.Log.i(TAG, "check queue age - queue is empty");
             }
         }
 
@@ -1187,13 +1188,13 @@ public class BluetoothGlucoseMeter extends Service {
             try {
                 for (Bluetooth_CMD btc : queue) {
                     if (btc.service.equals(fromService) && btc.characteristic.equals(fromCharacteristic)) {
-                        Log.d(TAG, "Removing: " + btc.note);
+                        UserError.Log.i(TAG, "Removing: " + btc.note);
                         queue.remove(btc);
                         break; // currently we only ever need to do one so break for speed
                     }
                 }
             } catch (Exception e) {
-                Log.wtf("Got exception in delete: ", e);
+                UserError.Log.wtf("Got exception in delete: ", e);
             }
         }
 
@@ -1204,13 +1205,13 @@ public class BluetoothGlucoseMeter extends Service {
                     if (btc.service.equals(fromService) && btc.characteristic.equals(fromCharacteristic)) {
                         btc.service = toService;
                         btc.characteristic = toCharacteristic;
-                        Log.d(TAG, "Transmuted service: " + fromService + " -> " + toService);
-                        Log.d(TAG, "Transmuted charact: " + fromCharacteristic + " -> " + toCharacteristic);
+                        UserError.Log.i(TAG, "Transmuted service: " + fromService + " -> " + toService);
+                        UserError.Log.i(TAG, "Transmuted charact: " + fromCharacteristic + " -> " + toCharacteristic);
                         break; // currently we only ever need to do one so break for speed
                     }
                 }
             } catch (Exception e) {
-                Log.wtf("Got exception in transmute: ", e);
+                UserError.Log.wtf("Got exception in transmute: ", e);
             }
         }
 
@@ -1226,14 +1227,14 @@ public class BluetoothGlucoseMeter extends Service {
                         btc.cmd = btc_replacement.cmd;
                         btc.data = btc_replacement.data;
                         btc.note = btc_replacement.note;
-                        Log.d(TAG, "Replaced service: " + fromService + " -> " + btc_replacement.service);
-                        Log.d(TAG, "Replaced charact: " + fromCharacteristic + " -> " + btc_replacement.characteristic);
-                        Log.d(TAG, "Replaced     cmd: " + btc_replacement.cmd);
+                        UserError.Log.i(TAG, "Replaced service: " + fromService + " -> " + btc_replacement.service);
+                        UserError.Log.i(TAG, "Replaced charact: " + fromCharacteristic + " -> " + btc_replacement.characteristic);
+                        UserError.Log.i(TAG, "Replaced     cmd: " + btc_replacement.cmd);
                         break; // currently we only ever need to do one so break for speed
                     }
                 }
             } catch (Exception e) {
-                Log.wtf("Got exception in replace: ", e);
+                UserError.Log.wtf("Got exception in replace: ", e);
             }
         }
 
@@ -1254,7 +1255,7 @@ public class BluetoothGlucoseMeter extends Service {
                 queue.addAll(tmp_queue);
 
             } catch (Exception e) {
-                Log.wtf("Got exception in insert_after: ", e);
+                UserError.Log.wtf("Got exception in insert_after: ", e);
             }
         }
 
@@ -1266,20 +1267,20 @@ public class BluetoothGlucoseMeter extends Service {
         private synchronized static void poll_queue(boolean startup) {
 
             if (mConnectionState == STATE_DISCONNECTED) {
-                Log.e(TAG, "Connection is disconnecting, deleting queue");
+                UserError.Log.e(TAG, "Connection is disconnecting, deleting queue");
                 last_queue_command = null;
                 queue.clear();
                 return;
             }
 
             if (mBluetoothGatt == null) {
-                Log.e(TAG, "mBluetoothGatt is null - connect and defer");
+                UserError.Log.e(TAG, "mBluetoothGatt is null - connect and defer");
                 // connect?
                 // set timer?
                 return;
             }
             if (startup && queue.size() > 1) {
-                Log.d(TAG, "Queue busy deferring poll");
+                UserError.Log.i(TAG, "Queue busy deferring poll");
                 // set timer??
                 return;
             }
@@ -1289,21 +1290,21 @@ public class BluetoothGlucoseMeter extends Service {
                 JoH.runOnUiThreadDelayed(Bluetooth_CMD::check_queue_age, QUEUE_TIMEOUT + 1000);
                 queue_check_scheduled = time_now;
             } else {
-                if (d) Log.d(TAG, "Queue check already scheduled");
+                if (d) UserError.Log.i(TAG, "Queue check already scheduled");
             }
 
             if (ack_blocking()) {
-                if (d) Log.d(TAG, "Queue blocked by awaiting ack");
+                if (d) UserError.Log.i(TAG, "Queue blocked by awaiting ack");
                 return;
             }
 
             Bluetooth_CMD btc = queue.poll();
             if (btc != null) {
-                Log.d(TAG, "Processing queue " + btc.cmd + " :: " + btc.note + " :: " + btc.characteristic.toString() + " " + JoH.bytesToHex(btc.data));
+                UserError.Log.i(TAG, "Processing queue " + btc.cmd + " :: " + btc.note + " :: " + btc.characteristic.toString() + " " + JoH.bytesToHex(btc.data));
                 last_queue_command = btc;
                 process_queue_entry(btc);
             } else {
-                if (d) Log.d(TAG, "Queue empty");
+                if (d) UserError.Log.i(TAG, "Queue empty");
             }
         }
 
@@ -1311,17 +1312,17 @@ public class BluetoothGlucoseMeter extends Service {
             if (last_queue_command != null) {
                 if (last_queue_command.resent <= MAX_RESEND) {
                     last_queue_command.resent++;
-                    if (d) Log.d(TAG, "Delay before retry");
+                    if (d) UserError.Log.i(TAG, "Delay before retry");
                     waitFor(200);
-                    Log.d(TAG, "Retrying try:(" + last_queue_command.resent + ") last command: " + last_queue_command.note);
+                    UserError.Log.i(TAG, "Retrying try:(" + last_queue_command.resent + ") last command: " + last_queue_command.note);
                     process_queue_entry(last_queue_command);
                 } else {
-                    Log.e(TAG, "Exceeded max resend for: " + last_queue_command.note);
+                    UserError.Log.e(TAG, "Exceeded max resend for: " + last_queue_command.note);
                     last_queue_command = null;
 
                 }
             } else {
-                Log.d(TAG, "No last command to retry");
+                UserError.Log.i(TAG, "No last command to retry");
             }
         }
 
@@ -1329,7 +1330,7 @@ public class BluetoothGlucoseMeter extends Service {
         private static void process_queue_entry(Bluetooth_CMD btc) {
 
             if (mBluetoothAdapter == null || mBluetoothGatt == null) {
-                Log.w(TAG, "BluetoothAdapter not initialized");
+                UserError.Log.w(TAG, "BluetoothAdapter not initialized");
                 return;
             }
 
@@ -1349,7 +1350,7 @@ public class BluetoothGlucoseMeter extends Service {
                             if (await_acks && (characteristic.getValue().length > 1)) {
                                 awaiting_ack = true;
                                 awaiting_data = true;
-                                if (d) Log.d(TAG, "Setting await ack blocker 1");
+                                if (d) UserError.Log.i(TAG, "Setting await ack blocker 1");
                                 if (btc.note.startsWith("verio get record")) { // notify which record we are processing
                                     VerioHelper.updateRequestedRecord(Integer.parseInt(btc.note.substring(17)));
                                 }
@@ -1357,10 +1358,10 @@ public class BluetoothGlucoseMeter extends Service {
                             JoH.runOnUiThreadDelayed(() -> {
                                 try {
                                     if (!mBluetoothGatt.writeCharacteristic(characteristic)) {
-                                        Log.d(TAG, "Failed in write characteristic");
+                                        UserError.Log.i(TAG, "Failed in write characteristic");
                                         waitFor(150);
                                         if (!mBluetoothGatt.writeCharacteristic(characteristic)) {
-                                            Log.e(TAG, "Failed second time in write charactersitic");
+                                            UserError.Log.e(TAG, "Failed second time in write charactersitic");
                                         }
                                     }
                                 } catch (NullPointerException e) {
@@ -1391,16 +1392,16 @@ public class BluetoothGlucoseMeter extends Service {
                             break;
 
                         default:
-                            Log.e(TAG, "Unknown queue cmd: " + btc.cmd);
+                            UserError.Log.e(TAG, "Unknown queue cmd: " + btc.cmd);
 
                     } // end switch
 
                 } else {
-                    Log.e(TAG, "Characteristic was null!!!!");
+                    UserError.Log.e(TAG, "Characteristic was null!!!!");
                 }
 
             } else {
-                Log.e(TAG, "Got null service error on: " + btc.service);
+                UserError.Log.e(TAG, "Got null service error on: " + btc.service);
             }
         }
 

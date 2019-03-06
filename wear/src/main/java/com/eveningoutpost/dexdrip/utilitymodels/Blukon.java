@@ -71,7 +71,7 @@ public class Blukon {
 
         m_minutesDiff = (long) (JoH.msSince(m_timeLastCmdReceived) / Constants.MINUTE_IN_MS);
 
-        Log.i(TAG, "m_minutesDiff to last cmd=" + m_minutesDiff + ", last cmd received at: " + JoH.dateTimeText(m_timeLastCmdReceived));
+       UserError.Log.i(TAG, "m_minutesDiff to last cmd=" + m_minutesDiff + ", last cmd received at: " + JoH.dateTimeText(m_timeLastCmdReceived));
 
         if (m_communicationStarted) {
             //we need to make sure communication did not stop a long time ago because of another issue
@@ -89,7 +89,7 @@ public class Blukon {
     }
 
     public static void initialize() {
-            Log.i(TAG, "initialize Blukon!");
+           UserError.Log.i(TAG, "initialize Blukon!");
             JoH.clearRatelimit(BLUKON_GETSENSORAGE_TIMER);
             JoH.clearRatelimit(BLUKON_DECODE_SERIAL_TIMER);// set to current time to force timer to be set back
             m_getNowGlucoseDataCommand = false;
@@ -215,7 +215,7 @@ private static final int POSITION_OF_SENSOR_STATUS_BYTE = 17;
         boolean getHistoricReadings = false;
 
         if (buffer == null) {
-            Log.e(TAG, "null buffer passed to decodeBlukonPacket");
+           UserError.Log.e(TAG, "null buffer passed to decodeBlukonPacket");
             return null;
         }
 
@@ -225,7 +225,7 @@ private static final int POSITION_OF_SENSOR_STATUS_BYTE = 17;
         m_persistentTimeLastBg = PersistentStore.getLong("blukon-time-of-last-reading");
         m_minutesDiffToLastReading = (int) (((JoH.msSince(m_persistentTimeLastBg) / 1000) + 30) / 60);
 
-        Log.i(TAG, "m_minutesDiffToLastReading=" + m_minutesDiffToLastReading + ", last reading: " + JoH.dateTimeText(m_persistentTimeLastBg));
+       UserError.Log.i(TAG, "m_minutesDiffToLastReading=" + m_minutesDiffToLastReading + ", last reading: " + JoH.dateTimeText(m_persistentTimeLastBg));
 
         // Get history if the last reading is older than we can reasonably backfill
         if (Pref.getBooleanDefaultFalse("retrieve_blukon_history") && (m_persistentTimeLastBg > 0) && (m_minutesDiffToLastReading > 17)) {
@@ -234,10 +234,10 @@ private static final int POSITION_OF_SENSOR_STATUS_BYTE = 17;
 
         //BluCon code by gregorybel
         final String strRecCmd = CipherUtils.bytesToHex(buffer).toLowerCase();
-        Log.i(TAG, "Blukon data: " + strRecCmd);
+       UserError.Log.i(TAG, "Blukon data: " + strRecCmd);
 
         if (Pref.getBooleanDefaultFalse("external_blukon_algorithm")) {
-            Log.i(TAG, HexDump.dumpHexString(buffer));
+           UserError.Log.i(TAG, HexDump.dumpHexString(buffer));
         }
 
         /*
@@ -245,7 +245,7 @@ private static final int POSITION_OF_SENSOR_STATUS_BYTE = 17;
          */
         if (strRecCmd.equalsIgnoreCase(WAKEUP_COMMAND)) {
             cmdFound = 1;
-            Log.i(TAG, "Reset currentCommand");
+           UserError.Log.i(TAG, "Reset currentCommand");
             currentCommand = "";
             m_communicationStarted = true;
         }
@@ -258,34 +258,34 @@ private static final int POSITION_OF_SENSOR_STATUS_BYTE = 17;
          */
         if (strRecCmd.startsWith(BLUCON_ACK_RESPONSE)) {
             cmdFound = 1;
-            Log.i(TAG, "Got ACK");
+           UserError.Log.i(TAG, "Got ACK");
 
             if (currentCommand.startsWith(ACK_ON_WAKEUP_ANSWER)) {//ACK sent
                 //ack received
 
                 currentCommand = UNKNOWN1_COMMAND;
-                Log.i(TAG, "getUnknownCmd1: " + currentCommand);
+               UserError.Log.i(TAG, "getUnknownCmd1: " + currentCommand);
 
             } else {
-                Log.i(TAG, "Got sleep ack, resetting initialstate!");
+               UserError.Log.i(TAG, "Got sleep ack, resetting initialstate!");
                 currentCommand = "";
             }
         }
 
         if (strRecCmd.startsWith(BLUCON_NAK_RESPONSE_PREFIX)) {
             cmdFound = 1;
-            Log.e(TAG, "Got NACK on cmd=" + currentCommand + " with error=" + strRecCmd.substring(6));
+           UserError.Log.e(TAG, "Got NACK on cmd=" + currentCommand + " with error=" + strRecCmd.substring(6));
 
             if (strRecCmd.startsWith(BLUCON_NAK_RESPONSE_ERROR14)) {
-                Log.e(TAG, "Timeout: please wait 5min or push button to restart!");
+               UserError.Log.e(TAG, "Timeout: please wait 5min or push button to restart!");
             }
 
             if (strRecCmd.startsWith(PATCH_NOT_FOUND_RESPONSE)) {
-                Log.e(TAG, "Libre sensor has been removed!");
+               UserError.Log.e(TAG, "Libre sensor has been removed!");
             }
 
             if (strRecCmd.startsWith(PATCH_READ_ERROR)) {
-                Log.e(TAG, "Patch read error.. please check the connectivity and re-initiate... or maybe battery is low?");
+               UserError.Log.e(TAG, "Patch read error.. please check the connectivity and re-initiate... or maybe battery is low?");
                 Pref.setInt("bridge_battery", 1);
                 gotLowBat = true;
             }
@@ -298,7 +298,7 @@ private static final int POSITION_OF_SENSOR_STATUS_BYTE = 17;
             m_getNowGlucoseDataIndexCommand = false;
 
             currentCommand = SLEEP_COMMAND;
-            Log.i(TAG, "Send sleep cmd");
+           UserError.Log.i(TAG, "Send sleep cmd");
             m_communicationStarted = false;
 
 
@@ -310,19 +310,19 @@ private static final int POSITION_OF_SENSOR_STATUS_BYTE = 17;
          */
         if (currentCommand.equals("") && strRecCmd.equalsIgnoreCase(WAKEUP_COMMAND)) {
             cmdFound = 1;
-            Log.i(TAG, "wakeup received");
+           UserError.Log.i(TAG, "wakeup received");
 
             //must be first cmd to be sent otherwise get NACK!
            if (JoH.ratelimit("blukon-request_patch_info",1)) {
                currentCommand = GET_PATCH_INFO_COMMAND;
            }
-            Log.i(TAG, "getPatchInfo");
+           UserError.Log.i(TAG, "getPatchInfo");
         /*
          * step 3: analyse received patch info, decode serial number and check sensorStatus
          */
         } else if (currentCommand.startsWith(GET_PATCH_INFO_COMMAND) /*getPatchInfo*/ && strRecCmd.startsWith(PATCH_INFO_RESPONSE_PREFIX)) {
             cmdFound = 1;
-            Log.i(TAG, "Patch Info received");
+           UserError.Log.i(TAG, "Patch Info received");
 
             /*
                 in getPatchInfo: blucon answer is 20 bytes long.
@@ -343,11 +343,11 @@ private static final int POSITION_OF_SENSOR_STATUS_BYTE = 17;
 
             if (LibreUtils.isSensorReady(buffer[POSITION_OF_SENSOR_STATUS_BYTE])) {
                 currentCommand = ACK_ON_WAKEUP_ANSWER;
-                Log.i(TAG, "Send ACK");
+               UserError.Log.i(TAG, "Send ACK");
             } else {
-                Log.e(TAG, "Sensor is not ready, stop!");
+               UserError.Log.e(TAG, "Sensor is not ready, stop!");
                 currentCommand = SLEEP_COMMAND;
-                Log.i(TAG, "Send sleep cmd");
+               UserError.Log.i(TAG, "Send sleep cmd");
                 m_communicationStarted = false;
             }
 
@@ -356,28 +356,28 @@ private static final int POSITION_OF_SENSOR_STATUS_BYTE = 17;
          */
         } else if (currentCommand.startsWith(UNKNOWN1_COMMAND) /*getUnknownCmd1*/ && strRecCmd.startsWith("8bdb")) {
             cmdFound = 1;
-            Log.i(TAG, "gotUnknownCmd1 (010d0b00): " + strRecCmd);
+           UserError.Log.i(TAG, "gotUnknownCmd1 (010d0b00): " + strRecCmd);
 
             if (!strRecCmd.equals(BLUCON_UNKNOWN1_COMMAND_RESPONSE)) {
-                Log.e(TAG, "gotUnknownCmd1 (010d0b00): " + strRecCmd);
+               UserError.Log.e(TAG, "gotUnknownCmd1 (010d0b00): " + strRecCmd);
             }
 
             currentCommand = UNKNOWN2_COMMAND;
-            Log.i(TAG, "getUnknownCmd2 " + currentCommand);
+           UserError.Log.i(TAG, "getUnknownCmd2 " + currentCommand);
 
         /*
          * step 6: send unknownCommand2 as otherwise communication errors will occur
          */
         } else if (currentCommand.startsWith(UNKNOWN2_COMMAND) /*getUnknownCmd2*/ && strRecCmd.startsWith("8bda")) {
             cmdFound = 1;
-            Log.i(TAG, "gotUnknownCmd2 (010d0a00): " + strRecCmd);
+           UserError.Log.i(TAG, "gotUnknownCmd2 (010d0a00): " + strRecCmd);
 
             if (!strRecCmd.equals(BLUCON_UNKNOWN2_COMMAND_RESPONSE)) {
-                Log.e(TAG, "gotUnknownCmd2 (010d0a00): " + strRecCmd);
+               UserError.Log.e(TAG, "gotUnknownCmd2 (010d0a00): " + strRecCmd);
             }
 
             if (strRecCmd.equals(BLUCON_UNKNOWN2_COMMAND_RESPONSE_BATTERY_LOW)) {
-                Log.e(TAG, "gotUnknownCmd2: is maybe battery low????");
+               UserError.Log.e(TAG, "gotUnknownCmd2: is maybe battery low????");
                 Pref.setInt("bridge_battery", 5);
                 gotLowBat = true;
             }
@@ -387,7 +387,7 @@ private static final int POSITION_OF_SENSOR_STATUS_BYTE = 17;
              */
             if (Pref.getBooleanDefaultFalse("external_blukon_algorithm") || getHistoricReadings) {
                 // Send the command to getHistoricData (read all blocks from 0 to 0x2b)
-                Log.i(TAG, "getHistoricData (2)");
+               UserError.Log.i(TAG, "getHistoricData (2)");
                 currentCommand = GET_HISTORIC_DATA_COMMAND_ALL_BLOCKS;
                 m_blockNumber = 0;
 
@@ -398,11 +398,11 @@ private static final int POSITION_OF_SENSOR_STATUS_BYTE = 17;
             } else {
                 if (JoH.pratelimit(BLUKON_GETSENSORAGE_TIMER, GET_SENSOR_AGE_DELAY)) {
                     currentCommand = GET_SENSOR_TIME_COMMAND;
-                    Log.i(TAG, "getSensorAge");
+                   UserError.Log.i(TAG, "getSensorAge");
                 } else {
                     currentCommand = GET_NOW_DATA_INDEX_COMMAND;
                     m_getNowGlucoseDataIndexCommand = true;//to avoid issue when gotNowDataIndex cmd could be same as getNowGlucoseData (case block=3)
-                    Log.i(TAG, "getNowGlucoseDataIndexCommand");
+                   UserError.Log.i(TAG, "getNowGlucoseDataIndexCommand");
                 }
             }
 
@@ -413,14 +413,14 @@ private static final int POSITION_OF_SENSOR_STATUS_BYTE = 17;
             cmdFound = 1;
 
             int sensorAge = sensorAge(buffer);
-            Log.d(TAG, "SensorAge received=" + sensorAge);
+           UserError.Log.d(TAG, "SensorAge received=" + sensorAge);
 
             int currentSensorAge = Pref.getInt("nfc_sensor_age", 0);
-            Log.d(TAG, "current SensorAge=" + currentSensorAge);
+           UserError.Log.d(TAG, "current SensorAge=" + currentSensorAge);
 
             //This is a new sensor, force read from serial
             if (sensorAge < currentSensorAge) {
-                Log.i(TAG, "new sensor?");
+               UserError.Log.i(TAG, "new sensor?");
                 JoH.clearRatelimit(BLUKON_DECODE_SERIAL_TIMER);// set to current time to force timer to be set back
             }
 
@@ -430,25 +430,25 @@ private static final int POSITION_OF_SENSOR_STATUS_BYTE = 17;
                 //to avoid warning, simply overide this flag
                 Pref.setBoolean("nfc_age_problem", false);
             } else {
-                Log.e(TAG, "Do not set 'nfc_sensor_age'");
+               UserError.Log.e(TAG, "Do not set 'nfc_sensor_age'");
             }
 
             currentSensorAge = Pref.getInt("nfc_sensor_age", 0);
-            Log.d(TAG, "[After set] current SensorAge=" + currentSensorAge);
+           UserError.Log.d(TAG, "[After set] current SensorAge=" + currentSensorAge);
 
             currentCommand = GET_NOW_DATA_INDEX_COMMAND;
             m_getNowGlucoseDataIndexCommand = true;//to avoid issue when gotNowDataIndex cmd could be same as getNowGlucoseData (case block=3)
-            Log.i(TAG, "getNowGlucoseDataIndexCommand");
+           UserError.Log.i(TAG, "getNowGlucoseDataIndexCommand");
 
         /*
          * step 8: determine trend or historic data index
          */
-        } else if (currentCommand.startsWith(GET_NOW_DATA_INDEX_COMMAND) /*getNowDataIndex*/ && m_getNowGlucoseDataIndexCommand == true && strRecCmd.startsWith(SINGLE_BLOCK_INFO_RESPONSE_PREFIX)) {
+        } else if (currentCommand.startsWith(GET_NOW_DATA_INDEX_COMMAND) /*getNowDataIndex*/ && m_getNowGlucoseDataIndexCommand && strRecCmd.startsWith(SINGLE_BLOCK_INFO_RESPONSE_PREFIX)) {
             cmdFound = 1;
 
             // check time range for valid backfilling
             if ((m_minutesDiffToLastReading > 7) && (m_minutesDiffToLastReading < (8 * 60))) {
-                Log.i(TAG, "start backfilling");
+               UserError.Log.i(TAG, "start backfilling");
                 m_getOlderReading = true;
             } else {
                 m_getOlderReading = false;
@@ -460,7 +460,7 @@ private static final int POSITION_OF_SENSOR_STATUS_BYTE = 17;
             if (!m_getOlderReading) {
                 currentCommand = READ_SINGLE_BLOCK_COMMAND_PREFIX + Integer.toHexString(m_currentBlockNumber);//getNowGlucoseData
                 m_nowGlucoseOffset = m_currentOffset;
-                Log.i(TAG, "getNowGlucoseData");
+               UserError.Log.i(TAG, "getNowGlucoseData");
             } else {
                 m_minutesBack = m_minutesDiffToLastReading;
                 int delayedTrendIndex = m_currentTrendIndex;
@@ -472,14 +472,14 @@ private static final int POSITION_OF_SENSOR_STATUS_BYTE = 17;
                 } else if (m_minutesBack > 7) {
                     m_minutesBack = 5;
                 }
-                Log.i(TAG, "read " + m_minutesBack + " mins old trend data");
+               UserError.Log.i(TAG, "read " + m_minutesBack + " mins old trend data");
                 for (int i = 0; i < m_minutesBack; i++) {
                     if (--delayedTrendIndex < 0)
                         delayedTrendIndex = 15;
                 }
                 int delayedBlockNumber = blockNumberForNowGlucoseDataDelayed(delayedTrendIndex);
                 currentCommand = READ_SINGLE_BLOCK_COMMAND_PREFIX + Integer.toHexString(delayedBlockNumber);//getNowGlucoseData
-                Log.i(TAG, "getNowGlucoseData backfilling");
+               UserError.Log.i(TAG, "getNowGlucoseData backfilling");
             }
             m_getNowGlucoseDataIndexCommand = false;
             m_getNowGlucoseDataCommand = true;
@@ -487,14 +487,14 @@ private static final int POSITION_OF_SENSOR_STATUS_BYTE = 17;
         /*
          * step 9: calculate fro current index the block number next to read
          */
-        } else if (currentCommand.startsWith(READ_SINGLE_BLOCK_COMMAND_PREFIX_SHORT) /*getNowGlucoseData*/ && m_getNowGlucoseDataCommand == true && strRecCmd.startsWith(SINGLE_BLOCK_INFO_RESPONSE_PREFIX)) {
-            Log.d(TAG, "Before Saving data: + currentCommand = " + currentCommand);
+        } else if (currentCommand.startsWith(READ_SINGLE_BLOCK_COMMAND_PREFIX_SHORT) /*getNowGlucoseData*/ && m_getNowGlucoseDataCommand && strRecCmd.startsWith(SINGLE_BLOCK_INFO_RESPONSE_PREFIX)) {
+           UserError.Log.d(TAG, "Before Saving data: + currentCommand = " + currentCommand);
             String blockId = currentCommand.substring(READ_SINGLE_BLOCK_COMMAND_PREFIX_SHORT.length());
             long now = JoH.tsl();
             if(!blockId.isEmpty()) {
                 int blockNum = JoH.parseIntWithDefault(blockId, 16, -1);
                 if(blockNum != -1) {
-                    Log.d(TAG, "Saving data: + blockid = " + blockNum);
+                   UserError.Log.d(TAG, "Saving data: + blockid = " + blockNum);
                     LibreBlock.createAndSave("blukon", now , buffer, blockNum * 8);
                 }
             }
@@ -502,12 +502,12 @@ private static final int POSITION_OF_SENSOR_STATUS_BYTE = 17;
             cmdFound = 1;
             int currentGlucose = nowGetGlucoseValue(buffer);
 
-            Log.i(TAG, "********got getNowGlucoseData=" + currentGlucose);
+           UserError.Log.i(TAG, "********got getNowGlucoseData=" + currentGlucose);
 
             if (!m_getOlderReading) {
 
                 m_minutesDiffToLastReading = (int) (JoH.msSince(m_persistentTimeLastBg) / Constants.MINUTE_IN_MS);
-                Log.i(TAG, "m_minutesDiffToLastReading (no rounding)=" + m_minutesDiffToLastReading + ", last reading: " + JoH.dateTimeText(m_persistentTimeLastBg));
+               UserError.Log.i(TAG, "m_minutesDiffToLastReading (no rounding)=" + m_minutesDiffToLastReading + ", last reading: " + JoH.dateTimeText(m_persistentTimeLastBg));
 
                 if (m_minutesDiffToLastReading >= 4) {
                     processNewTransmitterData(TransmitterData.create(currentGlucose, currentGlucose, 0 /*battery level force to 0 as unknown*/, now));
@@ -515,27 +515,27 @@ private static final int POSITION_OF_SENSOR_STATUS_BYTE = 17;
                     m_timeLastBg = now;
 
                     PersistentStore.setLong("blukon-time-of-last-reading", m_timeLastBg);
-                    Log.i(TAG, "time of current reading: " + JoH.dateTimeText(m_timeLastBg));
+                   UserError.Log.i(TAG, "time of current reading: " + JoH.dateTimeText(m_timeLastBg));
                 } else {
-                    Log.e(TAG, "New Cmd received too early, send blukon to sleep and ignore BG value");
+                   UserError.Log.e(TAG, "New Cmd received too early, send blukon to sleep and ignore BG value");
                 }
 
                 /* 
                  * step 10: send sleep command
                  */
                 currentCommand = SLEEP_COMMAND;
-                Log.i(TAG, "Send sleep cmd");
+               UserError.Log.i(TAG, "Send sleep cmd");
                 m_communicationStarted = false;
                 m_getNowGlucoseDataCommand = false;
             } else {
-                Log.i(TAG, "bf: processNewTransmitterData with delayed timestamp of " + m_minutesBack + " min");
+               UserError.Log.i(TAG, "bf: processNewTransmitterData with delayed timestamp of " + m_minutesBack + " min");
                 processNewTransmitterData(TransmitterData.create(currentGlucose, currentGlucose, 0 /*battery level force to 0 as unknown*/, now - (m_minutesBack * 60 * 1000)));
                 // @keencave - count down for next backfilling entry
                 m_minutesBack -= 5;
                 if (m_minutesBack < 5) {
                     m_getOlderReading = false;
                 }
-                Log.i(TAG, "bf: calculate next trend buffer with " + m_minutesBack + " min timestamp");
+               UserError.Log.i(TAG, "bf: calculate next trend buffer with " + m_minutesBack + " min timestamp");
                 int delayedTrendIndex = m_currentTrendIndex;
                 for (int i = 0; i < m_minutesBack; i++) {
                     if (--delayedTrendIndex < 0)
@@ -543,7 +543,7 @@ private static final int POSITION_OF_SENSOR_STATUS_BYTE = 17;
                 }
                 int delayedBlockNumber = blockNumberForNowGlucoseDataDelayed(delayedTrendIndex);
                 currentCommand = READ_SINGLE_BLOCK_COMMAND_PREFIX + Integer.toHexString(delayedBlockNumber);//getNowGlucoseData
-                Log.i(TAG, "bf: read next block: " + currentCommand);
+               UserError.Log.i(TAG, "bf: read next block: " + currentCommand);
 
 
             }
@@ -552,12 +552,12 @@ private static final int POSITION_OF_SENSOR_STATUS_BYTE = 17;
             handlegetHistoricDataResponse(buffer);
         } else if (strRecCmd.startsWith(BLUCON_BATTERY_LOW_INDICATION1)) {
             cmdFound = 1;
-            Log.e(TAG, "is bridge battery low????!");
+           UserError.Log.e(TAG, "is bridge battery low????!");
             Pref.setInt("bridge_battery", 3);
             gotLowBat = true;
         } else if (strRecCmd.startsWith(BLUCON_BATTERY_LOW_INDICATION2)) {
             cmdFound = 1;
-            Log.e(TAG, "is bridge battery really low????!");
+           UserError.Log.e(TAG, "is bridge battery really low????!");
             Pref.setInt("bridge_battery", 2);
             gotLowBat = true;
         }
@@ -568,12 +568,12 @@ private static final int POSITION_OF_SENSOR_STATUS_BYTE = 17;
 
         CheckBridgeBattery.checkBridgeBattery();
 
-        if (currentCommand.length() > 0 && cmdFound == 1) {
-            Log.i(TAG, "Sending reply: " + currentCommand);
+        if (!currentCommand.isEmpty() && cmdFound == 1) {
+           UserError.Log.i(TAG, "Sending reply: " + currentCommand);
             return CipherUtils.hexToBytes(currentCommand);
         } else {
             if (cmdFound == 0) {
-                Log.e(TAG, "***COMMAND NOT FOUND! -> " + strRecCmd + " on currentCmd=" + currentCommand);
+               UserError.Log.e(TAG, "***COMMAND NOT FOUND! -> " + strRecCmd + " on currentCmd=" + currentCommand);
             }
             currentCommand = "";
             return null;
@@ -582,24 +582,24 @@ private static final int POSITION_OF_SENSOR_STATUS_BYTE = 17;
     }
 
     private static void handlegetHistoricDataResponse(byte[] buffer) {
-        Log.e(TAG, "recieved historic data, m_block_number = " + m_blockNumber);
+       UserError.Log.e(TAG, "recieved historic data, m_block_number = " + m_blockNumber);
         // We are looking for 43 blocks of 8 bytes.
         // The bluekon will send them as 21 blocks of 16 bytes, and the last one of 8 bytes. 
         // The packet will look like "0x8b 0xdf 0xblocknumber 0x02 DATA" (so data starts at place 4)
         if (m_blockNumber > 42) {
-            Log.e(TAG, "recieved historic data, but block number is too big " + m_blockNumber);
+           UserError.Log.e(TAG, "recieved historic data, but block number is too big " + m_blockNumber);
             return;
         }
 
         int len = buffer.length - 4;
-        Log.e(TAG, "len = " + len + " " + len + " blocknum " + buffer[2]);
+       UserError.Log.e(TAG, "len = " + len + " " + len + " blocknum " + buffer[2]);
 
         if (buffer[2] != m_blockNumber) {
-            Log.e(TAG, "We have recieved a bad block number buffer[2] = " + buffer[2] + " m_blockNumber = " + m_blockNumber);
+           UserError.Log.e(TAG, "We have recieved a bad block number buffer[2] = " + buffer[2] + " m_blockNumber = " + m_blockNumber);
             return;
         }
         if (8 * m_blockNumber + len > m_full_data.length) {
-            Log.e(TAG, "We have recieved too much data  m_blockNumber = " + m_blockNumber + " len = " + len +
+           UserError.Log.e(TAG, "We have recieved too much data  m_blockNumber = " + m_blockNumber + " len = " + len +
                     " m_full_data.length = " + m_full_data.length);
             return;
         }
@@ -610,16 +610,16 @@ private static final int POSITION_OF_SENSOR_STATUS_BYTE = 17;
         if (m_blockNumber >= 43) {
             long now = JoH.tsl();
             currentCommand = SLEEP_COMMAND;
-            Log.i(TAG, "Send sleep cmd");
+           UserError.Log.i(TAG, "Send sleep cmd");
             m_communicationStarted = false;
 
-            Log.i(TAG, "Full data that was received is " + HexDump.dumpHexString(m_full_data));
+           UserError.Log.i(TAG, "Full data that was received is " + HexDump.dumpHexString(m_full_data));
 
             final String tagId = PersistentStore.getString("LibreSN");
             NFCReaderX.HandleGoodReading(tagId, m_full_data, now);
 
             PersistentStore.setLong("blukon-time-of-last-reading", now);
-            Log.i(TAG, "time of current reading: " + JoH.dateTimeText(now));
+           UserError.Log.i(TAG, "time of current reading: " + JoH.dateTimeText(now));
         } else {
             currentCommand = "";
         }
@@ -628,18 +628,18 @@ private static final int POSITION_OF_SENSOR_STATUS_BYTE = 17;
 
     private static synchronized void processNewTransmitterData(TransmitterData transmitterData) {
         if (transmitterData == null) {
-            Log.e(TAG, "Got duplicated data! Last BG at " + JoH.dateTimeText(m_timeLastBg));
+           UserError.Log.e(TAG, "Got duplicated data! Last BG at " + JoH.dateTimeText(m_timeLastBg));
             return;
         }
 
         final Sensor sensor = Sensor.currentSensor();
         if (sensor == null) {
-            Log.i(TAG, "processNewTransmitterData: No Active Sensor, Data only stored in Transmitter Data");
+           UserError.Log.i(TAG, "processNewTransmitterData: No Active Sensor, Data only stored in Transmitter Data");
             return;
         }
 
         DexCollectionService.last_transmitter_Data = transmitterData;
-        Log.d(TAG, "BgReading.create: new BG reading at " + transmitterData.timestamp);
+       UserError.Log.d(TAG, "BgReading.create: new BG reading at " + transmitterData.timestamp);
         BgReading.create(transmitterData.raw_data, transmitterData.filtered_data, xdrip.getAppContext(), transmitterData.timestamp);
     }
 
@@ -673,7 +673,7 @@ private static final int POSITION_OF_SENSOR_STATUS_BYTE = 17;
         // calculate offset of the 2 bytes in the block
         m_nowGlucoseOffset = nowGlucoseIndex2 % 8;
 
-        Log.i(TAG, "++++++++currentTrendData: index " + m_currentTrendIndex + ", block " + nowGlucoseIndex3 + ", offset " + m_nowGlucoseOffset);
+       UserError.Log.i(TAG, "++++++++currentTrendData: index " + m_currentTrendIndex + ", block " + nowGlucoseIndex3 + ", offset " + m_nowGlucoseOffset);
 
         return (nowGlucoseIndex3);
     }
@@ -695,7 +695,7 @@ private static final int POSITION_OF_SENSOR_STATUS_BYTE = 17;
 
         // calculate the offset in the block
         m_nowGlucoseOffset = ngi2 % 8;
-        Log.i(TAG, "++++++++backfillingTrendData: index " + delayedIndex + ", block " + ngi3 + ", offset " + m_nowGlucoseOffset);
+       UserError.Log.i(TAG, "++++++++backfillingTrendData: index " + delayedIndex + ", block " + ngi3 + ", offset " + m_nowGlucoseOffset);
 
         return (ngi3);
     }
@@ -727,7 +727,7 @@ private static final int POSITION_OF_SENSOR_STATUS_BYTE = 17;
         final boolean thirteen_bit_mask = true;
         // grep 2 bytes with BG data from input bytearray, mask out 12 LSB bits and rescale for xDrip+
         rawGlucose = ((input[3 + m_nowGlucoseOffset + 1] & (thirteen_bit_mask ? 0x1F : 0x0F)) << 8) | (input[3 + m_nowGlucoseOffset] & 0xFF);
-        Log.i(TAG, "rawGlucose=" + rawGlucose + ", m_nowGlucoseOffset=" + m_nowGlucoseOffset);
+       UserError.Log.i(TAG, "rawGlucose=" + rawGlucose + ", m_nowGlucoseOffset=" + m_nowGlucoseOffset);
 
         // rescale
         curGluc = getGlucose(rawGlucose);
@@ -738,7 +738,7 @@ private static final int POSITION_OF_SENSOR_STATUS_BYTE = 17;
 
     private static int sensorAge(byte[] input) {
         int sensorAge = ((input[3 + 5] & 0xFF) << 8) | (input[3 + 4] & 0xFF);
-        Log.i(TAG, "sensorAge=" + sensorAge);
+       UserError.Log.i(TAG, "sensorAge=" + sensorAge);
 
         return sensorAge;
     }
@@ -768,7 +768,7 @@ private static final int POSITION_OF_SENSOR_STATUS_BYTE = 17;
         try {
             dialog.show();
         } catch (IllegalStateException e) {
-            Log.e(TAG, e.toString());
+           UserError.Log.e(TAG, e.toString());
             JoH.static_toast_long("Error displaying PIN entry. Please contact us if this keeps happening");
         }
     }

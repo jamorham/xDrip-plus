@@ -10,6 +10,7 @@ import android.view.ViewGroup;
 
 import com.eveningoutpost.dexdrip.Home;
 import com.eveningoutpost.dexdrip.WidgetUpdateService;
+import com.eveningoutpost.dexdrip.models.*;
 import com.eveningoutpost.dexdrip.xdrip;
 import com.rarepebble.colorpicker.ColorPreference;
 
@@ -36,9 +37,9 @@ public class ColorPicker extends ColorPreference {
                 if (attrs.getAttributeName(i).equals("defaultValue")) {
                     final String this_value = attrs.getAttributeValue(i);
 
-                    if (this_value.length() > 0) {
+                    if (!this_value.isEmpty()) {
                         if (debug)
-                            Log.d(TAG, "Attribute debug: " + i + " " + attrs.getAttributeName(i) + " " + this_value);
+                            UserError.Log.i(TAG, "Attribute debug: " + i + " " + attrs.getAttributeName(i) + " " + this_value);
                         if (this_value.startsWith("@")) {
                             localDefaultValue = Color.parseColor(getStringResourceByName(this_value));
                         } else {
@@ -47,7 +48,7 @@ public class ColorPicker extends ColorPreference {
                         localDefaultValue = Color.parseColor(attrs.getAttributeValue(i));
                         super.defaultColor = localDefaultValue;
                     } else {
-                        Log.w(TAG, "No default value for colorpicker");
+                        UserError.Log.w(TAG, "No default value for colorpicker");
                     }
                     break;
                 }
@@ -70,14 +71,14 @@ public class ColorPicker extends ColorPreference {
 
         // TODO maybe a better way to send this message to the chart
         if (mParent != null) {
-            Log.d(TAG, "Calling refresh on parent");
+            UserError.Log.i(TAG, "Calling refresh on parent");
             try {
                 mParent.refreshDrawableState();
             } catch (Exception e) {
-                Log.e(TAG, "Got exception refreshing drawablestate: " + e);
+                UserError.Log.e(TAG, "Got exception refreshing drawablestate: " + e);
             }
         } else {
-            Log.d(TAG, "mparent is null :(");
+            UserError.Log.i(TAG, "mparent is null :(");
         }
         notifyChanged();
 
@@ -110,7 +111,7 @@ public class ColorPicker extends ColorPreference {
             try {
                 mCurrentValue = this.getPersistedInt(DEFAULT_VALUE);
             } catch (ClassCastException e) {
-                Log.e(TAG, "Cannot cast - invalid preference type saved? Should be Int!! ", e);
+                UserError.Log.e(TAG, "Cannot cast - invalid preference type saved? Should be Int!! ", e);
             }
         } else {
             // Set default state from the XML attribute
@@ -121,7 +122,7 @@ public class ColorPicker extends ColorPreference {
 
     @Override
     protected Object onGetDefaultValue(TypedArray a, int index) {
-        if (debug) Log.d(TAG, "onGetDefault Value called: " + a.getString(index));
+        if (debug) UserError.Log.i(TAG, "onGetDefault Value called: " + a.getString(index));
 
         localDefaultValue = Color.parseColor(a.getString(index));
         super.defaultColor = localDefaultValue;

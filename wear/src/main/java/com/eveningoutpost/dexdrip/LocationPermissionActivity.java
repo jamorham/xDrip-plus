@@ -24,14 +24,14 @@ public class LocationPermissionActivity extends WearableActivity {//KS
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
-        Log.d(TAG, "onCreate ENTERING");
+       UserError.Log.d(TAG, "onCreate ENTERING");
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_location_permission);
         JoH.vibrateNotice();
     }
 
     public void onClickEnablePermission(View view) {
-        Log.d(TAG, "onClickEnablePermission()");
+       UserError.Log.d(TAG, "onClickEnablePermission()");
 
         // On 23+ (M+) devices, GPS permission not granted. Request permission.
         ActivityCompat.requestPermissions(
@@ -48,12 +48,12 @@ public class LocationPermissionActivity extends WearableActivity {//KS
     public void onRequestPermissionsResult(
             int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
 
-        Log.d(TAG, "onRequestPermissionsResult()");
+       UserError.Log.d(TAG, "onRequestPermissionsResult()");
 
         if (requestCode == PERMISSION_REQUEST_FINE_LOCATION) {
             if ((grantResults.length == 1)
                     && (grantResults[0] == PackageManager.PERMISSION_GRANTED)) {
-                Log.i(TAG, "onRequestPermissionsResult() granted");
+               UserError.Log.i(TAG, "onRequestPermissionsResult() granted");
                 finish();
             }
         }

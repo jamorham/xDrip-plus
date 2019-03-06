@@ -59,18 +59,18 @@ public class MtpConfigure {
 
         if (device != null) {
             if (Build.VERSION.SDK_INT < 24) {
-                Log.e(TAG, "Doesn't work below android 7");
+                UserError.Log.e(TAG, "Doesn't work below android 7");
                 return;
             }
             if (JoH.ratelimit("mtp-request-perms", 25)) {
                 msg("Requesting permission");
-                Log.d(TAG, "Processing handleConnect()");
+                UserError.Log.i(TAG, "Processing handleConnect()");
 
                 UsbTools.requestPermission(device, new UsbTools.PermissionReceiver() {
                     @Override
                     public void onGranted(final UsbDevice device) {
                         msg("Permission granted");
-                        Log.d(TAG, "Permission granted - executing in background");
+                        UserError.Log.i(TAG, "Permission granted - executing in background");
                         Inevitable.task("mtp-configure-action", 1000, () -> openDevice(device));
                     }
                 });
@@ -85,30 +85,30 @@ public class MtpConfigure {
             return;
         }
         msg("Opening device");
-        Log.d(TAG, "Attempting to open MTP device");
+        UserError.Log.i(TAG, "Attempting to open MTP device");
         final MtpDeviceHelper mtp = new MtpDeviceHelper(device);
         if (!mtp.ok()) {
             msg("Cannot connect to device");
-            Log.e(TAG, "Cannot open MTP device");
+            UserError.Log.e(TAG, "Cannot open MTP device");
             return;
         }
 
         try {
             msg("Device: " + mtp.name());
-            Log.d(TAG, "mtp name: " + mtp.name());
+            UserError.Log.i(TAG, "mtp name: " + mtp.name());
 
             if (mtp.hash().startsWith("eb3b2846")) {
 
                 if (mtp.numberOfStorageIds() != 1) {
                     err("Problem with device storage");
-                    Log.e(TAG, "Invalid Size of storage ids: " + mtp.numberOfStorageIds()); // baulk if not 1
+                    UserError.Log.e(TAG, "Invalid Size of storage ids: " + mtp.numberOfStorageIds()); // baulk if not 1
                     return;
                 }
 
                 final int storageID = mtp.getFirstStorageId();
                 if (storageID == -1) {
                     err("Cannot open device storage");
-                    Log.e(TAG, "Cannot get first storage id");
+                    UserError.Log.e(TAG, "Cannot get first storage id");
                     return;
                 }
 
@@ -124,7 +124,7 @@ public class MtpConfigure {
 
             } else {
                 err("Device type not known - cannot proceed");
-                Log.e(TAG, "Device doesn't match");
+                UserError.Log.e(TAG, "Device doesn't match");
             }
         } finally {
             mtp.close();

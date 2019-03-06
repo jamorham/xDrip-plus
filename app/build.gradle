@@ -318,7 +318,7 @@ dependencies {
     androidTestImplementation 'androidx.test.espresso:espresso-core:3.0.1', {
         exclude group: 'com.android.support', module: 'support-annotations'
     }
-    androidTestImplementation 'androidx.test:runner:1.1.0', {
+    androidTestImplementation 'androidx.test:runner:1.1.1', {
         exclude group: 'com.android.support', module: 'support-annotations'
     }
     androidTestImplementation 'androidx.test.espresso:espresso-idling-resource:3.1.1'
@@ -341,6 +341,7 @@ dependencies {
     implementation 'com.google.dagger:dagger-android:2.21'
     //implementation 'com.google.dagger:dagger-android-support:2.x' // if you use the support libraries
     annotationProcessor 'com.google.dagger:dagger-compiler:2.21'
+    implementation 'androidx.legacy:legacy-preference-v14:1.0.0'
 }
 
 apply plugin: 'com.google.gms.google-services'

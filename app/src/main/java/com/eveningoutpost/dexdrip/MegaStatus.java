@@ -210,7 +210,7 @@ public class MegaStatus extends ActivityWithMenu {
 
         // if triggered from pending intent, flip to named section if we can
         final String action = getIntent().getAction();
-        if ((action != null) && (action.length() > 0)) {
+        if ((action != null) && (!action.isEmpty())) {
             int action_position = sectionList.indexOf(action);
             if (action_position > -1) saved_position = action_position;
         }

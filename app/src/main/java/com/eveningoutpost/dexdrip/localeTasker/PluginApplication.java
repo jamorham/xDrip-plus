@@ -18,6 +18,7 @@ import android.os.*;
 import android.util.*;
 
 import com.eveningoutpost.dexdrip.*;
+import com.eveningoutpost.dexdrip.models.*;
 
 /**
  * Implements an application object for the plug-in.
@@ -36,18 +37,12 @@ public final class PluginApplication extends Application
         {
             if (Constants.IS_LOGGABLE)
             {
-                Log.v(Constants.LOG_TAG, "Application is debuggable.  Enabling additional debug logging"); //$NON-NLS-1$
+                UserError.Log.v(Constants.LOG_TAG, "Application is debuggable.  Enabling additional debug logging"); //$NON-NLS-1$
             }
 
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.GINGERBREAD)
-            {
-                enableApiLevel9Debugging();
-            }
+            enableApiLevel9Debugging();
 
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.HONEYCOMB)
-            {
-                enableApiLevel11Debugging();
-            }
+            enableApiLevel11Debugging();
 
             /*
              * If using the Fragment compatibility library, enable debug logging here

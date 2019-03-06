@@ -67,10 +67,10 @@ public class NSClientChat {
                     context.sendBroadcast(intent);
                     List<ResolveInfo> q = context.getPackageManager().queryBroadcastReceivers(intent, 0);
                     if (q.size() < 1) {
-                        Log.e(TAG, "DBADD No receivers");
-                    } else Log.e(TAG, "DBADD dbAdd " + q.size() + " receivers");
+                        UserError.Log.e(TAG, "DBADD No receivers");
+                    } else UserError.Log.e(TAG, "DBADD dbAdd " + q.size() + " receivers");
                 } catch (JSONException e) {
-                    Log.e(TAG, "Got exception with parsing: " + e.toString());
+                    UserError.Log.e(TAG, "Got exception with parsing: " + e.toString());
                 }
             }
         };

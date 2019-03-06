@@ -29,9 +29,7 @@ public class SMS {
 
             UserError.Log.d(TAG, "Sim State: " + manager.getSimState());
 
-            if (manager.getSimState() == SIM_STATE_READY) {
-                return true;
-            }
+	        return manager.getSimState() == SIM_STATE_READY;
 
 
         } else {

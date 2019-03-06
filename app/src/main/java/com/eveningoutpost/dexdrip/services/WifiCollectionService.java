@@ -35,14 +35,14 @@ public class WifiCollectionService extends Service {
     public SharedPreferences.OnSharedPreferenceChangeListener prefListener = new SharedPreferences.OnSharedPreferenceChangeListener() {
         public void onSharedPreferenceChanged(SharedPreferences prefs, String key) {
             if (key.compareTo("run_service_in_foreground") == 0) {
-                Log.d("FOREGROUND", "run_service_in_foreground changed!");
+                UserError.Log.i("FOREGROUND", "run_service_in_foreground changed!");
                 if (prefs.getBoolean("run_service_in_foreground", false)) {
                     foregroundServiceStarter = new ForegroundServiceStarter(getApplicationContext(), dexCollectionService);
                     foregroundServiceStarter.start();
-                    Log.d(TAG, "Moving to foreground");
+                    UserError.Log.i(TAG, "Moving to foreground");
                 } else {
                     dexCollectionService.stopForeground(true);
-                    Log.d(TAG, "Removing from foreground");
+                    UserError.Log.i(TAG, "Removing from foreground");
                 }
             }
         }
@@ -92,7 +92,7 @@ public class WifiCollectionService extends Service {
         prefs = PreferenceManager.getDefaultSharedPreferences(getApplicationContext());
         listenForChangeInSettings();
         // bgToSpeech = BgToSpeech.setupTTS(mContext); //keep reference to not being garbage collected
-        Log.i(TAG, "onCreate: STARTING SERVICE");
+        UserError.Log.i(TAG, "onCreate: STARTING SERVICE");
         lastState = "Starting up " + JoH.hourMinuteString();
     }
 
@@ -104,7 +104,7 @@ public class WifiCollectionService extends Service {
             JoH.persistentBuggySamsungCheck();
             final long wakeup_jitter = JoH.msSince(requested_wake_time);
             if (wakeup_jitter > 2000) {
-                Log.d(TAG, "Wake up jitter: " + JoH.niceTimeScalar(wakeup_jitter));
+                UserError.Log.i(TAG, "Wake up jitter: " + JoH.niceTimeScalar(wakeup_jitter));
             }
             if ((wakeup_jitter > TOLERABLE_JITTER) && (!JoH.buggy_samsung) && (JoH.isSamsung())) {
                 UserError.Log.wtf(TAG, "Enabled Buggy Samsung workaround due to jitter of: " + JoH.niceTimeScalar(wakeup_jitter));
@@ -133,15 +133,15 @@ public class WifiCollectionService extends Service {
     @Override
     public void onDestroy() {
         super.onDestroy();
-        Log.d(TAG, "onDestroy entered");
+        UserError.Log.i(TAG, "onDestroy entered");
         foregroundServiceStarter.stop();
         //BgToSpeech.tearDownTTS();
-        Log.i(TAG, "SERVICE STOPPED");
+        UserError.Log.i(TAG, "SERVICE STOPPED");
         // ???? What will realy stop me, or am I already stopped???
         try {
             prefs.unregisterOnSharedPreferenceChangeListener(prefListener);
         } catch (Exception e) {
-            Log.e(TAG, "Exception unregistering prefListener");
+            UserError.Log.e(TAG, "Exception unregistering prefListener");
         }
     }
 
@@ -153,7 +153,7 @@ public class WifiCollectionService extends Service {
             } else {
                 retry_in = WixelReader.timeForNextRead();
             }
-            Log.d(TAG, "setFailoverTimer: Fallover Restarting in: " + (retry_in / (60 * 1000)) + " minutes");
+            UserError.Log.i(TAG, "setFailoverTimer: Fallover Restarting in: " + (retry_in / (60 * 1000)) + " minutes");
             //requested_wake_time = JoH.wakeUpIntent(this, retry_in, PendingIntent.getService(this, Constants.WIFI_COLLECTION_SERVICE_ID, new Intent(this, this.getClass()), 0));
             requested_wake_time = JoH.wakeUpIntent(this, retry_in, WakeLockTrampoline.getPendingIntent(this.getClass(), Constants.WIFI_COLLECTION_SERVICE_ID));
             PersistentStore.setLong(WIFI_COLLECTION_WAKEUP, requested_wake_time);

@@ -87,11 +87,11 @@ public class ParakeetHelper {
     }
 
     public static void checkParakeetNotifications(long timestamp, String geo_location) {
-        Log.d(TAG, "CheckParakeetNotifications: " + timestamp + " / " + geo_location + " not checking in? " + parakeet_not_checking_in);
+        UserError.Log.i(TAG, "CheckParakeetNotifications: " + timestamp + " / " + geo_location + " not checking in? " + parakeet_not_checking_in);
         if (waiting_for_parakeet) {
-            Log.d(TAG, "checkParakeetNotifications:" + waiting_for_parakeet + " " + timestamp + " vs " + wait_timestamp);
+            UserError.Log.i(TAG, "checkParakeetNotifications:" + waiting_for_parakeet + " " + timestamp + " vs " + wait_timestamp);
             if (timestamp > wait_timestamp) {
-                Log.d(TAG, "sending notification");
+                UserError.Log.i(TAG, "sending notification");
                 sendNotification("The parakeet has connected to the web service.",
                         "Parakeet has connected!");
                 waiting_for_parakeet = false;
@@ -107,24 +107,24 @@ public class ParakeetHelper {
                 highest_parakeet_timestamp=timestamp;
                 }
                     final int minutes_since = (int) ((JoH.ts() - highest_parakeet_timestamp) / (1000 * 60));
-                    if (highest_parakeet_timestamp>0) Log.d(TAG, "Not waiting for parakeet Minutes since: " + minutes_since);
+                    if (highest_parakeet_timestamp>0) UserError.Log.i(TAG, "Not waiting for parakeet Minutes since: " + minutes_since);
 
 
                     if (!parakeet_not_checking_in) {
                         if ((minutes_since > PARAKEET_ALERT_MISSING_MINUTES) && (highest_parakeet_timestamp > 0)) {
                             if (timestamp >= highest_timestamp) {
                                 parakeet_not_checking_in = true;
-                                Log.i(TAG, "Parakeet missing for: " + minutes_since + " mins");
+                                UserError.Log.i(TAG, "Parakeet missing for: " + minutes_since + " mins");
                                 sendNotification("The parakeet has not connected > " + minutes_since + " mins",
                                         "Parakeet missing");
                                 // TODO some more sophisticated persisting notification
                             }
                         }
                     } else {
-                        if (timestamp < highest_parakeet_timestamp) Log.d(TAG,"Timestamp less than highest");
+                        if (timestamp < highest_parakeet_timestamp) UserError.Log.i(TAG,"Timestamp less than highest");
                         if ((timestamp >= highest_parakeet_timestamp) && (minutes_since < PARAKEET_ALERT_MISSING_MINUTES)
                                 && (!geo_location.equals("-15,-15"))) {
-                            Log.d(TAG, "Parakeet now checking in: " + minutes_since + " mins ago");
+                            UserError.Log.i(TAG, "Parakeet now checking in: " + minutes_since + " mins ago");
                             parakeet_not_checking_in = false;
                             cancelParakeetMissingNotification();
                         }
@@ -148,9 +148,9 @@ public class ParakeetHelper {
     public static void toast(Context context, final String msg) {
         try {
             Toast.makeText(context, msg, Toast.LENGTH_LONG).show();
-            Log.d(TAG, "toast: " + msg);
+            UserError.Log.i(TAG, "toast: " + msg);
         } catch (Exception e) {
-            Log.d(TAG, "Couldn't display toast: " + msg + " / " + e.toString());
+            UserError.Log.i(TAG, "Couldn't display toast: " + msg + " / " + e.toString());
         }
     }
 
@@ -183,7 +183,7 @@ public class ParakeetHelper {
             notificationManager.cancel(Notifications.parakeetMissingId);
             notificationManager.notify(Notifications.parakeetMissingId, XdripNotificationCompat.build(notificationBuilder));
         } else {
-            Log.d(TAG, "Not sending parakeet notification as they are disabled: " + body);
+            UserError.Log.i(TAG, "Not sending parakeet notification as they are disabled: " + body);
         }
     }
 
@@ -217,7 +217,7 @@ public class ParakeetHelper {
                 }
 
             } catch (Exception e) {
-                Log.e(TAG, "Got error in web helper callback: " + e.toString());
+                UserError.Log.e(TAG, "Got error in web helper callback: " + e.toString());
             }
         }
     }

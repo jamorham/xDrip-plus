@@ -101,7 +101,7 @@ public class UserError extends PlusModel {
                 .where("timestamp < ?", timestamp)
                 .orderBy("timestamp desc")
                 .execute();
-        if (userErrors != null) Log.d(TAG, "cleanup UserError size=" + userErrors.size());
+        if (userErrors != null)UserError.Log.d(TAG, "cleanup UserError size=" + userErrors.size());
         new Cleanup().execute(userErrors);
     }
 
@@ -141,7 +141,7 @@ public class UserError extends PlusModel {
         for (int level : levels) {
             levelsString.append(level).append(",");
         }
-        Log.d("UserError", "severity in ("+levelsString.substring(0,levelsString.length() - 1)+")");
+       UserError.Log.d("UserError", "severity in ("+levelsString.substring(0,levelsString.length() - 1)+")");
         return new Select()
                 .from(UserError.class)
                 .where("severity in ("+levelsString.substring(0,levelsString.length() - 1)+")")
@@ -189,7 +189,7 @@ public class UserError extends PlusModel {
                     .where("message = ?", error.message)
                     .executeSingle();
         } catch (Exception e) {
-            Log.e(TAG,"getForTimestamp() Got exception on Select : "+e.toString());
+           UserError.Log.e(TAG,"getForTimestamp() Got exception on Select : "+e.toString());
             return null;
         }
     }
@@ -303,7 +303,7 @@ public class UserError extends PlusModel {
          */
         public static void readPreference(String extraLogs) {
             extraLogs = extraLogs.trim();
-            if (extraLogs.length() > 0) UserErrorLow(TAG, "called with string " + extraLogs);
+            if (!extraLogs.isEmpty()) UserErrorLow(TAG, "called with string " + extraLogs);
             extraTags.clear();
 
             // allow splitting to work with a single entry and no delimiter zzz
@@ -317,7 +317,7 @@ public class UserError extends PlusModel {
             
             // go over all tags and parse them
             for(String tag : tags) {
-                if (tag.length() > 0) parseTag(tag);
+                if (!tag.isEmpty()) parseTag(tag);
             }
         }
         
@@ -325,7 +325,7 @@ public class UserError extends PlusModel {
             // Format is tag:level for example  Alerts:i
             String[] tagAndLevel = tag.trim().split(":");
             if(tagAndLevel.length != 2) {
-                Log.e(TAG, "Failed to parse " + tag);
+               UserError.Log.e(TAG, "Failed to parse " + tag);
                 return;
             }
             String level =  tagAndLevel[1];
@@ -345,7 +345,7 @@ public class UserError extends PlusModel {
                 UserErrorLow(TAG, "Adding tag with info " + tagAndLevel[0] );
                 return;
             }
-            Log.e(TAG, "Unknown level for tag " + tag + " please use d v or i");
+           UserError.Log.e(TAG, "Unknown level for tag " + tag + " please use d v or i");
 
         }
         

@@ -70,12 +70,12 @@ public class UpdateActivity extends BaseActivity {
             prefs.edit().putLong(last_update_check_time, last_check_time).apply();
 
             String channel = prefs.getString("update_channel", "beta");
-            Log.i(TAG, "Checking for a software update, channel: " + channel);
+            UserError.Log.i(TAG, "Checking for a software update, channel: " + channel);
 
             String subversion = "";
             if (!context.getString(R.string.app_name).equals("xDrip+")) {
                 subversion = context.getString(R.string.app_name).replaceAll("[^a-zA-Z0-9]", "");
-                Log.d(TAG, "Using subversion: " + subversion);
+                UserError.Log.i(TAG, "Using subversion: " + subversion);
             }
 
             final String CHECK_URL = context.getString(R.string.wserviceurl) + "/update-check/" + channel + subversion;
@@ -119,13 +119,13 @@ public class UpdateActivity extends BaseActivity {
                                 newversion = Integer.parseInt(lines[0]);
                                 if ((newversion > versionnumber) || (debug)) {
                                     if (lines[1].startsWith("http")) {
-                                        Log.i(TAG, "Notifying user of new update available our version: " + versionnumber + " new: " + newversion);
+                                        UserError.Log.i(TAG, "Notifying user of new update available our version: " + versionnumber + " new: " + newversion);
                                         DOWNLOAD_URL = lines[1];
                                         if (lines.length > 2) {
                                             try {
                                                 FILE_SIZE = Integer.parseInt(lines[2]);
                                             } catch (NumberFormatException | NullPointerException e) {
-                                                Log.e(TAG, "Got exception processing update download parameters");
+                                                UserError.Log.e(TAG, "Got exception processing update download parameters");
                                             }
                                         } else {
                                             FILE_SIZE = -1;
@@ -146,20 +146,20 @@ public class UpdateActivity extends BaseActivity {
                                         context.startActivity(intent);
 
                                     } else {
-                                        Log.e(TAG, "Error parsing second line of update reply");
+                                        UserError.Log.e(TAG, "Error parsing second line of update reply");
                                     }
                                 } else {
-                                    Log.i(TAG, "Our current version is the most recent: " + versionnumber + " vs " + newversion);
+                                    UserError.Log.i(TAG, "Our current version is the most recent: " + versionnumber + " vs " + newversion);
                                 }
                             } catch (Exception e) {
-                                Log.e(TAG, "Got exception parsing update version: " + e.toString());
+                                UserError.Log.e(TAG, "Got exception parsing update version: " + e.toString());
                             }
                         } else {
-                            Log.d(TAG, "zero lines received in reply");
+                            UserError.Log.i(TAG, "zero lines received in reply");
                         }
-                        Log.i(TAG, "Success getting latest software version");
+                        UserError.Log.i(TAG, "Success getting latest software version");
                     } else {
-                        Log.d(TAG, "Failure getting update URL data: code: " + response.code());
+                        UserError.Log.i(TAG, "Failure getting update URL data: code: " + response.code());
                     }
                 } catch (Exception e) {
                     UserError.Log.e(TAG, "Exception in reading http update version " + e.toString());
@@ -200,14 +200,14 @@ public class UpdateActivity extends BaseActivity {
         autoUpdateSwitch.setChecked(prefs.getBoolean(AUTO_UPDATE_PREFS_NAME, true));
         autoUpdateSwitch.setOnCheckedChangeListener((buttonView, isChecked) -> {
             prefs.edit().putBoolean(AUTO_UPDATE_PREFS_NAME, isChecked).apply();
-            Log.d(TAG, "Auto Updates IsChecked:" + isChecked);
+            UserError.Log.i(TAG, "Auto Updates IsChecked:" + isChecked);
         });
 
         CheckBox useInternalDownloader = (CheckBox) findViewById(R.id.internaldownloadercheckBox);
         useInternalDownloader.setChecked(prefs.getBoolean(useInternalDownloaderPrefsName, true));
         useInternalDownloader.setOnCheckedChangeListener((buttonView, isChecked) -> {
             prefs.edit().putBoolean(useInternalDownloaderPrefsName, isChecked).apply();
-            Log.d(TAG, "Use internal downloader IsChecked:" + isChecked);
+            UserError.Log.i(TAG, "Use internal downloader IsChecked:" + isChecked);
         });
 
         TextView detail = (TextView) findViewById(R.id.updatedetail);
@@ -252,7 +252,7 @@ public class UpdateActivity extends BaseActivity {
     }
 
     public void downloadNow(View myview) {
-        if (DOWNLOAD_URL.length() > 0) {
+        if (!DOWNLOAD_URL.isEmpty()) {
             if (prefs.getBoolean(useInternalDownloaderPrefsName, true)) {
                 if (checkPermissions()) {
                     if (downloading) {
@@ -273,7 +273,7 @@ public class UpdateActivity extends BaseActivity {
             }
 
         } else {
-            Log.e(TAG, "Download button pressed but no download URL");
+            UserError.Log.e(TAG, "Download button pressed but no download URL");
         }
     }
 
@@ -324,7 +324,7 @@ public class UpdateActivity extends BaseActivity {
                     filename = "xDrip-plus-" + newversion + ".apk";
                 }
 
-                Log.d(TAG, "Filename: " + filename);
+                UserError.Log.i(TAG, "Filename: " + filename);
                 if (response.code() == 200) {
                     lastDigest = "";
                     InputStream inputStream = null;
@@ -336,7 +336,7 @@ public class UpdateActivity extends BaseActivity {
                             if (dest_file.exists())
                                 dest_file.delete();
                         } catch (Exception e) {
-                            Log.e(TAG, "Got exception deleting existing file: " + e);
+                            UserError.Log.e(TAG, "Got exception deleting existing file: " + e);
                         }
 
                         outputStream = new FileOutputStream(dest_file);
@@ -373,7 +373,7 @@ public class UpdateActivity extends BaseActivity {
                         return downloaded == target;
 
                     } catch (IOException e) {
-                        Log.e(TAG, "Download error: " + e.toString());
+                        UserError.Log.e(TAG, "Download error: " + e.toString());
                         JoH.static_toast_long(getApplicationContext(), "Data error: ");
                         return false;
                     } finally {
@@ -391,7 +391,7 @@ public class UpdateActivity extends BaseActivity {
                 JoH.static_toast_long(getApplicationContext(), "Download timeout!");
                 return false;
             } catch (IOException e) {
-                Log.e(TAG, "Exception in download: " + e);
+                UserError.Log.e(TAG, "Exception in download: " + e);
                 if (e instanceof javax.net.ssl.SSLHandshakeException) {
                     if (JoH.ratelimit("internal-update-fallback", 15)) {
                         JoH.static_toast_long("Internal problems - trying with android system");
@@ -424,13 +424,13 @@ public class UpdateActivity extends BaseActivity {
             downloading = false;
             if (result) {
                 if ((filename != null) && (filename.length() > 5) && (dest_file != null)) {
-                    if ((CHECKSUM.length() == 0) || (lastDigest.length() == 0) || (CHECKSUM.equals(lastDigest))) {
+                    if ((CHECKSUM.isEmpty()) || (lastDigest.isEmpty()) || (CHECKSUM.equals(lastDigest))) {
                         try {
                             try {
                                 DownloadManager dm = (DownloadManager) getSystemService(DOWNLOAD_SERVICE);
                                 dm.addCompletedDownload(filename, "xDrip+ update version " + newversion, false, "application/vnd.android.package-archive", getDownloadFolder() + "/" + filename, FILE_SIZE, true);
                             } catch (Exception e) {
-                                Log.e(TAG, "Download manager error: " + e);
+                                UserError.Log.e(TAG, "Download manager error: " + e);
                             }
 
                             final Intent installapk = new Intent(Intent.ACTION_VIEW);
@@ -439,15 +439,15 @@ public class UpdateActivity extends BaseActivity {
                             startActivity(installapk);
                             finish();
                         } catch (Exception e) {
-                            Log.e(TAG, "Got exception trying to install apk: " + e);
+                            UserError.Log.e(TAG, "Got exception trying to install apk: " + e);
                             JoH.static_toast_long(getApplicationContext(), "Update is in your downloads folder");
                         }
                     } else {
-                        Log.e(TAG, "Checksum doesn't match: " + lastDigest + " vs " + CHECKSUM);
+                        UserError.Log.e(TAG, "Checksum doesn't match: " + lastDigest + " vs " + CHECKSUM);
                         try {
                             dest_file.delete();
                         } catch (Exception e) {
-                            Log.e(TAG, "Got exception deleting corrupt file: " + e);
+                            UserError.Log.e(TAG, "Got exception deleting corrupt file: " + e);
                         }
                         JoH.static_toast_long("File appears corrupt!");
                         finish();
@@ -459,7 +459,7 @@ public class UpdateActivity extends BaseActivity {
                     if ((dest_file != null) && dest_file.exists())
                         dest_file.delete();
                 } catch (Exception e) {
-                    Log.e(TAG, "Got exception deleting existing file: " + e);
+                    UserError.Log.e(TAG, "Got exception deleting existing file: " + e);
                 }
             }
 

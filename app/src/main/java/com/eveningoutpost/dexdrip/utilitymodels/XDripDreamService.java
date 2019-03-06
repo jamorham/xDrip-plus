@@ -24,7 +24,7 @@ import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.eveningoutpost.dexdrip.BestGlucose;
-import com.eveningoutpost.dexdrip.models.JoH;
+import com.eveningoutpost.dexdrip.models.*;
 import com.eveningoutpost.dexdrip.R;
 import com.eveningoutpost.dexdrip.utils.DexCollectionType;
 
@@ -70,10 +70,10 @@ public class XDripDreamService extends DreamService implements SensorEventListen
     private final Runnable mRunnable = new Runnable() {
         public void run() {
             if (!keep_running) {
-                Log.d(TAG, "Keep running false: exiting");
+                UserError.Log.i(TAG, "Keep running false: exiting");
                 return;
             }
-            Log.d(TAG, "Runnable executing");
+            UserError.Log.i(TAG, "Runnable executing");
             mainHandler.postDelayed(mRunnable, updateData());
         }
     };
@@ -121,7 +121,7 @@ public class XDripDreamService extends DreamService implements SensorEventListen
         graph_height = (int) (128 * screen_scale);
         int widget_width = (int) (180 * screen_scale);
         int widget_height = (int) (100 * screen_scale);
-        Log.d(TAG, "Width: " + graph_width + " Height: " + graph_height);
+        UserError.Log.i(TAG, "Width: " + graph_width + " Height: " + graph_height);
 
         // sanity check
         if (graph_height >= screen_height) graph_height = screen_height - 20;
@@ -201,7 +201,7 @@ public class XDripDreamService extends DreamService implements SensorEventListen
         try {
             mSensorManager.unregisterListener(this);
         } catch (Exception e) {
-            Log.e(TAG, "Could not unregister gravity listener");
+            UserError.Log.e(TAG, "Could not unregister gravity listener");
         }
     }
 
@@ -219,7 +219,7 @@ public class XDripDreamService extends DreamService implements SensorEventListen
             // try to align our minute updates with 10 seconds after reading should arrive to show
             // most recent data with least polling and without using broadcast receiver
             final long timemod = ((300000 - dg.mssince) % 60000) + 10000;
-            Log.d(TAG, "Time mod: " + timemod);
+            UserError.Log.i(TAG, "Time mod: " + timemod);
             if (timemod > 1000) delay = timemod;
             updateGraph();
         }
@@ -294,14 +294,14 @@ public class XDripDreamService extends DreamService implements SensorEventListen
                 }
             }
         } else {
-            Log.e(TAG, "Got sensor data when sensor should be disabled");
+            UserError.Log.e(TAG, "Got sensor data when sensor should be disabled");
             unregister_sensor_receiver();
         }
     }
 
     @Override
     public void onAccuracyChanged(Sensor sensor, int accuracy) {
-        Log.d(TAG, "Accuracy: " + accuracy);
+        UserError.Log.i(TAG, "Accuracy: " + accuracy);
     }
 
     // from http://code.google.com/p/android-daydream-samples

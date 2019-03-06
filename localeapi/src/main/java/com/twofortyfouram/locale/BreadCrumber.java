@@ -28,7 +28,7 @@ public final class BreadCrumber
     /**
      * Static helper method to generate bread crumbs. Bread crumb strings will be properly formatted for the
      * current language, including right-to-left languages, as long as the proper
-     {@link com.twofortyfouram.locale.platform.R.string#twofortyfouram_locale_breadcrumb_format} string
+     {@link com.twofortyfouram.locale .platform.R.string #twofortyfouram_locale_breadcrumb_format} string
      * resources have been created.
      *
      * @param context {@code Context} for loading platform resources. Cannot be null.
@@ -52,12 +52,12 @@ public final class BreadCrumber
         {
             if (null == currentCrumb)
             {
-                Log.w(Constants.LOG_TAG, "currentCrumb cannot be null"); //$NON-NLS-1$
+               Log.w(Constants.LOG_TAG, "currentCrumb cannot be null"); //$NON-NLS-1$
                 return ""; //$NON-NLS-1$
             }
             if (null == intent)
             {
-                Log.w(Constants.LOG_TAG, "intent cannot be null"); //$NON-NLS-1$
+               Log.w(Constants.LOG_TAG, "intent cannot be null"); //$NON-NLS-1$
                 return currentCrumb;
             }
 
@@ -73,7 +73,7 @@ public final class BreadCrumber
         }
         catch (final Exception e)
         {
-            Log.e(Constants.LOG_TAG, "Encountered error generating breadcrumb", e); //$NON-NLS-1$
+           Log.e(Constants.LOG_TAG, "Encountered error generating breadcrumb", e); //$NON-NLS-1$
             return ""; //$NON-NLS-1$
         }
     }

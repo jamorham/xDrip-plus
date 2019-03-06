@@ -26,7 +26,7 @@ public class WebServiceSteps extends BaseWebService {
 
         List<String> components = getUrlComponents(query);
 
-        if (components.size() > 0) {
+        if (!components.isEmpty()) {
             UserError.Log.d(TAG, "Processing " + query);
             switch (components.get(0)) {
 

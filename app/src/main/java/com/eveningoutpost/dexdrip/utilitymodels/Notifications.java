@@ -89,7 +89,7 @@ public class Notifications extends IntentService {
 
     public Notifications() {
         super("Notifications");
-        Log.i("Notifications", "Creating Notifications Intent Service");
+        UserError.Log.i("Notifications", "Creating Notifications Intent Service");
     }
 
     @Override
@@ -99,7 +99,7 @@ public class Notifications extends IntentService {
 
         boolean unclearReading;
         try {
-            Log.d("Notifications", "Running Notifications Intent Service");
+            UserError.Log.i("Notifications", "Running Notifications Intent Service");
             final Context context = getApplicationContext();
 
             if (Pref.getBoolean("motion_tracking_enabled", false)) {
@@ -167,13 +167,13 @@ public class Notifications extends IntentService {
                 calculated_value = dg.mgdl;
             } else {
                 calculated_value = bgReading.calculated_value;
-                Log.wtf(TAG, "Could not obtain best glucose value!");
+                UserError.Log.wtf(TAG, "Could not obtain best glucose value!");
             }
         } else {
             calculated_value = bgReading.calculated_value;
         }
 
-        Log.d(TAG, "FileBasedNotifications called bgReading.calculated_value = " + bgReading.calculated_value + " calculated value: "+calculated_value);
+        UserError.Log.i(TAG, "FileBasedNotifications called bgReading.calculated_value = " + bgReading.calculated_value + " calculated value: "+calculated_value);
 
 
         // TODO: tzachi what is the time of this last bgReading
@@ -185,7 +185,7 @@ public class Notifications extends IntentService {
             AlertType newAlert = AlertType.get_highest_active_alert(context, calculated_value);
 
             if (newAlert == null) {
-                Log.d(TAG, "FileBasedNotifications - No active notifcation exists, stopping all alerts");
+                UserError.Log.i(TAG, "FileBasedNotifications - No active notifcation exists, stopping all alerts");
                 // No alert should work, Stop all alerts, but keep the snoozing...
                 AlertPlayer.getPlayer().stopAlert(context, false, true);
                 return;
@@ -193,7 +193,7 @@ public class Notifications extends IntentService {
 
             AlertType activeBgAlert = ActiveBgAlert.alertTypegetOnly();
             if (activeBgAlert == null) {
-                Log.d(TAG, "FileBasedNotifications we have a new alert, starting to play it... " + newAlert.name);
+                UserError.Log.i(TAG, "FileBasedNotifications we have a new alert, starting to play it... " + newAlert.name);
                 // We need to create a new alert  and start playing
                 boolean trendingToAlertEnd = trendingToAlertEnd(context, true, newAlert);
                 AlertPlayer.getPlayer().startAlert(context, trendingToAlertEnd, newAlert, EditAlertActivity.unitsConvert2Disp(doMgdl, calculated_value));
@@ -208,12 +208,12 @@ public class Notifications extends IntentService {
                 if(prefs.getBoolean("disable_alerts_stale_data", false)) {
                     int minutes = Integer.parseInt(prefs.getString("disable_alerts_stale_data_minutes", "15")) + 2;
                     if ((new Date().getTime()) - (60000 * minutes) - BgReading.lastNoSenssor().timestamp > 0) {
-                        Log.d(TAG, "FileBasedNotifications : active alert found but not replaying it because more than three readings missed :  " + newAlert.name);
+                        UserError.Log.i(TAG, "FileBasedNotifications : active alert found but not replaying it because more than three readings missed :  " + newAlert.name);
                         return;
                     }
                 }
 
-                Log.d(TAG, "FileBasedNotifications we have found an active alert, checking if we need to play it " + newAlert.name);
+                UserError.Log.i(TAG, "FileBasedNotifications we have found an active alert, checking if we need to play it " + newAlert.name);
                 boolean trendingToAlertEnd = trendingToAlertEnd(context, false, newAlert);
                 AlertPlayer.getPlayer().ClockTick(context, trendingToAlertEnd, EditAlertActivity.unitsConvert2Disp(doMgdl, calculated_value));
                 return;
@@ -222,7 +222,7 @@ public class Notifications extends IntentService {
 
             boolean alertSnoozeOver = ActiveBgAlert.alertSnoozeOver();
             if (alertSnoozeOver) {
-                Log.d(TAG, "FileBasedNotifications we had two alerts, the snoozed one is over, we fall down to deleting the snoozed and staring the new");
+                UserError.Log.i(TAG, "FileBasedNotifications we had two alerts, the snoozed one is over, we fall down to deleting the snoozed and staring the new");
                 // in such case it is not important which is higher.
 
             } else {
@@ -240,14 +240,14 @@ public class Notifications extends IntentService {
                 AlertType newHigherAlert = AlertType.HigherAlert(activeBgAlert, newAlert);
                     if ((newHigherAlert == activeBgAlert)) {
                         // the existing (snoozed) alert is the higher, No need to play it since it is snoozed.
-                        Log.d(TAG, "FileBasedNotifications The new alert has the same direcotion, it is lower than the one snoozed, not playing it." +
+                        UserError.Log.i(TAG, "FileBasedNotifications The new alert has the same direcotion, it is lower than the one snoozed, not playing it." +
                               " newHigherAlert = " + newHigherAlert.name + "activeBgAlert = " + activeBgAlert.name);
                         return;
                     }
                 }
             }
             // For now, we are stopping the old alert and starting a new one.
-            Log.d(TAG, "Found a new alert, that is higher than the previous one will play it. " + newAlert.name);
+            UserError.Log.i(TAG, "Found a new alert, that is higher than the previous one will play it. " + newAlert.name);
             AlertPlayer.getPlayer().stopAlert(context, true, false);
             boolean trendingToAlertEnd = trendingToAlertEnd(context, true, newAlert);
             AlertPlayer.getPlayer().startAlert(context, trendingToAlertEnd, newAlert, EditAlertActivity.unitsConvert2Disp(doMgdl, calculated_value));
@@ -282,14 +282,14 @@ public class Notifications extends IntentService {
             bgOngoingNotification(bgGraphBuilder);
         }
         if (prefs.getLong("alerts_disabled_until", 0) > new Date().getTime()) {
-            Log.d("NOTIFICATIONS", "Notifications are currently disabled!!");
+            UserError.Log.i("NOTIFICATIONS", "Notifications are currently disabled!!");
             return false;
         }
         
         boolean unclearReading = BgReading.getAndRaiseUnclearReading(context);
 
         boolean forced_wear = Home.get_forced_wear();
-        Log.d(TAG, "forced_wear=" + forced_wear + " bg_notifications_watch=" + bg_notifications_watch + " persistent_high_alert_enabled_watch=" + bg_persistent_high_alert_enabled_watch);
+        UserError.Log.i(TAG, "forced_wear=" + forced_wear + " bg_notifications_watch=" + bg_notifications_watch + " persistent_high_alert_enabled_watch=" + bg_persistent_high_alert_enabled_watch);
 
         //boolean watchAlert = (Home.get_forced_wear() && bg_notifications_watch);
         if (unclearReading) {
@@ -323,14 +323,14 @@ public class Notifications extends IntentService {
             int calibration_reminder_secs = 0;
             try {
                 calibration_reminder_secs = Integer.parseInt(Pref.getString("calibration_reminder_hours","0")) * 60 * 60;
-                Log.d(TAG,"Calibration reminder seconds: "+calibration_reminder_secs);
+                UserError.Log.i(TAG,"Calibration reminder seconds: "+calibration_reminder_secs);
             } catch (Exception e) {
-                Log.wtf(TAG,"Could not parse calibration_reminder_hours");
+                UserError.Log.wtf(TAG,"Could not parse calibration_reminder_hours");
             }
 
             // TODO this should only clear double calibration once after calibrations are achieved
             if (bgReadings.size() >= 3) {
-                if (calibrations.size() == 0 && (new Date().getTime() - bgReadings.get(2).timestamp <= (60000 * 30)) && sensor != null) {
+                if (calibrations.isEmpty() && (new Date().getTime() - bgReadings.get(2).timestamp <= (60000 * 30)) && sensor != null) {
                     if ((sensor.started_at + (60000 * 60 * 2)) < new Date().getTime()) {
                         doubleCalibrationRequest();
                     } else {
@@ -357,7 +357,7 @@ public class Notifications extends IntentService {
             // questionable use of abs for time since
             if (calibrations.size() >= 1 && (Math.abs(JoH.msSince(calibrations.get(0).timestamp)) > (calibration_reminder_secs * 1000))
                     && (CalibrationRequest.isSlopeFlatEnough(BgReading.last(true)))) {
-                Log.d("NOTIFICATIONS", "Calibration difference in hours: " + ((new Date().getTime() - calibrations.get(0).timestamp)) / (1000 * 60 * 60));
+                UserError.Log.i("NOTIFICATIONS", "Calibration difference in hours: " + ((new Date().getTime() - calibrations.get(0).timestamp)) / (1000 * 60 * 60));
                 if ((!PowerStateReceiver.is_power_connected()) || (Pref.getBooleanDefaultFalse("calibration_alerts_while_charging"))) {
                     if (JoH.pratelimit("calibration-request-notification", Math.max(CALIBRATION_REQUEST_MIN_FREQUENCY, calibration_reminder_secs)) || Pref.getBooleanDefaultFalse("calibration_alerts_repeat")) {
                         calibrationRequest();
@@ -398,10 +398,10 @@ public class Notifications extends IntentService {
         }
         if( wakeTimeUnclear == Long.MAX_VALUE) {
             // Should not happen
-            Log.e(TAG ,"calcuatleArmTimeUnclearalert wakeTimeUnclear bad value setting it to one minute from now " + new Date(wakeTimeUnclear) + " in " +  ((wakeTimeUnclear - now)/60000d) + " minutes" );
+            UserError.Log.e(TAG ,"calcuatleArmTimeUnclearalert wakeTimeUnclear bad value setting it to one minute from now " + new Date(wakeTimeUnclear) + " in " +  ((wakeTimeUnclear - now)/60000d) + " minutes" );
             return now + 60 * 1000;
         }
-        Log.w(TAG ,"calcuatleArmTimeUnclearalert returning " + new Date(wakeTimeUnclear) + " in " +  ((wakeTimeUnclear - now)/60000d) + " minutes" );
+        UserError.Log.w(TAG ,"calcuatleArmTimeUnclearalert returning " + new Date(wakeTimeUnclear) + " in " +  ((wakeTimeUnclear - now)/60000d) + " minutes" );
         return wakeTimeUnclear;
     }
     
@@ -413,16 +413,16 @@ public class Notifications extends IntentService {
             AlertType alert = AlertType.get_alert(activeBgAlert.alert_uuid);
             if (alert != null) {
                 wakeTimeBg = activeBgAlert.next_alert_at ;
-                Log.d(TAG , "ArmTimer BG alert -waking at: "+ new Date(wakeTimeBg) +" in " +  (wakeTimeBg - now)/60000d + " minutes");
+                UserError.Log.i(TAG , "ArmTimer BG alert -waking at: "+ new Date(wakeTimeBg) +" in " +  (wakeTimeBg - now)/60000d + " minutes");
                 if (wakeTimeBg < now) {
                     // next alert should be at least one minute from now.
                     wakeTimeBg = now + 60000;
-                    Log.w(TAG , "setting next alert to 1 minute from now (no problem right now, but needs a fix someplace else)");
+                    UserError.Log.w(TAG , "setting next alert to 1 minute from now (no problem right now, but needs a fix someplace else)");
                 }
                 
             }
         }
-        Log.d("Notifications" , "calcuatleArmTimeBg returning: "+ new Date(wakeTimeBg) +" in " +  (wakeTimeBg - now)/60000d + " minutes");
+        UserError.Log.i("Notifications" , "calcuatleArmTimeBg returning: "+ new Date(wakeTimeBg) +" in " +  (wakeTimeBg - now)/60000d + " minutes");
         return wakeTimeBg;
     }
     
@@ -434,7 +434,7 @@ public class Notifications extends IntentService {
         Long wakeTimeUnclear = calcuatleArmTimeUnclearalert(ctx, now, unclearAlert);
         long wakeTime = Math.min(wakeTimeBg, wakeTimeUnclear);
         
-        Log.d("Notifications" , "calcuatleArmTime returning: "+ new Date(wakeTime) +" in " +  (wakeTime - now)/60000d + " minutes");
+        UserError.Log.i("Notifications" , "calcuatleArmTime returning: "+ new Date(wakeTime) +" in " +  (wakeTime - now)/60000d + " minutes");
         return wakeTime;
 
 /*
@@ -467,20 +467,20 @@ public class Notifications extends IntentService {
 
         // TODO make this neater - immediate wake time not needed as handled in JoH wakeup?
         if(wakeTime < now ) {
-            Log.e("Notifications" , "ArmTimer recieved a negative time, will fire in 6 minutes");
+            UserError.Log.e("Notifications" , "ArmTimer recieved a negative time, will fire in 6 minutes");
             wakeTime = now + 6 * 60000;
         } else if  (wakeTime >=  now + 6 * 60000) {
-        	 Log.i("Notifications" , "ArmTimer recieved a biger time, will fire in 6 minutes");
+        	 UserError.Log.i("Notifications" , "ArmTimer recieved a biger time, will fire in 6 minutes");
              wakeTime = now + 6 * 60000;
         }  else if (wakeTime == now) {
-            Log.e("Notifications", "should arm right now, waiting one more second to avoid infinitue loop");
+            UserError.Log.e("Notifications", "should arm right now, waiting one more second to avoid infinitue loop");
             wakeTime = now + 1000;
         }
         
         //AlarmManager alarm = (AlarmManager) getSystemService(ALARM_SERVICE);
 
         // TODO use JoH wakeup
-        Log.d("Notifications" , "ArmTimer waking at: "+ new Date(wakeTime ) +" in " +
+        UserError.Log.i("Notifications" , "ArmTimer waking at: "+ new Date(wakeTime ) +" in " +
             (wakeTime - now) /60000d + " minutes");
 
         if (wakeIntent == null) {
@@ -671,12 +671,12 @@ public class Notifications extends IntentService {
                     if (notifiationBitmap != null)
                         notifiationBitmap.recycle();
                 } catch (RuntimeException e) {
-                    Log.e(TAG, "Got runtime exception in bgOngoingNotification runnable: ", e);
+                    UserError.Log.e(TAG, "Got runtime exception in bgOngoingNotification runnable: ", e);
                     Home.toaststaticnext("Problem displaying ongoing notification");
                 }
             });
         } catch (RuntimeException e) {
-            Log.e(TAG, "Got runtime exception in bgOngoingNotification: ", e);
+            UserError.Log.e(TAG, "Got runtime exception in bgOngoingNotification: ", e);
             Home.toaststaticnext("Problem displaying ongoing notification");
         }
     }
@@ -699,7 +699,7 @@ public class Notifications extends IntentService {
         final String this_noise_string=BgGraphBuilder.noiseString(BgGraphBuilder.last_noise);
         if (!BgGraphBuilder.noiseString(BgGraphBuilder.last_noise).equals(last_noise_string))
         {
-            Log.uel("Noise","Changed from: "+last_noise_string+" to "+this_noise_string);
+            UserError.Log.uel("Noise","Changed from: "+last_noise_string+" to "+this_noise_string);
             last_noise_string = this_noise_string;
         }
     }
@@ -855,7 +855,7 @@ public class Notifications extends IntentService {
                    if (JoH.pratelimit("low-predict-speak", 1800)) SpeechUtil.say(msg, 4000);
                 }
             } else {
-                Log.ueh(TAG, "Not Low predict alerting due to snooze: " + msg);
+                UserError.Log.ueh(TAG, "Not Low predict alerting due to snooze: " + msg);
             }
         } else {
             NotificationManager mNotifyMgr = (NotificationManager) context.getSystemService(Context.NOTIFICATION_SERVICE);
@@ -872,7 +872,7 @@ public class Notifications extends IntentService {
                 try {
                     snooze_time = Integer.parseInt(Pref.getString("persistent_high_repeat_mins", "20"));
                 } catch (NumberFormatException e) {
-                    Log.e(TAG, "Invalid snooze time for persistent high");
+                    UserError.Log.e(TAG, "Invalid snooze time for persistent high");
                 }
                 if (snooze_time < 1) snooze_time = 1;       // not less than 1 minute
                 if (snooze_time > 1440) snooze_time = 1440; // not more than 1 day
@@ -883,7 +883,7 @@ public class Notifications extends IntentService {
                     }
                 }
             } else {
-                Log.ueh(TAG, "Not persistent high alerting due to snooze: " + msg);
+                UserError.Log.ueh(TAG, "Not persistent high alerting due to snooze: " + msg);
             }
         } else {
             NotificationManager mNotifyMgr = (NotificationManager) context.getSystemService(Context.NOTIFICATION_SERVICE);
@@ -908,7 +908,7 @@ public class Notifications extends IntentService {
         String otherAlertsSound = prefs.getString(type+"_sound",prefs.getString("other_alerts_sound", "content://settings/system/notification_sound"));
         boolean otherAlertsOverrideSilent = prefs.getBoolean("other_alerts_override_silent", false);
 
-        Log.d(TAG,"OtherAlert called " + type + " " + message + " reraiseSec = " + reraiseSec);
+        UserError.Log.i(TAG,"OtherAlert called " + type + " " + message + " reraiseSec = " + reraiseSec);
         UserNotification userNotification = UserNotification.GetNotificationByType(type); //"bg_unclear_readings_alert"
         if ((userNotification == null) || userNotification.timestamp <= new Date().getTime() ) {
             if (userNotification != null) {
@@ -917,7 +917,7 @@ public class Notifications extends IntentService {
                 } catch (NullPointerException e) {
                     // ignore null pointer exception during delete as we emulate database records
                 }
-                Log.d(TAG, "Delete");
+                UserError.Log.i(TAG, "Delete");
             }
             UserNotification.create(message, type, new Date().getTime() + reraiseSec * 1000);
 
@@ -926,7 +926,7 @@ public class Notifications extends IntentService {
             if (notificatioId == persistentHighAlertNotificationId) {
                 localOnly = (Home.get_forced_wear() && bg_notifications_watch && bg_persistent_high_alert_enabled_watch);
             }
-            Log.d(TAG,"OtherAlert forced_wear localOnly=" + localOnly);
+            UserError.Log.i(TAG,"OtherAlert forced_wear localOnly=" + localOnly);
             Intent intent = new Intent(context, Home.class);
             @SuppressLint("InlinedApi") NotificationCompat.Builder mBuilder =
                     new NotificationCompat.Builder(context, channelId)
@@ -954,7 +954,7 @@ public class Notifications extends IntentService {
             NotificationManager mNotifyMgr = (NotificationManager) context.getSystemService(Context.NOTIFICATION_SERVICE);
             //mNotifyMgr.cancel(notificatioId);
             //Log.d(TAG, "Notify");
-            Log.ueh("Other Alert",message);
+            UserError.Log.ueh("Other Alert",message);
             mNotifyMgr.notify(notificatioId, XdripNotificationCompat.build(mBuilder));
 
             if (Pref.getBooleanDefaultFalse("pref_amazfit_enable_key")
@@ -1001,7 +1001,7 @@ public class Notifications extends IntentService {
         try {
             JoH.startService(Notifications.class);
         } catch (Exception e) {
-            Log.e(TAG, "Got exception in staticupdatenotification: " + e);
+            UserError.Log.e(TAG, "Got exception in staticupdatenotification: " + e);
         }
     }
 }

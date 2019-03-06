@@ -1,5 +1,6 @@
 package com.eveningoutpost.dexdrip.importedLibraries.dexcom.records;
 
+import com.eveningoutpost.dexdrip.models.*;
 import com.eveningoutpost.dexdrip.models.UserError.Log;
 
 import org.w3c.dom.Document;
@@ -37,7 +38,7 @@ public class GenericXMLRecord extends GenericTimestampRecord {
             document = builder.parse(new InputSource(new StringReader(xml)));
             xmlElement = document.getDocumentElement();
         } catch (Exception e) {
-            Log.e(TAG, "Unable to build xml element", e);
+            UserError.Log.e(TAG, "Unable to build xml element", e);
         }
     }
 

@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android">
-    <PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android"
+    <PreferenceScreen
         android:icon="@drawable/ic_watch_grey600_48dp"
         android:key="smart_watch_options"
         android:summary="@string/pebble_and_android_wear_options"
@@ -471,7 +471,7 @@
                 android:summary="@string/short_speak_readings_shortcut"
                 android:title="@string/speak_readings_shortcut" />
         </PreferenceScreen>
-        <PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android"
+        <PreferenceScreen
             android:icon="@drawable/ic_open_in_app_grey600_48dp"
             android:key="xdrip_intrer_app_settings"
             android:summary="@string/for_interacting_compatible_apps"
@@ -543,7 +543,7 @@
                 android:summary="@string/summary_Shared_Secret_for_open_web_service"
                 android:title="@string/title_xDrip_Web_Service_Secret" />
         </PreferenceScreen>
-        <PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android"
+        <PreferenceScreen
             android:key="xdrip_less_common_settings"
             android:summary="@string/debug_and_other_misc_options"
             android:title="@string/less_common_settings">
@@ -556,7 +556,7 @@
                     android:targetPackage="@string/local_target_package" />
             </Preference>
 
-            <PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android"
+            <PreferenceScreen
                 android:key="xdrip_extra_status_line"
                 android:summary="@string/options_for_extra_line"
                 android:title="@string/extra_status_line">
@@ -698,7 +698,7 @@
                     android:summary="@string/show_plugin_data"
                     android:title="@string/calibration_plugin" />
             </PreferenceScreen>
-            <PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android"
+            <PreferenceScreen
                 android:key="xdrip_plus_calibration_settings"
                 android:summary="@string/extra_calibration_options"
                 android:title="@string/advanced_calibration">
@@ -774,7 +774,7 @@
 
             </PreferenceScreen>
 
-            <PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android"
+            <PreferenceScreen
                 android:icon="@drawable/ic_bluetooth_settings_grey600_48dp"
                 android:key="xdrip_bluetooth_adv_settings"
                 android:summary="@string/advanced_bluetooth_settings"
@@ -854,7 +854,7 @@
                     android:summary="@string/summary_Only_suitable_for_phones_which_support_automatic_pairing"
                     android:title="@string/title_Allow_blucon_unbonding" />
             </PreferenceScreen>
-            <PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android"
+            <PreferenceScreen
                 android:key="xdrip_blueReader_advanced_settings"
                 android:summary="@string/advanced_bluereader_settings_summary"
                 android:title="@string/advanced_bluereader_settings">
@@ -900,7 +900,7 @@
                 android:summary="@string/interpret_share_raw"
                 android:title="@string/interpret_raw" />
 
-            <PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android"
+            <PreferenceScreen
                 android:key="xdrip_logging_adv_settings"
                 android:title="@string/extra_logging">
                 <CheckBoxPreference
@@ -959,7 +959,7 @@
                 android:numeric="integer"
                 android:summary="@string/summary_Erase_data_older_than_this_many_days"
                 android:title="@string/title_Glucose_Retention" />
-            <PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android"
+            <PreferenceScreen
                 android:key="xdrip_other_misc_extra_screen"
                 android:summary=""
                 android:title="@string/title_Other_misc_options">

@@ -46,7 +46,7 @@ public class VersionFixer {
             updateVersion(version);
             checkAndActOnVersionDifference();
         } else {
-            Log.d(TAG, "Ignoring update as we appear to be running on wear 1.x");
+           UserError.Log.d(TAG, "Ignoring update as we appear to be running on wear 1.x");
         }
     }
 

@@ -55,7 +55,7 @@ public class xdrip extends Application {
                 initBF();
             }
         } catch (Exception e) {
-            Log.e(TAG, e.toString());
+            UserError.Log.e(TAG, e.toString());
         }
         executor = new PlusAsyncExecutor();
         PreferenceManager.setDefaultValues(this, R.xml.pref_general, true);
@@ -92,7 +92,7 @@ public class xdrip extends Application {
             VersionTracker.updateDevice();
 
         } else {
-            Log.d(TAG, "Detected running test mode, holding back on background processes");
+            UserError.Log.i(TAG, "Detected running test mode, holding back on background processes");
         }
         Reminder.firstInit(xdrip.getAppContext());
         PluggableCalibration.invalidateCache();
@@ -106,7 +106,7 @@ public class xdrip extends Application {
                         .build();
                 Fabric.with(context, crashlyticsKit);
             } catch (Exception e) {
-                Log.e(TAG, e.toString());
+                UserError.Log.e(TAG, e.toString());
             }
             fabricInited = true;
         }
@@ -173,7 +173,7 @@ public class xdrip extends Application {
             final String forced_language = Pref.getString("forced_language", "en");
             final String current_language = Locale.getDefault().getLanguage();
             if (!current_language.equals(forced_language)) {
-                Log.i(TAG, "Forcing locale: " + forced_language + " was: " + current_language);
+                UserError.Log.i(TAG, "Forcing locale: " + forced_language + " was: " + current_language);
                 LOCALE = new Locale(forced_language, "", "");
                 Locale.setDefault(LOCALE);
                 final Configuration config = context.getResources().getConfiguration();
@@ -194,7 +194,7 @@ public class xdrip extends Application {
 
                 }
             }
-            Log.d(TAG, "Already set to locale: " + forced_language);
+            UserError.Log.i(TAG, "Already set to locale: " + forced_language);
         }
     }
 
@@ -215,7 +215,7 @@ public class xdrip extends Application {
                 return context;
             }
         } catch (Exception e) {
-            Log.e(TAG, "Got exception in getLangContext: " + e);
+            UserError.Log.e(TAG, "Got exception in getLangContext: " + e);
             return context;
         }
     }

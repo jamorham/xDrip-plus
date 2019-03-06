@@ -22,7 +22,7 @@ public class HexTestTools {
     public static byte[] hexStringToByteArray(String str) {
         try {
             str = str.toUpperCase().trim();
-            if (str.length() == 0) return null;
+            if (str.isEmpty()) return null;
             final int len = str.length();
             byte[] data = new byte[len / 2];
             for (int i = 0; i < len; i += 2) {

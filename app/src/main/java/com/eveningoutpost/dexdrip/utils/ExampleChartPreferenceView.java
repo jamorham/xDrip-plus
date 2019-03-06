@@ -9,6 +9,7 @@ import android.view.View;
 import android.view.ViewGroup;
 
 import com.eveningoutpost.dexdrip.R;
+import com.eveningoutpost.dexdrip.models.*;
 import com.eveningoutpost.dexdrip.utilitymodels.BgGraphBuilder;
 
 import lecho.lib.hellocharts.model.Viewport;
@@ -53,7 +54,7 @@ public class ExampleChartPreferenceView extends Preference {
         chart.setPadding(0, 0, 0, 0);
         chart.setLeft(0);
         chart.setTop(0);
-        Log.d(TAG, "onBindExampleChart: refreshview " + chart.getHeight());
+        UserError.Log.i(TAG, "onBindExampleChart: refreshview " + chart.getHeight());
     }
 
     @Override

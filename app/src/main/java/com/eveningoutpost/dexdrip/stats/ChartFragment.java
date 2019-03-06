@@ -6,6 +6,7 @@ import android.view.*;
 import androidx.annotation.*;
 import androidx.fragment.app.*;
 
+import com.eveningoutpost.dexdrip.models.*;
 import com.eveningoutpost.dexdrip.models.UserError.*;
 
 /**
@@ -18,14 +19,14 @@ public class ChartFragment extends Fragment {
     @Nullable
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
-        Log.d("DrawStats", "ChartFragment onCreateView");
+        UserError.Log.i("DrawStats", "ChartFragment onCreateView");
         return getView();
     }
 
     @Nullable
     @Override
     public View getView() {
-        Log.d("DrawStats", "getView - ChartFragment");
+        UserError.Log.i("DrawStats", "getView - ChartFragment");
 
         if (chartView == null) {
             chartView = new ChartView(getActivity().getApplicationContext());

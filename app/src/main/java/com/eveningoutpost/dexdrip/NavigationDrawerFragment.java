@@ -15,6 +15,8 @@ import androidx.appcompat.app.*;
 import androidx.drawerlayout.widget.*;
 import androidx.fragment.app.Fragment;
 
+import com.eveningoutpost.dexdrip.models.*;
+
 import java.util.*;
 
 public class NavigationDrawerFragment extends Fragment {
@@ -105,7 +107,7 @@ public class NavigationDrawerFragment extends Fragment {
             getActionBar()/*    getActivity().getSupportActionBar()*/.setDisplayHomeAsUpEnabled(true);
             getActionBar()/*    getActivity().getSupportActionBar()*/.setHomeButtonEnabled(true);
             } catch (Exception e) {
-                Log.d("NavigationDrawerFrag", "Exception with getActionBar: " + e.toString());
+                UserError.Log.i("NavigationDrawerFrag", "Exception with getActionBar: " + e.toString());
             }
         }
 
@@ -129,7 +131,7 @@ public class NavigationDrawerFragment extends Fragment {
             try {
                 mDrawerListView.setAdapter(new ArrayAdapter<>(getActionBar()/*getActivity().getSupportActionBar()*/.getThemedContext(), android.R.layout.simple_list_item_activated_1, android.R.id.text1, menu_options));
             } catch (NullPointerException ex) {
-                Log.d("NavigationDrawerFrag", "Got second null pointer: " + ex.toString());
+                UserError.Log.i("NavigationDrawerFrag", "Got second null pointer: " + ex.toString());
             }
         }
 
@@ -222,7 +224,7 @@ public class NavigationDrawerFragment extends Fragment {
     public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
         if (mDrawerLayout != null && isDrawerOpen()) {
             inflater.inflate(R.menu.global, menu);
-            Log.e("jamorham Runtime", "Call to on-create options menu in Navigation Drawer Fragment");
+            UserError.Log.e("jamorham Runtime", "Call to on-create options menu in Navigation Drawer Fragment");
             //showGlobalContextActionBar();
         }
         super.onCreateOptionsMenu(menu, inflater);

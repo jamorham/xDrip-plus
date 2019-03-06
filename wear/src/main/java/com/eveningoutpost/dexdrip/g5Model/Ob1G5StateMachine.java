@@ -779,7 +779,7 @@ public class Ob1G5StateMachine {
 	}
 
 	private synchronized static void loadQueue() {
-		if (commandQueue.size() == 0) {
+		if (commandQueue.isEmpty()) {
 			injectQueueJson(PersistentStore.getString(PREF_SAVED_QUEUE));
 			UserError.Log.d(TAG, "Loaded queue stream backup.");
 		}
@@ -808,7 +808,7 @@ public class Ob1G5StateMachine {
 	// used in backup restore and wear
 	@SuppressWarnings("WeakerAccess")
 	public static void injectQueueJson(String json) {
-		if (json == null || json.length() == 0) return;
+		if (json == null || json.isEmpty()) return;
 		final Type queueType = new TypeToken<ArrayList<Ob1Work>>() {
 		}.getType();
 		final List<Ob1Work> queue = JoH.defaultGsonInstance().fromJson(json, queueType);
@@ -847,7 +847,7 @@ public class Ob1G5StateMachine {
 
 	public static void emptyQueue() {
 		synchronized (commandQueue) {
-			if (commandQueue.size() > 0) {
+			if (!commandQueue.isEmpty()) {
 				UserError.Log.d(TAG, "Queue drained on wear, clearing: " + commandQueue.size() + " commands");
 				commandQueue.clear();
 				Inevitable.task("Save cleared G5 queue", 1000, Ob1G5StateMachine::saveQueue);

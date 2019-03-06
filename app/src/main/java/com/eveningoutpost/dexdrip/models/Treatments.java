@@ -100,7 +100,7 @@ public class Treatments extends Model {
 
     public static synchronized Treatments create(final double carbs, final double insulin, long timestamp, double position, String suggested_uuid) {
         // TODO sanity check values
-        Log.d(TAG, "Creating treatment: Insulin: " + insulin + " / Carbs: " + carbs + (suggested_uuid != null && !suggested_uuid.isEmpty() ? " uuid: " + suggested_uuid : ""));
+        UserError.Log.i(TAG, "Creating treatment: Insulin: " + insulin + " / Carbs: " + carbs + (suggested_uuid != null && !suggested_uuid.isEmpty() ? " uuid: " + suggested_uuid : ""));
 
         if ((carbs == 0) && (insulin == 0)) return null;
 
@@ -141,14 +141,14 @@ public class Treatments extends Model {
 
     public static synchronized Treatments create_note(String note, long timestamp, double position, String suggested_uuid) {
         // TODO sanity check values
-        Log.d(TAG, "Creating treatment note: " + note);
+        UserError.Log.i(TAG, "Creating treatment note: " + note);
 
         if (timestamp == 0) {
             timestamp = new Date().getTime();
         }
 
         if ((note == null || (note.isEmpty()))) {
-            Log.i(TAG, "Empty treatment note - not saving");
+            UserError.Log.i(TAG, "Empty treatment note - not saving");
             return null;
         }
 
@@ -159,7 +159,7 @@ public class Treatments extends Model {
         // if unknown create
         if (treatment == null) {
             treatment = new Treatments();
-            Log.d(TAG, "Creating new treatment entry for note");
+            UserError.Log.i(TAG, "Creating new treatment entry for note");
             is_new = true;
 
             treatment.eventType = DEFAULT_EVENT_TYPE;
@@ -172,15 +172,15 @@ public class Treatments extends Model {
 
         } else {
             if (treatment.notes == null) treatment.notes = "";
-            Log.d(TAG, "Found existing treatment for note: " + treatment.uuid + ((suggested_uuid != null) ? " vs suggested: " + suggested_uuid : "") + " distance:" + (timestamp - treatment.timestamp) + " " + treatment.notes);
+            UserError.Log.i(TAG, "Found existing treatment for note: " + treatment.uuid + ((suggested_uuid != null) ? " vs suggested: " + suggested_uuid : "") + " distance:" + (timestamp - treatment.timestamp) + " " + treatment.notes);
             if (treatment.notes.contains(note)) {
-                Log.d(TAG, "Suggested note update already present - skipping");
+                UserError.Log.i(TAG, "Suggested note update already present - skipping");
                 return null;
             }
             // append existing note or treatment
             if (!treatment.notes.isEmpty()) treatment.notes += " \u2192 ";
             treatment.notes += note;
-            Log.d(TAG, "Final notes: " + treatment.notes);
+            UserError.Log.i(TAG, "Final notes: " + treatment.notes);
         }
         //    if ((treatment.enteredBy == null) || (!treatment.enteredBy.contains(NightscoutUploader.VIA_NIGHTSCOUT_TAG))) {
         // tag it as from xdrip if it isn't being synced from nightscout right now to allow local updates to nightscout sourced notes
@@ -226,7 +226,7 @@ public class Treatments extends Model {
         if (!(Pref.getBoolean("cloud_storage_api_enable", false) || Pref.getBoolean("cloud_storage_mongodb_enable", false))) {
             NSClientChat.pushTreatmentAsync(treatment);
         } else {
-            Log.d(TAG, "Skipping NSClient treatment broadcast as nightscout direct sync is enabled");
+            UserError.Log.i(TAG, "Skipping NSClient treatment broadcast as nightscout direct sync is enabled");
         }
 
         if (suggested_uuid == null) {
@@ -238,7 +238,7 @@ public class Treatments extends Model {
     }
 
     public static void pushTreatmentSyncToWatch(Treatments treatment, boolean is_new) {
-        Log.d(TAG, "pushTreatmentSyncToWatch Add treatment to UploaderQueue.");
+        UserError.Log.i(TAG, "pushTreatmentSyncToWatch Add treatment to UploaderQueue.");
         if (Pref.getBooleanDefaultFalse("wear_sync")) {
             if (UploaderQueue.newEntryForWatch(is_new ? "insert" : "update", treatment) != null) {
                 SyncService.startSyncService(3000); // sync in 3 seconds
@@ -267,7 +267,7 @@ public class Treatments extends Model {
                 SQLiteUtils.execSql(patch);
                 //Log.e(TAG, "Processed patch should not have succeeded!!: " + patch);
             } catch (Exception e) {
-                // Log.d(TAG, "Patch: " + patch + " generated exception as it should: " + e.toString());
+                // UserError.Log.i(TAG, "Patch: " + patch + " generated exception as it should: " + e.toString());
             }
         }
         patched = true;
@@ -347,10 +347,10 @@ public class Treatments extends Model {
     public static void delete_by_timestamp(long timestamp, int accuracy, boolean from_interactive) {
         final Treatments t = byTimestamp(timestamp, accuracy); // do we need to alter default accuracy?
         if (t != null) {
-            Log.d(TAG, "Deleting treatment closest to: " + JoH.dateTimeText(timestamp) + " matches uuid: " + t.uuid);
+            UserError.Log.i(TAG, "Deleting treatment closest to: " + JoH.dateTimeText(timestamp) + " matches uuid: " + t.uuid);
             delete_by_uuid(t.uuid, from_interactive);
         } else {
-            Log.e(TAG, "Couldn't find a treatment near enough to " + JoH.dateTimeText(timestamp) + " to delete!");
+            UserError.Log.e(TAG, "Couldn't find a treatment near enough to " + JoH.dateTimeText(timestamp) + " to delete!");
         }
     }
 
@@ -393,7 +393,7 @@ public class Treatments extends Model {
         try {
             return new GsonBuilder().excludeFieldsWithoutExposeAnnotation().create().fromJson(json, Treatments.class);
         } catch (Exception e) {
-            Log.d(TAG, "Got exception parsing treatment json: " + e.toString());
+            UserError.Log.i(TAG, "Got exception parsing treatment json: " + e.toString());
             Home.toaststatic("Error on treatment, probably decryption key mismatch");
             return null;
         }
@@ -404,17 +404,17 @@ public class Treatments extends Model {
     }
 
     public static synchronized boolean pushTreatmentFromJson(String json, boolean from_interactive) {
-        Log.d(TAG, "converting treatment from json: " + json);
+        UserError.Log.i(TAG, "converting treatment from json: " + json);
         final Treatments mytreatment = fromJSON(json);
         if (mytreatment != null) {
             if ((mytreatment.carbs == 0) && (mytreatment.insulin == 0)
                     && (mytreatment.notes != null) && (mytreatment.notes.startsWith("AndroidAPS started"))) {
-                Log.d(TAG, "Skipping AndroidAPS started message");
+                UserError.Log.i(TAG, "Skipping AndroidAPS started message");
                 return false;
             }
             if ((mytreatment.eventType != null) && (mytreatment.eventType.equals("Temp Basal"))) {
                 // we don't yet parse or process these
-                Log.d(TAG, "Skipping Temp Basal msg");
+                UserError.Log.i(TAG, "Skipping Temp Basal msg");
                 return false;
             }
 
@@ -430,7 +430,7 @@ public class Treatments extends Model {
             // anything received +- 1500 ms is going to be treated as a duplicate
             final Treatments dupe_treatment = byTimestamp(mytreatment.timestamp);
             if (dupe_treatment != null) {
-                Log.i(TAG, "Duplicate treatment for: " + mytreatment.timestamp);
+                UserError.Log.i(TAG, "Duplicate treatment for: " + mytreatment.timestamp);
 
                 if ((dupe_treatment.insulin == 0) && (mytreatment.insulin > 0)) {
                     dupe_treatment.insulin = mytreatment.insulin;
@@ -452,7 +452,7 @@ public class Treatments extends Model {
                         dupe_treatment.notes = mytreatment.notes;
                         fixUpTable();
                         dupe_treatment.save();
-                        Log.d(TAG,"Saved updated treatement notes");
+                        UserError.Log.i(TAG,"Saved updated treatement notes");
                         // should not end up needing to append notes and be from_interactive via undo as these
                         // would be mutually exclusive operations so we don't need to handle that here.
                         Home.staticRefreshBGChartsOnIdle();
@@ -461,7 +461,7 @@ public class Treatments extends Model {
 
                 return false;
             }
-            Log.d(TAG, "Saving pushed treatment: " + mytreatment.uuid);
+            UserError.Log.i(TAG, "Saving pushed treatment: " + mytreatment.uuid);
             if ((mytreatment.enteredBy == null) || (mytreatment.enteredBy.equals(""))) {
                 mytreatment.enteredBy = "sync";
             }
@@ -472,13 +472,13 @@ public class Treatments extends Model {
                 try {
                     mytreatment.created_at = DateUtil.toISOString(mytreatment.timestamp); // should have a default
                 } catch (Exception e) {
-                    Log.e(TAG, "Could not convert timestamp to isostring");
+                    UserError.Log.e(TAG, "Could not convert timestamp to isostring");
                 }
             }
 
             fixUpTable();
             long x = mytreatment.save();
-            Log.d(TAG, "Saving treatment result: " + x);
+            UserError.Log.i(TAG, "Saving treatment result: " + x);
             if (from_interactive) {
                 pushTreatmentSync(mytreatment);
             }
@@ -642,7 +642,7 @@ public class Treatments extends Model {
     // NEW NEW NEW
     public static List<Iob> ioBForGraph_new(int number, double startTime) {
 
-        Log.d(TAG, "Processing iobforgraph2: main  ");
+        UserError.Log.i(TAG, "Processing iobforgraph2: main  ");
         JoH.benchmark_method_start();
 
         // number param currently ignored
@@ -664,7 +664,7 @@ public class Treatments extends Model {
         final double carb_delay_minutes = Profile.carbDelayMinutes(mytime); // not likely a time dependent parameter
         final double carb_delay_ms_stepped = ((long) (carb_delay_minutes / step_minutes)) * step_minutes * (60 * 1000);
 
-        Log.d(TAG, "Carb delay ms: " + carb_delay_ms_stepped);
+        UserError.Log.i(TAG, "Carb delay ms: " + carb_delay_ms_stepped);
 
         Map<String, Boolean> carbsEaten = new HashMap<>();
 
@@ -695,7 +695,7 @@ public class Treatments extends Model {
         } // per insulin treatment
 
 
-        Log.d(TAG, "insulin iteration counter: " + counter);
+        UserError.Log.i(TAG, "insulin iteration counter: " + counter);
 
 
         // evaluate insulin impact
@@ -775,13 +775,13 @@ public class Treatments extends Model {
                 }
             }
 
-            //   Log.d(TAG,"iobinfo2carb  debug: "+JoH.qs(thisiob.timestamp)+" C:"+JoH.qs(thisiob.cob,4)+" I:"+JoH.qs(thisiob.iob,4)+" CA:"+JoH.qs(thisiob.jCarbImpact)+" IA:"+JoH.qs(thisiob.jActivity));
+            //   UserError.Log.i(TAG,"iobinfo2carb  debug: "+JoH.qs(thisiob.timestamp)+" C:"+JoH.qs(thisiob.cob,4)+" I:"+JoH.qs(thisiob.iob,4)+" CA:"+JoH.qs(thisiob.jCarbImpact)+" IA:"+JoH.qs(thisiob.jActivity));
             counter++;
             lastiob = thisiob;
         }
 
-        Log.d(TAG, "second iteration counter: " + counter);
-        Log.d(TAG, "Timeslices size: " + timeslices.size());
+        UserError.Log.i(TAG, "second iteration counter: " + counter);
+        UserError.Log.i(TAG, "Timeslices size: " + timeslices.size());
         JoH.benchmark_method_end();
         return new ArrayList<>(timeslices.values());
     }
@@ -794,7 +794,7 @@ public class Treatments extends Model {
         JoH.benchmark_method_start();
         //JoH.benchmark_method_end();
 
-        Log.d(TAG, "Processing iobforgraph: main  ");
+        UserError.Log.i(TAG, "Processing iobforgraph: main  ");
         // get all treatments from 24 hours earlier than our current time
         List<Treatments> theTreatments = latestForGraph(2000, startTime - 86400000);
         Map<String, Boolean> carbsEaten = new HashMap<String, Boolean>();
@@ -840,7 +840,7 @@ public class Treatments extends Model {
                 double iobdiff = (double) ioblookup.get(lastmytime) - totalIOB;
                 if (iobdiff < 0) iobdiff = 0;
                 if ((iobdiff != 0) || (totalActivity != 0)) {
-                    Log.d(TAG, "New IOB diffi @: " + JoH.qs(mytime) + " = " + JoH.qs(iobdiff) + " old activity: " + JoH.qs(totalActivity));
+                    UserError.Log.i(TAG, "New IOB diffi @: " + JoH.qs(mytime) + " = " + JoH.qs(iobdiff) + " old activity: " + JoH.qs(totalActivity));
                 }
                 totalActivity = iobdiff; // WARNING OVERRIDE
             }
@@ -859,7 +859,7 @@ public class Treatments extends Model {
                             stomachCarbs = stomachCarbs + thisTreatment.carbs;
                             stomachCarbs = stomachCarbs + stomachDiff; // offset first subtraction
                             // pre-subtract for granularity or just reduce granularity
-                            Log.d(TAG, "newcarbs: " + thisTreatment.carbs + " " + thisTreatment.uuid + " @ " + thisTreatment.timestamp + " mytime: " + JoH.qs(mytime) + " diff: " + JoH.qs((thisTreatment.timestamp - mytime) / 1000) + " stomach: " + JoH.qs(stomachCarbs));
+                            UserError.Log.i(TAG, "newcarbs: " + thisTreatment.carbs + " " + thisTreatment.uuid + " @ " + thisTreatment.timestamp + " mytime: " + JoH.qs(mytime) + " diff: " + JoH.qs((thisTreatment.timestamp - mytime) / 1000) + " stomach: " + JoH.qs(stomachCarbs));
                         }
                         lastCarbs = thisTreatment;
                         CobCalc cCalc = cobCalc(thisTreatment, lastDecayedBy, mytime); // need to handle last decayedby shunting
@@ -871,9 +871,9 @@ public class Treatments extends Model {
                             double delayedCarbs = (avgActivity * Profile.getLiverSensRatio(mytime) / Profile.getSensitivity(mytime)) * Profile.getCarbRatio(mytime);
 
                             delayMinutes = Math.round(delayedCarbs / (Profile.getCarbAbsorptionRate(mytime) / 60));
-                            Log.d(TAG, "Avg activity: " + JoH.qs(avgActivity) + " Decaysin_hr: " + JoH.qs(decaysin_hr) + " delay minutes: " + JoH.qs(delayMinutes) + " delayed carbs: " + JoH.qs(delayedCarbs));
+                            UserError.Log.i(TAG, "Avg activity: " + JoH.qs(avgActivity) + " Decaysin_hr: " + JoH.qs(decaysin_hr) + " delay minutes: " + JoH.qs(delayMinutes) + " delayed carbs: " + JoH.qs(delayedCarbs));
                             if (delayMinutes > 0) {
-                                Log.d(TAG, "Delayed Carbs: " + JoH.qs(delayedCarbs) + " Delay minutes: " + JoH.qs(delayMinutes) + " Average activity: " + JoH.qs(avgActivity));
+                                UserError.Log.i(TAG, "Delayed Carbs: " + JoH.qs(delayedCarbs) + " Delay minutes: " + JoH.qs(delayMinutes) + " Average activity: " + JoH.qs(avgActivity));
                                 cCalc.decayedBy += delayMinutes * 60 * 1000;
                                 decaysin_hr = (cCalc.decayedBy - mytime) / 1000 / 60 / 60;
                             }
@@ -882,9 +882,9 @@ public class Treatments extends Model {
                         lastDecayedBy = cCalc.decayedBy;
 
                         if (decaysin_hr > 0) {
-                            Log.d(TAG, "cob: Adding " + JoH.qs(delayMinutes) + " minutes to decay of " + JoH.qs(thisTreatment.carbs) + "g bolus at " + JoH.qs(thisTreatment.timestamp));
+                            UserError.Log.i(TAG, "cob: Adding " + JoH.qs(delayMinutes) + " minutes to decay of " + JoH.qs(thisTreatment.carbs) + "g bolus at " + JoH.qs(thisTreatment.timestamp));
                             totalCOB += Math.min(thisTreatment.carbs, decaysin_hr * Profile.getCarbAbsorptionRate(thisTreatment.timestamp));
-                            Log.d(TAG, "cob: " + JoH.qs(Math.min(cCalc.initialCarbs, decaysin_hr * Profile.getCarbAbsorptionRate(thisTreatment.timestamp)))
+                            UserError.Log.i(TAG, "cob: " + JoH.qs(Math.min(cCalc.initialCarbs, decaysin_hr * Profile.getCarbAbsorptionRate(thisTreatment.timestamp)))
                                     + " inital carbs:" + JoH.qs(cCalc.initialCarbs) + " decaysin_hr:" + JoH.qs(decaysin_hr) + " absorbrate:" + JoH.qs(Profile.getCarbAbsorptionRate(thisTreatment.timestamp)));
                             isDecaying = cCalc.isDecaying;
                         } else {
@@ -896,7 +896,7 @@ public class Treatments extends Model {
 
             if (stomachCarbs > 0) {
 
-                Log.d(TAG, "newcarbs Stomach Diff: " + JoH.qs(stomachDiff) + " Old total: " + JoH.qs(stomachCarbs) + " Delayed carbs: " + JoH.qs(newdelayedCarbs));
+                UserError.Log.i(TAG, "newcarbs Stomach Diff: " + JoH.qs(stomachDiff) + " Old total: " + JoH.qs(stomachCarbs) + " Delayed carbs: " + JoH.qs(newdelayedCarbs));
 
                 stomachCarbs = stomachCarbs - stomachDiff;
                 if (newdelayedCarbs > 0) {
@@ -930,7 +930,7 @@ public class Treatments extends Model {
                     }
                 }
 
-                Log.d(TAG, "added record: cob raw impact: " + Double.toString(thisrecord.rawCarbImpact) + " Isdecaying: "
+                UserError.Log.i(TAG, "added record: cob raw impact: " + Double.toString(thisrecord.rawCarbImpact) + " Isdecaying: "
                         + JoH.qs(isDecaying) + " jCarbImpact: " + JoH.qs(thisrecord.jCarbImpact) +
                         " jActivity: " + JoH.qs(thisrecord.jActivity) + " old activity: " + JoH.qs(thisrecord.activity));
 
@@ -941,7 +941,7 @@ public class Treatments extends Model {
             counter++;
         } // while time period in range
 
-        Log.d(TAG, "Finished Processing iobforgraph: main - processed:  " + Integer.toString(counter) + " Timeslot records");
+        UserError.Log.i(TAG, "Finished Processing iobforgraph: main - processed:  " + Integer.toString(counter) + " Timeslot records");
         JoH.benchmark_method_end();
         return responses;
     }*/

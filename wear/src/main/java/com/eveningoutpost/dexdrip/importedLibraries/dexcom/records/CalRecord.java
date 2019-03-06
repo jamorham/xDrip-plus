@@ -32,14 +32,14 @@ public class CalRecord extends GenericTimestampRecord {
         long displayTimeOffset = (getDisplayTime().getTime() - getSystemTime().getTime()) / (1000);
         int start = 44;
         for (int i = 0; i < numRecords; i++) {
-            Log.d("CalDebug","Loop #"+i);
+           UserError.Log.d("CalDebug","Loop #"+i);
             byte[] temp = new byte[SUB_LEN];
             System.arraycopy(packet, start, temp, 0, temp.length);
             calSubrecords[i] = new CalSubrecord(temp, displayTimeOffset);
             start += SUB_LEN;
         }
 
-        Log.d("ShareTest", "slope: " + slope + " intercept: " + intercept);
+       UserError.Log.d("ShareTest", "slope: " + slope + " intercept: " + intercept);
     }
 
     public double getSlope() {

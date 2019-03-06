@@ -46,7 +46,7 @@ public class Datricsae extends CalibrationAbstract {
     public synchronized CalibrationData getCalibrationData(long until) {
         // first is most recent
         final List<Calibration> calibrations = Calibration.latestValid(CALIBRATIONS_TO_USE, until);
-        if ((calibrations == null) || (calibrations.size() == 0)) return null;
+        if ((calibrations == null) || (calibrations.isEmpty())) return null;
         //Log.d(TAG,"graph: DATRICSAE: got: "+calibrations.size()+" until: "+JoH.dateTimeText(until)+" last: "+JoH.dateTimeText(calibrations.get(0).timestamp));
         // have we got enough data to have a go
 
@@ -55,9 +55,9 @@ public class Datricsae extends CalibrationAbstract {
         CalibrationData cd = loadDataFromCache(TAG, highest_calibration_timestamp);
         if (d) {
             if (cd == null) {
-                Log.d(TAG, "GETCALIB No cache match for: " + JoH.dateTimeText(highest_calibration_timestamp));
+               UserError.Log.d(TAG, "GETCALIB No cache match for: " + JoH.dateTimeText(highest_calibration_timestamp));
             } else {
-                Log.d(TAG, "GETCALIB Cache hit " + cd.slope + " " + cd.intercept + " " + JoH.dateTimeText(highest_calibration_timestamp) + " " + JoH.dateTimeText(until));
+               UserError.Log.d(TAG, "GETCALIB Cache hit " + cd.slope + " " + cd.intercept + " " + JoH.dateTimeText(highest_calibration_timestamp) + " " + JoH.dateTimeText(until));
             }
         }
         if (cd == null) {
@@ -83,7 +83,7 @@ public class Datricsae extends CalibrationAbstract {
                     // sanity check?
                     // weighting!
                     final double raw = adjust_raw ? calibration.adjusted_raw_value : calibration.raw_value;
-                    Log.d(TAG, "Calibration: " + JoH.qs(raw, 4) + " -> " + JoH.qs(calibration.bg, 4) + "  @ " + JoH.dateTimeText(calibration.raw_timestamp));
+                   UserError.Log.d(TAG, "Calibration: " + JoH.qs(raw, 4) + " -> " + JoH.qs(calibration.bg, 4) + "  @ " + JoH.dateTimeText(calibration.raw_timestamp));
                     raws.add(raw);
                     bgs.add(calibration.bg);
                 }
@@ -92,7 +92,7 @@ public class Datricsae extends CalibrationAbstract {
 
                     bg_to_raw.setValues(PolyTrendLine.toPrimitiveFromList(bgs), PolyTrendLine.toPrimitiveFromList(raws));
                     final double all_varience = bg_to_raw.errorVarience();
-                    Log.d(TAG, "Error Variance All: " + all_varience);
+                   UserError.Log.d(TAG, "Error Variance All: " + all_varience);
 
                     // TODO CHECK SLOPE IN RANGE HERE
 
@@ -123,14 +123,14 @@ public class Datricsae extends CalibrationAbstract {
                             raws.remove(i);
                             bg_to_raw.setValues(PolyTrendLine.toPrimitiveFromList(bgs), PolyTrendLine.toPrimitiveFromList(raws));
                             final double this_variance = bg_to_raw.errorVarience();
-                            Log.d(TAG, "Error Variance drop: " + i + " = " + JoH.qs(this_variance, 3));
+                           UserError.Log.d(TAG, "Error Variance drop: " + i + " = " + JoH.qs(this_variance, 3));
                             if (this_variance < lowest_variance) {
 
                                 final double intercept = bg_to_raw.predict(0);
                                 final double one = bg_to_raw.predict(1);
                                 final double slope = one - intercept;
 
-                                Log.d(TAG, "Removing outlier: " + i + " Reduces varience to: " + JoH.qs(this_variance, 3) + " Slope: " + JoH.qs(slope, 3) + " " + slope_in_range(slope));
+                               UserError.Log.d(TAG, "Removing outlier: " + i + " Reduces varience to: " + JoH.qs(this_variance, 3) + " Slope: " + JoH.qs(slope, 3) + " " + slope_in_range(slope));
 
                                 if (slope_in_range(slope)) {
                                     lowest_variance = this_variance;
@@ -146,27 +146,27 @@ public class Datricsae extends CalibrationAbstract {
                     bg_to_raw.setValues(PolyTrendLine.toPrimitiveFromList(lowest_bgs_set), PolyTrendLine.toPrimitiveFromList(lowest_raws_set));
 
                     final double intercept = bg_to_raw.predict(0);
-                    Log.d(TAG, "Intercept: " + intercept);
+                   UserError.Log.d(TAG, "Intercept: " + intercept);
                     final double one = bg_to_raw.predict(1);
-                    Log.d(TAG, "One: " + one);
+                   UserError.Log.d(TAG, "One: " + one);
                     final double slope = one - intercept;
-                    Log.d(TAG, "Slope: " + slope);
+                   UserError.Log.d(TAG, "Slope: " + slope);
 
                     // last sanity check
                     if (slope_in_range(slope)) {
                         cd = new CalibrationData(slope, intercept);
                     } else {
                         cd = new CalibrationData(calibrations.get(0).slope, calibrations.get(0).intercept);
-                        Log.wtf(TAG, "ERROR: Slope outside range: " + slope + " REVERTING TO FALLBACK! " + calibrations.get(0).slope);
+                       UserError.Log.wtf(TAG, "ERROR: Slope outside range: " + slope + " REVERTING TO FALLBACK! " + calibrations.get(0).slope);
                     }
                 } catch (org.apache.commons.math3.linear.SingularMatrixException e) {
                     cd = new CalibrationData(calibrations.get(0).slope, calibrations.get(0).intercept);
-                    Log.wtf(TAG, "ERROR: Math Error REVERTING TO FALLBACK! " + e + "  / slope: " + calibrations.get(0).slope);
+                   UserError.Log.wtf(TAG, "ERROR: Math Error REVERTING TO FALLBACK! " + e + "  / slope: " + calibrations.get(0).slope);
                 }
                 saveDataToCache(TAG, cd, until, highest_calibration_timestamp); // Save cached data
             }
         } else {
-           if (d) Log.d(TAG, "Returning cached calibration data object");
+           if (d)UserError.Log.d(TAG, "Returning cached calibration data object");
         }
 
         return cd; // null if invalid

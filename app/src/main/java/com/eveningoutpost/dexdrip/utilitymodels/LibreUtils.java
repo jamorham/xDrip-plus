@@ -62,7 +62,7 @@ public class LibreUtils {
 
     public static boolean verify(byte[] data) {
         if(data.length < 344) {
-            Log.e(TAG, "Must have at least 344 bytes for libre data");
+            UserError.Log.e(TAG, "Must have at least 344 bytes for libre data");
             return false;
         }
         boolean checksum_ok = CheckCRC16(data, 0 ,24);
@@ -107,13 +107,13 @@ public class LibreUtils {
                 break;
         }
     
-        Log.i(TAG, "Sensor status is: " + sensorStatusString);
+        UserError.Log.i(TAG, "Sensor status is: " + sensorStatusString);
     
         
         
         
         if (SensorSanity.allowTestingWithDeadSensor()) {
-            Log.e(TAG, "Warning allow to use a dead sensor");
+            UserError.Log.e(TAG, "Warning allow to use a dead sensor");
             return true;
         }
     
@@ -159,7 +159,7 @@ public class LibreUtils {
             int value = (pozS[0] - '0') * 16 + (pozS[1] - '0') * 8 + (pozS[2] - '0') * 4 + (pozS[3] - '0') * 2 + (pozS[4] - '0') * 1;
             v.append(lookupTable[value]);
         }
-        Log.e(TAG, "decodeSerialNumber=" + v);
+        UserError.Log.e(TAG, "decodeSerialNumber=" + v);
 
         return v.toString();
     }

@@ -122,9 +122,9 @@ public class NotificationChannels {
             PersistentStore.setString("original-channel-sound-" + id, x.getSound().toString());
             return false; // no existing record so save the original and do nothing else
         }
-        if (original_sound.equals(x.getSound().toString()))
-            return false; // its the same sound still
-        return true; // the sound has changed vs the original
+	    // its the same sound still
+	    return !original_sound.equals(x.getSound().toString());
+// the sound has changed vs the original
     }
 
     @TargetApi(26)

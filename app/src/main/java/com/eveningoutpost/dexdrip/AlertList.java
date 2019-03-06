@@ -77,7 +77,7 @@ public class AlertList extends ActivityWithMenu {
 
         List<AlertType> alerts = AlertType.getAll(above);
         for (AlertType alert : alerts) {
-            Log.d(TAG, alert.toString());
+            UserError.Log.i(TAG, alert.toString());
             feedList.add(createAlertMap(alert));
         }
         return feedList;
@@ -94,7 +94,7 @@ public class AlertList extends ActivityWithMenu {
                     ListView lv = (ListView) parent;
                     @SuppressWarnings("unchecked")
                     HashMap<String, String> item = (HashMap<String, String>) lv.getItemAtPosition(position);
-                    Log.d(TAG, "Item clicked " + lv.getItemAtPosition(position) + item.get("uuid"));
+                    UserError.Log.i(TAG, "Item clicked " + lv.getItemAtPosition(position) + item.get("uuid"));
 
                     //The XML for each item in the list (should you use a custom XML) must have android:longClickable="true"
                     // as well (or you can use the convenience method lv.setLongClickable(true);). This way you can have a list
@@ -186,13 +186,13 @@ public class AlertList extends ActivityWithMenu {
 
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
-        Log.d(TAG, "onActivityResult called request code  = " + requestCode + " result code " + resultCode);
+        UserError.Log.i(TAG, "onActivityResult called request code  = " + requestCode + " result code " + resultCode);
         if (!AlertType.activeLowAlertExists()) {
             displayWarning();
         }
         if (requestCode == ADD_ALERT || requestCode == EDIT_ALERT) {
             if (resultCode == RESULT_OK) {
-                Log.d(TAG, "onActivityResult called invalidating...");
+                UserError.Log.i(TAG, "onActivityResult called invalidating...");
                 FillLists();
             }
             if (resultCode == RESULT_CANCELED) {
@@ -228,7 +228,7 @@ public class AlertList extends ActivityWithMenu {
     private String shortPath(String path) {
         try {
             if (path != null) {
-                if (path.length() == 0) {
+                if (path.isEmpty()) {
                     return "xDrip Default";
                 }
                 Ringtone ringtone = RingtoneManager.getRingtone(mContext, Uri.parse(path));

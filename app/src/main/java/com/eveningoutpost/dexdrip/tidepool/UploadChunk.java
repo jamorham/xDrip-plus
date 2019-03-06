@@ -124,7 +124,7 @@ public class UploadChunk implements NamedSliderProcessor {
         final long end = JoH.tsl();
 
         final List<BgReading> bgReadingList = BgReading.latestForGraphAsc(1, start, end);
-        if (bgReadingList != null && bgReadingList.size() > 0) {
+        if (bgReadingList != null && !bgReadingList.isEmpty()) {
             return bgReadingList.get(0).timestamp;
         }
         return -1;

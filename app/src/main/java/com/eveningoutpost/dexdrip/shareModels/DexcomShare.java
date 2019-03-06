@@ -102,14 +102,14 @@ public interface DexcomShare {
     //]
 
     @POST("Publisher/DoesContactExistByName")
-    @Headers({"Content-Length: 0"})
+    @Headers("Content-Length: 0")
     Call<ResponseBody> doesContactExist(@Query("sessionId") String sessionId,
                                         @Query("contactName") String contactName);
     // needs ?sessionId={YourSessionId}&contactName={newcontactName}
     // returns true or false
 
     @POST("Publisher/CreateContact")
-    @Headers({"Content-Length: 0"})
+    @Headers("Content-Length: 0")
     Call<String> createContact(@Query("sessionId") String sessionId,
                                      @Query("contactName") String contactName,
                                      @Query("emailAddress") String emailAddress);
@@ -124,7 +124,7 @@ public interface DexcomShare {
     // returns a contact id
 
     @POST("Publisher/DeleteContact")
-    @Headers({"Content-Length: 0"})
+    @Headers("Content-Length: 0")
     Call<ResponseBody> deleteContact(@Query("sessionId") String sessionId,
                                      @Query("contactId") String contactId);
     // needs ?sessionId={YourSessionId}&contactId={foll`owersContactId}

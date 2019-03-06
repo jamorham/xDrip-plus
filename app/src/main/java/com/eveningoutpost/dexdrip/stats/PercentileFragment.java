@@ -6,6 +6,7 @@ import android.view.*;
 import androidx.annotation.*;
 import androidx.fragment.app.*;
 
+import com.eveningoutpost.dexdrip.models.*;
 import com.eveningoutpost.dexdrip.models.UserError.*;
 
 /**
@@ -18,14 +19,14 @@ public class PercentileFragment extends Fragment {
     @Nullable
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
-        Log.d("DrawStats", "PercentileFragment - onCreateView");
+        UserError.Log.i("DrawStats", "PercentileFragment - onCreateView");
         return getView();
     }
 
     @Nullable
     @Override
     public View getView() {
-        Log.d("DrawStats", "PercentileFragment - getView");
+        UserError.Log.i("DrawStats", "PercentileFragment - getView");
 
         if (percentileView == null) {
             percentileView = new PercentileView(getActivity().getApplicationContext());

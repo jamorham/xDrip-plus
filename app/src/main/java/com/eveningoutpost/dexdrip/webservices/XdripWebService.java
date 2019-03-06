@@ -129,7 +129,7 @@ public class XdripWebService implements Runnable {
                 mServerSocket = null;
             }
         } catch (IOException e) {
-            Log.e(TAG, "Error closing the server socket.", e);
+            UserError.Log.e(TAG, "Error closing the server socket.", e);
         }
     }
 
@@ -158,7 +158,7 @@ public class XdripWebService implements Runnable {
                 final Socket socket = mServerSocket.accept();
                 final int runningThreads = thread_count.get();
                 if (runningThreads < MAX_RUNNING_THREADS) {
-                    Log.d(TAG, "Running threads: " + runningThreads);
+                    UserError.Log.i(TAG, "Running threads: " + runningThreads);
                     new Thread(() -> {
                         thread_count.incrementAndGet();
                         try {
@@ -167,7 +167,7 @@ public class XdripWebService implements Runnable {
                         } catch (SocketException e) {
                             // ignore
                         } catch (IOException e) {
-                            Log.e(TAG, "Web server thread error.", e);
+                            UserError.Log.e(TAG, "Web server thread error.", e);
                         } finally {
                             thread_count.decrementAndGet();
                         }
@@ -183,7 +183,7 @@ public class XdripWebService implements Runnable {
         } catch (SocketException e) {
             // The server was stopped; ignore.
         } catch (IOException e) {
-            Log.e(TAG, "Web server error.", e);
+            UserError.Log.e(TAG, "Web server error.", e);
         }
     }
 

@@ -1,5 +1,6 @@
 package com.eveningoutpost.dexdrip.importedLibraries.dexcom;
 
+import com.eveningoutpost.dexdrip.models.*;
 import com.eveningoutpost.dexdrip.models.UserError.Log;
 
 import com.eveningoutpost.dexdrip.importedLibraries.dexcom.records.CalRecord;
@@ -135,7 +136,7 @@ public class ReadDataShare {
         payload.add(numOfPages);
         accumulatedResponse = null;
         final Action1<byte[]> databasePageReader = s -> {
-            Log.d("ShareTest", "Database Page Reader received SIZE: " + s.length);
+            UserError.Log.i("ShareTest", "Database Page Reader received SIZE: " + s.length);
             byte[] temp = s;
             if (accumulatedResponse == null) {
                 accumulatedResponse = s;
@@ -145,7 +146,7 @@ public class ReadDataShare {
                     outputStream.write(accumulatedResponse);
                     outputStream.write(temp);
                     accumulatedResponse = outputStream.toByteArray();
-                    Log.d("ShareTest", "Combined Response length: " + accumulatedResponse.length);
+                    UserError.Log.i("ShareTest", "Combined Response length: " + accumulatedResponse.length);
                 } catch (Exception e) { e.printStackTrace(); }
             }
             if (temp.length < 20) { Observable.just(accumulatedResponse).subscribe(fullPageListener).unsubscribe(); }

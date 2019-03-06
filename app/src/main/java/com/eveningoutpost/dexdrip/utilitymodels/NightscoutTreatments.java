@@ -89,7 +89,7 @@ public class NightscoutTreatments {
                     }
                 }
             } catch (JSONException e) {
-                // Log.d(TAG, "json processing: " + e);
+                // UserError.Log.i(TAG, "json processing: " + e);
             }
 
             // extract treatment data if present
@@ -99,17 +99,17 @@ public class NightscoutTreatments {
             try {
                 carbs = tr.getDouble("carbs");
             } catch (JSONException e) {
-                //  Log.d(TAG, "json processing: " + e);
+                //  UserError.Log.i(TAG, "json processing: " + e);
             }
             try {
                 insulin = tr.getDouble("insulin");
             } catch (JSONException e) {
-                // Log.d(TAG, "json processing: " + e);
+                // UserError.Log.i(TAG, "json processing: " + e);
             }
             try {
                 notes = tr.getString("notes");
             } catch (JSONException e) {
-                // Log.d(TAG, "json processing: " + e);
+                // UserError.Log.i(TAG, "json processing: " + e);
             }
 
             if ((notes != null) && ((notes.startsWith("AndroidAPS started") || notes.equals("null") || (notes.equals("Bolus Std")))))
@@ -173,7 +173,7 @@ public class NightscoutTreatments {
                                 existing.insulin = insulin;
                                 existing.timestamp = timestamp;
                                 existing.created_at = DateUtil.toISOString(timestamp);
-                                if (existing.notes.length() > 0) {
+                                if (!existing.notes.isEmpty()) {
                                     existing.notes += " \u2192 " + notes;
                                 } else {
                                     existing.notes = notes;

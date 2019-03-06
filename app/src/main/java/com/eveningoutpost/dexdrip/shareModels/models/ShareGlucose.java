@@ -41,13 +41,13 @@ public class ShareGlucose extends Model {
 	public void processShareData(Context context) {
 		Log.d("SHARE", "Share Data being processed!"); // TODO maybe set this up??
 //        mContext = context;
-//        Log.d("SHARE", "Timestamp before parsing: " + WT);
-//        Log.d("SHARE", "Timestamp before parsing: " + WT.replaceAll("[^\\d.]", ""));
+//        UserError.Log.i("SHARE", "Timestamp before parsing: " + WT);
+//        UserError.Log.i("SHARE", "Timestamp before parsing: " + WT.replaceAll("[^\\d.]", ""));
 //
 //        double timestamp = (Double.parseDouble(WT.replaceAll("[^\\d.]", "")));
-//        Log.d("SHARE", "Timestamp: " + timestamp);
+//        UserError.Log.i("SHARE", "Timestamp: " + timestamp);
 //        if (!Bg.alreadyExists(timestamp)) {
-//            Log.d("SHARE", "Data looks new!!");
+//            UserError.Log.i("SHARE", "Data looks new!!");
 //            Bg bg = new Bg();
 //            bg.direction = slopeDirection();
 //            bg.battery = Integer.toString(getBatteryLevel());
@@ -56,9 +56,9 @@ public class ShareGlucose extends Model {
 //            bg.sgv = Integer.toString((int) Value);
 //            bg.save();
 //            DataCollectionService.newDataArrived(mContext, true);
-//            Log.d("SHARE", "Share Data Processed Successfully!");
+//            UserError.Log.i("SHARE", "Share Data Processed Successfully!");
 //        } else {
-//            Log.d("SHARE", "A Bg Value similar to this timestamp already exists.");
+//            UserError.Log.i("SHARE", "A Bg Value similar to this timestamp already exists.");
 //        }
 	}
 

@@ -94,7 +94,7 @@ public class NightscoutBackfillActivity extends AppCompatActivity implements Nav
             final PowerManager.WakeLock wl = JoH.getWakeLock("nightscout-backfill", 600000);
             try {
                 final List<BgReading> the_readings = BgReading.latestForGraphAsc(500000, calendar.getTimeInMillis(), JoH.tsl());
-                if ((the_readings != null) && (the_readings.size() > 0)) {
+                if ((the_readings != null) && (!the_readings.isEmpty())) {
                     PersistentStore.setBoolean(UploaderTask.BACKFILLING_BOOSTER, true);
                     long bgcount = the_readings.size();
                     long trcount = 0;
@@ -103,7 +103,7 @@ public class NightscoutBackfillActivity extends AppCompatActivity implements Nav
                     }
 
                     final List<Treatments> the_treatments = Treatments.latestForGraph(50000, calendar.getTimeInMillis(), JoH.tsl());
-                    if ((the_treatments != null) && (the_treatments.size() > 0)) {
+                    if ((the_treatments != null) && (!the_treatments.isEmpty())) {
                         trcount = the_treatments.size();
                         for (Treatments tr : the_treatments) {
                             UploaderQueue.newEntry("update", tr);

@@ -23,13 +23,13 @@ public class UndoRedo {
     public static boolean undoListHasItems()
     {
         synchronized (queue_lock) {
-            return (undo_queue.size() > 0);
+            return (!undo_queue.isEmpty());
         }
     }
     public static boolean redoListHasItems()
     {
         synchronized (queue_lock) {
-            return (redo_queue.size() > 0);
+            return (!redo_queue.isEmpty());
         }
     }
 

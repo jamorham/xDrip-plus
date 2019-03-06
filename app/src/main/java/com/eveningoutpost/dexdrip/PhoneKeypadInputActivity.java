@@ -6,6 +6,7 @@ import android.util.*;
 import android.view.*;
 import android.widget.*;
 
+import com.eveningoutpost.dexdrip.models.*;
 import com.eveningoutpost.dexdrip.utilitymodels.*;
 import com.eveningoutpost.dexdrip.wearintegration.*;
 
@@ -47,7 +48,7 @@ public class PhoneKeypadInputActivity extends BaseActivity {
         int width = dm.widthPixels;
         int height = dm.heightPixels;
         final int refdpi = 320;
-        Log.d(TAG, "Width height: " + width + " " + height + " DPI:" + dm.densityDpi);
+        UserError.Log.i(TAG, "Width height: " + width + " " + height + " DPI:" + dm.densityDpi);
         getWindow().setLayout((int) Math.min(((520 * dm.densityDpi) / refdpi), width), (int) Math.min((650 * dm.densityDpi) / refdpi, height));
         getWindow().setBackgroundDrawableResource(android.R.color.transparent);
         WindowManager.LayoutParams lp = getWindow().getAttributes();
@@ -184,7 +185,7 @@ public class PhoneKeypadInputActivity extends BaseActivity {
     private static String appendCurrent(String append) {
         String cval = getValue(currenttab);
         if (cval.length() < 6) {
-            if ((cval.length() == 0) && (append.equals("."))) append = "0.";
+            if ((cval.isEmpty()) && (append.equals("."))) append = "0.";
             return appendValue(currenttab, append);
         } else {
             return cval;
@@ -198,7 +199,7 @@ public class PhoneKeypadInputActivity extends BaseActivity {
 
     private void appBackSpace() {
         String cval = getValue(currenttab);
-        if (cval.length() > 0) {
+        if (!cval.isEmpty()) {
             values.put(currenttab, cval.substring(0, cval.length() - 1));
         }
         updateTab();
@@ -216,12 +217,12 @@ public class PhoneKeypadInputActivity extends BaseActivity {
     private boolean isInvalidTime()
     {
         String timeValue = getValue("time");
-        if (timeValue.length() == 0) return false;
+        if (timeValue.isEmpty()) return false;
         if (!timeValue.contains("."))
             return (timeValue.length() < 3);
 
         String[] parts = timeValue.split("\\.");
-        return (parts.length != 2) || (parts[0].length() == 0) || (parts[1].length() != 2);
+        return (parts.length != 2) || (parts[0].isEmpty()) || (parts[1].length() != 2);
     }
 
     private void submitAll() {
@@ -245,7 +246,7 @@ public class PhoneKeypadInputActivity extends BaseActivity {
         }
 
         String mystring = "";
-        if (timeValue.length() > 0) mystring += timeValue + " time ";
+        if (!timeValue.isEmpty()) mystring += timeValue + " time ";
         if (nonzeroBloodValue) mystring += getValue("bloodtest") + " blood ";
         if (nonzeroCarbsValue) mystring += getValue("carbs") + " carbs ";
         if (nonzeroInsulinValue) mystring += getValue("insulin") + " units ";
@@ -298,7 +299,7 @@ public class PhoneKeypadInputActivity extends BaseActivity {
             showSubmitButton = false;
 
         else if (currenttab.equals("time"))
-            showSubmitButton = value.length() > 0 &&
+            showSubmitButton = !value.isEmpty() &&
                     ( isNonzeroValueInTab("bloodtest") || isNonzeroValueInTab("carbs") || isNonzeroValueInTab("insulin"));
         else
             showSubmitButton = isNonzeroValueInTab(currenttab);
@@ -308,7 +309,7 @@ public class PhoneKeypadInputActivity extends BaseActivity {
     @Override
     protected void onResume() {
         final String savedtab = PersistentStore.getString(LAST_TAB_STORE);
-        if (savedtab.length() > 0) currenttab = savedtab;
+        if (!savedtab.isEmpty()) currenttab = savedtab;
         updateTab();
         super.onResume();
     }

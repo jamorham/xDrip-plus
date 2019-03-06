@@ -3,6 +3,7 @@ package com.eveningoutpost.dexdrip.utils;
 import android.os.AsyncTask;
 import android.util.Log;
 
+import com.eveningoutpost.dexdrip.models.*;
 import com.squareup.okhttp.OkHttpClient;
 import com.squareup.okhttp.Request;
 import com.squareup.okhttp.Response;
@@ -27,14 +28,14 @@ public class WebAppHelper extends AsyncTask<String, Integer, Integer> {
     }
 
     protected void onPostExecute(Integer result) {
-        Log.d(TAG, "OnPostExecute: body: " + result);
+        UserError.Log.i(TAG, "OnPostExecute: body: " + result);
         if (listener != null) listener.onTaskCompleted(this.body);
     }
 
     @Override
     protected Integer doInBackground(String... url) {
         try {
-            Log.d(TAG, "Processing URL: " + url[0]);
+            UserError.Log.i(TAG, "Processing URL: " + url[0]);
             Request request = new Request.Builder()
                     .header("User-Agent", "Mozilla/5.0 (jamorham)")
                     .header("Connection", "close")
@@ -49,7 +50,7 @@ public class WebAppHelper extends AsyncTask<String, Integer, Integer> {
             if (!response.isSuccessful()) throw new IOException("Unexpected code " + response);
             body = response.body().bytes();
         } catch (Exception e) {
-            Log.d(TAG, "Exception in background task: " + e.toString());
+            UserError.Log.i(TAG, "Exception in background task: " + e.toString());
         }
         return body.length;
     }

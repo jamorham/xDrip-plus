@@ -184,7 +184,7 @@ public class BestGlucose {
         // if we are actively using a plugin, get the glucose calculation from there
         if ((plugin != null) && ((pcalibration = plugin.getCalibrationData()) != null) && (Pref.getBoolean("display_glucose_from_plugin", false))) {
             dg.plugin_name = plugin.getAlgorithmName();
-            Log.d(TAG, "Using plugin: " + dg.plugin_name);
+            UserError.Log.i(TAG, "Using plugin: " + dg.plugin_name);
             dg.from_plugin = true;
             estimate = plugin.getGlucoseFromBgReading(lastBgReading, pcalibration);
             filtered = plugin.getGlucoseFromFilteredBgReading(lastBgReading, pcalibration);
@@ -241,13 +241,13 @@ public class BestGlucose {
             // TODO optimize adding units
             dg.unitized_delta = unitizedDeltaString(true, true, doMgdl, estimate, timestamp, previous_estimate, previous_timestamp);
             long time_delta = timestamp - previous_timestamp;
-            if (time_delta < 0) Log.wtf(TAG, "Time delta is negative! : " + time_delta);
+            if (time_delta < 0) UserError.Log.wtf(TAG, "Time delta is negative! : " + time_delta);
             //slope_arrow = lastBgReading.slopeArrow(); // internalize this for plugins
             double slope = calculateSlope(estimate, timestamp, previous_estimate, previous_timestamp);
             dg.slope = slope;
             slope_arrow = BgReading.slopeToArrowSymbol(slope * 60000); // slope by minute
             slope_name = BgReading.slopeName(slope * 60000);
-            Log.d(TAG, "No noise option slope by minute: " + JoH.qs(slope * 60000, 5));
+            UserError.Log.i(TAG, "No noise option slope by minute: " + JoH.qs(slope * 60000, 5));
         }
 
         // TODO bit more work on deltas etc needed here
@@ -287,7 +287,7 @@ public class BestGlucose {
         }
 
         if (d)
-            Log.d(TAG, "dg result: " + dg.unitized + " previous: " + BgGraphBuilder.unitized_string(previous_estimate, doMgdl));
+            UserError.Log.i(TAG, "dg result: " + dg.unitized + " previous: " + BgGraphBuilder.unitized_string(previous_estimate, doMgdl));
         return dg;
     }
 

@@ -858,11 +858,8 @@ public class TaskerPlugin {
     		else if ( Character.isDigit( ch ) )
     			digitCount++;
     	}
-    		
-    	if ( digitCount == ( varName.length() - 1 ) )
-    		return false;
-    	
-    	return true;
+
+	    return digitCount != (varName.length() - 1);
     }
     
     // state tracking for random number sequence

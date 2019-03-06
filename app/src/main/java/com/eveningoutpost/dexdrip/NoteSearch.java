@@ -1,6 +1,7 @@
 package com.eveningoutpost.dexdrip;
 
 import android.app.*;
+import android.content.*;
 import android.database.*;
 import android.database.sqlite.*;
 import android.os.*;
@@ -9,6 +10,7 @@ import android.util.*;
 import android.view.*;
 import android.view.inputmethod.*;
 import android.widget.*;
+import android.widget.AdapterView.*;
 
 import androidx.appcompat.app.AlertDialog;
 
@@ -70,6 +72,7 @@ public class NoteSearch extends ListActivityWithMenu {
 
 		resultListAdapter = new SearchResultAdapter();
 		//setListAdapter(resultListAdapter);
+
 		listViewNote.setAdapter(resultListAdapter);
 
 		final Activity activity = this;
@@ -93,7 +96,18 @@ public class NoteSearch extends ListActivityWithMenu {
 			}
 			return true;
 		});
+listViewNote.setOnItemClickListener((parent, view, position, id) -> {
+	SearchResult sResult = (SearchResult) resultListAdapter.getItem(position);
 
+	if (!sResult.isLoadMoreAction) {
+		Intent myIntent = new Intent(NoteSearch.this, BGHistory.class);
+		myIntent.putExtra(BGHistory.OPEN_ON_TIME_KEY, sResult.timestamp);
+		startActivity(myIntent);
+		finish();
+	} else {
+		loadMore();
+	}
+});
 		setupGui();
 		doAll(false);
 
@@ -290,7 +304,7 @@ public class NoteSearch extends ListActivityWithMenu {
 		dateButton1.setText(dateFormatter.format(date1.getTime()));
 		dateButton2.setText(dateFormatter.format(date2.getTime()));
 	}
-//FIXME
+/*FIXME*/
 //	@Override
 //	protected void onListItemClick(ListView l, View v, int position, long id) {
 //		SearchResult sResult = (SearchResult) resultListAdapter.getItem(position);

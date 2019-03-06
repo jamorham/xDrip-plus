@@ -179,7 +179,7 @@ public class BloodTest extends Model {
         }
 
         if ((bg < 40) || (bg > 400)) {
-            Log.wtf(TAG, "Invalid out of range bloodtest glucose mg/dl value of: " + bg);
+           UserError.Log.wtf(TAG, "Invalid out of range bloodtest glucose mg/dl value of: " + bg);
             JoH.static_toast_long("Bloodtest out of range: " + bg + " mg/dl");
             return null;
         }
@@ -189,7 +189,7 @@ public class BloodTest extends Model {
 
     public static BloodTest last() {
         final List<BloodTest> btl = last(1);
-        if ((btl != null) && (btl.size() > 0)) {
+        if ((btl != null) && (!btl.isEmpty())) {
             return btl.get(0);
         } else {
             return null;
@@ -225,7 +225,7 @@ public class BloodTest extends Model {
 
     public static BloodTest lastValid() {
         final List<BloodTest> btl = lastValid(1);
-        if ((btl != null) && (btl.size() > 0)) {
+        if ((btl != null) && (!btl.isEmpty())) {
             return btl.get(0);
         } else {
             return null;
@@ -328,7 +328,7 @@ public class BloodTest extends Model {
     }
 */
     public static BloodTest fromJSON(String json) {
-        if ((json == null) || (json.length() == 0)) {
+        if ((json == null) || (json.isEmpty())) {
             UserError.Log.d(TAG, "Empty json received in bloodtest fromJson");
             return null;
         }
@@ -396,39 +396,39 @@ public class BloodTest extends Model {
         if (Pref.getBooleanDefaultFalse("bluetooth_meter_for_calibrations_auto")) {
             final BloodTest bt = lastValid();
             if (bt == null) {
-                Log.d(TAG, "opportunistic: No blood tests");
+               UserError.Log.d(TAG, "opportunistic: No blood tests");
                 return;
             }
             if (JoH.msSince(bt.timestamp) > Constants.DAY_IN_MS) {
-                Log.d(TAG, "opportunistic: Blood test older than 1 days ago");
+               UserError.Log.d(TAG, "opportunistic: Blood test older than 1 days ago");
                 return;
             }
 
             if ((bt.uuid != null) && (bt.uuid.length() > 1) && PersistentStore.getString("last-bt-auto-calib-uuid").equals(bt.uuid)) {
-                Log.d(TAG, "Already processed uuid: " + bt.uuid);
+               UserError.Log.d(TAG, "Already processed uuid: " + bt.uuid);
                 return;
             }
 
             final Calibration calibration = Calibration.lastValid();
             if (calibration == null) {
-                Log.d(TAG, "opportunistic: No calibrations");
+               UserError.Log.d(TAG, "opportunistic: No calibrations");
                 return;
             }
 
             if (JoH.msSince(calibration.timestamp) < Constants.HOUR_IN_MS) {
-                Log.d(TAG, "opportunistic: Last calibration less than 1 hour ago");
+               UserError.Log.d(TAG, "opportunistic: Last calibration less than 1 hour ago");
                 return;
             }
 
             if (bt.timestamp <= calibration.timestamp) {
-                Log.d(TAG, "opportunistic: Blood test isn't more recent than last calibration");
+               UserError.Log.d(TAG, "opportunistic: Blood test isn't more recent than last calibration");
                 return;
             }
 
             // get closest bgreading - must be within dexcom period and locked to sensor
             final BgReading bgReading = BgReading.getForPreciseTimestamp(bt.timestamp + (AddCalibration.estimatedInterstitialLagSeconds * 1000), BgGraphBuilder.DEXCOM_PERIOD);
             if (bgReading == null) {
-                Log.d(TAG, "opportunistic: No matching bg reading");
+               UserError.Log.d(TAG, "opportunistic: No matching bg reading");
                 return;
             }
 
@@ -444,7 +444,7 @@ public class BloodTest extends Model {
             }
 
             if (!CalibrationRequest.isSlopeFlatEnough(bgReading)) {
-                Log.d(TAG, "opportunistic: Slope is not flat enough at: " + JoH.dateTimeText(bgReading.timestamp));
+               UserError.Log.d(TAG, "opportunistic: Slope is not flat enough at: " + JoH.dateTimeText(bgReading.timestamp));
                 return;
             }
 
@@ -456,7 +456,7 @@ public class BloodTest extends Model {
             final long time_since = JoH.msSince(bt.timestamp);
 
 
-            Log.d(TAG, "opportunistic: attempting auto calibration");
+           UserError.Log.d(TAG, "opportunistic: attempting auto calibration");
             PersistentStore.setString("last-bt-auto-calib-uuid", bt.uuid);
             Home.startHomeWithExtra(xdrip.getAppContext(),
                     Home.BLUETOOTH_METER_CALIBRATION,
@@ -485,31 +485,31 @@ public class BloodTest extends Model {
             if (bgReading != null) {
                 final Calibration calibration = bgReading.calibration;
                 if (calibration == null) {
-                    Log.d(TAG,"Calibration for bgReading is null! @ "+JoH.dateTimeText(bgReading.timestamp));
+                   UserError.Log.d(TAG,"Calibration for bgReading is null! @ "+JoH.dateTimeText(bgReading.timestamp));
                     continue;
                 }
                 final double diff = Math.abs(bgReading.calculated_value - bt.mgdl);
                 difference.add(diff);
                 if (d) {
-                    Log.d(TAG, "Evaluate Accuracy: difference: " + JoH.qs(diff));
+                   UserError.Log.d(TAG, "Evaluate Accuracy: difference: " + JoH.qs(diff));
                 }
                 final CalibrationAbstract.CalibrationData cd = (plugin != null) ? plugin.getCalibrationData(bgReading.timestamp) : null;
                 if ((plugin != null) && (cd != null)) {
                     final double plugin_diff = Math.abs(bt.mgdl - plugin.getGlucoseFromBgReading(bgReading, cd));
                     plugin_difference.add(plugin_diff);
                     if (d)
-                        Log.d(TAG, "Evaluate Plugin Accuracy: " + BgGraphBuilder.unitized_string_with_units_static(bt.mgdl) + " @ " + JoH.dateTimeText(bt.timestamp) + "  difference: " + JoH.qs(plugin_diff) + "/" + JoH.qs(plugin_diff * Constants.MGDL_TO_MMOLL, 2) + " calibration: " + JoH.qs(cd.slope, 2) + " " + JoH.qs(cd.intercept, 2));
+                       UserError.Log.d(TAG, "Evaluate Plugin Accuracy: " + BgGraphBuilder.unitized_string_with_units_static(bt.mgdl) + " @ " + JoH.dateTimeText(bt.timestamp) + "  difference: " + JoH.qs(plugin_diff) + "/" + JoH.qs(plugin_diff * Constants.MGDL_TO_MMOLL, 2) + " calibration: " + JoH.qs(cd.slope, 2) + " " + JoH.qs(cd.intercept, 2));
                 }
             }
         }
 
         if (difference.size() == 0) return null;
         double avg = DoubleMath.mean(difference);
-        Log.d(TAG, "Average accuracy: " + accuracyAsString(avg) + "  (" + JoH.qs(avg, 5) + ")");
+       UserError.Log.d(TAG, "Average accuracy: " + accuracyAsString(avg) + "  (" + JoH.qs(avg, 5) + ")");
 
         if (plugin_difference.size() > 0) {
             double plugin_avg = DoubleMath.mean(plugin_difference);
-            Log.d(TAG, "Plugin Average accuracy: " + accuracyAsString(plugin_avg) + "  (" + JoH.qs(plugin_avg, 5) + ")");
+           UserError.Log.d(TAG, "Plugin Average accuracy: " + accuracyAsString(plugin_avg) + "  (" + JoH.qs(plugin_avg, 5) + ")");
             return accuracyAsString(plugin_avg) + " / " + accuracyAsString(avg);
         }
         return accuracyAsString(avg);

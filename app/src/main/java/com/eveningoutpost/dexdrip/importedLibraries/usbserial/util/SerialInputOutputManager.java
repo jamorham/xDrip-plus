@@ -22,6 +22,8 @@
 package com.eveningoutpost.dexdrip.importedLibraries.usbserial.util;
 
 import android.hardware.usb.UsbRequest;
+
+import com.eveningoutpost.dexdrip.models.*;
 import com.eveningoutpost.dexdrip.models.UserError.Log;
 
 import com.eveningoutpost.dexdrip.importedLibraries.usbserial.driver.UsbSerialPort;
@@ -106,7 +108,7 @@ public class SerialInputOutputManager implements Runnable {
 
     public synchronized void stop() {
         if (getState() == State.RUNNING) {
-            Log.i(TAG, "Stop requested");
+            UserError.Log.i(TAG, "Stop requested");
             mState = State.STOPPING;
         }
     }
@@ -131,17 +133,17 @@ public class SerialInputOutputManager implements Runnable {
             mState = State.RUNNING;
         }
 
-        Log.i(TAG, "Running ..");
+        UserError.Log.i(TAG, "Running ..");
         try {
             while (true) {
                 if (getState() != State.RUNNING) {
-                    Log.i(TAG, "Stopping mState=" + getState());
+                    UserError.Log.i(TAG, "Stopping mState=" + getState());
                     break;
                 }
                 step();
             }
         } catch (Exception e) {
-            Log.w(TAG, "Run ending due to exception: " + e.getMessage(), e);
+            UserError.Log.w(TAG, "Run ending due to exception: " + e.getMessage(), e);
             final Listener listener = getListener();
             if (listener != null) {
               listener.onRunError(e);
@@ -149,7 +151,7 @@ public class SerialInputOutputManager implements Runnable {
         } finally {
             synchronized (this) {
                 mState = State.STOPPED;
-                Log.i(TAG, "Stopped.");
+                UserError.Log.i(TAG, "Stopped.");
             }
         }
     }
@@ -158,7 +160,7 @@ public class SerialInputOutputManager implements Runnable {
         // Handle incoming data.
         int len = mDriver.read(mReadBuffer.array(), READ_WAIT_MILLIS);
         if (len > 0) {
-            if (DEBUG) Log.d(TAG, "Read data len=" + len);
+            if (DEBUG) UserError.Log.i(TAG, "Read data len=" + len);
             final Listener listener = getListener();
             if (listener != null) {
                 final byte[] data = new byte[len];
@@ -181,7 +183,7 @@ public class SerialInputOutputManager implements Runnable {
         }
         if (outBuff != null) {
             if (DEBUG) {
-                Log.d(TAG, "Writing data len=" + len);
+                UserError.Log.i(TAG, "Writing data len=" + len);
             }
             mDriver.write(outBuff, READ_WAIT_MILLIS);
         }

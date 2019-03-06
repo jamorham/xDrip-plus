@@ -2,6 +2,8 @@ package com.eveningoutpost.dexdrip.webservices;
 
 import android.util.Log;
 
+import com.eveningoutpost.dexdrip.models.*;
+
 import javax.inject.Named;
 import javax.inject.Singleton;
 
@@ -25,7 +27,7 @@ public class WebServiceModule {
     @Singleton
     @Named("RouteFinder")
     RouteFinder providesRouteFinder() {
-        if (d) Log.d("INJECT", "creating RouteFinder");
+        if (d) UserError.Log.i("INJECT", "creating RouteFinder");
         return new RouteFinder();
     }
 
@@ -33,7 +35,7 @@ public class WebServiceModule {
     @Singleton
     @Named("WebServicePebble")
     BaseWebService providesWebServicePebble() {
-        if (d) Log.d("INJECT", "creating WebServicePebble");
+        if (d) UserError.Log.i("INJECT", "creating WebServicePebble");
         return new WebServicePebble();
     }
 
@@ -41,7 +43,7 @@ public class WebServiceModule {
     @Singleton
     @Named("WebServiceSgv")
     BaseWebService providesWebServiceSgv() {
-        if (d) Log.d("INJECT", "creating WebServiceSgv");
+        if (d) UserError.Log.i("INJECT", "creating WebServiceSgv");
         return new WebServiceSgv();
     }
 
@@ -49,7 +51,7 @@ public class WebServiceModule {
     @Singleton
     @Named("WebServiceStatus")
     BaseWebService providesWebServiceStatus() {
-        if (d) Log.d("INJECT", "creating WebServiceStatus");
+        if (d) UserError.Log.i("INJECT", "creating WebServiceStatus");
         return new WebServiceStatus();
     }
 
@@ -57,7 +59,7 @@ public class WebServiceModule {
     @Singleton
     @Named("WebServiceTasker")
     BaseWebService providesWebServiceTasker() {
-        if (d) Log.d("INJECT", "creating WebServiceTasker");
+        if (d) UserError.Log.i("INJECT", "creating WebServiceTasker");
         return new WebServiceTasker();
     }
 
@@ -65,7 +67,7 @@ public class WebServiceModule {
     @Singleton
     @Named("WebServiceSteps")
     BaseWebService providesWebServiceSteps() {
-        if (d) Log.d("INJECT", "creating WebServiceSteps");
+        if (d) UserError.Log.i("INJECT", "creating WebServiceSteps");
         return new WebServiceSteps();
     }
 
@@ -73,7 +75,7 @@ public class WebServiceModule {
     @Singleton
     @Named("WebServiceHeart")
     BaseWebService providesWebServiceHeart() {
-        if (d) Log.d("INJECT", "creating WebServiceHeart");
+        if (d) UserError.Log.i("INJECT", "creating WebServiceHeart");
         return new WebServiceHeart();
     }
 
@@ -81,7 +83,7 @@ public class WebServiceModule {
     @Singleton
     @Named("WebServiceSync")
     BaseWebService providesWebServiceSync() {
-        if (d) Log.d("INJECT", "creating WebServiceSync");
+        if (d) UserError.Log.i("INJECT", "creating WebServiceSync");
         return new WebServiceSync();
     }
 

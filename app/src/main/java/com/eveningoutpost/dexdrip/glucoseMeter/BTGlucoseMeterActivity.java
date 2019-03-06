@@ -7,6 +7,7 @@ import android.graphics.*;
 import android.os.*;
 import android.view.*;
 import android.widget.*;
+import android.widget.AdapterView.*;
 
 import androidx.appcompat.app.*;
 import androidx.localbroadcastmanager.content.*;
@@ -89,8 +90,18 @@ public class BTGlucoseMeterActivity extends ListActivityWithMenu {
 
             mLeDeviceListAdapter = new LeDeviceListAdapter();
 ListView listViewGlucose = (ListView) findViewById(R.id.listGlucose);
-//            setListAdapter(mLeDeviceListAdapter);
-listViewGlucose.setAdapter(mLeDeviceListAdapter);
+listViewGlucose.setOnItemClickListener((parent, view, position, id) -> {
+    final MyBluetoothDevice device = mLeDeviceListAdapter.getDevice(position);
+    if (device != null) {
+        if (JoH.ratelimit("bt-meter-item-clicked", 7)) {
+            UserError.Log.d(TAG, "Item Clicked: " + device.address);
+            BluetoothGlucoseMeter.start_service(device.address);
+        }
+    } else {
+        UserError.Log.wtf(TAG, "Null pointer on list item click");
+    }
+});
+
             // long click call back
            listViewGlucose./* getListView().*/setOnItemLongClickListener((adapterView, v, position, id) -> {
 
@@ -127,7 +138,11 @@ listViewGlucose.setAdapter(mLeDeviceListAdapter);
 
                 return true;
             });
+
            listViewGlucose./* getListView().*/setLongClickable(true);
+
+//            setListAdapter(mLeDeviceListAdapter);
+            listViewGlucose.setAdapter(mLeDeviceListAdapter);
         }
     }
 
@@ -207,7 +222,8 @@ listViewGlucose.setAdapter(mLeDeviceListAdapter);
         return menu_name;
     }
 
-//TODO    @Override
+/*FIXME*/
+// @Override
 //    protected void onListItemClick(ListView l, View v, int position, long id) {
 //        final MyBluetoothDevice device = mLeDeviceListAdapter.getDevice(position);
 //        if (device != null) {

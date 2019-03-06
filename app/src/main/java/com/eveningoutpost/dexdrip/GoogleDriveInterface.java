@@ -66,7 +66,7 @@ public class GoogleDriveInterface extends FauxActivity {
                           showMessage("Error while trying to create the file");
                           return;
                       }
-                      Log.d(TAG, "Created a file in App Folder: "
+                      UserError.Log.i(TAG, "Created a file in App Folder: "
                               + result.getDriveFile().getDriveId());
                   }
               };
@@ -75,15 +75,15 @@ public class GoogleDriveInterface extends FauxActivity {
                   @Override
                   public void onResult(DriveResource.MetadataResult result) {
                       if (!result.getStatus().isSuccess()) {
-                          Log.v(TAG, "Problem while trying to fetch metadata.");
+                          UserError.Log.v(TAG, "Problem while trying to fetch metadata.");
                           return;
                       }
 
                       Metadata metadata = result.getMetadata();
                       if (metadata.isTrashed()) {
-                          Log.v(TAG, "Folder is trashed");
+                          UserError.Log.v(TAG, "Folder is trashed");
                       } else {
-                          Log.v(TAG, "Folder is not trashed");
+                          UserError.Log.v(TAG, "Folder is not trashed");
                       }
 
                   }
@@ -97,11 +97,11 @@ public class GoogleDriveInterface extends FauxActivity {
                 @Override
                 public void onResult(Status status) {
                     if (!status.isSuccess()) {
-                        Log.e(TAG, "Unable to delete file: " +
+                        UserError.Log.e(TAG, "Unable to delete file: " +
                                 status.getStatusMessage());
                         return;
                     } else {
-                        Log.d(TAG, "Trash successful");
+                        UserError.Log.i(TAG, "Trash successful");
                     }
                 }
             };
@@ -112,7 +112,7 @@ public class GoogleDriveInterface extends FauxActivity {
     final private ChangeListener changeListener = new ChangeListener() {
         @Override
         public void onChange(ChangeEvent event) {
-            Log.i(TAG, String.format("File change event: %s", event));
+            UserError.Log.i(TAG, String.format("File change event: %s", event));
         }
     };
     private boolean isSubscribed = false;
@@ -129,7 +129,7 @@ public class GoogleDriveInterface extends FauxActivity {
                     }
 
                     try {
-                        Log.i(TAG, "Looking at file metadata query result");
+                        UserError.Log.i(TAG, "Looking at file metadata query result");
                         MetadataBuffer metabuffer = null;
                         try {
                             metabuffer = result.getMetadataBuffer();
@@ -141,13 +141,13 @@ public class GoogleDriveInterface extends FauxActivity {
 
                                 remoteFiles.add(record);
 
-                                Log.i(TAG, "First file metadata: " + record.getTitle());
+                                UserError.Log.i(TAG, "First file metadata: " + record.getTitle());
                             }
                         } finally {
                             //    if (metabuffer != null) metabuffer.close(); // should we close and when?
                         }
 
-                        Log.i(TAG, "endfile  query result");
+                        UserError.Log.i(TAG, "endfile  query result");
                         new Thread() {
                             @Override
                             public void run() {
@@ -156,7 +156,7 @@ public class GoogleDriveInterface extends FauxActivity {
                         }.start();
 
                     } catch (Exception e) {
-                        Log.e(TAG, "Got exception in file metadata: " + e.toString());
+                        UserError.Log.e(TAG, "Got exception in file metadata: " + e.toString());
                     }
                 }
             };
@@ -166,9 +166,9 @@ public class GoogleDriveInterface extends FauxActivity {
         @Override
         public void onResult(Status status) {
             if (!status.isSuccess()) {
-                Log.e(TAG, "Unable to subscribe." + status.getStatusMessage());
+                UserError.Log.e(TAG, "Unable to subscribe." + status.getStatusMessage());
             } else {
-                Log.i(TAG, "Subscribe result ok");
+                UserError.Log.i(TAG, "Subscribe result ok");
             }
         }
     };
@@ -197,26 +197,26 @@ public class GoogleDriveInterface extends FauxActivity {
                         return;
                     }
                     try {
-                        Log.i(TAG, "Looking at metadata query result");
+                        UserError.Log.i(TAG, "Looking at metadata query result");
                         MetadataBuffer metabuffer = null;
                         try {
                             metabuffer = result.getMetadataBuffer();
 
                             if (metabuffer != null) for (Metadata record : metabuffer) {
-                                Log.i(TAG, "metdata business");
+                                UserError.Log.i(TAG, "metdata business");
                                 if (record == null || !record.isDataValid()) continue;
                                 if (record.isTrashed()) continue;
 
                                 ourFolderID = record.getDriveId();
                                 ourFolderResourceID = ourFolderID.getResourceId();
                                 PlusSyncService.speedup();
-                                Log.i(TAG, "First metadata: " + record.getTitle());
+                                UserError.Log.i(TAG, "First metadata: " + record.getTitle());
                             }
                         } finally {
                             if (metabuffer != null) metabuffer.close();
                         }
 
-                        Log.i(TAG, "end query result");
+                        UserError.Log.i(TAG, "end query result");
 
                         if (ourFolderID == null) {
                             MetadataChangeSet changeSet = new MetadataChangeSet.Builder()
@@ -225,11 +225,11 @@ public class GoogleDriveInterface extends FauxActivity {
                                     getGoogleApiClient(), changeSet).setResultCallback(ourFolderCreateCallback);
                         } else {
 
-                            Log.i(TAG, "Found our folder: " + ourFolderID.toString());
+                            UserError.Log.i(TAG, "Found our folder: " + ourFolderID.toString());
                             getFolderFileList(ourFolderID);
                         }
                     } catch (Exception e) {
-                        Log.e(TAG, "Got exception in metadata: " + e.toString());
+                        UserError.Log.e(TAG, "Got exception in metadata: " + e.toString());
                     }
                 }
             };
@@ -238,9 +238,9 @@ public class GoogleDriveInterface extends FauxActivity {
         @Override
         public void onResult(Status status) {
             if (!status.isSuccess()) {
-                Log.e(TAG, "Unable to sync.");
+                UserError.Log.e(TAG, "Unable to sync.");
             } else {
-                Log.i(TAG, "Sync reports ok");
+                UserError.Log.i(TAG, "Sync reports ok");
             }
             if (use_app_folder) {
                 ourFolderID = Drive.DriveApi.getAppFolder(getGoogleApiClient()).getDriveId();
@@ -249,7 +249,7 @@ public class GoogleDriveInterface extends FauxActivity {
                 if (ourFolderID != null) {
                     getFolderFileList(ourFolderID);
                 } else {
-                    Log.e(TAG, "Could not get app_folder identity");
+                    UserError.Log.e(TAG, "Could not get app_folder identity");
                 }
             } else {
 
@@ -270,8 +270,7 @@ public class GoogleDriveInterface extends FauxActivity {
     };
 */
     public static boolean keyInitialized() {
-        if (getDriveIdentityString() != null) return true;
-        return false;
+	    return getDriveIdentityString() != null;
     }
 
     private static String getCustomSyncKey() {
@@ -279,7 +278,7 @@ public class GoogleDriveInterface extends FauxActivity {
             prefs = PreferenceManager.getDefaultSharedPreferences(xdrip.getAppContext());
         }
         //if ((prefs != null) && (prefs.getBoolean("use_custom_sync_key", true))) {
-        if ((prefs != null) && (true)) {
+        if ((prefs != null)) {
             if (prefs.getString("custom_sync_key", "").equals("")) {
                 prefs.edit().putString("custom_sync_key", CipherUtils.getRandomHexKey()).apply();
             }
@@ -316,7 +315,7 @@ public class GoogleDriveInterface extends FauxActivity {
             return null;
         }
         if (ourFolderResourceIDHash == null) {
-            Log.d(TAG, "Using ResourceID String: " + ourFolderResourceID);
+            UserError.Log.i(TAG, "Using ResourceID String: " + ourFolderResourceID);
             ourFolderResourceIDHash = CipherUtils.getSHA256(ourFolderResourceID);
         }
         return ourFolderResourceIDHash;
@@ -339,7 +338,7 @@ public class GoogleDriveInterface extends FauxActivity {
             return CipherUtils.getRandomHexKey();
         }
         if (ourFolderResourceKeyHash == null) {
-            Log.d(TAG, "Using Key ResourceID String: " + ourFolderResourceID);
+            UserError.Log.i(TAG, "Using Key ResourceID String: " + ourFolderResourceID);
             ourFolderResourceKeyHash = CipherUtils.getMD5(ourFolderResourceID);
         }
         return ourFolderResourceKeyHash;
@@ -357,10 +356,10 @@ public class GoogleDriveInterface extends FauxActivity {
      */
   /*  private void saveFileToDrive(final String filename, final byte[] source) {
 
-        Log.i(TAG, "Creating new contents.");
+        UserError.Log.i(TAG, "Creating new contents.");
 
         if (source.length == 0) {
-            Log.e(TAG, "Not writing zero byte file to gdrive");
+            UserError.Log.e(TAG, "Not writing zero byte file to gdrive");
             return;
         }
 
@@ -370,7 +369,7 @@ public class GoogleDriveInterface extends FauxActivity {
                     @Override
                     public void onResult(DriveContentsResult result) {
                         if (!result.getStatus().isSuccess()) {
-                            Log.i(TAG, "Failed to create new contents.");
+                            UserError.Log.i(TAG, "Failed to create new contents.");
                             return;
                         }
 
@@ -378,13 +377,13 @@ public class GoogleDriveInterface extends FauxActivity {
                         new Thread() {
                             @Override
                             public void run() {
-                                Log.d(TAG, "Starting output stream.  size: " + source.length);
+                                UserError.Log.i(TAG, "Starting output stream.  size: " + source.length);
                                 OutputStream outputStream = driveContents.getOutputStream();
                                 try {
                                     outputStream.write(source);
                                     outputStream.close();
                                 } catch (IOException e) {
-                                    Log.e(TAG, e.getMessage());
+                                    UserError.Log.e(TAG, e.getMessage());
                                 }
 
                                 MetadataChangeSet changeSet = new MetadataChangeSet.Builder()
@@ -397,7 +396,7 @@ public class GoogleDriveInterface extends FauxActivity {
                                         .setNotifyOnCompletion(true)
                                         .build())
                                         .setResultCallback(fileCallback);
-                                Log.d(TAG, "Sent create file req");
+                                UserError.Log.i(TAG, "Sent create file req");
                             }
                         }.start();
 
@@ -412,7 +411,7 @@ public class GoogleDriveInterface extends FauxActivity {
         if (false) {
             //      connectGoogleAPI();
         } else {
-            Log.d(TAG, "Using custom sync key");
+            UserError.Log.i(TAG, "Using custom sync key");
             shutdown();
         }
     }
@@ -420,16 +419,16 @@ public class GoogleDriveInterface extends FauxActivity {
     private void shutdown() {
         if (mGoogleApiClient != null) {
             mGoogleApiClient.disconnect();
-            Log.i(TAG, "DISCONNECTED GOOGLE DRIVE API");
+            UserError.Log.i(TAG, "DISCONNECTED GOOGLE DRIVE API");
         } else {
-            Log.i(TAG, "No drive instance to shutdown");
+            UserError.Log.i(TAG, "No drive instance to shutdown");
         }
         mGoogleApiClient = null;
         isRunning = false;
         try {
             finish();
         } catch (Exception e) {
-            Log.e(TAG, "Got exception doing finish in shutdown");
+            UserError.Log.e(TAG, "Got exception doing finish in shutdown");
         }
     }
 /*
@@ -450,9 +449,9 @@ public class GoogleDriveInterface extends FauxActivity {
             case REQUEST_CODE_CREATOR:
                 // Called after a file is saved to Drive.
                 if (resultCode == RESULT_OK) {
-                    Log.i(TAG, "successfully saved.");
+                    UserError.Log.i(TAG, "successfully saved.");
                 } else {
-                    Log.i(TAG, "Bad result code: " + resultCode);
+                    UserError.Log.i(TAG, "Bad result code: " + resultCode);
                 }
                 break;
         }
@@ -461,14 +460,14 @@ public class GoogleDriveInterface extends FauxActivity {
     @Override
     public void onConnectionFailed(ConnectionResult result) {
         // Called whenever the API client fails to connect.
-        Log.i(TAG, "GoogleApiClient connection failed: " + result.toString());
+        UserError.Log.i(TAG, "GoogleApiClient connection failed: " + result.toString());
         PlusSyncService.backoff();
         if (!result.hasResolution()) {
             // show the localized error dialog.
             try {
                 GoogleApiAvailability.getInstance().getErrorDialog(this, result.getErrorCode(), 0).show();
             } catch (Exception e) {
-                Log.e(TAG, "Ouch could not display the error dialog from play services: " + e.toString());
+                UserError.Log.e(TAG, "Ouch could not display the error dialog from play services: " + e.toString());
             }
             return;
         }
@@ -478,44 +477,44 @@ public class GoogleDriveInterface extends FauxActivity {
             }
             result.startResolutionForResult(this, REQUEST_CODE_RESOLUTION);
         } catch (SendIntentException e) {
-            Log.e(TAG, "Exception while starting resolution activity", e);
+            UserError.Log.e(TAG, "Exception while starting resolution activity", e);
         }
         shutdown();
     }
 
     @Override
     public void onConnected(Bundle connectionHint) {
-        Log.i(TAG, "API client connected. starting query thread");
+        UserError.Log.i(TAG, "API client connected. starting query thread");
         Drive.DriveApi.requestSync(getGoogleApiClient()).setResultCallback(syncCallback);
         PlusSyncService.speedup();
     }
 
     @Override
     public void onConnectionSuspended(int cause) {
-        Log.i(TAG, "GoogleApiClient connection suspended");
+        UserError.Log.i(TAG, "GoogleApiClient connection suspended");
     }
 
     void getFolderFileList(DriveId driveId) {
         if (!staticGetFolderFileList) {
             try {
-                Log.d(TAG, "Calling shutdown");
+                UserError.Log.i(TAG, "Calling shutdown");
                 shutdown();
             } catch (Exception e) {
             }
             return;
         }
-        Log.d(TAG, "Asking drive file list");
+        UserError.Log.i(TAG, "Asking drive file list");
         Query query = new Query.Builder()
                 .build();
         DriveFolder folder = driveId.asDriveFolder();
 
         if (!isSubscribed) {
-            Log.d(TAG, "Starting to listen to the file changes.");
+            UserError.Log.i(TAG, "Starting to listen to the file changes.");
             folder.addChangeListener(getGoogleApiClient(), changeListener).setResultCallback(subscribeCallBack);
             folder.addChangeSubscription(getGoogleApiClient());
             //  isSubscribed = true;
         } else {
-            Log.d(TAG, "Already listening to the file changes.");
+            UserError.Log.i(TAG, "Already listening to the file changes.");
         }
         folder.queryChildren(getGoogleApiClient(), query)
                 .setResultCallback(fileListCallback);
@@ -528,7 +527,7 @@ public class GoogleDriveInterface extends FauxActivity {
         DriveContentsResult driveContentsResult =
                 file.open(getGoogleApiClient(), DriveFile.MODE_READ_ONLY, null).await();
         if (!driveContentsResult.getStatus().isSuccess()) {
-            Log.d(TAG, "Could not get drive file");
+            UserError.Log.i(TAG, "Could not get drive file");
             return null;
         }
         DriveContents driveContents = driveContentsResult.getDriveContents();
@@ -536,9 +535,9 @@ public class GoogleDriveInterface extends FauxActivity {
 
         try {
             int readbytes = reader.read(data);
-            Log.i(TAG, "Read bytes from file: " + readbytes + "/" + data.length + " vs total: " + bytesize);
+            UserError.Log.i(TAG, "Read bytes from file: " + readbytes + "/" + data.length + " vs total: " + bytesize);
         } catch (IOException e) {
-            Log.e(TAG, "IOException while reading from the stream", e);
+            UserError.Log.e(TAG, "IOException while reading from the stream", e);
         }
         driveContents.discard(getGoogleApiClient());
         return data;
@@ -546,7 +545,7 @@ public class GoogleDriveInterface extends FauxActivity {
 
     boolean evaluateTreatmentsSync() {
         boolean modified = false;
-        Log.i(TAG, "Evaluating treatments for sync");
+        UserError.Log.i(TAG, "Evaluating treatments for sync");
         double timeNow = new Date().getTime();
         double earliestTime = timeNow - (25 * 60 * 60 * 1000); // look back 25 hours
         double evenearliestTime = timeNow - (72 * 60 * 60 * 1000); // look back 25 hours
@@ -555,11 +554,11 @@ public class GoogleDriveInterface extends FauxActivity {
 
         for (Treatments thistreatment : localTreatments) {
             if (!doesRemoteFileExist(thistreatment.uuid)) {
-                Log.d(TAG, "Remote treatment: " + thistreatment.uuid + " does not exist yet");
+                UserError.Log.i(TAG, "Remote treatment: " + thistreatment.uuid + " does not exist yet");
                 pushTreatmentToRemote(thistreatment);
                 // create it!
             } else {
-                Log.d(TAG, "Remote treatment: " + thistreatment.uuid + " already exists");
+                UserError.Log.i(TAG, "Remote treatment: " + thistreatment.uuid + " already exists");
             }
         }
         double timenow = new Date().getTime();
@@ -570,14 +569,14 @@ public class GoogleDriveInterface extends FauxActivity {
 
             if ((timenow - record.getCreatedDate().getTime()) > (max_sync_file_age)) {
                 if (record.isTrashable()) {
-                    Log.i(TAG, "Attempting to delete old data: " + record.getTitle());
+                    UserError.Log.i(TAG, "Attempting to delete old data: " + record.getTitle());
                     DriveResource driveResource = record.getDriveId().asDriveResource();
                     com.google.android.gms.common.api.Status deleteStatus =
                             driveResource.delete(mGoogleApiClient).await();
                     if (!deleteStatus.isSuccess()) {
-                        Log.e(TAG, "Unable to delete app data: " + deleteStatus.getStatus().getStatusMessage());
+                        UserError.Log.e(TAG, "Unable to delete app data: " + deleteStatus.getStatus().getStatusMessage());
                     } else {
-                        Log.i(TAG, "Successfully deleted: " + record.getTitle());
+                        UserError.Log.i(TAG, "Successfully deleted: " + record.getTitle());
                     }
                 } else {
                     showMessage("Resource is not owned by the user or is in the AppFolder." + record.getTitle());
@@ -585,11 +584,11 @@ public class GoogleDriveInterface extends FauxActivity {
             } else {
                 // check length = 36 which would be standard uuid length
                 if ((thistitle.length() == 36) && !doesTreatmentUuidExist(thistitle)) {
-                    Log.d(TAG, "Local treatment: " + thistitle + " does not exist yet");
+                    UserError.Log.i(TAG, "Local treatment: " + thistitle + " does not exist yet");
                     pullTreatmentFromRemote(record.getDriveId(), record.getFileSize());
                     modified = true;
                 } else {
-                    Log.d(TAG, "Local treatment: " + thistitle + " already exists or is invalid uuid length");
+                    UserError.Log.i(TAG, "Local treatment: " + thistitle + " already exists or is invalid uuid length");
                 }
             }
         }
@@ -604,21 +603,21 @@ public class GoogleDriveInterface extends FauxActivity {
         byte[] data = getDriveFile(remoteid, bytesize);
         byte[] plain = CipherUtils.decryptBytes(data);
         String json = new String(plain, my_charset);
-        Log.d(TAG, "json downloaded: " + json);
+        UserError.Log.i(TAG, "json downloaded: " + json);
         Treatments.pushTreatmentFromJson(json);
     }
 
     void pushTreatmentToRemote(Treatments thistreatment) {
         String json = thistreatment.toJSON();
         byte[] plain = json.getBytes(my_charset);
-        Log.d(TAG, "json prepared: " + json);
+        UserError.Log.i(TAG, "json prepared: " + json);
         byte[] crypted = CipherUtils.encryptBytes(plain);
         saveFileToDrive(thistreatment.uuid, crypted);
     }
 
     public void deleteTreatmentAtRemote(String uuid) {
         byte[] bogus = new byte[0];
-        Log.d(TAG, "Sending deletion marker to drive sync for uuid: " + uuid);
+        UserError.Log.i(TAG, "Sending deletion marker to drive sync for uuid: " + uuid);
         saveFileToDrive(uuid + ".deleted", bogus);
     }
 
@@ -635,7 +634,7 @@ public class GoogleDriveInterface extends FauxActivity {
     }
 
     boolean doesTreatmentUuidExist(String uuid) {
-        // Log.d(TAG,"Debug doestreatmentuuidexist: start: "+uuid);
+        // UserError.Log.i(TAG,"Debug doestreatmentuuidexist: start: "+uuid);
         // will this get significant size list that we should do a hashmap lookup for the filename
         // instead of iterating - total size should be number of treatments in a 24 hour period but
         // we may want to reuse code to sync larger datasets

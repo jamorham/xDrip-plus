@@ -8,8 +8,7 @@ import com.activeandroid.annotation.Column;
 import com.activeandroid.annotation.Table;
 import com.activeandroid.query.Delete;
 import com.activeandroid.query.Select;
-import com.eveningoutpost.dexdrip.models.Calibration;
-import com.eveningoutpost.dexdrip.models.Sensor;
+import com.eveningoutpost.dexdrip.models.*;
 import com.eveningoutpost.dexdrip.models.UserError.Log;
 
 import java.util.List;
@@ -67,7 +66,7 @@ public class CalibrationSendQueue extends Model {
         //  calibrationSendQueue.mongo_success = false;
         //  calibrationSendQueue.save();
         UploaderQueue.newEntry("create", calibration);
-        Log.i(TAG, "calling SensorSendQueue.SendToFollower");
+        UserError.Log.i(TAG, "calling SensorSendQueue.SendToFollower");
         SensorSendQueue.SendToFollower(Sensor.getByUuid(calibration.sensor_uuid));
     }
 

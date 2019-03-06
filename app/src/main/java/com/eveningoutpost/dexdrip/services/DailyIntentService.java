@@ -149,7 +149,7 @@ public class DailyIntentService extends IntentService {
 
 				Log.i(TAG, "DailyIntentService onHandleIntent exiting after " + ((JoH.tsl() - start) / 1000) + " seconds");
 				//} else {
-				// Log.e(TAG, "DailyIntentService exceeding rate limit");
+				// UserError.Log.e(TAG, "DailyIntentService exceeding rate limit");
 			}
 		} finally {
 			JoH.releaseWakeLock(wl);

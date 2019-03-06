@@ -50,7 +50,7 @@ public class LicenseAgreementActivity extends BaseActivity {
     }
 
     /**
-     * TODO
+     * FIXME
      * getOpenSourceSoftwareLicenseInfo(Context context)
      * This method was deprecated. This license information is displayed in Settings > Google > Open
      * Source on any device running Google Play services.

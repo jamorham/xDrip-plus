@@ -28,7 +28,7 @@ public class WebServiceTasker extends BaseWebService {
     public WebResponse request(String query) {
 
         query = stripFirstComponent(query);
-        if (query.length() > 0) {
+        if (!query.isEmpty()) {
             UserError.Log.d(TAG, "Processing " + query);
 
             // package up the string and send it to the tasker interface

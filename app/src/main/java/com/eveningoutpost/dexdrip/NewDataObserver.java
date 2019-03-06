@@ -57,7 +57,7 @@ public class NewDataObserver {
     public static void newExternalStatus(boolean receivedLocally) {
 
         final String statusLine = ExternalStatusService.getLastStatusLine();
-        if (statusLine.length() > 0) {
+        if (!statusLine.isEmpty()) {
             // send to wear
             if (Pref.getBooleanDefaultFalse("wear_sync")) {
                 startWatchUpdaterService(xdrip.getAppContext(), WatchUpdaterService.ACTION_SEND_STATUS, TAG, "externalStatusString", statusLine);

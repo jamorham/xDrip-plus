@@ -26,6 +26,8 @@ import android.hardware.usb.UsbDevice;
 import android.hardware.usb.UsbDeviceConnection;
 import android.hardware.usb.UsbEndpoint;
 import android.hardware.usb.UsbRequest;
+
+import com.eveningoutpost.dexdrip.models.*;
 import com.eveningoutpost.dexdrip.models.UserError.Log;
 
 import com.eveningoutpost.dexdrip.importedLibraries.usbserial.util.HexDump;
@@ -294,7 +296,7 @@ public class FtdiSerialDriver implements UsbSerialDriver {
             try {
                 for (int i = 0; i < mDevice.getInterfaceCount(); i++) {
                     if (connection.claimInterface(mDevice.getInterface(i), true)) {
-                        Log.d(TAG, "claimInterface " + i + " SUCCESS");
+                        UserError.Log.i(TAG, "claimInterface " + i + " SUCCESS");
                     } else {
                         throw new IOException("Error claiming interface " + i);
                     }
@@ -347,7 +349,7 @@ public class FtdiSerialDriver implements UsbSerialDriver {
 
                 final int payloadBytesRead = buf.position() - MODEM_STATUS_HEADER_LENGTH;
                 if (payloadBytesRead > 0) {
-                    Log.d(TAG, HexDump.dumpHexString(dest, 0, Math.min(32, dest.length)));
+                    UserError.Log.i(TAG, HexDump.dumpHexString(dest, 0, Math.min(32, dest.length)));
                     return payloadBytesRead;
                 } else {
                     return 0;
@@ -399,7 +401,7 @@ public class FtdiSerialDriver implements UsbSerialDriver {
                             + " bytes at offset " + offset + " length=" + src.length);
                 }
 
-                Log.d(TAG, "Wrote amtWritten=" + amtWritten + " attempted=" + writeLength);
+                UserError.Log.i(TAG, "Wrote amtWritten=" + amtWritten + " attempted=" + writeLength);
                 offset += amtWritten;
             }
             return offset;

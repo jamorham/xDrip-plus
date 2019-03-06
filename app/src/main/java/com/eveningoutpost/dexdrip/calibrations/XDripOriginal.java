@@ -35,7 +35,7 @@ public class XDripOriginal extends CalibrationAbstract {
         if (cd == null) {
             UserError.Log.d(TAG, "Regenerating Calibration data cache");
             final List<Calibration> calibrationl = Calibration.latestValid(1, until);
-            if ((calibrationl != null) && (calibrationl.size() > 0)) {
+            if ((calibrationl != null) && (!calibrationl.isEmpty())) {
                 final Calibration calibration = calibrationl.get(0); // first and only
                 if (calibration != null) {
 

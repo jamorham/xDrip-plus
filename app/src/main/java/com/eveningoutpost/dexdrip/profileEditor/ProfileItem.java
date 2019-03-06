@@ -54,7 +54,7 @@ public class ProfileItem {
     public static int timeStampToMin(double when)
     {
         final String result = hourMinConvert.format(when);
-       // Log.d("profileitem","Input time: "+result);
+       // UserError.Log.i("profileitem","Input time: "+result);
         return Integer.parseInt(result.substring(0,2))*60+Integer.parseInt(result.substring(2,4));
     }
 

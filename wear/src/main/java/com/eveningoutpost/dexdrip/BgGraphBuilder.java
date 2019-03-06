@@ -160,7 +160,7 @@ public class BgGraphBuilder {
         List<PointValue> macropoints = macroline.getValues();
         List<PointValue> thesepoints = new ArrayList<>();
 
-        if (macropoints.size() > 0) {
+        if (!macropoints.isEmpty()) {
             final float endmarker = macropoints.get(macropoints.size() - 1).getX();
             for (PointValue thispoint : macropoints) {
 
@@ -363,22 +363,22 @@ public class BgGraphBuilder {
                     PointValueExtended pv = new PointValueExtended((fuzz(treatment.timestamp)), (float) height);//(treatment.timestamp / FUZZER)
                     String mylabel = "";
                     if (insulin > 0) {
-                        if (mylabel.length() > 0)
+                        if (!mylabel.isEmpty())
                             mylabel = mylabel + System.getProperty("line.separator");
                         mylabel = mylabel + (insulin + "u").replace(".0u", "u");
                     }
                     if (carbs > 0) {
-                        if (mylabel.length() > 0)
+                        if (!mylabel.isEmpty())
                             mylabel = mylabel + System.getProperty("line.separator");
                         mylabel = mylabel + (carbs + "g").replace(".0g", "g");
                     }
                     pv.setLabel(mylabel); // standard label
                     if (d)
-                        Log.d(TAG, "watchkeypad pv.mylabel: " + mylabel);
-                    if ((notes != null) && (notes.length() > 0)) {
+                       UserError.Log.d(TAG, "watchkeypad pv.mylabel: " + mylabel);
+                    if ((notes != null) && (!notes.isEmpty())) {
                         pv.note = notes;
                         if (d)
-                            Log.d(TAG, "watchkeypad pv.note: " + pv.note + " mylabel: " + mylabel);
+                           UserError.Log.d(TAG, "watchkeypad pv.note: " + pv.note + " mylabel: " + mylabel);
                     /*try {
                         final Pattern p = Pattern.compile(".*?pos:([0-9.]+).*");
                         final Matcher m = p.matcher(treatment.enteredBy);
@@ -386,7 +386,7 @@ public class BgGraphBuilder {
                             pv.set(pv.getX(), (float) JoH.tolerantParseDouble(m.group(1)));
                         }
                     } catch (Exception e) {
-                        Log.d(TAG, "Exception matching position: " + e);
+                       UserError.Log.d(TAG, "Exception matching position: " + e);
                     }*/
                     } else {
                         pv.note = "Treatment";
@@ -397,7 +397,7 @@ public class BgGraphBuilder {
                         if (Math.abs(lastpv.getX() - pv.getX()) < ((10 * 60 * 1000) / FUZZER)) {
                             // merge label with previous - Intelligent parsing and additions go here
                             if (d)
-                                Log.d(TAG, "Merge treatment difference: " + Float.toString(lastpv.getX() - pv.getX()));
+                               UserError.Log.d(TAG, "Merge treatment difference: " + Float.toString(lastpv.getX() - pv.getX()));
                             String lastlabel = String.valueOf(lastpv.getLabelAsChars());
                             if (lastlabel.length() > 0) {
                                 lastpv.setLabel(lastlabel + "+" + mylabel);
@@ -410,13 +410,13 @@ public class BgGraphBuilder {
 
                     //treatmentValues.add(pv); // hover
                     if (d)
-                        Log.d(TAG, "Treatment total record: " + height + " " + " timestamp: " + treatment.timestamp + " timestamp=" + JoH.dateTimeText((long) treatment.timestamp));
+                       UserError.Log.d(TAG, "Treatment total record: " + height + " " + " timestamp: " + treatment.timestamp + " timestamp=" + JoH.dateTimeText((long) treatment.timestamp));
                 }
             }
 
         } catch (Exception e) {
 
-            Log.e(TAG, "Exception doing treatment values in bggraphbuilder: " + e.toString());
+           UserError.Log.e(TAG, "Exception doing treatment values in bggraphbuilder: " + e.toString());
         }
     }
 
@@ -432,11 +432,11 @@ public class BgGraphBuilder {
                     //calibrationValues.add(this_point);
                     calibrationValues.add(new PointValue(fuzz(adjusted_timestamp), (float) unitized(calibration.sgv)));//KS calibration.timestamp
                     if (d)
-                        Log.d(TAG, "calibration total record: " + calibration.sgv + " " + " adjusted_timestamp: " + fuzz(calibration.timestamp) + " timestamp=" + JoH.dateTimeText((long) calibration.timestamp));
+                       UserError.Log.d(TAG, "calibration total record: " + calibration.sgv + " " + " adjusted_timestamp: " + fuzz(calibration.timestamp) + " timestamp=" + JoH.dateTimeText((long) calibration.timestamp));
                 }
             }
         } catch (Exception e) {
-            Log.e(TAG, "Exception doing calibration values in bggraphbuilder: " + e.toString());
+           UserError.Log.e(TAG, "Exception doing calibration values in bggraphbuilder: " + e.toString());
         }
     }
 
@@ -462,11 +462,11 @@ public class BgGraphBuilder {
                     if (!matches)
                         bloodTestValues.add(new PointValue(fuzz(adjusted_timestamp), (float) unitized(bloodtest.sgv)));//KS bloodtest.timestamp
                     if (d)
-                        Log.d(TAG, "bloodtest total record: " + bloodtest.sgv + " " + " adjusted_timestamp: " + fuzz(bloodtest.timestamp) + " timestamp=" + JoH.dateTimeText((long) bloodtest.timestamp));
+                       UserError.Log.d(TAG, "bloodtest total record: " + bloodtest.sgv + " " + " adjusted_timestamp: " + fuzz(bloodtest.timestamp) + " timestamp=" + JoH.dateTimeText((long) bloodtest.timestamp));
                 }
             }
         } catch (Exception e) {
-            Log.e(TAG, "Exception doing bloodtest values in bggraphbuilder: " + e.toString());
+           UserError.Log.e(TAG, "Exception doing bloodtest values in bggraphbuilder: " + e.toString());
         }
 
     }
@@ -560,7 +560,7 @@ public class BgGraphBuilder {
     }
 
     public OnValueSelectTooltipListener getOnValueSelectTooltipListener(BaseWatchFace callerActivity) {//Activity
-        Log.d(TAG, "getOnValueSelectTooltipListener");
+       UserError.Log.d(TAG, "getOnValueSelectTooltipListener");
         return new OnValueSelectTooltipListener(callerActivity);
     }
 
@@ -576,7 +576,7 @@ public class BgGraphBuilder {
         @Override
         public synchronized void onValueSelected(int i, int i1, PointValue pointValue) {
 
-            Log.d(TAG, "onValueSelected pointValue=" + pointValue.getX() + "," + pointValue.getY());
+           UserError.Log.d(TAG, "onValueSelected pointValue=" + pointValue.getX() + "," + pointValue.getY());
             String filtered = "";
             String alternate = "";
             String uuid = "";
@@ -597,7 +597,7 @@ public class BgGraphBuilder {
                 real_timestamp = pve.real_timestamp;
 
             } catch (ClassCastException e) {
-                Log.e(TAG, "Error casting a point from pointValue to PointValueExtended", e);
+               UserError.Log.e(TAG, "Error casting a point from pointValue to PointValueExtended", e);
             }
 
             final java.text.DateFormat timeFormat = DateFormat.getTimeFormat(context);
@@ -607,12 +607,12 @@ public class BgGraphBuilder {
 
             final String message;
 
-            if (alternate.length() > 0) {
+            if (!alternate.isEmpty()) {
                 message = timeFormat.format(time) + "    " + alternate;
             } else {
                 message = timeFormat.format(time) + "      " + (Math.round(pointValue.getY() * 10) / 10d) + " " + unit() + filtered;
             }
-            Log.d(TAG, "onValueSelected message=" + message);
+           UserError.Log.d(TAG, "onValueSelected message=" + message);
             JoH.static_toast(xdrip.getAppContext(), message, Toast.LENGTH_SHORT);
 
             /*switch (type) {

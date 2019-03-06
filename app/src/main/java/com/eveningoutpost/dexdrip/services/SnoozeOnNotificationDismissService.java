@@ -43,7 +43,7 @@ public class SnoozeOnNotificationDismissService extends IntentService {
             UserError.Log.wtf(TAG, "Attempt to cancel alert (" + alertType + ") within minimum limit of: " + JoH.niceTimeScalar(MINIMUM_CANCEL_DELAY));
             Home.startHomeWithExtra(xdrip.getAppContext(),"confirmsnooze","simpleconfirm");
         }
-        Log.e(TAG, "SnoozeOnNotificationDismissService called source = " + alertType + " shown for: " + JoH.niceTimeScalar(time_showing));
+        UserError.Log.e(TAG, "SnoozeOnNotificationDismissService called source = " + alertType + " shown for: " + JoH.niceTimeScalar(time_showing));
         if (alertType.equals("bg_alerts") && (time_showing > MINIMUM_CANCEL_DELAY)) {
             snoozeBgAlert();
             return;
@@ -61,11 +61,11 @@ public class SnoozeOnNotificationDismissService extends IntentService {
 
         if (alertType.equals("bg_predict_alert") ||
                 alertType.equals("persistent_high_alert")) {
-            Log.wtf(TAG, "SnoozeOnNotificationDismissService called for unsupported type!!! source = " + alertType);
+            UserError.Log.wtf(TAG, "SnoozeOnNotificationDismissService called for unsupported type!!! source = " + alertType);
 
         }
 
-        Log.e(TAG, "SnoozeOnNotificationDismissService called for unknown source = " + alertType);
+        UserError.Log.e(TAG, "SnoozeOnNotificationDismissService called for unknown source = " + alertType);
     }
     
     private void snoozeBgAlert() {
@@ -86,7 +86,7 @@ public class SnoozeOnNotificationDismissService extends IntentService {
     private void snoozeOtherAlert(String alertType) {
         SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(getApplicationContext());
         long snoozeMinutes = MissedReadingService.getOtherAlertSnoozeMinutes(prefs, alertType);
-        Log.i(TAG, "snoozeOtherAlert calling snooze alert alert = " + alertType + " snoozeMinutes = " + snoozeMinutes);
+        UserError.Log.i(TAG, "snoozeOtherAlert calling snooze alert alert = " + alertType + " snoozeMinutes = " + snoozeMinutes);
         UserNotification.snoozeAlert(alertType, snoozeMinutes);
 
         if (Pref.getBooleanDefaultFalse("pref_amazfit_enable_key")

@@ -93,9 +93,9 @@ public class InstallPebbleWatchFace extends BaseActivity {
     protected void toast(String msg) {
         try {
             Toast.makeText(getApplicationContext(), msg, Toast.LENGTH_SHORT).show();
-            Log.d(getTag(), "Toast msg: " + msg);
+            UserError.Log.i(getTag(), "Toast msg: " + msg);
         } catch (Exception e) {
-            Log.e(getTag(), "Couldn't display toast: " + msg);
+            UserError.Log.e(getTag(), "Couldn't display toast: " + msg);
         }
     }
 

@@ -18,6 +18,7 @@ import android.text.TextUtils;
 import android.util.Log;
 
 import com.eveningoutpost.dexdrip.localeTasker.Constants;
+import com.eveningoutpost.dexdrip.models.*;
 
 /**
  * Class for managing the {@link com.twofortyfouram.locale.Intent#EXTRA_BUNDLE} for this plug-in.
@@ -66,7 +67,7 @@ public final class PluginBundleManager
         {
             if (Constants.IS_LOGGABLE)
             {
-                Log.e(Constants.LOG_TAG,
+                UserError.Log.e(Constants.LOG_TAG,
                       String.format("bundle must contain extra %s", BUNDLE_EXTRA_STRING_MESSAGE)); //$NON-NLS-1$
             }
             return false;
@@ -75,7 +76,7 @@ public final class PluginBundleManager
         {
             if (Constants.IS_LOGGABLE)
             {
-                Log.e(Constants.LOG_TAG,
+                UserError.Log.e(Constants.LOG_TAG,
                       String.format("bundle must contain extra %s", BUNDLE_EXTRA_INT_VERSION_CODE)); //$NON-NLS-1$
             }
             return false;
@@ -90,7 +91,7 @@ public final class PluginBundleManager
         {
             if (Constants.IS_LOGGABLE)
             {
-                Log.e(Constants.LOG_TAG,
+                UserError.Log.e(Constants.LOG_TAG,
                       String.format("bundle must contain 2 keys, but currently contains %d keys: %s", bundle.keySet().size(), bundle.keySet())); //$NON-NLS-1$
             }
             return false;
@@ -100,7 +101,7 @@ public final class PluginBundleManager
         {
             if (Constants.IS_LOGGABLE)
             {
-                Log.e(Constants.LOG_TAG,
+                UserError.Log.e(Constants.LOG_TAG,
                       String.format("bundle extra %s appears to be null or empty.  It must be a non-empty string", BUNDLE_EXTRA_STRING_MESSAGE)); //$NON-NLS-1$
             }
             return false;
@@ -110,7 +111,7 @@ public final class PluginBundleManager
         {
             if (Constants.IS_LOGGABLE)
             {
-                Log.e(Constants.LOG_TAG,
+                UserError.Log.e(Constants.LOG_TAG,
                       String.format("bundle extra %s appears to be the wrong type.  It must be an int", BUNDLE_EXTRA_INT_VERSION_CODE)); //$NON-NLS-1$
             }
 

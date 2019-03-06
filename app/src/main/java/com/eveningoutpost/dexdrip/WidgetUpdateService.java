@@ -11,7 +11,7 @@ import android.os.Build;
 import android.os.IBinder;
 import android.os.PowerManager;
 
-import com.eveningoutpost.dexdrip.models.JoH;
+import com.eveningoutpost.dexdrip.models.*;
 import com.eveningoutpost.dexdrip.models.UserError.Log;
 
 public class WidgetUpdateService extends Service {
@@ -28,7 +28,7 @@ public class WidgetUpdateService extends Service {
             }
         } catch (Exception e)
         {
-            Log.e(TAG,"Got exception in staticRefreshWidgets: "+e);
+            UserError.Log.e(TAG,"Got exception in staticRefreshWidgets: "+e);
         }
     }
 
@@ -57,7 +57,7 @@ public class WidgetUpdateService extends Service {
     public void onCreate() {
         super.onCreate();
         PowerManager pm = (PowerManager) getSystemService(Service.POWER_SERVICE);
-        Log.d(TAG, "onCreate");
+        UserError.Log.i(TAG, "onCreate");
         if ((Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP && pm.isInteractive()) ||
                 (Build.VERSION.SDK_INT < Build.VERSION_CODES.LOLLIPOP && pm.isScreenOn()))
             enableClockTicks();
@@ -66,7 +66,7 @@ public class WidgetUpdateService extends Service {
     }
 
     private void enableClockTicks() {
-        Log.d(TAG, "enableClockTicks");
+        UserError.Log.i(TAG, "enableClockTicks");
         IntentFilter intentFilter = new IntentFilter();
         intentFilter.addAction(Intent.ACTION_TIME_TICK);
         intentFilter.addAction(Intent.ACTION_SCREEN_ON);
@@ -78,7 +78,7 @@ public class WidgetUpdateService extends Service {
     }
 
     private void disableClockTicks() {
-        Log.d(TAG, "disableClockTicks");
+        UserError.Log.i(TAG, "disableClockTicks");
         IntentFilter intentFilter = new IntentFilter();
         intentFilter.addAction(Intent.ACTION_SCREEN_ON);
         intentFilter.addAction(Intent.ACTION_SCREEN_OFF);
@@ -104,9 +104,9 @@ public class WidgetUpdateService extends Service {
     }
 
     public void updateCurrentBgInfo() {
-        Log.d(TAG, "Sending update flag to widget");
+        UserError.Log.i(TAG, "Sending update flag to widget");
 	    int[] ids = AppWidgetManager.getInstance(getApplication()).getAppWidgetIds(new ComponentName(getApplication(), xDripWidget.class));
-        Log.d(TAG, "Updating " + ids.length + " widgets");
+        UserError.Log.i(TAG, "Updating " + ids.length + " widgets");
         Intent intent = new Intent(this,xDripWidget.class);
         intent.setAction(AppWidgetManager.ACTION_APPWIDGET_UPDATE);
         intent.putExtra(AppWidgetManager.EXTRA_APPWIDGET_IDS,ids);

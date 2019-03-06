@@ -12,6 +12,7 @@ import android.util.Log;
 
 import com.eveningoutpost.dexdrip.GcmActivity;
 import com.eveningoutpost.dexdrip.GoogleDriveInterface;
+import com.eveningoutpost.dexdrip.models.*;
 import com.eveningoutpost.dexdrip.utilitymodels.UpdateActivity;
 import com.eveningoutpost.dexdrip.xdrip;
 
@@ -40,18 +41,18 @@ public class PlusSyncService extends Service {
 
     public synchronized static void startSyncService(Context context, String source) {
         if (created) {
-            Log.d(TAG, "Already created");
+            UserError.Log.i(TAG, "Already created");
             return;
         }
         if (PreferenceManager.getDefaultSharedPreferences(context).getBoolean("disable_all_sync", false))
         {
             keeprunning=false;
             GcmActivity.cease_all_activity = true;
-            Log.d(TAG,"Sync services disabled");
+            UserError.Log.i(TAG,"Sync services disabled");
             return;
         }
         if ((GcmActivity.token != null) && (xdrip.getAppContext() != null)) return;
-        Log.d(TAG, "Starting jamorham xDrip-Plus sync service: " + source);
+        UserError.Log.i(TAG, "Starting jamorham xDrip-Plus sync service: " + source);
         context.startService(new Intent(context, PlusSyncService.class));
     }
 
@@ -79,7 +80,7 @@ public class PlusSyncService extends Service {
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
         created = true;
-        Log.i(TAG, "jamorham xDrip-Plus sync service onStart command called");
+        UserError.Log.i(TAG, "jamorham xDrip-Plus sync service onStart command called");
         keeprunning = true;
         sleepcounter = 5000;
         new Thread(() -> {
@@ -104,13 +105,13 @@ public class PlusSyncService extends Service {
             }
             created = false;
         }).start();
-        Log.i(TAG, "jamorham xDrip-Plus sync service onStart command complete");
+        UserError.Log.i(TAG, "jamorham xDrip-Plus sync service onStart command complete");
         return Service.START_NOT_STICKY;
     }
 
     @Override
     public void onLowMemory() {
-        Log.e(TAG, "Low memory trigger!");
+        UserError.Log.e(TAG, "Low memory trigger!");
         keeprunning = false;
     }
 
@@ -139,10 +140,10 @@ public class PlusSyncService extends Service {
             if (activity != null) {
                 if (GoogleDriveInterface.getDriveIdentityString() == null) {
                     boolean iunderstand = prefs.getBoolean("I_understand", false);
-                    if ((GoogleDriveInterface.isRunning) || (iunderstand == false)) {
-                        Log.d(TAG, "Drive interface is running or blocked");
+                    if ((GoogleDriveInterface.isRunning) || (!iunderstand)) {
+                        UserError.Log.i(TAG, "Drive interface is running or blocked");
                     } else {
-                     /*   Log.d(TAG, "Calling Google Drive Interface");
+                     /*   UserError.Log.i(TAG, "Calling Google Drive Interface");
                         Intent dialogIntent = new Intent(context, GoogleDriveInterface.class);
                         dialogIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
                         dialogIntent.addFlags(Intent.FLAG_ACTIVITY_EXCLUDE_FROM_RECENTS);
@@ -154,10 +155,10 @@ public class PlusSyncService extends Service {
                 } else if (GcmActivity.token == null) {
                     // also needs isrunning here
                     if (GcmActivity.cease_all_activity) {
-                        Log.d(TAG, "GCM cease all activity flag set!");
+                        UserError.Log.i(TAG, "GCM cease all activity flag set!");
                         updateCheckThenStop();
                     } else {
-                        Log.d(TAG, "Calling Google Cloud Interface");
+                        UserError.Log.i(TAG, "Calling Google Cloud Interface");
                         //Intent dialogIntent = new Intent(context, GcmActivity.class);
                         //dialogIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
                         //dialogIntent.addFlags(Intent.FLAG_ACTIVITY_EXCLUDE_FROM_RECENTS);
@@ -167,7 +168,7 @@ public class PlusSyncService extends Service {
                         new GcmActivity().jumpStart();
                     }
                 } else {
-                    Log.d(TAG, "Got our token - stopping polling");
+                    UserError.Log.i(TAG, "Got our token - stopping polling");
                     updateCheckThenStop();
                 }
             }
@@ -178,10 +179,10 @@ public class PlusSyncService extends Service {
             skipnext = true;
             UpdateActivity.checkForAnUpdate(context);
             try {
-                Log.d(TAG, "Shutting down");
+                UserError.Log.i(TAG, "Shutting down");
                 stopSelf();
             } catch (Exception e) {
-                Log.e(TAG, "Exception with stop self");
+                UserError.Log.e(TAG, "Exception with stop self");
             }
         }
     }

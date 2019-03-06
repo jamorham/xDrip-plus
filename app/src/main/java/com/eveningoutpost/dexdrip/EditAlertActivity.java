@@ -227,7 +227,7 @@ public class EditAlertActivity extends ActivityWithMenu {
             // We are editing an alert
             AlertType alertType = AlertType.get_alert(uuid);
             if(alertType==null) {
-                Log.wtf(TAG, "Error editing alert, when that alert does not exist...");
+                UserError.Log.wtf(TAG, "Error editing alert, when that alert does not exist...");
                 Intent returnIntent = new Intent();
                 setResult(RESULT_CANCELED, returnIntent);
                 finish();
@@ -425,10 +425,8 @@ public class EditAlertActivity extends ActivityWithMenu {
         int et1 = at.end_time_minutes;
         int et2 = endTime;
 
-        return  st1 <= st2 && et1 > st2 ||
-                st1 <= st2 && (et2 < st2) && et2 > st1 || //2nd timeframe passes midnight
-                st2 <= st1 && et2 > st1 ||
-                st2 <= st1 && (et1 < st1) && et1 > st2 ||
+        return  st1 <= st2 && et1 > st2 || (et2 < st2) && et2 > st1 || //2nd timeframe passes midnight
+                st2 <= st1 && et2 > st1 || (et1 < st1) && et1 > st2 ||
                 (et1 < st1 && et2 < st2); //both timeframes pass midnight -> overlap at least at midnight
     }
 
@@ -437,11 +435,11 @@ public class EditAlertActivity extends ActivityWithMenu {
             final DecimalFormat numberFormatter = getNumberFormatter(doMgdl);
             return numberFormatter.parse(str).doubleValue();
         } catch (NumberFormatException nfe) {
-            Log.e(TAG, "Invalid number", nfe);
+            UserError.Log.e(TAG, "Invalid number", nfe);
             Toast.makeText(getApplicationContext(), "Invalid number: " + str, Toast.LENGTH_LONG).show();
             return Double.NaN;
         } catch (ParseException e) {
-            Log.e(TAG, "Invalid number", e);
+            UserError.Log.e(TAG, "Invalid number", e);
             Toast.makeText(getApplicationContext(), "Invalid number: " + str, Toast.LENGTH_LONG).show();
             return Double.NaN;
         }
@@ -454,7 +452,7 @@ public class EditAlertActivity extends ActivityWithMenu {
         try {
             defaultSnooze = parseInt(editSnooze.getText().toString());
         } catch (NullPointerException e) {
-            Log.wtf(TAG,"Got null pointer exception unboxing parseInt: ",e);
+            UserError.Log.wtf(TAG,"Got null pointer exception unboxing parseInt: ",e);
             defaultSnooze = SnoozeActivity.getDefaultSnooze(above);
         }
         return defaultSnooze;
@@ -465,7 +463,7 @@ public class EditAlertActivity extends ActivityWithMenu {
             return Integer.parseInt(str);
         }
         catch (NumberFormatException nfe) {
-            Log.e(TAG, "Invalid number", nfe);
+            UserError.Log.e(TAG, "Invalid number", nfe);
             Toast.makeText(getApplicationContext(), "Invalid number: " + str, Toast.LENGTH_LONG).show();
             return null;
         }
@@ -511,7 +509,7 @@ public class EditAlertActivity extends ActivityWithMenu {
                timeEnd == AlertType.toTime(24, 0)) {
                 allDay = true;
             }
-            if (timeStart == timeEnd && (allDay==false)) {
+            if (timeStart == timeEnd && (!allDay)) {
                 Toast.makeText(getApplicationContext(), "start time and end time of alert can not be equal",Toast.LENGTH_LONG).show();
                 return;
             }
@@ -541,7 +539,7 @@ public class EditAlertActivity extends ActivityWithMenu {
 
 
             if (uuid == null) {
-                Log.wtf(TAG, "Error remove pressed, while we were adding an alert");
+                UserError.Log.wtf(TAG, "Error remove pressed, while we were adding an alert");
             }  else {
                 AlertType.remove_alert(uuid);
                 startWatchUpdaterService(mContext, WatchUpdaterService.ACTION_SYNC_ALERTTYPE, TAG);
@@ -677,7 +675,7 @@ public class EditAlertActivity extends ActivityWithMenu {
             try {
                 column_index = cursor.getColumnIndexOrThrow(MediaStore.Images.Media.DATA);
             } catch ( IllegalArgumentException e) {
-                Log.e(TAG, "cursor.getColumnIndexOrThrow failed", e);
+                UserError.Log.e(TAG, "cursor.getColumnIndexOrThrow failed", e);
                 return null;
             }
             cursor.moveToFirst();
@@ -726,7 +724,7 @@ public class EditAlertActivity extends ActivityWithMenu {
         if(path == null) {
             return "";
         }
-        if(path.length() == 0) {
+        if(path.isEmpty()) {
             return "xDrip Default";
         }
         String[] segments = path.split("/");

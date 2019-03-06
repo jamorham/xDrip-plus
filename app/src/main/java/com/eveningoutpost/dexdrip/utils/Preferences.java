@@ -103,7 +103,7 @@ public class Preferences extends PreferenceActivity {
                 } else {
                     byte[] plainbytes = JoH.decompressBytesToBytes(CipherUtils.decryptBytes(result, staticKey));
                     staticKey = null;
-                    Log.d(TAG, "Plain bytes size: " + plainbytes.length);
+                    UserError.Log.i(TAG, "Plain bytes size: " + plainbytes.length);
                     if (plainbytes.length > 0) {
                         SdcardImportExport.storePreferencesFromBytes(plainbytes, getApplicationContext());
                     } else {
@@ -127,7 +127,7 @@ public class Preferences extends PreferenceActivity {
     }
 
     private void installxDripPlusPreferencesFromQRCode(SharedPreferences prefs, String data) {
-        Log.d(TAG, "installing preferences from QRcode");
+        UserError.Log.i(TAG, "installing preferences from QRcode");
         try {
             Map<String, String> prefsmap = DisplayQRCode.decodeString(data);
             if (prefsmap != null) {
@@ -138,7 +138,7 @@ public class Preferences extends PreferenceActivity {
 
                         new WebAppHelper(new ServiceCallback()).executeOnExecutor(xdrip.executor, getString(R.string.wserviceurl) + "/joh-getsw/" + prefsmap.get(getString(R.string.wizard_uuid)));
                     } else {
-                        Log.d(TAG, "Incorrectly formatted wizard pref");
+                        UserError.Log.i(TAG, "Incorrectly formatted wizard pref");
                     }
                     return;
                 }
@@ -148,7 +148,7 @@ public class Preferences extends PreferenceActivity {
                 for (Map.Entry<String, String> entry : prefsmap.entrySet()) {
                     String key = entry.getKey();
                     String value = entry.getValue();
-                    //            Log.d(TAG, "Saving preferences: " + key + " = " + value);
+                    //            UserError.Log.i(TAG, "Saving preferences: " + key + " = " + value);
                     if (value.equals("true") || (value.equals("false"))) {
                         editor.putBoolean(key, Boolean.parseBoolean(value));
                         changes++;
@@ -172,7 +172,7 @@ public class Preferences extends PreferenceActivity {
                 android.util.Log.e(TAG, "Got null prefsmap during decode");
             }
         } catch (Exception e) {
-            Log.e(TAG, "Got exception installing preferences");
+            UserError.Log.e(TAG, "Got exception installing preferences");
         }
 
     }
@@ -255,7 +255,7 @@ public class Preferences extends PreferenceActivity {
                 editor.apply();
             }
         } else if (scanResult.getFormatName().equals("CODE_128")) {
-            Log.d(TAG, "Setting serial number to: " + scanResult.getContents());
+            UserError.Log.i(TAG, "Setting serial number to: " + scanResult.getContents());
             prefs.edit().putString("share_key", scanResult.getContents()).apply();
         }
         refreshFragments();
@@ -267,7 +267,7 @@ public class Preferences extends PreferenceActivity {
         try {
             setTheme(R.style.OldAppTheme);
         } catch (Exception e) {
-            Log.e(TAG, "Failed to set theme");
+            UserError.Log.e(TAG, "Failed to set theme");
         }
         super.onCreate(savedInstanceState);
 
@@ -278,7 +278,7 @@ public class Preferences extends PreferenceActivity {
         try {
             PreferenceManager.getDefaultSharedPreferences(this).registerOnSharedPreferenceChangeListener(preferenceFragment.lockListener.prefListener);
         } catch (Exception e) {
-            Log.e(TAG,"Got exception registering lockListener: "+e+ " "+(preferenceFragment.lockListener == null));
+            UserError.Log.e(TAG,"Got exception registering lockListener: "+e+ " "+(preferenceFragment.lockListener == null));
         }
 
     }
@@ -288,7 +288,7 @@ public class Preferences extends PreferenceActivity {
     {
         super.onResume();
         PreferenceManager.getDefaultSharedPreferences(this).registerOnSharedPreferenceChangeListener(ActivityRecognizedService.prefListener);
- //TODO       if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M && DexCollectionType.hasBluetooth()) {
+ //FIXME       if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M && DexCollectionType.hasBluetooth()) {
  //           LocationHelper.requestLocationForBluetooth(this); // double check!
  //       }
         PreferenceManager.getDefaultSharedPreferences(this).registerOnSharedPreferenceChangeListener(LeFunEntry.prefListener);
@@ -322,10 +322,7 @@ public class Preferences extends PreferenceActivity {
 
     @Override
     protected boolean isValidFragment(String fragmentName) {
-        if (AllPrefsFragment.class.getName().equals(fragmentName)) {
-            return true;
-        }
-        return false;
+	    return AllPrefsFragment.class.getName().equals(fragmentName);
     }
 
     @Override
@@ -495,7 +492,7 @@ public class Preferences extends PreferenceActivity {
         try {
             Profile.setSensitivityDefault(Double.parseDouble(newValue));
         } catch (Exception e) {
-            Log.e(TAG, "Invalid insulin sensitivity: " + newValue);
+            UserError.Log.e(TAG, "Invalid insulin sensitivity: " + newValue);
         }
 
         EditTextPreference thispref = (EditTextPreference) preference;
@@ -516,7 +513,7 @@ public class Preferences extends PreferenceActivity {
                             .getDefaultSharedPreferences(preference.getContext())
                             .getString(preference.getKey(), ""));
         } catch (Exception e) {
-            Log.e(TAG, "Got exception binding preference summary: " + e.toString());
+            UserError.Log.e(TAG, "Got exception binding preference summary: " + e.toString());
         }
     }
 
@@ -528,7 +525,7 @@ public class Preferences extends PreferenceActivity {
                             .getDefaultSharedPreferences(preference.getContext())
                             .getString(preference.getKey(), ""));
         } catch (Exception e) {
-            Log.e(TAG, "Got exception binding preference title: " + e.toString());
+            UserError.Log.e(TAG, "Got exception binding preference title: " + e.toString());
         }
     }
 
@@ -540,7 +537,7 @@ public class Preferences extends PreferenceActivity {
                             .getDefaultSharedPreferences(preference.getContext())
                             .getString(preference.getKey(), ""));
         } catch (Exception e) {
-            Log.e(TAG, "Got exception binding preference title: " + e.toString());
+            UserError.Log.e(TAG, "Got exception binding preference title: " + e.toString());
         }
     }
 
@@ -553,7 +550,7 @@ public class Preferences extends PreferenceActivity {
                             .getDefaultSharedPreferences(preference.getContext())
                             .getInt(preference.getKey(), 0));
         } catch (Exception e) {
-            Log.e(TAG, "Got exception binding preference title: " + e.toString());
+            UserError.Log.e(TAG, "Got exception binding preference title: " + e.toString());
         }
     }
 
@@ -582,7 +579,7 @@ public class Preferences extends PreferenceActivity {
                             .getDefaultSharedPreferences(preference.getContext())
                             .getInt(preference.getKey(), 0));
         } catch (Exception e) {
-            Log.e(TAG, "Got exception binding preference title: " + e.toString());
+            UserError.Log.e(TAG, "Got exception binding preference title: " + e.toString());
         }
     }
 
@@ -612,7 +609,7 @@ public class Preferences extends PreferenceActivity {
                 EditTextPreference thispref = (EditTextPreference) findPreference(pref_name);
                 thispref.setText(pref_val);
             } catch (Exception e) {
-                Log.e(TAG, "Exception during setSummary: " + e.toString());
+                UserError.Log.e(TAG, "Exception during setSummary: " + e.toString());
             }
             */
             setSummary_static(this, pref_name);
@@ -626,7 +623,7 @@ public class Preferences extends PreferenceActivity {
                 EditTextPreference thispref = (EditTextPreference) allPrefsFragment.findPreference(pref_name);
                 thispref.setText(pref_val);
             } catch (Exception e) {
-                Log.e(TAG, "Exception during setSummary: " + e.toString());
+                UserError.Log.e(TAG, "Exception during setSummary: " + e.toString());
             }
         }
 
@@ -890,7 +887,7 @@ public class Preferences extends PreferenceActivity {
             enableAmazfit.setOnPreferenceChangeListener((preference, newValue) -> {
                final Context context = preference.getContext();
                boolean enabled = (boolean) newValue;
-                if (enabled==true) {
+                if (enabled) {
                     context.startService(new Intent(context, Amazfitservice.class));
 
                 }else {
@@ -1029,7 +1026,7 @@ public class Preferences extends PreferenceActivity {
                     setSummary("highValue");
                     setSummary("lowValue");
                     if (profile_insulin_sensitivity_default != null) {
-                        Log.d(TAG, "refreshing profile insulin sensitivity default display");
+                        UserError.Log.i(TAG, "refreshing profile insulin sensitivity default display");
                         profile_insulin_sensitivity_default.setTitle(format_insulin_sensitivity(profile_insulin_sensitivity_default.getTitle().toString(), ProfileEditor.minMaxSens(ProfileEditor.loadData(false))));
 
 //                            do_format_insulin_sensitivity(profile_insulin_sensitivity_default, AllPrefsFragment.this.prefs, false, null);
@@ -1037,7 +1034,7 @@ public class Preferences extends PreferenceActivity {
                     Profile.reloadPreferences(AllPrefsFragment.this.prefs);
 
                 } catch (Exception e) {
-                    Log.e(TAG, "Got excepting processing high/low value preferences: " + e.toString());
+                    UserError.Log.e(TAG, "Got excepting processing high/low value preferences: " + e.toString());
                 }*/
                 return true;
             });
@@ -1071,7 +1068,7 @@ public class Preferences extends PreferenceActivity {
 
             DexCollectionType collectionType = DexCollectionType.getType(this.prefs.getString("dex_collection_method", "BluetoothWixel"));
 
-            Log.d(TAG, collectionType.name());
+            UserError.Log.i(TAG, collectionType.name());
             if (collectionType != DexCollectionType.DexcomShare) {
                 collectionCategory.removePreference(shareKey);
                 collectionCategory.removePreference(scanShare);
@@ -1107,7 +1104,7 @@ public class Preferences extends PreferenceActivity {
                     return true;
                 });
             } catch (NullPointerException e) {
-                Log.d(TAG, "Nullpointer looking for nfc_scan_homescreen");
+                UserError.Log.i(TAG, "Nullpointer looking for nfc_scan_homescreen");
             }
             try {
                 findPreference("use_nfc_scan").setOnPreferenceChangeListener((preference, newValue) -> {
@@ -1132,7 +1129,7 @@ public class Preferences extends PreferenceActivity {
                     return true;
                 });
             } catch (NullPointerException e) {
-                Log.d(TAG, "Nullpointer looking for nfc_scan");
+                UserError.Log.i(TAG, "Nullpointer looking for nfc_scan");
             }
 
             try {
@@ -1217,7 +1214,7 @@ public class Preferences extends PreferenceActivity {
                         }
                     }
                 } catch (NullPointerException e) {
-                    Log.wtf(TAG, "Nullpointer wifireceivers ", e);
+                    UserError.Log.wtf(TAG, "Nullpointer wifireceivers ", e);
                 }
 
                 if ((collectionType != DexCollectionType.DexbridgeWixel)
@@ -1226,7 +1223,7 @@ public class Preferences extends PreferenceActivity {
                         collectionCategory.removePreference(transmitterId);
                         // collectionCategory.removePreference(closeGatt);
                     } catch (NullPointerException e) {
-                        Log.wtf(TAG, "Nullpointer removing txid ", e);
+                        UserError.Log.wtf(TAG, "Nullpointer removing txid ", e);
                     }
                 }
 
@@ -1274,7 +1271,7 @@ public class Preferences extends PreferenceActivity {
                         //collectionCategory.addPreference(reBond);
                         //collectionCategory.addPreference(runOnMain);
                     } catch (NullPointerException e) {
-                        Log.wtf(TAG, "Null pointer adding G5 prefs ", e);
+                        UserError.Log.wtf(TAG, "Null pointer adding G5 prefs ", e);
                     }
                 } else {
                     try {
@@ -1287,7 +1284,7 @@ public class Preferences extends PreferenceActivity {
                        // collectionCategory.removePreference(reBond);
                        // collectionCategory.removePreference(runOnMain);
                     } catch (NullPointerException e) {
-                        Log.wtf(TAG, "Null pointer removing G5 prefs ", e);
+                        UserError.Log.wtf(TAG, "Null pointer removing G5 prefs ", e);
                     }
                 }
 
@@ -1296,7 +1293,7 @@ public class Preferences extends PreferenceActivity {
                         if (!Experience.gotData()) getPreferenceScreen().removePreference(motionScreen);
                         calibrationSettingsScreen.removePreference(old_school_calibration_mode);
                     } catch (NullPointerException e) {
-                        Log.wtf(TAG, "Nullpointer with engineering mode s ", e);
+                        UserError.Log.wtf(TAG, "Nullpointer with engineering mode s ", e);
                     }
                 }
                 if ((!engineering_mode) || (!this.prefs.getBoolean("enable_bugfender", false))) {
@@ -1304,7 +1301,7 @@ public class Preferences extends PreferenceActivity {
                 }
 
             } catch (NullPointerException e) {
-                Log.wtf(TAG, "Got null pointer exception removing pref: ", e);
+                UserError.Log.wtf(TAG, "Got null pointer exception removing pref: ", e);
             }
 
             if (engineering_mode || this.prefs.getString("update_channel", "").matches("alpha|nightly")) {
@@ -1550,7 +1547,7 @@ public class Preferences extends PreferenceActivity {
 	                } catch (InterruptedException e) {
 		                //
 	                }
-	                Log.d(TAG, "Trying to restart collector due to tx id change");
+	                UserError.Log.i(TAG, "Trying to restart collector due to tx id change");
 	                CollectionServiceStarter.restartCollectionService(xdrip.getAppContext());
                 }).start();
                 sBindPreferenceSummaryToValueListener.onPreferenceChange(preference, newValue);
@@ -1760,7 +1757,7 @@ public class Preferences extends PreferenceActivity {
                 }
                 force_english.setTitle("Force " + word + " Text");
             } catch (NullPointerException e) {
-                Log.e(TAG, "Nullpointer in update_force_english_title: " + e);
+                UserError.Log.e(TAG, "Nullpointer in update_force_english_title: " + e);
             }
         }
 
@@ -1847,17 +1844,17 @@ public class Preferences extends PreferenceActivity {
 
         private static int pebbleType = 1;
         private void enablePebble(int newValueInt, boolean enabled, Context context) {
-            Log.d(TAG,"enablePebble called with: "+newValueInt+" "+enabled);
+            UserError.Log.i(TAG,"enablePebble called with: "+newValueInt+" "+enabled);
             if (pebbleType == 1) {
                 if (enabled && (newValueInt != 1)) {
                     context.stopService(new Intent(context, PebbleWatchSync.class));
                     context.startService(new Intent(context, PebbleWatchSync.class));
-                    Log.d(TAG,"Starting pebble service type: "+newValueInt);
+                    UserError.Log.i(TAG,"Starting pebble service type: "+newValueInt);
                 }
             } else {
                 if (!enabled || (newValueInt == 1)) {
                     context.stopService(new Intent(context, PebbleWatchSync.class));
-                    Log.d(TAG, "Stopping pebble service type: " + newValueInt);
+                    UserError.Log.i(TAG, "Stopping pebble service type: " + newValueInt);
                 }
 
 
@@ -1894,7 +1891,7 @@ public class Preferences extends PreferenceActivity {
                     // getPreferenceScreen().addPreference(findPreference("plus_follow_master"));
                 }
             } catch (Exception e) {
-                Log.e(TAG, "Got exception in refresh extra: " + e.toString());
+                UserError.Log.e(TAG, "Got exception in refresh extra: " + e.toString());
             }
         }
 
@@ -1913,7 +1910,7 @@ public class Preferences extends PreferenceActivity {
                     try {
                         BgToSpeech.testSpeech();
                     } catch (Exception e) {
-                        Log.e(TAG, "Got exception with TTS: " + e);
+                        UserError.Log.e(TAG, "Got exception with TTS: " + e);
                     }
                 } else {
                     BgToSpeech.tearDownTTS();
@@ -1927,7 +1924,7 @@ public class Preferences extends PreferenceActivity {
                         try {
                             BgToSpeech.testSpeech();
                         } catch (Exception e) {
-                            Log.e(TAG, "Got exception with TTS: " + e);
+                            UserError.Log.e(TAG, "Got exception with TTS: " + e);
                         }
                         return true;
                     }
@@ -1938,7 +1935,7 @@ public class Preferences extends PreferenceActivity {
                         try {
                             BgToSpeech.testSpeech();
                         } catch (Exception e) {
-                            Log.e(TAG, "Got exception with TTS: " + e);
+                            UserError.Log.e(TAG, "Got exception with TTS: " + e);
                         }
                         return true;
                     }
@@ -2013,7 +2010,7 @@ public class Preferences extends PreferenceActivity {
                 allPrefsFragment.setSummary("lowValue");
             }
             if (profile_insulin_sensitivity_default != null) {
-                Log.d(TAG, "refreshing profile insulin sensitivity default display");
+                UserError.Log.i(TAG, "refreshing profile insulin sensitivity default display");
                 profile_insulin_sensitivity_default.setTitle(format_insulin_sensitivity(profile_insulin_sensitivity_default.getTitle().toString(), ProfileEditor.minMaxSens(ProfileEditor.loadData(false))));
 
 //                            do_format_insulin_sensitivity(profile_insulin_sensitivity_default, AllPrefsFragment.this.prefs, false, null);
@@ -2021,7 +2018,7 @@ public class Preferences extends PreferenceActivity {
             Profile.reloadPreferences(preferences);
 
         } catch (Exception e) {
-            Log.e(TAG, "Got excepting processing high/low value preferences: " + e.toString());
+            UserError.Log.e(TAG, "Got excepting processing high/low value preferences: " + e.toString());
         }
     }
 

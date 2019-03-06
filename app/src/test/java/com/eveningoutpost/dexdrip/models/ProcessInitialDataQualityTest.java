@@ -60,7 +60,7 @@ public class ProcessInitialDataQualityTest extends RobolectricTestWithConfig {
 
                 assertThat("Result object not null", test != null, is(true));
                 if (i < 3) assertThat("Empty input should fail", test.pass, is(false));
-                assertThat("There should be some advice on loop " + i, test.advice.length() > 0, is(true));
+                assertThat("There should be some advice on loop " + i, !test.advice.isEmpty(), is(true));
 
                 final long ms_since = (JoH.msSince(bgReadingList.get(bgReadingList.size() - 1).timestamp));
                 if ((ms_since > Constants.STALE_CALIBRATION_CUT_OFF + COMPUTATION_GRACE_TIME) || (i < 3)) {

@@ -122,7 +122,7 @@ public class UserError extends Model {
                 .where("timestamp < ?", timestamp)
                 .orderBy("timestamp desc")
                 .execute();
-        if (userErrors != null) Log.d(TAG, "cleanup UserError size=" + userErrors.size());
+        if (userErrors != null) UserError.Log.i(TAG, "cleanup UserError size=" + userErrors.size());
         new Cleanup().execute(userErrors);
     }
 
@@ -162,7 +162,7 @@ public class UserError extends Model {
         for (int level : levels) {
             levelsString.append(level).append(",");
         }
-        Log.d("UserError", "severity in ("+levelsString.substring(0,levelsString.length() - 1)+")");
+        UserError.Log.i("UserError", "severity in ("+levelsString.substring(0,levelsString.length() - 1)+")");
         return new Select()
                 .from(UserError.class)
                 .where("severity in ("+levelsString.substring(0,levelsString.length() - 1)+")")
@@ -175,7 +175,7 @@ public class UserError extends Model {
         for (int level : levels) {
             levelsString.append(level).append(",");
         }
-        Log.d("UserError", "severity in (" + levelsString.substring(0, levelsString.length() - 1) + ")");
+        UserError.Log.i("UserError", "severity in (" + levelsString.substring(0, levelsString.length() - 1) + ")");
         return new Select()
                 .from(UserError.class)
                 .where("_ID > ?", id)
@@ -208,7 +208,7 @@ public class UserError extends Model {
         for (int level : levels) {
             levelsString.append(level).append(",");
         }
-        Log.d("UserError", "severity in (" + levelsString.substring(0, levelsString.length() - 1) + ")");
+        UserError.Log.i("UserError", "severity in (" + levelsString.substring(0, levelsString.length() - 1) + ")");
         return new Select()
                 .from(UserError.class)
                 .where("_ID < ?", id)
@@ -228,7 +228,7 @@ public class UserError extends Model {
                     .where("message = ?", error.message)
                     .executeSingle();
         } catch (Exception e) {
-            Log.e(TAG,"getForTimestamp() Got exception on Select : "+e.toString());
+            UserError.Log.e(TAG,"getForTimestamp() Got exception on Select : "+e.toString());
             return null;
         }
     }
@@ -364,7 +364,7 @@ public class UserError extends Model {
             // Format is tag:level for example  Alerts:i
             String[] tagAndLevel = tag.trim().split(":");
             if(tagAndLevel.length != 2) {
-                Log.e(TAG, "Failed to parse " + tag);
+                UserError.Log.e(TAG, "Failed to parse " + tag);
                 return;
             }
             String level =  tagAndLevel[1];
@@ -384,7 +384,7 @@ public class UserError extends Model {
                 UserErrorLow(TAG, "Adding tag with info " + tagAndLevel[0] );
                 return;
             }
-            Log.e(TAG, "Unknown level for tag " + tag + " please use d v or i");
+            UserError.Log.e(TAG, "Unknown level for tag " + tag + " please use d v or i");
         }
         
         static boolean shouldLogTag(String tag, int level) {

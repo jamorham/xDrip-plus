@@ -32,19 +32,19 @@ public class LibreTrendGraph extends BaseActivity {
         try {
             finish();
         } catch (Exception e) {
-            Log.d(TAG, "Error finishing " + e.toString());
+            UserError.Log.i(TAG, "Error finishing " + e.toString());
         }
     }
 
     private static ArrayList<Float> getLatestBg(LibreBlock libreBlock) {
         ReadingData readingData = NFCReaderX.getTrend(libreBlock);
         if(readingData == null) {
-            Log.e(TAG, "NFCReaderX.getTrend returned null");
+            UserError.Log.e(TAG, "NFCReaderX.getTrend returned null");
             return null;
         }
         
         if(readingData.trend.isEmpty() || readingData.trend.get(0).glucoseLevelRaw == 0) {
-            Log.e(TAG, "libreBlock exists but no trend data exists, or first value is zero ");
+            UserError.Log.e(TAG, "libreBlock exists but no trend data exists, or first value is zero ");
             return null;
         }
         ArrayList<Float> ret = new ArrayList<>();
@@ -53,10 +53,10 @@ public class LibreTrendGraph extends BaseActivity {
         if(factor == 0) {
             // We don't have the calculated value, but we do have the raw value. (No calibration exists)
             // I want to show raw data.
-            Log.w(TAG, "Bg data was not calculated, working on raw data");
+            UserError.Log.w(TAG, "Bg data was not calculated, working on raw data");
             List<BgReading> latestReading = BgReading.latestForGraph (1, libreBlock.timestamp - 1000, libreBlock.timestamp + 1000);
             if(latestReading == null || latestReading.isEmpty()) {
-                Log.e(TAG, "libreBlock exists but no matching bg record exists");
+                UserError.Log.e(TAG, "libreBlock exists but no matching bg record exists");
                 return null;
             }
             
@@ -72,17 +72,17 @@ public class LibreTrendGraph extends BaseActivity {
     
     private static ArrayList<Float> getLatestBgForXMinutes(int NumberOfMinutes) {
 
-        Log.i(TAG, "getLatestBgForXMinutes number of minutes = " + NumberOfMinutes);
+        UserError.Log.i(TAG, "getLatestBgForXMinutes number of minutes = " + NumberOfMinutes);
         
         List<LibreTrendPoint> LibreTrendPoints = LibreTrendUtil.getInstance().getData(JoH.tsl() - NumberOfMinutes * 60 * 1000, JoH.tsl());
         if(LibreTrendPoints == null || LibreTrendPoints.isEmpty()) {
-            Log.e(TAG, "Error getting data from getLatestBgForXMinutes");
+            UserError.Log.e(TAG, "Error getting data from getLatestBgForXMinutes");
             return null;
         }
         
         LibreTrendLatest libreTrendLatest = LibreTrendUtil.getInstance().getLibreTrendLatest();
         if(libreTrendLatest.glucoseLevelRaw == 0) {
-            Log.e(TAG, "libreBlock exists but libreTrendLatest.glucoseLevelRaw is zero ");
+            UserError.Log.e(TAG, "libreBlock exists but libreTrendLatest.glucoseLevelRaw is zero ");
             return null;
         }
         ArrayList<Float> ret = new ArrayList<>();
@@ -91,10 +91,10 @@ public class LibreTrendGraph extends BaseActivity {
         if(factor == 0) {
             // We don't have the calculated value, but we do have the raw value. (No calibration exists)
             // I want to show raw data.
-            Log.w(TAG, "Bg data was not calculated, working on raw data");
+            UserError.Log.w(TAG, "Bg data was not calculated, working on raw data");
             List<BgReading> latestReading = BgReading.latestForGraph (1, libreTrendLatest.timestamp - 1000, libreTrendLatest.timestamp + 1000);
             if(latestReading == null || latestReading.isEmpty()) {
-                Log.e(TAG, "libreBlock exists but no matching bg record exists");
+                UserError.Log.e(TAG, "libreBlock exists but no matching bg record exists");
                 return null;
             }
             
@@ -150,14 +150,14 @@ public class LibreTrendGraph extends BaseActivity {
          final float conversion_factor_mmol = (float) (doMgdl ? 1 : Constants.MGDL_TO_MMOLL);
          ArrayList<Float> bg_data = getLatestBgForXMinutes((int) ((end_time - start_time) /  Constants.MINUTE_IN_MS)  );
          if (bg_data == null) {
-             Log.e(TAG, "Error getting data from getLatestBgForXMinutes. Returning");
+             UserError.Log.e(TAG, "Error getting data from getLatestBgForXMinutes. Returning");
              return null;
              
          }
          
          LibreTrendLatest libreTrendLatest = LibreTrendUtil.getInstance().getLibreTrendLatest();
          if(libreTrendLatest.glucoseLevelRaw == 0) {
-             Log.e(TAG, "libreBlock exists but libreTrendLatest.glucoseLevelRaw is zero ");
+             UserError.Log.e(TAG, "libreBlock exists but libreTrendLatest.glucoseLevelRaw is zero ");
              return null;
          }
          

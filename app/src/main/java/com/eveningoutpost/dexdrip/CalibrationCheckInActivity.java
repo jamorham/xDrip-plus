@@ -38,7 +38,7 @@ public class CalibrationCheckInActivity extends ActivityWithMenu {
                 startActivity(tableIntent);
                 finish();
             } else {
-                Log.d("CALIBRATION", "ERROR, sensor not active");
+                UserError.Log.i("CALIBRATION", "ERROR, sensor not active");
             }
         });
 

@@ -40,7 +40,7 @@ public class Session {
             authReply = (MAuthReply) obj;
         } else if (obj instanceof List) {
             List list = (List)obj;
-            if (list.size() > 0 && list.get(0) instanceof MDatasetReply) {
+            if (!list.isEmpty() && list.get(0) instanceof MDatasetReply) {
                 datasetReply = (MDatasetReply) list.get(0);
             }
         } else if (obj instanceof MDatasetReply) {

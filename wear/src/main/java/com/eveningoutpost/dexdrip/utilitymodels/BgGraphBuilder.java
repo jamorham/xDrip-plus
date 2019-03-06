@@ -210,7 +210,7 @@ public class BgGraphBuilder {
         final float jump_threshold = 15; // in minutes
         List<PointValue> local_points = new ArrayList<>();
 
-        if (filteredValues.size() > 0) {
+        if (!filteredValues.isEmpty()) {
             final float end_marker = filteredValues.get(filteredValues.size() - 1).getX();
 
             for (PointValue current_point : filteredValues) {
@@ -285,14 +285,14 @@ public class BgGraphBuilder {
         try {
             final long last_bg_reading_timestamp = BgReading.last().timestamp;
             if (low_occurs_at_processed_till_timestamp < last_bg_reading_timestamp) {
-                Log.d(TAG, "Recalculating lowOccursAt: " + JoH.dateTimeText((long) low_occurs_at_processed_till_timestamp) + " vs " + JoH.dateTimeText(last_bg_reading_timestamp));
+               UserError.Log.d(TAG, "Recalculating lowOccursAt: " + JoH.dateTimeText((long) low_occurs_at_processed_till_timestamp) + " vs " + JoH.dateTimeText(last_bg_reading_timestamp));
                 // new only the last hour worth of data for this
                 (new BgGraphBuilder(xdrip.getAppContext(), System.currentTimeMillis() - 60 * 60 * 1000, System.currentTimeMillis() + 5 * 60 * 1000, 24, true)).addBgReadingValues(false);
             } else {
-                Log.d(TAG, "Cached current low timestamp ok: " +  JoH.dateTimeText((long) low_occurs_at_processed_till_timestamp) + " vs " + JoH.dateTimeText(last_bg_reading_timestamp));
+               UserError.Log.d(TAG, "Cached current low timestamp ok: " +  JoH.dateTimeText((long) low_occurs_at_processed_till_timestamp) + " vs " + JoH.dateTimeText(last_bg_reading_timestamp));
             }
         } catch (Exception e) {
-            Log.e(TAG, "Got exception in getCurrentLowOccursAt() " + e);
+           UserError.Log.e(TAG, "Got exception in getCurrentLowOccursAt() " + e);
         }
         return low_occurs_at;
     }

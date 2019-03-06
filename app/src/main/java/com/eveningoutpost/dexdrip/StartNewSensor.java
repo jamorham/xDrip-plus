@@ -166,7 +166,7 @@ public class StartNewSensor extends ActivityWithMenu {
 
     private void realRealStartSensor() {
         long startTime = ucalendar.getTime().getTime();
-        Log.d(TAG, "Starting sensor time: " + JoH.dateTimeText(ucalendar.getTime().getTime()));
+        UserError.Log.i(TAG, "Starting sensor time: " + JoH.dateTimeText(ucalendar.getTime().getTime()));
 
         if (new Date().getTime() + 15 * 60000 < startTime) {
             Toast.makeText(this, gs(R.string.error_sensor_start_time_in_future), Toast.LENGTH_LONG).show();
@@ -214,7 +214,7 @@ public class StartNewSensor extends ActivityWithMenu {
               long startTime = calendar.getTime().getTime();
 
               Sensor.create(startTime);
-              Log.d("NEW SENSOR", "Sensor started at " + startTime);
+              UserError.Log.i("NEW SENSOR", "Sensor started at " + startTime);
 
               Toast.makeText(getApplicationContext(), gs(R.string.new_sensor_started), Toast.LENGTH_LONG).show();
               CollectionServiceStarter.newStart(getApplicationContext());

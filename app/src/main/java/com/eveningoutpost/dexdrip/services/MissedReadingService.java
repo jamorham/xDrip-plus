@@ -9,14 +9,8 @@ import android.os.PowerManager;
 import android.preference.PreferenceManager;
 
 import com.eveningoutpost.dexdrip.Home;
-import com.eveningoutpost.dexdrip.models.AlertType;
-import com.eveningoutpost.dexdrip.models.BgReading;
-import com.eveningoutpost.dexdrip.models.DesertSync;
-import com.eveningoutpost.dexdrip.models.JoH;
-import com.eveningoutpost.dexdrip.models.Reminder;
-import com.eveningoutpost.dexdrip.models.Sensor;
+import com.eveningoutpost.dexdrip.models.*;
 import com.eveningoutpost.dexdrip.models.UserError.Log;
-import com.eveningoutpost.dexdrip.models.UserNotification;
 import com.eveningoutpost.dexdrip.utilitymodels.CollectionServiceStarter;
 import com.eveningoutpost.dexdrip.utilitymodels.Constants;
 import com.eveningoutpost.dexdrip.utilitymodels.Inevitable;
@@ -56,7 +50,7 @@ public class MissedReadingService extends IntentService {
 
             final boolean sensorActive = Sensor.isActive();
 
-            Log.d(TAG, "MissedReadingService onHandleIntent"); // test debug log
+            UserError.Log.i(TAG, "MissedReadingService onHandleIntent"); // test debug log
 
             final long stale_millis = Home.stale_data_millis();
 
@@ -78,7 +72,7 @@ public class MissedReadingService extends IntentService {
             if ((Pref.getBoolean("aggressive_service_restart", false) || DexCollectionType.isFlakey())) {//!Home.get_enable_wear() &&
                 if (!BgReading.last_within_millis(stale_millis) && sensorActive && (!getLocalServiceCollectingState())) {
                     if (JoH.ratelimit("aggressive-restart", aggressive_backoff_timer)) {
-                        Log.e(TAG, "Aggressively restarting collector service due to lack of reception: backoff: " + aggressive_backoff_timer);
+                        UserError.Log.e(TAG, "Aggressively restarting collector service due to lack of reception: backoff: " + aggressive_backoff_timer);
                         if (aggressive_backoff_timer < 1200) aggressive_backoff_timer += 60;
                         CollectionServiceStarter.restartCollectionServiceBackground();
                     } else {
@@ -108,7 +102,7 @@ public class MissedReadingService extends IntentService {
             }
 
             if (!JoH.upForAtLeastMins(15)) {
-                Log.d(TAG, "Uptime less than 15 minutes so not processing for missed reading");
+                UserError.Log.i(TAG, "Uptime less than 15 minutes so not processing for missed reading");
                 return;
             }
 
@@ -116,7 +110,7 @@ public class MissedReadingService extends IntentService {
             if ((Home.get_forced_wear()) && Pref.getBoolean("disable_wearG5_on_missedreadings", false)) {
                 int bg_wear_missed_minutes = Pref.getStringToInt("disable_wearG5_on_missedreadings_level", 30);
                 if (BgReading.getTimeSinceLastReading() >= (bg_wear_missed_minutes * 1000 * 60)) {
-                    Log.d(TAG, "Request WatchUpdaterService to disable force_wearG5 when wear is connected");
+                    UserError.Log.i(TAG, "Request WatchUpdaterService to disable force_wearG5 when wear is connected");
                     startWatchUpdaterService(xdrip.getAppContext(), WatchUpdaterService.ACTION_DISABLE_FORCE_WEAR, TAG);
                 }
             }
@@ -158,7 +152,7 @@ public class MissedReadingService extends IntentService {
         UserNotification userNotification = UserNotification.GetNotificationByType("bg_missed_alerts");
         if (userNotification == null) {
             // No active alert exists, should not happen, we have just created it.
-            Log.wtf(TAG, "No active alert exists.");
+            UserError.Log.wtf(TAG, "No active alert exists.");
             setAlarm(getOtherAlertReraiseSec(context, "bg_missed_alerts") * 1000, false);
         } else {
             // we have an alert that should be re-raised on userNotification.timestamp
@@ -183,7 +177,7 @@ public class MissedReadingService extends IntentService {
 
         alarmIn = Math.max(alarmIn, 5000); // don't try to set less than 5 seconds in the future
 
-        Log.d(TAG, "Setting timer to  " + alarmIn / 60000 + " minutes from now");
+        UserError.Log.i(TAG, "Setting timer to  " + alarmIn / 60000 + " minutes from now");
 
         initializeServiceIntent();
         JoH.wakeUpIntent(this, alarmIn, serviceIntent);

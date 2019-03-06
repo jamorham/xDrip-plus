@@ -94,7 +94,7 @@ public class BgSendQueue extends Model {
         bgSendQueue.success = false;
         bgSendQueue.mongo_success = false;
         bgSendQueue.save();
-        Log.d("BGQueue", "New value added to queue!");
+        UserError.Log.i("BGQueue", "New value added to queue!");
     }
 
     public static void handleNewBgReading(BgReading bgReading, String operation_type, Context context) {

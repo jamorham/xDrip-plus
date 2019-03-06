@@ -1028,7 +1028,7 @@
     <string name="title_snooze_hide">Erinnerung Schlummer Feld - Verstecken</string>
     <string name="message_snooze_hide">Der Verstecken-Button blendet das Schlummer-Feld aus</string>
     <string name="title_snooze_times">Erinnerung Schlummer Feld - Zeiten</string>
-    <string name="message_snooze_times">Die verschiedenen Buttons ändern schnell die Standart-Schlummer-Zeit zu einer anderen Schlummer-Zeit</string>
+    <string name="message_snooze_times">Die verschiedenen Buttons ändern schnell die Standard-Schlummer-Zeit zu einer anderen Schlummer-Zeit</string>
     <string name="title_which_day">Welcher Tag?</string>
     <string name="title_what_time_day">Welche Zeit des Tages?</string>
     <string name="reminder_due">Erinnerung fällig</string>

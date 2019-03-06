@@ -574,7 +574,7 @@
     <string name="bluetooth_watchdog">Bluetooth Watchdog</string>
     <string name="reset_bluetooth_g5">Bluetooth\'u, G5 veri kaynağının çalışmaya devam etmesini sağlayacak şekilde kapatıp açarak sıfırlayın. Bu olmadan G5 toplayıcı başarısız olabilir.</string>
     <string name="g5_bluetooth_watchdog">G5 Bluetooth Watchdog</string>
-    <string name="close_gatt">Bluetooth watchdog sık sık etkinleşirse, yardımcı olup olmadığını görmek için bu seçeneğin işaretini kaldırabilirsiniz</string>
+    <string name="close_gatt">Bluetooth watchdog sık etkinleşirse, yardımcı olup olmadığını görmek için bu seçeneğin işaretini kaldırabilirsiniz</string>
     <string name="older_bluetooth_wakelocks">Eski bluetooth wakelocks,ekstra pil kullanımına neden olabilir ancak bluetooth veri toplaması için de gerekli olabilir</string>
     <string name="reset_bluetooth_on_off">Birkaç dakikada bir kapatıp açarak Bluetooth\'u sıfırlayın! Sadece test ediyorsanız seçin. Bluetooth oynamak başka bir şeyi etkileyebilir.</string>
     <string name="constantly_reset_bluetooth">Bluetooth\'u sıkca sıfırla</string>

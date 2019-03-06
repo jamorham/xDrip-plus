@@ -24,7 +24,7 @@ import android.os.PowerManager;
 import android.util.Log;
 import android.widget.Toast;
 
-import com.eveningoutpost.dexdrip.models.JoH;
+import com.eveningoutpost.dexdrip.models.*;
 import com.eveningoutpost.dexdrip.R;
 import com.eveningoutpost.dexdrip.utilitymodels.AlertPlayer;
 import com.eveningoutpost.dexdrip.utilitymodels.CollectionServiceStarter;
@@ -70,7 +70,7 @@ public final class FireReceiver extends BroadcastReceiver {
 
             if (!com.twofortyfouram.locale.Intent.ACTION_FIRE_SETTING.equals(intent.getAction())) {
                 if (Constants.IS_LOGGABLE) {
-                    Log.e(Constants.LOG_TAG,
+                    UserError.Log.e(Constants.LOG_TAG,
                             String.format(Locale.US, "Received unexpected Intent action %s", intent.getAction())); //$NON-NLS-1$
                 }
                 JoH.releaseWakeLock(wl);
@@ -90,7 +90,7 @@ public final class FireReceiver extends BroadcastReceiver {
 
                 if ((message != null) && !message.isEmpty()) {
                     final String[] message_array = message.split("\\s+"); // split by space
-                    Log.d(TAG,"Received tasker message: "+message);
+                    UserError.Log.i(TAG,"Received tasker message: "+message);
 
                     // Commands recognised:
                     //
@@ -113,7 +113,7 @@ public final class FireReceiver extends BroadcastReceiver {
 
                             // We push the values to the Calibration Activity
                             if (message_array.length < 3) {
-                                Log.e(TAG, "Not enough parameters for BG message");
+                                UserError.Log.e(TAG, "Not enough parameters for BG message");
                                 break;
                             }
                             final Intent calintent = new Intent();
@@ -241,19 +241,19 @@ public final class FireReceiver extends BroadcastReceiver {
 //                                    return;
 //                                }
 //                                // Toast.makeText(context, "SET PREF STRING: " + message_array[2] + " to " + message_array[3], Toast.LENGTH_SHORT).show();
-//                                Log.e(TAG,"firereceiver - About to write prefs");
+//                                UserError.Log.e(TAG,"firereceiver - About to write prefs");
 //                                prefs.edit().putString(message_array[2], message_array[3]).commit();
 //                                // If preferences screen is actually open right now then shut it down to avoid cache errors
 //                                Intent fintent = new Intent(context.getString(R.string.finish_preferences_activity));
 //                                context.sendBroadcast(fintent);
 //                                prefs.edit().putString(message_array[2],message_array[3]).commit(); // save again
-//                                Log.e(TAG,"firereceiver about to restart collector");
+//                                UserError.Log.e(TAG,"firereceiver about to restart collector");
 //                                // blanket restart
 //                                try {
 //                                    CollectionServiceStarter.restartCollectionService(context.getApplicationContext());
 //                                } catch (Exception e) {
 //
-//                                    Log.e(TAG,"fireReceiver: error restarting collectionservice "+e.toString());
+//                                    UserError.Log.e(TAG,"fireReceiver: error restarting collectionservice "+e.toString());
 //                                }
 //
 //                                break;
@@ -270,11 +270,11 @@ public final class FireReceiver extends BroadcastReceiver {
                     }
 
                 } else {
-                    Log.e(TAG,"Message is empty!");
+                    UserError.Log.e(TAG,"Message is empty!");
                 }
 
             } else {
-                Log.e(TAG,"Bundle is invalid!");
+                UserError.Log.e(TAG,"Bundle is invalid!");
             }
         } finally {
             JoH.releaseWakeLock(wl);

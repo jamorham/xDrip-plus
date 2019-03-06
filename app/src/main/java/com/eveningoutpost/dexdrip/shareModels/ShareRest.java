@@ -84,7 +84,7 @@ public class ShareRest {
             if ("".equals(sessionId)) // migrate previous empty sessionIds to null;
                 sessionId = null;
         } catch (IllegalStateException e) {
-            Log.wtf(TAG, "Illegal state exception: " + e);
+            UserError.Log.wtf(TAG, "Illegal state exception: " + e);
         }
     }
 
@@ -126,23 +126,23 @@ public class ShareRest {
                                 .header("Content-Type", "application/json")
                                 .header("Accept", "application/json")
                                 .build();
-                        Log.d(TAG, "Sending request: " + modifiedRequest.toString());
+                        UserError.Log.i(TAG, "Sending request: " + modifiedRequest.toString());
                         Buffer buffer = new Buffer();
                         copy.body().writeTo(buffer);
-                        Log.d(TAG, "Request body: " + buffer.readUtf8());
+                        UserError.Log.i(TAG, "Request body: " + buffer.readUtf8());
 
                         final Response response = chain.proceed(modifiedRequest);
-                        Log.d(TAG, "Received response: " + response.toString());
+                        UserError.Log.i(TAG, "Received response: " + response.toString());
                         if (response.body() != null) {
                             MediaType contentType = response.body().contentType();
                             String bodyString = response.body().string();
-                            Log.d(TAG, "Response body: " + bodyString);
+                            UserError.Log.i(TAG, "Response body: " + bodyString);
                             return response.newBuilder().body(ResponseBody.create(contentType, bodyString)).build();
                         } else
                             return response;
 
                     } catch (NullPointerException e) {
-                        Log.e(TAG, "Got null pointer exception: " + e);
+                        UserError.Log.e(TAG, "Got null pointer exception: " + e);
                         return null;
                     } catch (IllegalStateException e) {
                         UserError.Log.wtf(TAG,"Got illegal state exception: " + e);

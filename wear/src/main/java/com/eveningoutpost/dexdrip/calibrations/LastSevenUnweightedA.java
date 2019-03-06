@@ -53,11 +53,11 @@ public class LastSevenUnweightedA extends CalibrationAbstract {
 
             // first is most recent
             final List<Calibration> calibrations = Calibration.latestValid(7, until);
-            if ((calibrations == null) || (calibrations.size() == 0)) return null;
+            if ((calibrations == null) || (calibrations.isEmpty())) return null;
             // have we got enough data to have a go
             if (calibrations.size() < 4) {
                 // just use whatever xDrip original would have come up with at this point
-                Log.d(TAG, "Falling back to xDrip-original values");
+               UserError.Log.d(TAG, "Falling back to xDrip-original values");
                 cd = new CalibrationData(calibrations.get(0).slope, calibrations.get(0).intercept);
             } else {
                 // TODO sanity checks
@@ -70,19 +70,19 @@ public class LastSevenUnweightedA extends CalibrationAbstract {
                     // sanity check?
                     // weighting!
                     final double raw = adjust_raw ? calibration.adjusted_raw_value : calibration.raw_value;
-                    Log.d(TAG, "Calibration: " + raw + " -> " + calibration.bg);
+                   UserError.Log.d(TAG, "Calibration: " + raw + " -> " + calibration.bg);
                     raws.add(raw);
                     bgs.add(calibration.bg);
                 }
 
                 bg_to_raw.setValues(PolyTrendLine.toPrimitiveFromList(bgs), PolyTrendLine.toPrimitiveFromList(raws));
-                Log.d(TAG, "Error Variance: " + bg_to_raw.errorVarience());
+               UserError.Log.d(TAG, "Error Variance: " + bg_to_raw.errorVarience());
                 final double intercept = bg_to_raw.predict(0);
-                Log.d(TAG, "Intercept: " + intercept);
+               UserError.Log.d(TAG, "Intercept: " + intercept);
                 final double one = bg_to_raw.predict(1);
-                Log.d(TAG, "One: " + one);
+               UserError.Log.d(TAG, "One: " + one);
                 final double slope = one - intercept;
-                Log.d(TAG, "Slope: " + slope);
+               UserError.Log.d(TAG, "Slope: " + slope);
                 cd = new CalibrationData(slope, intercept);
             }
         }

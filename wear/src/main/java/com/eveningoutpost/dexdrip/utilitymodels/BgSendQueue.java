@@ -103,7 +103,7 @@ public class BgSendQueue extends Model {
         bgSendQueue.success = false;
         bgSendQueue.mongo_success = false;
         bgSendQueue.save();
-        Log.d("BGQueue", "New value added to queue!");
+       UserError.Log.d("BGQueue", "New value added to queue!");
     }
 
     public static void handleNewBgReading(BgReading bgReading, String operation_type, Context context) {
@@ -145,7 +145,7 @@ public class BgSendQueue extends Model {
             }
 
             if (prefs.getBoolean("broadcast_data_through_intents", false)) {
-                Log.i("SENSOR QUEUE:", "Broadcast data");
+               UserError.Log.i("SENSOR QUEUE:", "Broadcast data");
                 final Bundle bundle = new Bundle();
                 bundle.putDouble(Intents.EXTRA_BG_ESTIMATE, bgReading.calculated_value);
 
@@ -228,7 +228,7 @@ public class BgSendQueue extends Model {
 
             if ((!is_follower) && (!quick) && (prefs.getBoolean("share_upload", false))) {
                 if (JoH.ratelimit("sending-to-share-upload",10)) {
-                    Log.d("ShareRest", "About to call ShareRest!!");
+                   UserError.Log.d("ShareRest", "About to call ShareRest!!");
                     String receiverSn = prefs.getString("share_key", "SM00000000").toUpperCase();
                     BgUploader bgUploader = new BgUploader(context);
                     bgUploader.upload(new ShareUploadPayload(receiverSn, bgReading));
@@ -250,7 +250,7 @@ public class BgSendQueue extends Model {
             // if executing on watch; send to watchface
             Inevitable.task("bg-send-queue", 1000, () -> {
                 if (prefs.getBoolean("enable_wearG5", false)) {//KS
-                    Log.d("BgSendQueue", "handleNewBgReading Broadcast BG data to watch");
+                   UserError.Log.d("BgSendQueue", "handleNewBgReading Broadcast BG data to watch");
                     resendData(context);
                     if (prefs.getBoolean("force_wearG5", false)) {
                         //ListenerService.requestData(context);//Gets called by watchface in missedReadingAlert so not needed here
@@ -282,7 +282,7 @@ public class BgSendQueue extends Model {
 
     //KS start from WatchUpdaterService - updates watchface data
     public static void resendData(Context context, int battery) {//KS
-        Log.d("BgSendQueue", "resendData enter battery=" + battery);
+       UserError.Log.d("BgSendQueue", "resendData enter battery=" + battery);
         long startTime = new Date().getTime() - (60000 * 60 * 24);
         Intent messageIntent = new Intent();
         messageIntent.setAction(Intent.ACTION_SEND);
@@ -290,13 +290,13 @@ public class BgSendQueue extends Model {
 
         BgReading last_bg = BgReading.last();
         if (last_bg != null) {
-            Log.d("BgSendQueue", "resendData last_bg.timestamp:" +  JoH.dateTimeText(last_bg.timestamp));
+           UserError.Log.d("BgSendQueue", "resendData last_bg.timestamp:" +  JoH.dateTimeText(last_bg.timestamp));
         }
 
         List<BgReading> graph_bgs = BgReading.latestForGraph(60, startTime);
         BgGraphBuilder bgGraphBuilder = new BgGraphBuilder(context.getApplicationContext());
         if (!graph_bgs.isEmpty()) {
-            Log.d("BgSendQueue", "resendData graph_bgs size=" + graph_bgs.size());
+           UserError.Log.d("BgSendQueue", "resendData graph_bgs size=" + graph_bgs.size());
             final ArrayList<DataMap> dataMaps = new ArrayList<>(graph_bgs.size());
             SharedPreferences sharedPrefs = PreferenceManager.getDefaultSharedPreferences(context.getApplicationContext());
             DataMap entries = dataMap(last_bg, sharedPrefs, bgGraphBuilder, context, battery);
@@ -308,7 +308,7 @@ public class BgSendQueue extends Model {
                 //messageIntent.putExtra("extra_status_line", extraStatusLine(sharedPrefs));
                 entries.putString("extra_status_line", extraStatusLine(sharedPrefs));
             }
-            Log.d("BgSendQueue", "resendData entries=" + entries);
+           UserError.Log.d("BgSendQueue", "resendData entries=" + entries);
             messageIntent.putExtra("data", entries.toBundle());
 
             DataMap stepsDataMap = getSensorSteps(sharedPrefs);
@@ -320,7 +320,7 @@ public class BgSendQueue extends Model {
     }
 
     public static DataMap getSensorSteps(SharedPreferences prefs) {
-        Log.d("BgSendQueue", "getSensorSteps");
+       UserError.Log.d("BgSendQueue", "getSensorSteps");
         DataMap dataMap = new DataMap();
         final long t = System.currentTimeMillis();
         final PebbleMovement pm = PebbleMovement.last();
@@ -328,16 +328,16 @@ public class BgSendQueue extends Model {
         final boolean show_heart_rate = prefs.getBoolean("showHeartRate", true);
         final boolean use_wear_health = prefs.getBoolean("use_wear_health", true);
         if (use_wear_health || show_steps) {
-            boolean sameDay = pm != null ? ListenerService.isSameDay(t, pm.timestamp) : false;
+            boolean sameDay = pm != null && ListenerService.isSameDay(t, pm.timestamp);
             if (!sameDay) {
                 dataMap.putInt("steps", 0);
                 dataMap.putLong("steps_timestamp", t);
-                Log.d("BgSendQueue", "getSensorSteps isSameDay false t=" + JoH.dateTimeText(t));
+               UserError.Log.d("BgSendQueue", "getSensorSteps isSameDay false t=" + JoH.dateTimeText(t));
             }
             else {
                 dataMap.putInt("steps", pm.metric);
                 dataMap.putLong("steps_timestamp", pm.timestamp);
-                Log.d("BgSendQueue", "getSensorSteps isSameDay true pm.timestamp=" + JoH.dateTimeText(pm.timestamp) + " metric=" + pm.metric);
+               UserError.Log.d("BgSendQueue", "getSensorSteps isSameDay true pm.timestamp=" + JoH.dateTimeText(pm.timestamp) + " metric=" + pm.metric);
             }
         }
 
@@ -405,11 +405,7 @@ public class BgSendQueue extends Model {
 
     public static boolean doMgdl(SharedPreferences sPrefs) {
         String unit = sPrefs.getString("units", "mgdl");
-        if (unit.compareTo("mgdl") == 0) {
-            return true;
-        } else {
-            return false;
-        }
+        return unit.compareTo("mgdl") == 0;
     }
     //KS end from WatchUpdaterService
 
@@ -504,10 +500,10 @@ public class BgSendQueue extends Model {
                 //extraline.append("Carbs: " + statsResult.getTotal_carbs());
                 double carbs = statsResult.getTotal_carbs();
                 extraline.append(carbs == -1 ? "" : "Carbs:" + carbs);
-                Log.d("BgSendQueue", "extraStatusLine carbs=" + carbs);
+               UserError.Log.d("BgSendQueue", "extraStatusLine carbs=" + carbs);
             }
             else
-                Log.d("BgSendQueue", "extraStatusLine getTotal_carbs=-1");
+               UserError.Log.d("BgSendQueue", "extraStatusLine getTotal_carbs=-1");
 
             if (prefs.getBoolean("status_line_insulin", false) && prefs.getBoolean("show_wear_treatments", false)) {
                 if (extraline.length() != 0 && extraline.charAt(extraline.length()-1) != ' ') extraline.append(' ');

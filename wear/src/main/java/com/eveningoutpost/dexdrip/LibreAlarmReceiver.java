@@ -72,28 +72,28 @@ public class LibreAlarmReceiver extends BroadcastReceiver {
             converted = 12; // RF error message - might be something else like unconstrained spline
         }
         if (gd.realDate > 0) {
-            //   Log.d(TAG, "Raw debug: " + JoH.dateTimeText(gd.realDate) + " raw: " + gd.glucoseLevelRaw + " converted: " + converted);
+            //  UserError.Log.d(TAG, "Raw debug: " + JoH.dateTimeText(gd.realDate) + " raw: " + gd.glucoseLevelRaw + " converted: " + converted);
             if ((newest_cmp == -1) || (oldest_cmp == -1) || (gd.realDate < oldest_cmp) || (gd.realDate > newest_cmp)) {
                 // if (BgReading.readingNearTimeStamp(gd.realDate) == null) {
                 if ((gd.realDate < oldest) || (oldest == -1)) oldest = gd.realDate;
                 if ((gd.realDate > newest) || (newest == -1)) newest = gd.realDate;
 
                 if (BgReading.getForPreciseTimestamp(gd.realDate, segmentation_timeslice) == null) {
-                    Log.d(TAG, "Creating bgreading at: " + JoH.dateTimeText(gd.realDate));
+                   UserError.Log.d(TAG, "Creating bgreading at: " + JoH.dateTimeText(gd.realDate));
                     BgReading.create(converted, converted, xdrip.getAppContext(), gd.realDate, quick); // quick lite insert
                 } else {
                     if (d)
-                        Log.d(TAG, "Ignoring duplicate timestamp for: " + JoH.dateTimeText(gd.realDate));
+                       UserError.Log.d(TAG, "Ignoring duplicate timestamp for: " + JoH.dateTimeText(gd.realDate));
                 }
             } else {
                 if (d)
-                    Log.d(TAG, "Already processed from date range: " + JoH.dateTimeText(gd.realDate));
+                   UserError.Log.d(TAG, "Already processed from date range: " + JoH.dateTimeText(gd.realDate));
             }
         } else {
-            Log.e(TAG, "Fed a zero or negative date");
+           UserError.Log.e(TAG, "Fed a zero or negative date");
         }
         if (d)
-            Log.d(TAG, "Oldest : " + JoH.dateTimeText(oldest_cmp) + " Newest : " + JoH.dateTimeText(newest_cmp));
+           UserError.Log.d(TAG, "Oldest : " + JoH.dateTimeText(oldest_cmp) + " Newest : " + JoH.dateTimeText(newest_cmp));
     }
 
     @Override
@@ -105,7 +105,7 @@ public class LibreAlarmReceiver extends BroadcastReceiver {
                 synchronized (lock) {
                     try {
 
-                        Log.d(TAG, "LibreReceiver onReceiver: " + intent.getAction());
+                       UserError.Log.d(TAG, "LibreReceiver onReceiver: " + intent.getAction());
                         JoH.benchmark(null);
                         // check source
                         if (prefs == null)
@@ -120,7 +120,7 @@ public class LibreAlarmReceiver extends BroadcastReceiver {
                             for (String key : bundle.keySet()) {
                                 Object value = bundle.get(key);
                                 if (value != null) {
-                                    Log.d(TAG, String.format("%s %s (%s)", key,
+                                   UserError.Log.d(TAG, String.format("%s %s (%s)", key,
                                             value.toString(), value.getClass().getName()));
                                 }
                             }
@@ -136,11 +136,11 @@ public class LibreAlarmReceiver extends BroadcastReceiver {
 
                                 if (bundle == null) break;
 
-                                Log.d(TAG, "Receiving LIBRE_ALARM broadcast");
+                               UserError.Log.d(TAG, "Receiving LIBRE_ALARM broadcast");
 
                                 oldest_cmp = oldest;
                                 newest_cmp = newest;
-                                Log.d(TAG, "At Start: Oldest : " + JoH.dateTimeText(oldest_cmp) + " Newest : " + JoH.dateTimeText(newest_cmp));
+                               UserError.Log.d(TAG, "At Start: Oldest : " + JoH.dateTimeText(oldest_cmp) + " Newest : " + JoH.dateTimeText(newest_cmp));
 
                                 final String data = bundle.getString("data");
                                 final int bridge_battery = bundle.getInt("bridge_battery");
@@ -152,15 +152,15 @@ public class LibreAlarmReceiver extends BroadcastReceiver {
                                     final ReadingData.TransferObject object =
                                             new Gson().fromJson(data, ReadingData.TransferObject.class);
                                     processReadingDataTransferObject(object, JoH.tsl(), "LibreAlarm", false);
-                                    Log.d(TAG, "At End: Oldest : " + JoH.dateTimeText(oldest_cmp) + " Newest : " + JoH.dateTimeText(newest_cmp));
+                                   UserError.Log.d(TAG, "At End: Oldest : " + JoH.dateTimeText(oldest_cmp) + " Newest : " + JoH.dateTimeText(newest_cmp));
                                 } catch (Exception e) {
-                                    Log.wtf(TAG, "Could not process data structure from LibreAlarm: " + e.toString());
+                                   UserError.Log.wtf(TAG, "Could not process data structure from LibreAlarm: " + e.toString());
                                     JoH.static_toast_long("LibreAlarm data format appears incompatible!? protocol changed or no data?");
                                 }
                                 break;
 
                             default:
-                                Log.e(TAG, "Unknown action! " + action);
+                               UserError.Log.e(TAG, "Unknown action! " + action);
                                 break;
                         }
                     } finally {
@@ -193,7 +193,7 @@ public class LibreAlarmReceiver extends BroadcastReceiver {
     	
         // insert any recent data we can
         final List<GlucoseData> mTrend = object.data.trend;
-        if (mTrend != null && mTrend.size() > 0) {
+        if (mTrend != null && !mTrend.isEmpty()) {
             Collections.sort(mTrend);
             final long thisSensorAge = mTrend.get(mTrend.size() - 1).sensorTime;
             sensorAge = Pref.getInt("nfc_sensor_age", 0);
@@ -201,33 +201,33 @@ public class LibreAlarmReceiver extends BroadcastReceiver {
                 sensorAge = thisSensorAge;
                 Pref.setInt("nfc_sensor_age", (int) sensorAge);
                 Pref.setBoolean("nfc_age_problem", false);
-                Log.d(TAG, "Sensor age advanced to: " + thisSensorAge);
+               UserError.Log.d(TAG, "Sensor age advanced to: " + thisSensorAge);
             } else if (thisSensorAge == sensorAge) {
-                Log.wtf(TAG, "Sensor age has not advanced: " + sensorAge);
+               UserError.Log.wtf(TAG, "Sensor age has not advanced: " + sensorAge);
                 JoH.static_toast_long("Sensor clock has not advanced!");
                 Pref.setBoolean("nfc_age_problem", true);
                 return; // do not try to insert again
             } else {
-                Log.wtf(TAG, "Sensor age has gone backwards!!! " + sensorAge);
+               UserError.Log.wtf(TAG, "Sensor age has gone backwards!!! " + sensorAge);
                 JoH.static_toast_long("Sensor age has gone backwards!!");
                 sensorAge = thisSensorAge;
                 Pref.setInt("nfc_sensor_age", (int) sensorAge);
                 Pref.setBoolean("nfc_age_problem", true);
             }
             if (d)
-                Log.d(TAG, "Oldest cmp: " + JoH.dateTimeText(oldest_cmp) + " Newest cmp: " + JoH.dateTimeText(newest_cmp));
+               UserError.Log.d(TAG, "Oldest cmp: " + JoH.dateTimeText(oldest_cmp) + " Newest cmp: " + JoH.dateTimeText(newest_cmp));
             long shiftx = 0;
-            if (mTrend.size() > 0) {
+            if (!mTrend.isEmpty()) {
 
                 shiftx = getTimeShift(mTrend);
-                if (shiftx != 0) Log.d(TAG, "Lag Timeshift: " + shiftx);
+                if (shiftx != 0)UserError.Log.d(TAG, "Lag Timeshift: " + shiftx);
                 //applyTimeShift(mTrend, shiftx);
 
                 for (GlucoseData gd : mTrend) {
-                    if (d) Log.d(TAG, "DEBUG: sensor time: " + gd.sensorTime);
+                    if (d)UserError.Log.d(TAG, "DEBUG: sensor time: " + gd.sensorTime);
                     if ((timeShiftNearest > 0) && ((timeShiftNearest - gd.realDate) < segmentation_timeslice) && (timeShiftNearest - gd.realDate != 0)) {
                         if (d)
-                            Log.d(TAG, "Skipping record due to closeness: " + JoH.dateTimeText(gd.realDate));
+                           UserError.Log.d(TAG, "Skipping record due to closeness: " + JoH.dateTimeText(gd.realDate));
                         continue;
                     }
                     if (use_raw) {
@@ -237,7 +237,7 @@ public class LibreAlarmReceiver extends BroadcastReceiver {
                     }
                 }
             } else {
-                Log.e(TAG, "Trend data was empty!");
+               UserError.Log.e(TAG, "Trend data was empty!");
             }
 
             // munge and insert the history data if any is missing
@@ -249,7 +249,7 @@ public class LibreAlarmReceiver extends BroadcastReceiver {
                 final List<Double> polyyList = new ArrayList<>();
                 for (GlucoseData gd : mHistory) {
                     if (d)
-                        Log.d(TAG, "history : " + JoH.dateTimeText(gd.realDate) + " " + gd.glucose(false));
+                       UserError.Log.d(TAG, "history : " + JoH.dateTimeText(gd.realDate) + " " + gd.glucose(false));
                     polyxList.add((double) gd.realDate);
                     if (use_raw) {
                         polyyList.add((double) gd.glucoseLevelRaw);
@@ -277,7 +277,7 @@ public class LibreAlarmReceiver extends BroadcastReceiver {
     
                         for (long ptime = startTime; ptime <= endTime; ptime += 300000) {
                             if (d)
-                                Log.d(TAG, "Spline: " + JoH.dateTimeText((long) ptime) + " value: " + (int) polySplineF.value(ptime));
+                               UserError.Log.d(TAG, "Spline: " + JoH.dateTimeText((long) ptime) + " value: " + (int) polySplineF.value(ptime));
                             if (use_raw) {
                                 createBGfromGD(new GlucoseData((int) polySplineF.value(ptime), ptime), true);
                             } else {
@@ -285,15 +285,15 @@ public class LibreAlarmReceiver extends BroadcastReceiver {
                             }
                         }
                     } catch (org.apache.commons.math3.exception.NonMonotonicSequenceException e) {
-                        Log.e(TAG, "NonMonotonicSequenceException: " + e);
+                       UserError.Log.e(TAG, "NonMonotonicSequenceException: " + e);
                     }
                 }
 
             } else {
-                Log.e(TAG, "no librealarm history data");
+               UserError.Log.e(TAG, "no librealarm history data");
             }
         } else {
-            Log.d(TAG, "Trend data is null!");
+           UserError.Log.d(TAG, "Trend data is null!");
         }
     }
 

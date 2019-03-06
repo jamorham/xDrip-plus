@@ -1,5 +1,6 @@
 package com.eveningoutpost.dexdrip.importedLibraries.dexcom.records;
 
+import com.eveningoutpost.dexdrip.models.*;
 import com.eveningoutpost.dexdrip.models.UserError.Log;
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
@@ -32,14 +33,14 @@ public class CalRecord extends GenericTimestampRecord {
         long displayTimeOffset = (getDisplayTime().getTime() - getSystemTime().getTime()) / (1000);
         int start = 44;
         for (int i = 0; i < numRecords; i++) {
-            Log.d("CalDebug","Loop #"+i);
+            UserError.Log.i("CalDebug","Loop #"+i);
             byte[] temp = new byte[SUB_LEN];
             System.arraycopy(packet, start, temp, 0, temp.length);
             calSubrecords[i] = new CalSubrecord(temp, displayTimeOffset);
             start += SUB_LEN;
         }
 
-        Log.d("ShareTest", "slope: " + slope + " intercept: " + intercept);
+        UserError.Log.i("ShareTest", "slope: " + slope + " intercept: " + intercept);
     }
 
     public double getSlope() {

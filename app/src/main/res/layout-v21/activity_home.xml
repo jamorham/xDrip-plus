@@ -47,7 +47,7 @@
 
                 android:layout_height="wrap_content"
                 android:minHeight="?attr/actionBarSize"
-                app:theme="@style/Toolbar" />
+                android:theme="@style/Toolbar" />
 
             <RelativeLayout
                 android:id="@+id/home_layout_holder"

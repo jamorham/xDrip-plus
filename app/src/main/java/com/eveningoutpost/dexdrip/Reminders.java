@@ -121,7 +121,7 @@ public class Reminders extends ActivityWithRecycler implements SensorEventListen
         processIncomingBundle(bundle);
 
 
-        if (reminders.size() == 0) {
+        if (reminders.isEmpty()) {
             //JoH.static_toast_long("No reminders yet, add one!"); // replace with showcase?
             showcase(this, Home.SHOWCASE_REMINDER1);
         }
@@ -185,7 +185,7 @@ public class Reminders extends ActivityWithRecycler implements SensorEventListen
         PowerManager.WakeLock wl = JoH.getWakeLock("reminders-onresume", 15000);
         super.onResume();
         if (JoH.ratelimit("proximity-reset", 5)) {
-            Log.d(TAG, "Initializing proximity as true");
+            UserError.Log.i(TAG, "Initializing proximity as true");
             proximity = true; // default to near
         }
         proximity_events = 0;
@@ -198,15 +198,15 @@ public class Reminders extends ActivityWithRecycler implements SensorEventListen
     @Override
     protected void onPause() {
         super.onPause();
-        Log.d(TAG, "onPause");
+        UserError.Log.i(TAG, "onPause");
         final SensorEventListener activity = this;
 
         JoH.runOnUiThreadDelayed(() -> {
-            Log.d(TAG, "Unregistering proximity sensor listener");
+            UserError.Log.i(TAG, "Unregistering proximity sensor listener");
             try {
                 mSensorManager.unregisterListener(activity);
             } catch (Exception e) {
-                Log.d(TAG, "Error unregistering proximity listener: " + e);
+                UserError.Log.i(TAG, "Error unregistering proximity listener: " + e);
             }
         }, 10000);
     }
@@ -216,13 +216,11 @@ public class Reminders extends ActivityWithRecycler implements SensorEventListen
         if (event.sensor.getType() == Sensor.TYPE_PROXIMITY) {
             proximity_events++;
             if (proximity_events < 20)
-                Log.d(TAG, "Sensor: " + event.values[0] + " " + mProximity.getMaximumRange());
-            if (event.values[0] <= (Math.min(mProximity.getMaximumRange() / 2, 10))) {
-                proximity = true; // near
-            } else {
-                proximity = false; // far
-            }
-            if (proximity_events < 20) Log.d(TAG, "Proxmity set to: " + proximity);
+                UserError.Log.i(TAG, "Sensor: " + event.values[0] + " " + mProximity.getMaximumRange());
+            // near
+// far
+            proximity = event.values[0] <= (Math.min(mProximity.getMaximumRange() / 2, 10));
+            if (proximity_events < 20) UserError.Log.i(TAG, "Proxmity set to: " + proximity);
         }
     }
 
@@ -258,7 +256,7 @@ public class Reminders extends ActivityWithRecycler implements SensorEventListen
     public class RecyclerAdapter extends ActivityWithRecycler.RecyclerAdapater {
 
         public RecyclerAdapter(Context ctx, List<Reminder> reminderList) {
-            Log.d(TAG, "New adapter, size: " + reminderList.size());
+            UserError.Log.i(TAG, "New adapter, size: " + reminderList.size());
         }
 
         @Override
@@ -534,7 +532,7 @@ public class Reminders extends ActivityWithRecycler implements SensorEventListen
 
     public void snoozeAdjust(View v) {
         final String button_text = ((Button) v).getTag().toString(); //changed String to Tag, to make the texts translateable
-        Log.d(TAG, "Snooze adjust button: " + button_text);
+        UserError.Log.i(TAG, "Snooze adjust button: " + button_text);
         long multiplier = Constants.MINUTE_IN_MS;
         final String[] button_textA = button_text.split(" ");
         switch (button_textA[1].toLowerCase()) {
@@ -554,7 +552,7 @@ public class Reminders extends ActivityWithRecycler implements SensorEventListen
                 break;
         }
         final long snooze_adjust = Integer.parseInt(button_textA[0]) * multiplier;
-        Log.d(TAG, "Snoozed adjust button result: " + snooze_adjust);
+        UserError.Log.i(TAG, "Snoozed adjust button result: " + snooze_adjust);
         dismissItem(last_swiped);
         snoozeReminder(last_swiped, snooze_adjust);
         reinject(last_swiped);
@@ -612,7 +610,7 @@ public class Reminders extends ActivityWithRecycler implements SensorEventListen
                 mAdapter.notifyItemRemoved(reminders.indexOf(reminder));
                 reminders.remove(reminder);
             } catch (Exception e) {
-                Log.d(TAG, "Dismiss item: " + e);
+                UserError.Log.i(TAG, "Dismiss item: " + e);
             }
         }
     }
@@ -628,7 +626,7 @@ public class Reminders extends ActivityWithRecycler implements SensorEventListen
                     }
                 }
             } catch (Exception e) {
-                Log.d(TAG, "DismissDoppelganger item: " + e);
+                UserError.Log.i(TAG, "DismissDoppelganger item: " + e);
             }
         }
     }
@@ -642,7 +640,7 @@ public class Reminders extends ActivityWithRecycler implements SensorEventListen
         if (reminder == null) return;
         final int i = reinjectionPosition(reminder);
         // TODO lock?
-        Log.d(TAG, "child Reinjection position: " + i);
+        UserError.Log.i(TAG, "child Reinjection position: " + i);
         reminders.add(i, reminder);
         mAdapter.notifyItemInserted(i);
         final AtomicBoolean corrected = new AtomicBoolean();
@@ -656,14 +654,14 @@ public class Reminders extends ActivityWithRecycler implements SensorEventListen
             }
         });
         if (highlighted < 2) {
-            Log.d(TAG, "Reinjection: scrolling to: " + i);
+            UserError.Log.i(TAG, "Reinjection: scrolling to: " + i);
             recyclerView.smoothScrollToPosition(i);
             JoH.runOnUiThreadDelayed(() -> {
                 // failsafe
                 correctiveScrolling(i, corrected);
             }, 1000);
         } else {
-            Log.d(TAG, "Not scrolling due to highlighted: " + highlighted);
+            UserError.Log.i(TAG, "Not scrolling due to highlighted: " + highlighted);
         }
     }
 
@@ -683,7 +681,7 @@ public class Reminders extends ActivityWithRecycler implements SensorEventListen
                         // is obscured
                         final float difference = lowest_point - floaterY;
                         //  int scrollto = i+((int)difference)+1;
-                        Log.d(TAG, "Corrective Scrolling by: " + (int) difference);
+                        UserError.Log.i(TAG, "Corrective Scrolling by: " + (int) difference);
                         // TODO wrap with speed adjustment
                         recyclerView.smoothScrollBy(0, (int) difference);
                     }
@@ -712,7 +710,7 @@ public class Reminders extends ActivityWithRecycler implements SensorEventListen
                 }
             }
             if (!reminder.enabled) {
-                Log.d(TAG, "Returning reinjection max_count+1 due to non enabled");
+                UserError.Log.i(TAG, "Returning reinjection max_count+1 due to non enabled");
                 return max_count + 1;
             }
         }
@@ -854,7 +852,7 @@ public class Reminders extends ActivityWithRecycler implements SensorEventListen
         //dialogBuilder.setMessage("Enter text below");
         dialogBuilder.setPositiveButton("Done", (dialog, whichButton) -> {
             String reminder_title = titleEditText.getText().toString().trim();
-            Log.d(TAG, "Got reminder title: " + reminder_title);
+            UserError.Log.i(TAG, "Got reminder title: " + reminder_title);
             // get and scale period
             long period = getPeriod(rbday, rbhour, rbweek);
 
@@ -982,16 +980,16 @@ public class Reminders extends ActivityWithRecycler implements SensorEventListen
             UserError.Log.uel(TAG, "Not alerting due to ongoing call");
             return;
         }
-        Log.d(TAG, "Scheduling alert reminder in 10 seconds time");
+        UserError.Log.i(TAG, "Scheduling alert reminder in 10 seconds time");
         // avoid conflicts with other notification alerts in first 10 seconds
 
         JoH.runOnUiThreadDelayed(() -> {
-            Log.d(TAG, "delayed wakeup firing");
+            UserError.Log.i(TAG, "delayed wakeup firing");
             startReminderWithExtra(REMINDER_WAKEUP, reminder.getId().toString());
         }, 9000);
 
         JoH.runOnUiThreadDelayed(() -> {
-            Log.d(TAG, "delayed alert firing");
+            UserError.Log.i(TAG, "delayed alert firing");
             final Intent notificationIntent = new Intent(xdrip.getAppContext(), Reminders.class).putExtra("reminder_id", reminder.getId().toString());
             final Intent notificationDeleteIntent = new Intent(xdrip.getAppContext(), Reminders.class).putExtra("snooze_id", reminder.getId()).putExtra("snooze", "true");
             final PendingIntent deleteIntent = PendingIntent.getActivity(xdrip.getAppContext(), NOTIFICATION_ID + 1, notificationDeleteIntent, 0);
@@ -1009,7 +1007,7 @@ public class Reminders extends ActivityWithRecycler implements SensorEventListen
 
     public static void cancelAlert() {
         JoH.runOnUiThreadDelayed(() -> {
-            Log.d(TAG, "Cancelling notification");
+            UserError.Log.i(TAG, "Cancelling notification");
             JoH.cancelNotification(NOTIFICATION_ID);
         }, 500);
     }
@@ -1068,7 +1066,7 @@ public class Reminders extends ActivityWithRecycler implements SensorEventListen
     }
 
     private void setFloaterText(String msg) {
-        Log.d(TAG, "Setting floater text:" + msg);
+        UserError.Log.i(TAG, "Setting floater text:" + msg);
         floaterText.setText(msg);
     }
 
@@ -1100,7 +1098,7 @@ public class Reminders extends ActivityWithRecycler implements SensorEventListen
                 for (String key : bundle.keySet()) {
                     Object value = bundle.get(key);
                     if (value != null) {
-                        Log.d(TAG, String.format("Bundle: %s %s (%s)", key,
+                        UserError.Log.i(TAG, String.format("Bundle: %s %s (%s)", key,
                                 value.toString(), value.getClass().getName()));
                     }
                 }
@@ -1108,7 +1106,7 @@ public class Reminders extends ActivityWithRecycler implements SensorEventListen
 
             if (bundle.getString("snooze") != null) {
                 long id = bundle.getLong("snooze_id");
-                Log.d(TAG, "Reminder id for snooze: " + id);
+                UserError.Log.i(TAG, "Reminder id for snooze: " + id);
                 final Reminder reminder = Reminder.byid(id);
                 if (reminder != null) {
                     final long snooze_time = reminder.last_snoozed_for > 0 ? reminder.last_snoozed_for : default_snooze;
@@ -1119,7 +1117,7 @@ public class Reminders extends ActivityWithRecycler implements SensorEventListen
                     hideKeyboard(recyclerView);
                 }
             } else {
-                Log.d(TAG, "Processing non null default bundle");
+                UserError.Log.i(TAG, "Processing non null default bundle");
                 reloadList();
                 hideSnoozeFloater();
                 hideKeyboard(recyclerView);
@@ -1128,10 +1126,10 @@ public class Reminders extends ActivityWithRecycler implements SensorEventListen
                     try {
                         recyclerView.smoothScrollToPosition(getPositionFromReminderId(Integer.parseInt(bundle.getString(REMINDER_WAKEUP))));
                     } catch (IllegalArgumentException e) {
-                        Log.e(TAG, "Couldn't scroll to position");
+                        UserError.Log.e(TAG, "Couldn't scroll to position");
                     }
                     JoH.runOnUiThreadDelayed(() -> {
-                        Log.d(TAG, "Checking for sensor: " + proximity);
+                        UserError.Log.i(TAG, "Checking for sensor: " + proximity);
                         if (!proximity) {
                             wakeUpScreen(true);
                         }
@@ -1154,7 +1152,7 @@ public class Reminders extends ActivityWithRecycler implements SensorEventListen
             final int timeout = 60000;
             final int wakeUpFlags;
 
-            Log.d(TAG, "Wake up screen called with unlock = " + unlock);
+            UserError.Log.i(TAG, "Wake up screen called with unlock = " + unlock);
 
             if (unlock) {
                 wakeUpFlags = WindowManager.LayoutParams.FLAG_SHOW_WHEN_LOCKED |
@@ -1184,7 +1182,7 @@ public class Reminders extends ActivityWithRecycler implements SensorEventListen
                 }
             }, timeout);
         } else {
-            Log.d(TAG, "Screen is already on so not turning on");
+            UserError.Log.i(TAG, "Screen is already on so not turning on");
         }
     }
 

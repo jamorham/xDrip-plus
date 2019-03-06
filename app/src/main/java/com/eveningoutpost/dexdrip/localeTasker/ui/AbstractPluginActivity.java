@@ -22,6 +22,7 @@ import androidx.appcompat.app.*;
 
 import com.eveningoutpost.dexdrip.*;
 import com.eveningoutpost.dexdrip.localeTasker.Constants;
+import com.eveningoutpost.dexdrip.models.*;
 import com.twofortyfouram.locale.*;
 
 /**
@@ -62,7 +63,7 @@ public abstract class AbstractPluginActivity extends AppCompatActivity
         {
             if (Constants.IS_LOGGABLE)
             {
-                Log.e(Constants.LOG_TAG, "Calling package couldn't be found", e); //$NON-NLS-1$
+                UserError.Log.e(Constants.LOG_TAG, "Calling package couldn't be found", e); //$NON-NLS-1$
             }
         }
         if (null != callingApplicationLabel)
@@ -119,7 +120,7 @@ public abstract class AbstractPluginActivity extends AppCompatActivity
         {
             if (Constants.IS_LOGGABLE)
             {
-                Log.w(Constants.LOG_TAG, "An error occurred loading the host's icon", e); //$NON-NLS-1$
+                UserError.Log.w(Constants.LOG_TAG, "An error occurred loading the host's icon", e); //$NON-NLS-1$
             }
         }
     }

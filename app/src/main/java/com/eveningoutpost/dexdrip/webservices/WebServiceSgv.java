@@ -146,7 +146,7 @@ public class WebServiceSgv extends BaseWebService {
                     }
 
                     // emit the external status line once if present
-                    if (external_status_line.length() > 0) {
+                    if (!external_status_line.isEmpty()) {
                         item.put("aaps", external_status_line);
                         item.put("aaps-ts", getLastStatusLineTime());
                         external_status_line = "";
@@ -187,7 +187,7 @@ public class WebServiceSgv extends BaseWebService {
                     reply.put(item);
                 }
 
-                Log.d(TAG, "Output: " + reply.toString());
+                UserError.Log.i(TAG, "Output: " + reply.toString());
             } catch (JSONException e) {
                 UserError.Log.wtf(TAG, "Got json exception: " + e);
             }

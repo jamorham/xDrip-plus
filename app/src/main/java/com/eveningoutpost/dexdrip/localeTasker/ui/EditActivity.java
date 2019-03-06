@@ -62,7 +62,7 @@ public final class EditActivity extends AbstractPluginActivity
             {
                 String message =
                         localeBundle.getString(PluginBundleManager.BUNDLE_EXTRA_STRING_MESSAGE);
-                if (message.length()==0) {
+                if (message.isEmpty()) {
                     message = "%par1"; // First tasker parameter
                 }
                 ((EditText) findViewById(R.id.editTextTasker)).setText(message);
@@ -81,7 +81,7 @@ public final class EditActivity extends AbstractPluginActivity
         {
             final String message = ((EditText) findViewById(R.id.editTextTasker)).getText().toString();
 
-            if (message.length() > 0)
+            if (!message.isEmpty())
             {
                 final Intent resultIntent = new Intent();
 

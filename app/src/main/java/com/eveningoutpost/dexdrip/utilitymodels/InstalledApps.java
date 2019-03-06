@@ -34,7 +34,7 @@ public class InstalledApps {
         } catch (PackageManager.NameNotFoundException e) {
             return false;
         } catch (Exception e) {
-            Log.wtf(TAG, "Exception trying to determine packages! " + e);
+            UserError.Log.wtf(TAG, "Exception trying to determine packages! " + e);
             return false;
         }
     }

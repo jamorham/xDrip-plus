@@ -33,7 +33,7 @@ public class SdcardImportExport extends BaseActivity {
     //private static Activity activity;
     public static boolean deleteFolder(File path, boolean recursion) {
         try {
-            Log.d(TAG, "deleteFolder called with: " + path.toString());
+            UserError.Log.i(TAG, "deleteFolder called with: " + path.toString());
             if (path.exists()) {
                 File[] files = path.listFiles();
                 if (files == null) {
@@ -43,14 +43,14 @@ public class SdcardImportExport extends BaseActivity {
                     if ((recursion) && (file.isDirectory())) {
                         deleteFolder(file, recursion);
                     } else {
-                        Log.d(TAG, "Calling delete for file: " + file.getName());
+                        UserError.Log.i(TAG, "Calling delete for file: " + file.getName());
                         file.delete();
                     }
                 }
             }
             return (path.delete());
         } catch (Exception e) {
-            Log.e(TAG, "Got exception in delete: " + e.toString());
+            UserError.Log.e(TAG, "Got exception in delete: " + e.toString());
             return false;
         }
     }
@@ -119,9 +119,9 @@ public class SdcardImportExport extends BaseActivity {
         final String[] filenames = gmsfiles.split(",");
         for (String filename : filenames) {
             if (deleteFolder(new File(context.getFilesDir().getParent() + "/" + filename), false)) {
-                Log.d(TAG, "Successfully deleted: " + filename);
+                UserError.Log.i(TAG, "Successfully deleted: " + filename);
             } else {
-                Log.e(TAG, "Error deleting: " + filename);
+                UserError.Log.e(TAG, "Error deleting: " + filename);
             }
         }
         hardReset();
@@ -130,9 +130,9 @@ public class SdcardImportExport extends BaseActivity {
     public static void deletePersistentStore() {
         final String filename = "shared_prefs/persist_internal_store.xml";
         if (deleteFolder(new File(xdrip.getAppContext().getFilesDir().getParent() + "/" + filename), false)) {
-            Log.d(TAG, "Successfully deleted: " + filename);
+            UserError.Log.i(TAG, "Successfully deleted: " + filename);
         } else {
-            Log.e(TAG, "Error deleting: " + filename);
+            UserError.Log.e(TAG, "Error deleting: " + filename);
         }
         hardReset();
     }
@@ -149,10 +149,10 @@ public class SdcardImportExport extends BaseActivity {
 
     public static void storePreferencesFromBytes(byte[] bytes, Context context) {
         if (dataFromBytes(bytes, PREFERENCES_FILE, context)) {
-            Log.i(TAG, "Restarting as new preferences loaded from bytes");
+            UserError.Log.i(TAG, "Restarting as new preferences loaded from bytes");
             hardReset();
         } else {
-            Log.e(TAG, "Failed to write preferences from bytes");
+            UserError.Log.e(TAG, "Failed to write preferences from bytes");
         }
     }
 
@@ -215,7 +215,7 @@ public class SdcardImportExport extends BaseActivity {
         try {
             return directReadFile(source_file);
         } catch (Exception e) {
-            Log.e(TAG, "Got exception in datatoBytes: " + e.toString());
+            UserError.Log.e(TAG, "Got exception in datatoBytes: " + e.toString());
             return null;
         }
     }
@@ -229,11 +229,11 @@ public class SdcardImportExport extends BaseActivity {
             File dest_file = new File(path, source_file.getName());
 
             if (directCopyFile(source_file, dest_file)) {
-                Log.i(TAG, "Copied success: " + filename);
+                UserError.Log.i(TAG, "Copied success: " + filename);
                 return true;
             }
         } catch (Exception e) {
-            Log.e(TAG, "Error making directory: " + path);
+            UserError.Log.e(TAG, "Error making directory: " + path);
             return false;
         }
         return false;
@@ -243,7 +243,7 @@ public class SdcardImportExport extends BaseActivity {
     public static boolean handleBackup(final AppCompatActivity activity) {
         final List<String> results = findAnyBackups(activity);
         if (!backupDismissed && (results != null) && (!results.isEmpty())) {
-            Log.e(TAG, "Found: " + results.size() + " backup files");
+            UserError.Log.e(TAG, "Found: " + results.size() + " backup files");
 
             final AlertDialog.Builder builder = new androidx.appcompat.app.AlertDialog.Builder(activity);
             builder.setTitle(gs(R.string.backup_detected));
@@ -277,7 +277,7 @@ public class SdcardImportExport extends BaseActivity {
         if ((results != null) && (!results.isEmpty())) {
             JoH.static_toast_long("Restoring Settings");
             if (copyPreferencesFileBack(activity, results.get(0))) {
-                Log.e(TAG, "Restoring preferences succeeded from first match: " + results.get(0));
+                UserError.Log.e(TAG, "Restoring preferences succeeded from first match: " + results.get(0));
                 hardReset();
             } else {
                 JoH.static_toast_long("Couldn't restore preferences from: " + results.get(0));
@@ -307,7 +307,7 @@ public class SdcardImportExport extends BaseActivity {
 
     public static List<String> listAllDirectories(String path, int depth) {
         final ArrayList<String> results = new ArrayList<>();
-        Log.d(TAG, "Processing scan for directory: " + path + " depth: " + depth);
+        UserError.Log.i(TAG, "Processing scan for directory: " + path + " depth: " + depth);
         try {
             final File[] files = new File(path).listFiles();
             depth--;
@@ -322,7 +322,7 @@ public class SdcardImportExport extends BaseActivity {
                 }
             }
         } catch (Exception e) {
-            Log.d(TAG, "Got exception walking directories: " + e);
+            UserError.Log.i(TAG, "Got exception walking directories: " + e);
         }
         return results;
     }
@@ -335,15 +335,15 @@ public class SdcardImportExport extends BaseActivity {
             try {
                 dest_file.mkdirs();
                 if (directCopyFile(source_file, dest_file)) {
-                    Log.i(TAG, "Copied success: " + source_filename);
+                    UserError.Log.i(TAG, "Copied success: " + source_filename);
                     return true;
                 }
             } catch (Exception e) {
-                Log.e(TAG, "Error making directory: " + dest_file.toString());
+                UserError.Log.e(TAG, "Error making directory: " + dest_file.toString());
                 return false;
             }
         } else {
-            Log.e(TAG, "Weirdly " + source_filename + " doesn't seem to exist or failed to copy somehow! " + dest_file.getAbsolutePath());
+            UserError.Log.e(TAG, "Weirdly " + source_filename + " doesn't seem to exist or failed to copy somehow! " + dest_file.getAbsolutePath());
         }
         return false;
     }
@@ -353,7 +353,7 @@ public class SdcardImportExport extends BaseActivity {
         File dest_file = new File(getFilesDir().getParent() + "/" + filename);
         File source_file = new File(getCustomSDcardpath() + "/" + dest_file.getName());
         File source_file_xdrip = new File(getxDripCustomSDcardpath() + "/" + dest_file.getName());
-        Log.d(TAG, source_file.toString() + " or " + source_file_xdrip.toString() + " to: " + dest_file.toString());
+        UserError.Log.i(TAG, source_file.toString() + " or " + source_file_xdrip.toString() + " to: " + dest_file.toString());
 
 
         if (source_file.exists() && source_file_xdrip.exists()) {
@@ -367,18 +367,18 @@ public class SdcardImportExport extends BaseActivity {
         try {
             dest_file.mkdirs();
             if (directCopyFile(source_file, dest_file)) {
-                Log.i(TAG, "Copied success: " + filename);
+                UserError.Log.i(TAG, "Copied success: " + filename);
                 return true;
             }
         } catch (Exception e) {
-            Log.e(TAG, "Error making directory: " + dest_file.toString());
+            UserError.Log.e(TAG, "Error making directory: " + dest_file.toString());
             return false;
         }
         return false;
     }
 
     private static boolean directCopyFile(File source_filename, File dest_filename) {
-        Log.i(TAG, "Attempt to copy: " + source_filename.toString() + " to " + dest_filename.toString());
+        UserError.Log.i(TAG, "Attempt to copy: " + source_filename.toString() + " to " + dest_filename.toString());
         try {
             final InputStream in = new FileInputStream(source_filename);
             final OutputStream out = new FileOutputStream(dest_filename);
@@ -392,30 +392,30 @@ public class SdcardImportExport extends BaseActivity {
             out.close();
             return true;
         } catch (Exception e) {
-            Log.e(TAG, e.getMessage());
+            UserError.Log.e(TAG, e.getMessage());
         }
         return false;
     }
 
     private static byte[] directReadFile(File source_filename) {
-        Log.i(TAG, "Attempt to read: " + source_filename.toString());
+        UserError.Log.i(TAG, "Attempt to read: " + source_filename.toString());
         InputStream in;
         try {
             in = new FileInputStream(source_filename);
             byte[] buffer = new byte[(int) source_filename.length()];
             in.read(buffer);
             in.close();
-            Log.d(TAG, "Read file size: " + buffer.length);
+            UserError.Log.i(TAG, "Read file size: " + buffer.length);
             return buffer;
         } catch (Exception e) {
-            Log.e(TAG, e.getMessage());
+            UserError.Log.e(TAG, e.getMessage());
         }
         return null;
     }
 
     private static boolean dataFromBytes(byte[] bytes, String filename, Context context) {
         if ((bytes == null) || (bytes.length == 0)) {
-            Log.e(TAG, "Got zero bytes in datafrom bytes");
+            UserError.Log.e(TAG, "Got zero bytes in datafrom bytes");
             return false;
         }
         File dest_file = new File(context.getFilesDir().getParent() + "/" + filename);
@@ -426,7 +426,7 @@ public class SdcardImportExport extends BaseActivity {
             out.close();
             return true;
         } catch (Exception e) {
-            Log.e(TAG, "Error writing file: " + dest_file.toString() + " " + e.toString());
+            UserError.Log.e(TAG, "Error writing file: " + dest_file.toString() + " " + e.toString());
             return false;
         }
     }
@@ -435,9 +435,9 @@ public class SdcardImportExport extends BaseActivity {
     private void toast(String msg) {
         try {
             Toast.makeText(getApplicationContext(), msg, Toast.LENGTH_SHORT).show();
-            Log.d(TAG, "Toast msg: " + msg);
+            UserError.Log.i(TAG, "Toast msg: " + msg);
         } catch (Exception e) {
-            Log.e(TAG, "Couldn't display toast: " + msg);
+            UserError.Log.e(TAG, "Couldn't display toast: " + msg);
         }
     }
 

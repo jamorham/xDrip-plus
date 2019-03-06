@@ -170,7 +170,7 @@ public class Mimeograph {
                 state = COPY_COLLISION_KEY;
             } else if (line.startsWith(deviceHunt)) {
                 state = COPY_DEVICE_KEY;
-            } else if (line.length() == 0) {
+            } else if (line.isEmpty()) {
                 state = SCAN;
             }
             switch (state) {
@@ -231,7 +231,7 @@ public class Mimeograph {
             } else if (line.startsWith(deviceArray[0])) {
                 state = INJECT_DEVICE_KEY;
                 processedSections++;
-            } else if (line.length() == 0) {
+            } else if (line.isEmpty()) {
                 state = COPY_SCAN;
             }
             switch (state) {
@@ -319,7 +319,7 @@ public class Mimeograph {
     }
 
     private synchronized static void add(final String aLine, final StringBuilder output) {
-        if (aLine.length() != 0 || lastWrite.length() != 0) {
+        if (!aLine.isEmpty() || !lastWrite.isEmpty()) {
             output.append(aLine);
             output.append("\n");
             lastWrite = aLine;

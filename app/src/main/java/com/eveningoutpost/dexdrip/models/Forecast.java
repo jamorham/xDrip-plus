@@ -56,7 +56,7 @@ public class Forecast {
             ols.newSampleData(y, xData); // provide the data to the model
             coef = MatrixUtils.createColumnRealMatrix(ols.estimateRegressionParameters()); // get our coefs
             last_error_rate = ols.estimateErrorVariance();
-            Log.d(TAG, getClass().getSimpleName() + " Forecast Error rate: errorvar:"
+            UserError.Log.i(TAG, getClass().getSimpleName() + " Forecast Error rate: errorvar:"
                     + JoH.qs(last_error_rate, 4)
                     + " regssionvar:" + JoH.qs(ols.estimateRegressandVariance(), 4)
                     + "  stderror:" + JoH.qs(ols.estimateRegressionStandardError(), 4));

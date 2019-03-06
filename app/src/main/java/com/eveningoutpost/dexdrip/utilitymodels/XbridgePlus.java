@@ -55,8 +55,8 @@ public class XbridgePlus {
     public static boolean isXbridgePacket(byte[] buffer) {
         if (((buffer.length > 1) && (buffer[0] == 0x07 || buffer[0] == 0x11 || buffer[0] == 0x15))) {
             if (buffer[0] == 0x07 && buffer[1] == -15) return true; // beacon
-            if (((buffer[0] == 0x11 || buffer[0] == 0x15) && buffer[1] == 0x00) && buffer.length >= 0x11)
-                return true; // data or buffered data
+	        // data or buffered data
+	        return ((buffer[0] == 0x11 || buffer[0] == 0x15) && buffer[1] == 0x00) && buffer.length >= 0x11;
         }
         return false;
     }

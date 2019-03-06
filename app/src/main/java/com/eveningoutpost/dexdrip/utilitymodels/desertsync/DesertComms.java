@@ -63,7 +63,7 @@ public class DesertComms {
     public static boolean pushToOasis(String topic, String sender, String payload) {
         if (Home.get_follower()) {
             final String oasisIP = getOasisIP();
-            if (oasisIP.length() == 0) return false;
+            if (oasisIP.isEmpty()) return false;
 
             final String url = HttpUrl.parse(getInitialUrl(oasisIP)).newBuilder()
                     .addPathSegment("sync").addPathSegment("push")
@@ -94,7 +94,7 @@ public class DesertComms {
 
     public static boolean pullFromOasis(final String topic, final long since) {
         final String oasisIP = getOasisIP();
-        if (oasisIP.length() == 0) return false;
+        if (oasisIP.isEmpty()) return false;
         try {
             final String url = HttpUrl.parse(getInitialUrl(oasisIP)).newBuilder().addPathSegment("sync").addPathSegment("pull")
                     .addPathSegment("" + since)
@@ -170,14 +170,14 @@ public class DesertComms {
 
         // TODO we should probably do this in parallel for prospective followers
         new Thread(() -> {
-            if (queue.size() == 0) return;
+            if (queue.isEmpty()) return;
             final PowerManager.WakeLock wl = getWakeLock("DesertComms send", 60000);
             UserError.Log.d(TAG, "Queue size: " + queue.size());
             try {
                 final String result = httpNext();
                 //UserError.Log.d(TAG, "Result: " + result);
                 checkCommsFailures(result == null);
-                if (((result != null) && queue.size() > 0) || Home.get_master()) {
+                if (((result != null) && !queue.isEmpty()) || Home.get_master()) {
                     runInBackground();
                 }
             } finally {

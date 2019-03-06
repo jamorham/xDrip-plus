@@ -20,6 +20,7 @@ import android.util.*;
 import android.view.*;
 import android.widget.*;
 
+import androidx.annotation.NonNull;
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.*;
 import androidx.appcompat.widget.Toolbar;
@@ -29,6 +30,7 @@ import androidx.drawerlayout.widget.*;
 import androidx.localbroadcastmanager.content.*;
 
 import com.crashlytics.android.*;
+import com.eveningoutpost.dexdrip.databinding.*;
 import com.eveningoutpost.dexdrip.g5Model.*;
 import com.eveningoutpost.dexdrip.importedLibraries.dexcom.*;
 import com.eveningoutpost.dexdrip.importedLibraries.usbserial.util.*;
@@ -60,13 +62,13 @@ import java.text.ParseException;
 import java.text.*;
 import java.util.*;
 
-import javax.inject.*;
+import javax.inject.Inject;
 
 import lecho.lib.hellocharts.gesture.*;
 import lecho.lib.hellocharts.listener.*;
 import lecho.lib.hellocharts.model.*;
 import lecho.lib.hellocharts.view.*;
-import lombok.*;
+import lombok.Getter;
 
 import static android.Manifest.permission.*;
 import static com.eveningoutpost.dexdrip.utilitymodels.ColorCache.*;
@@ -179,8 +181,8 @@ public class Home extends ActivityWithMenu implements ActivityCompat.OnRequestPe
     public AlertDialog dialog;
     private AlertDialog helper_dialog;
     private AlertDialog status_helper_dialog;
-    private com.eveningoutpost.dexdrip.databinding.PopupInitialStatusHelperBinding initial_status_binding;
-    private com.eveningoutpost.dexdrip.databinding.ActivityHomeBinding binding;
+    private PopupInitialStatusHelperBinding initial_status_binding;
+    private ActivityHomeBinding binding;
     private boolean is_newbie;
     private boolean checkedeula;
 
@@ -212,7 +214,7 @@ public class Home extends ActivityWithMenu implements ActivityCompat.OnRequestPe
 
         if (!xdrip.checkAppContext(getApplicationContext())) {
             toast(gs(R.string.unusual_internal_context_problem__please_report));
-            Log.wtf(TAG, "xdrip.checkAppContext FAILED!");
+            UserError.Log.wtf(TAG, "xdrip.checkAppContext FAILED!");
             try {
                 xdrip.initCrashlytics(getApplicationContext());
                 Crashlytics.log("xdrip.checkAppContext FAILED!");
@@ -413,14 +415,14 @@ public class Home extends ActivityWithMenu implements ActivityCompat.OnRequestPe
             small_screen = true;
         }
         //final int refdpi = 320;
-        Log.d(TAG, "Width height: " + screen_width + " " + screen_height + " DPI:" + dm.densityDpi);
+        UserError.Log.i(TAG, "Width height: " + screen_width + " " + screen_height + " DPI:" + dm.densityDpi);
 
 
         JoH.fixActionBar(this);
         try {
             getSupportActionBar().setTitle(R.string.app_name);
         } catch (NullPointerException e) {
-            Log.e(TAG, "Couldn't set title due to null pointer");
+            UserError.Log.e(TAG, "Couldn't set title due to null pointer");
         }
         activityVisible = true;
 
@@ -481,7 +483,7 @@ public class Home extends ActivityWithMenu implements ActivityCompat.OnRequestPe
             final PowerManager pm = (PowerManager) getSystemService(Context.POWER_SERVICE);
             if (!pm.isIgnoringBatteryOptimizations(packageName) &&
                     !Pref.getBooleanDefaultFalse("requested_ignore_battery_optimizations_new") && !xdrip.isRunningTest()) {
-                Log.d(TAG, "Requesting ignore battery optimization");
+                UserError.Log.i(TAG, "Requesting ignore battery optimization");
 
                 if (((dialog == null) || (!dialog.isShowing()))
                         && (PersistentStore.incrementLong("asked_battery_optimization") < 40)) {
@@ -514,14 +516,14 @@ public class Home extends ActivityWithMenu implements ActivityCompat.OnRequestPe
 
     private void refreshStatusLine() {
         try {
-            String status = ((statusIOB.length() > 0) ? ("IoB: " + statusIOB) : "")
-                    + ((statusBWP.length() > 0) ? (" " + statusBWP) : "");
-            Log.d(TAG, "Refresh Status Line: " + status);
+            String status = ((!statusIOB.isEmpty()) ? ("IoB: " + statusIOB) : "")
+                    + ((!statusBWP.isEmpty()) ? (" " + statusBWP) : "");
+            UserError.Log.i(TAG, "Refresh Status Line: " + status);
             //if (status.length() > 0) {
             getSupportActionBar().setSubtitle(status);
             // }
         } catch (NullPointerException e) {
-            Log.e(TAG, "Could not set subtitle due to null pointer exception: " + e);
+            UserError.Log.e(TAG, "Could not set subtitle due to null pointer exception: " + e);
         }
     }
 
@@ -529,7 +531,7 @@ public class Home extends ActivityWithMenu implements ActivityCompat.OnRequestPe
         final Intent homeStatus = new Intent(Intents.HOME_STATUS_ACTION);
         homeStatus.putExtra(key, value);
         LocalBroadcastManager.getInstance(xdrip.getAppContext()).sendBroadcast(homeStatus);
-        Log.d(TAG, "Home Status update: " + key + " / " + value);
+        UserError.Log.i(TAG, "Home Status update: " + key + " / " + value);
     }
 
     private void checkBadSettings() {
@@ -570,18 +572,18 @@ public class Home extends ActivityWithMenu implements ActivityCompat.OnRequestPe
             calintent.putExtra("bg_age", Long.toString((long) (timeoffset / 1000)));
             calintent.putExtra("allow_undo", "true");
             calintent.putExtra("cal_source", "processFingerStringCalibration");
-            Log.d(TAG, "processFingerStickCalibration number: " + glucosenumber + " offset: " + timeoffset);
+            UserError.Log.i(TAG, "processFingerStickCalibration number: " + glucosenumber + " offset: " + timeoffset);
 
             if (dontask) {
                 if (PersistentStore.getDouble("last-auto-calibration-value") == glucosenumber) {
                     UserError.Log.wtf(TAG, "Rejecting auto calibration as it is the same as last: " + glucosenumber);
                 } else {
                     PersistentStore.setDouble("last-auto-calibration-value", glucosenumber);
-                    Log.d(TAG, "Proceeding with calibration intent without asking");
+                    UserError.Log.i(TAG, "Proceeding with calibration intent without asking");
                     startIntentThreadWithDelayedRefresh(calintent);
                 }
             } else {
-                AlertDialog.Builder builder = new androidx.appcompat.app.AlertDialog.Builder(this);
+                AlertDialog.Builder builder = new AlertDialog.Builder(this);
                 builder.setTitle("Use " + JoH.qs(glucosenumber, 1) + " for Calibration?");
                 builder.setMessage(gs(R.string.do_you_want_to_use_this_synced_fingerstick_blood_glucose_result_to_calibrate_with__you_can_change_when_this_dialog_is_displayed_in_settings));
 
@@ -618,11 +620,11 @@ public class Home extends ActivityWithMenu implements ActivityCompat.OnRequestPe
             calintent.putExtra("bg_age", Long.toString((long) (timeoffset / 1000)));
             calintent.putExtra("allow_undo", "true");
             calintent.putExtra("cal_source", "processCalibrationNoUi");
-            Log.d(TAG, "ProcessCalibrationNoUI number: " + glucosenumber + " offset: " + timeoffset);
+            UserError.Log.i(TAG, "ProcessCalibrationNoUI number: " + glucosenumber + " offset: " + timeoffset);
 
             final String calibration_type = Pref.getString("treatment_fingerstick_calibration_usage", "ask");
             if (calibration_type.equals("ask")) {
-                AlertDialog.Builder builder = new androidx.appcompat.app.AlertDialog.Builder(this);
+                AlertDialog.Builder builder = new AlertDialog.Builder(this);
                 builder.setTitle(gs(R.string.use_bg_for_calibration));
                 builder.setMessage(gs(R.string.do_you_want_to_use_this_entered_fingerstick_blood_glucose_test_to_calibrate_with__you_can_change_when_this_dialog_is_displayed_in_settings));
 
@@ -640,11 +642,11 @@ public class Home extends ActivityWithMenu implements ActivityCompat.OnRequestPe
                     dialog.dismiss();
                 });
 
-                androidx.appcompat.app.AlertDialog alert = builder.create();
+                AlertDialog alert = builder.create();
                 alert.show();
 
             } else if (calibration_type.equals("auto")) {
-                Log.d(TAG, "Creating bloodtest  record from cal input data");
+                UserError.Log.i(TAG, "Creating bloodtest  record from cal input data");
                 BloodTest.createFromCal(glucosenumber, timeoffset, "Manual Entry");
                 GcmActivity.syncBloodTests();
                 if ((!Pref.getBooleanDefaultFalse("bluetooth_meter_for_calibrations_auto"))
@@ -662,7 +664,7 @@ public class Home extends ActivityWithMenu implements ActivityCompat.OnRequestPe
 
                     builder.setNegativeButton("NO", (dialog, which) -> dialog.dismiss());
 
-                    final androidx.appcompat.app.AlertDialog alert = builder.create();
+                    final AlertDialog alert = builder.create();
                     alert.show();
                 }
                 // offer choice to enable auto-calibration mode if not already enabled on pratelimit
@@ -716,9 +718,9 @@ public class Home extends ActivityWithMenu implements ActivityCompat.OnRequestPe
             // calculate absolute offset
             long treatment_timestamp = watchkeypad_timestamp - (long) mytimeoffset;
             mytimeoffset = JoH.tsl() - treatment_timestamp;
-            Log.d(TAG, "Watch Keypad timestamp is: " + JoH.dateTimeText(treatment_timestamp) + " Original offset: " + JoH.qs(thistimeoffset) + " New: " + JoH.qs(mytimeoffset));
+            UserError.Log.i(TAG, "Watch Keypad timestamp is: " + JoH.dateTimeText(treatment_timestamp) + " Original offset: " + JoH.qs(thistimeoffset) + " New: " + JoH.qs(mytimeoffset));
             if ((mytimeoffset > (DAY_IN_MS * 3)) || (mytimeoffset < -HOUR_IN_MS * 3)) {
-                Log.e(TAG, "Treatment timestamp out of range: " + mytimeoffset);
+                UserError.Log.e(TAG, "Treatment timestamp out of range: " + mytimeoffset);
                 JoH.static_toast_long(gs(R.string.treatment_time_wrong));
                 WatchUpdaterService.sendWearLocalToast(gs(R.string.treatment_error), Toast.LENGTH_LONG);
             } else {
@@ -728,11 +730,11 @@ public class Home extends ActivityWithMenu implements ActivityCompat.OnRequestPe
                 // sanity check timestamp
                 final Treatments exists = Treatments.byTimestamp(time);
                 if (exists == null) {
-                    Log.d(TAG, "processAndApproveTreatment create watchkeypad Treatment carbs=" + thiscarbsnumber + " insulin=" + thisinsulinnumber + " timestamp=" + JoH.dateTimeText(time) + " uuid=" + thisuuid);
+                    UserError.Log.i(TAG, "processAndApproveTreatment create watchkeypad Treatment carbs=" + thiscarbsnumber + " insulin=" + thisinsulinnumber + " timestamp=" + JoH.dateTimeText(time) + " uuid=" + thisuuid);
                     Treatments.create(thiscarbsnumber, thisinsulinnumber, time, thisuuid);
                     Pendiq.handleTreatment(thisinsulinnumber);
                 } else {
-                    Log.d(TAG, "processAndApproveTreatment Treatment already exists carbs=" + thiscarbsnumber + " insulin=" + thisinsulinnumber + " timestamp=" + JoH.dateTimeText(time));
+                    UserError.Log.i(TAG, "processAndApproveTreatment Treatment already exists carbs=" + thiscarbsnumber + " insulin=" + thisinsulinnumber + " timestamp=" + JoH.dateTimeText(time));
                 }
             }
         } else {
@@ -748,7 +750,7 @@ public class Home extends ActivityWithMenu implements ActivityCompat.OnRequestPe
         if (watchkeypad) {
             if (myglucosenumber > 0) {
                 if ((mytimeoffset > (DAY_IN_MS * 3)) || (mytimeoffset < -HOUR_IN_MS * 3)) {
-                    Log.e(TAG, "Treatment bloodtest timestamp out of range: " + mytimeoffset);
+                    UserError.Log.e(TAG, "Treatment bloodtest timestamp out of range: " + mytimeoffset);
                 } else {
                     BloodTest.createFromCal(myglucosenumber, mytimeoffset, "Manual Entry", thisuuid);
                 }
@@ -762,7 +764,7 @@ public class Home extends ActivityWithMenu implements ActivityCompat.OnRequestPe
     }
 
     private void processIncomingBundle(Bundle bundle) {
-        Log.d(TAG, "Processing incoming bundle");
+        UserError.Log.i(TAG, "Processing incoming bundle");
         if (bundle != null) {
             String receivedText = bundle.getString(WatchUpdaterService.WEARABLE_VOICE_PAYLOAD);
             if (receivedText != null) {
@@ -781,7 +783,7 @@ public class Home extends ActivityWithMenu implements ActivityCompat.OnRequestPe
                 try {
                     showNoteTextInputDialog(null, Long.parseLong(bundle.getString(Home.CREATE_TREATMENT_NOTE)), JoH.tolerantParseDouble(bundle.getString(Home.CREATE_TREATMENT_NOTE + "2"), 0));
                 } catch (NullPointerException e) {
-                    Log.d(TAG, "Got null point exception during CREATE_TREATMENT_NOTE Intent");
+                    UserError.Log.i(TAG, "Got null point exception during CREATE_TREATMENT_NOTE Intent");
                 } catch (NumberFormatException e) {
                     JoH.static_toast_long(gs(R.string.number_error_) + e);
                 }
@@ -800,7 +802,7 @@ public class Home extends ActivityWithMenu implements ActivityCompat.OnRequestPe
                         }
                     }, timeout);
                 } else {
-                    Log.d(TAG, "Screen is already on so not turning on");
+                    UserError.Log.i(TAG, "Screen is already on so not turning on");
                 }
             } else if (bundle.getString(Home.GCM_RESOLUTION_ACTIVITY) != null) {
                 GcmActivity.checkPlayServices(this, this);
@@ -810,7 +812,7 @@ public class Home extends ActivityWithMenu implements ActivityCompat.OnRequestPe
                 final Intent notificationIntent = new Intent(this, Home.class);
                 final int notification_id = bundle.getInt("notification_id");
                 if ((notification_id == SENSOR_READY_ID) && (!Sensor.isActive() || BgReading.last() != null)) {
-                    Log.e(TAG, "Sensor not in warm up period when notification due to fire");
+                    UserError.Log.e(TAG, "Sensor not in warm up period when notification due to fire");
                     return;
                 }
                 final PendingIntent pendingIntent = PendingIntent.getActivity(this, 0, notificationIntent, PendingIntent.FLAG_UPDATE_CURRENT);
@@ -836,7 +838,7 @@ public class Home extends ActivityWithMenu implements ActivityCompat.OnRequestPe
             } else if (bundle.getString("inpen-reset") != null) {
                 InPenEntry.startWithReset();
             } else if (bundle.getString(Home.BLOOD_TEST_ACTION) != null) {
-                Log.d(TAG, "BLOOD_TEST_ACTION");
+                UserError.Log.i(TAG, "BLOOD_TEST_ACTION");
                 final androidx.appcompat.app.AlertDialog.Builder builder = new AlertDialog.Builder(this);
                 builder.setTitle(gs(R.string.blood_test_action));
                 builder.setMessage(gs(R.string.what_would_you_like_to_do));
@@ -921,7 +923,7 @@ public class Home extends ActivityWithMenu implements ActivityCompat.OnRequestPe
         intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
         intent.putExtra(extra, text);
         intent.putExtra(extra + "2", even_more);
-        if (even_even_more.length() > 0) intent.putExtra(extra + "3", even_even_more);
+        if (!even_even_more.isEmpty()) intent.putExtra(extra + "3", even_even_more);
         context.startActivity(intent);
     }
 
@@ -1001,7 +1003,7 @@ public class Home extends ActivityWithMenu implements ActivityCompat.OnRequestPe
     }
 
     private void initializeSearchWords(String jstring) {
-        Log.d(TAG, "Initialize Search words");
+        UserError.Log.i(TAG, "Initialize Search words");
         wordDataWrapper lcs = new wordDataWrapper();
         try {
 
@@ -1016,12 +1018,12 @@ public class Home extends ActivityWithMenu implements ActivityCompat.OnRequestPe
         } catch (Exception e) {
             e.printStackTrace();
 
-            Log.d(TAG, "Got exception during search word load: " + e.toString());
+            UserError.Log.i(TAG, "Got exception during search word load: " + e.toString());
             Toast.makeText(getApplicationContext(),
                     "Problem loading speech lexicon!",
                     Toast.LENGTH_LONG).show();
         }
-        Log.d(TAG, "Loaded Words: " + lcs.entries.size());
+        UserError.Log.i(TAG, "Loaded Words: " + lcs.entries.size());
         searchWords = lcs;
     }
 
@@ -1049,7 +1051,7 @@ public class Home extends ActivityWithMenu implements ActivityCompat.OnRequestPe
     }
 
     private void promptKeypadInput() {
-        Log.d(TAG, "Showing pop-up");
+        UserError.Log.i(TAG, "Showing pop-up");
 
 /*        LayoutInflater inflater = (LayoutInflater) xdrip.getAppContext().getSystemService(LAYOUT_INFLATER_SERVICE);
         View popupView = inflater.inflate(R.layout.keypad_activity_phone, null);
@@ -1093,8 +1095,7 @@ public class Home extends ActivityWithMenu implements ActivityCompat.OnRequestPe
         final AlertDialog dialog = builder.create();
         input.setOnFocusChangeListener((v, hasFocus) -> {
             if (hasFocus) {
-                if (dialog != null)
-                    dialog.getWindow().setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_ALWAYS_VISIBLE);
+                dialog.getWindow().setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_ALWAYS_VISIBLE);
             }
         });
         dialog.show();
@@ -1136,11 +1137,11 @@ public class Home extends ActivityWithMenu implements ActivityCompat.OnRequestPe
 // convert fuzzy recognised word to our keyword from lexicon
         for (wordData thislex : searchWords.entries) {
             if (thislex.matchWords.contains(word)) {
-                Log.d(TAG, "Matched spoken word: " + word + " => " + thislex.lexicon);
+                UserError.Log.i(TAG, "Matched spoken word: " + word + " => " + thislex.lexicon);
                 return thislex.lexicon;
             }
         }
-        Log.d(TAG, "Could not match spoken word: " + word);
+        UserError.Log.i(TAG, "Could not match spoken word: " + word);
         return null; // if cannot match
     }
 
@@ -1152,7 +1153,7 @@ public class Home extends ActivityWithMenu implements ActivityCompat.OnRequestPe
                     Toast.LENGTH_LONG).show();
             return;
         }
-        Log.d(TAG, "Processing speech input allWords: " + allWords);
+        UserError.Log.i(TAG, "Processing speech input allWords: " + allWords);
         thisuuid = "";
         int end = allWords.indexOf(" uuid ");
         if (end > 0) {
@@ -1165,12 +1166,10 @@ public class Home extends ActivityWithMenu implements ActivityCompat.OnRequestPe
         allWords = allWords.replaceAll(":", "."); // fix real times
         allWords = allWords.replaceAll("(\\d)([a-zA-Z])", "$1 $2"); // fix like 22mm
         allWords = allWords.replaceAll("([0-9]\\.[0-9])([0-9][0-9])", "$1 $2"); // fix multi number order like blood 3.622 grams
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT) {
-            allWords = allWords.replaceAll(new String(RTL_BYTES, StandardCharsets.UTF_8), "");
-        }
+        allWords = allWords.replaceAll(new String(RTL_BYTES, StandardCharsets.UTF_8), "");
         allWords = allWords.toLowerCase();
 
-        Log.d(TAG, "Processing speech input allWords second: " + allWords + " UUID: " + thisuuid);
+        UserError.Log.i(TAG, "Processing speech input allWords second: " + allWords + " UUID: " + thisuuid);
 
         if (allWords.contentEquals("delete last treatment")
                 || allWords.contentEquals("cancel last treatment")
@@ -1234,51 +1233,51 @@ public class Home extends ActivityWithMenu implements ActivityCompat.OnRequestPe
         boolean preserve = false;
         if ((thisnumber == -1) || (thisword.equals(""))) return;
 
-        Log.d(TAG, "GOT WORD PAIR: " + thisnumber + " = " + thisword);
+        UserError.Log.i(TAG, "GOT WORD PAIR: " + thisnumber + " = " + thisword);
 
         switch (thisword) {
 
             case "watchkeypad":
-                if ((watchkeypadset == false) && (thisnumber > 1501968469)) {
+                if ((!watchkeypadset) && (thisnumber > 1501968469)) {
                     watchkeypad = true;
                     watchkeypadset = true;
                     watchkeypad_timestamp = (long) (thisnumber * 1000);
-                    Log.d(TAG, "Treatment entered on watchkeypad: " + thisnumber);
+                    UserError.Log.i(TAG, "Treatment entered on watchkeypad: " + thisnumber);
                 } else {
-                    Log.d(TAG, "watchkeypad already set");
+                    UserError.Log.i(TAG, "watchkeypad already set");
                 }
                 break;
 
             case "rapid":
-                if ((insulinset == false) && (thisnumber > 0)) {
+                if ((!insulinset) && (thisnumber > 0)) {
                     thisinsulinnumber = thisnumber;
                     textInsulinDose.setText(thisnumber + " units");
-                    Log.d(TAG, "Rapid dose: " + thisnumber);
+                    UserError.Log.i(TAG, "Rapid dose: " + thisnumber);
                     insulinset = true;
                     btnInsulinDose.setVisibility(View.VISIBLE);
                     textInsulinDose.setVisibility(View.VISIBLE);
                 } else {
-                    Log.d(TAG, "Rapid dose already set");
+                    UserError.Log.i(TAG, "Rapid dose already set");
                     preserve = true;
                 }
                 break;
 
             case "carbs":
-                if ((carbsset == false) && (thisnumber > 0)) {
+                if ((!carbsset) && (thisnumber > 0)) {
                     thiscarbsnumber = thisnumber;
                     textCarbohydrates.setText((int) thisnumber + " carbs");
                     carbsset = true;
-                    Log.d(TAG, "Carbs eaten: " + thisnumber);
+                    UserError.Log.i(TAG, "Carbs eaten: " + thisnumber);
                     btnCarbohydrates.setVisibility(View.VISIBLE);
                     textCarbohydrates.setVisibility(View.VISIBLE);
                 } else {
-                    Log.d(TAG, "Carbs already set");
+                    UserError.Log.i(TAG, "Carbs already set");
                     preserve = true;
                 }
                 break;
 
             case "blood":
-                if ((glucoseset == false) && (thisnumber > 0)) {
+                if ((!glucoseset) && (thisnumber > 0)) {
                     thisglucosenumber = thisnumber;
                     if (Pref.getString("units", "mgdl").equals("mgdl")) {
                         if (textBloodGlucose != null)
@@ -1288,7 +1287,7 @@ public class Home extends ActivityWithMenu implements ActivityCompat.OnRequestPe
                             textBloodGlucose.setText(thisnumber + " mmol/l");
                     }
 
-                    Log.d(TAG, "Blood test: " + thisnumber);
+                    UserError.Log.i(TAG, "Blood test: " + thisnumber);
                     glucoseset = true;
                     if (textBloodGlucose != null) {
                         btnBloodGlucose.setVisibility(View.VISIBLE);
@@ -1296,14 +1295,14 @@ public class Home extends ActivityWithMenu implements ActivityCompat.OnRequestPe
                     }
 
                 } else {
-                    Log.d(TAG, "Blood glucose already set");
+                    UserError.Log.i(TAG, "Blood glucose already set");
                     preserve = true;
                 }
                 break;
 
             case "time":
-                Log.d(TAG, "processing time keyword");
-                if ((timeset == false) && (thisnumber >= 0)) {
+                UserError.Log.i(TAG, "processing time keyword");
+                if ((!timeset) && (thisnumber >= 0)) {
 
                     final NumberFormat nf = NumberFormat.getNumberInstance(Locale.US);
                     final DecimalFormat df = (DecimalFormat) nf;
@@ -1321,7 +1320,7 @@ public class Home extends ActivityWithMenu implements ActivityCompat.OnRequestPe
                             new SimpleDateFormat("dd/M/yyyy HH.mm", Locale.US); // TODO double check 24 hour 12.00 etc
                     final String datenew = simpleDateFormat1.format(c.getTime()) + df.format(thisnumber);
 
-                    Log.d(TAG, "Time Timing data datenew: " + datenew);
+                    UserError.Log.i(TAG, "Time Timing data datenew: " + datenew);
 
                     final Date datethen;
                     final Date datenow = new Date();
@@ -1338,7 +1337,7 @@ public class Home extends ActivityWithMenu implements ActivityCompat.OnRequestPe
                                 difference = difference - (86400 * 1000);
                         }
 
-                        Log.d(TAG, "Time Timing data: " + df.format(thisnumber) + " = difference ms: " + JoH.qs(difference));
+                        UserError.Log.i(TAG, "Time Timing data: " + df.format(thisnumber) + " = difference ms: " + JoH.qs(difference));
                         textTime.setText(df.format(thisnumber));
                         timeset = true;
                         thistimeoffset = difference;
@@ -1346,21 +1345,21 @@ public class Home extends ActivityWithMenu implements ActivityCompat.OnRequestPe
                         textTime.setVisibility(View.VISIBLE);
                     } catch (ParseException e) {
                         // toast to explain?
-                        Log.d(TAG, "Got exception parsing date time");
+                        UserError.Log.i(TAG, "Got exception parsing date time");
                     }
                 } else {
-                    Log.d(TAG, "Time data already set");
+                    UserError.Log.i(TAG, "Time data already set");
                     preserve = true;
                 }
                 break;
         } // end switch
 
-        if (preserve == false) {
-            Log.d(TAG, "Clearing speech values");
+        if (!preserve) {
+            UserError.Log.i(TAG, "Clearing speech values");
             thisnumber = -1;
             thisword = "";
         } else {
-            Log.d(TAG, "Preserving speech values");
+            UserError.Log.i(TAG, "Preserving speech values");
         }
 
         // don't show approve if we only have time
@@ -1425,19 +1424,19 @@ public class Home extends ActivityWithMenu implements ActivityCompat.OnRequestPe
     public void toast(final String msg) {
         try {
             runOnUiThread((Runnable) () -> Toast.makeText(mActivity, msg, Toast.LENGTH_LONG).show());
-            Log.d(TAG, "toast: " + msg);
+            UserError.Log.i(TAG, "toast: " + msg);
         } catch (Exception e) {
-            Log.d(TAG, "Couldn't display toast: " + msg + " / " + e.toString());
+            UserError.Log.i(TAG, "Couldn't display toast: " + msg + " / " + e.toString());
         }
     }
 
     public static void toastStaticFromUI(final String msg) {
         try {
             Toast.makeText(mActivity, msg, Toast.LENGTH_LONG).show();
-            Log.d(TAG, "toast: " + msg);
+            UserError.Log.i(TAG, "toast: " + msg);
         } catch (Exception e) {
             toaststaticnext(msg);
-            Log.d(TAG, "Couldn't display toast (rescheduling): " + msg + " / " + e.toString());
+            UserError.Log.i(TAG, "Couldn't display toast (rescheduling): " + msg + " / " + e.toString());
         }
     }
 
@@ -1473,7 +1472,7 @@ public class Home extends ActivityWithMenu implements ActivityCompat.OnRequestPe
                     //last_speech_time = JoH.ts();
                     //naturalLanguageRecognition(result.get(0));
                     String treatment_text = result.get(0).trim();
-                    Log.d(TAG, "Got treatment note: " + treatment_text);
+                    UserError.Log.i(TAG, "Got treatment note: " + treatment_text);
                     voiceRecognitionText.setText(result.get(0));
                     voiceRecognitionText.setVisibility(View.VISIBLE);
                     Treatments.create_note(treatment_text, 0); // timestamp?
@@ -1845,7 +1844,7 @@ public class Home extends ActivityWithMenu implements ActivityCompat.OnRequestPe
         try {
             LocalBroadcastManager.getInstance(this).unregisterReceiver(statusReceiver);
         } catch (Exception e) {
-            Log.e(TAG, "Exception unregistering broadcast receiver: " + e);
+            UserError.Log.e(TAG, "Exception unregistering broadcast receiver: " + e);
         }
 
     }
@@ -1897,7 +1896,7 @@ public class Home extends ActivityWithMenu implements ActivityCompat.OnRequestPe
     public static void startWatchUpdaterService(Context context, String action, String logTag) {
         final boolean wear_integration = Pref.getBoolean("wear_sync", false);
         if (wear_integration) {
-            Log.d(logTag, "start WatchUpdaterService with " + action);
+            UserError.Log.i(logTag, "start WatchUpdaterService with " + action);
             context.startService(new Intent(context, WatchUpdaterService.class).setAction(action));
         }
     }
@@ -1905,7 +1904,7 @@ public class Home extends ActivityWithMenu implements ActivityCompat.OnRequestPe
     public static void startWatchUpdaterService(Context context, String action, String logTag, String key, String value) {
         final boolean wear_integration = Pref.getBoolean("wear_sync", false);
         if (wear_integration) {
-            Log.d(logTag, "start WatchUpdaterService with " + action);
+            UserError.Log.i(logTag, "start WatchUpdaterService with " + action);
             context.startService(new Intent(context, WatchUpdaterService.class).setAction(action).putExtra(key, value));
         }
     }
@@ -1913,7 +1912,7 @@ public class Home extends ActivityWithMenu implements ActivityCompat.OnRequestPe
     public static void startWatchUpdaterService(Context context, String action, String logTag, String key, boolean value) {
         final boolean wear_integration = Pref.getBoolean("wear_sync", false);
         if (wear_integration) {
-            Log.d(logTag, "start WatchUpdaterService with " + action);
+            UserError.Log.i(logTag, "start WatchUpdaterService with " + action);
             context.startService(new Intent(context, WatchUpdaterService.class).setAction(action).putExtra(key, value));
         }
     }
@@ -2028,10 +2027,10 @@ public class Home extends ActivityWithMenu implements ActivityCompat.OnRequestPe
     }
 
     private void updateCurrentBgInfo(String source) {
-        Log.d(TAG, "updateCurrentBgInfo from: " + source);
+        UserError.Log.i(TAG, "updateCurrentBgInfo from: " + source);
 
         if (!activityVisible) {
-            Log.d(TAG, "Display not visible - not updating chart");
+            UserError.Log.i(TAG, "Display not visible - not updating chart");
             return;
         }
         if (reset_viewport) {
@@ -2181,12 +2180,12 @@ public class Home extends ActivityWithMenu implements ActivityCompat.OnRequestPe
             BgGraphBuilder.previous_low_occurs_at = BgGraphBuilder.low_occurs_at;
         }
 
-        if (navigationDrawerFragment == null) Log.e("Runtime", "navigationdrawerfragment is null");
+        if (navigationDrawerFragment == null) UserError.Log.e("Runtime", "navigationdrawerfragment is null");
 
         try {
             navigationDrawerFragment.setUp(R.id.navigation_drawer, (DrawerLayout) findViewById(R.id.drawer_layout), getString(R.string.home_screen), this);
         } catch (Exception e) {
-            Log.e("Runtime", "Exception with navigrationdrawerfragment: " + e.toString());
+            UserError.Log.e("Runtime", "Exception with navigrationdrawerfragment: " + e.toString());
         }
         if (nexttoast != null) {
             toast(nexttoast);
@@ -2314,12 +2313,12 @@ public class Home extends ActivityWithMenu implements ActivityCompat.OnRequestPe
                 showUncalibratedSlope();
             } else {
                 final int calculatedBgReadingsCount = BgReading.latest(3).size();
-                if ((calculatedBgReadingsCount > 2) || (Ob1G5CollectionService.onlyUsingNativeMode() && BgReading.latest(1).size() > 0)) {
+                if ((calculatedBgReadingsCount > 2) || (Ob1G5CollectionService.onlyUsingNativeMode() && !BgReading.latest(1).isEmpty())) {
                     // TODO potential to calibrate off stale data here
                     final List<Calibration> calibrations = Calibration.latestValid(2);
                     if ((calibrations.size() > 1) || Ob1G5CollectionService.onlyUsingNativeMode()) {
                         if (calibrations.size() > 1) {
-                            if (calibrations.get(0).possible_bad != null && calibrations.get(0).possible_bad == true && calibrations.get(1).possible_bad != null && calibrations.get(1).possible_bad != true) {
+                            if (calibrations.get(0).possible_bad != null && calibrations.get(0).possible_bad && calibrations.get(1).possible_bad != null && !calibrations.get(1).possible_bad) {
                                 notificationText.setText(R.string.possible_bad_calibration);
                             }
                         }
@@ -2329,7 +2328,7 @@ public class Home extends ActivityWithMenu implements ActivityCompat.OnRequestPe
                         if (BgReading.isDataSuitableForDoubleCalibration()) {
                             notificationText.setText(R.string.please_enter_two_calibrations_to_get_started);
                             showUncalibratedSlope();
-                            Log.d(TAG, "Asking for calibration A: Uncalculated BG readings: " + BgReading.latest(2).size() + " / Calibrations size: " + calibrations.size());
+                            UserError.Log.i(TAG, "Asking for calibration A: Uncalculated BG readings: " + BgReading.latest(2).size() + " / Calibrations size: " + calibrations.size());
                             promptForCalibration();
                             dontKeepScreenOn();
                         } else {
@@ -2350,7 +2349,7 @@ public class Home extends ActivityWithMenu implements ActivityCompat.OnRequestPe
                         if (calibrations.size() < 2) {
                             notificationText.setText(R.string.please_enter_two_calibrations_to_get_started);
                             showUncalibratedSlope();
-                            Log.d(TAG, "Asking for calibration B: Uncalculated BG readings: " + BgReading.latestUnCalculated(2).size() + " / Calibrations size: " + calibrations.size());
+                            UserError.Log.i(TAG, "Asking for calibration B: Uncalculated BG readings: " + BgReading.latestUnCalculated(2).size() + " / Calibrations size: " + calibrations.size());
                             if (!Ob1G5CollectionService.isPendingCalibration()) {
                                 promptForCalibration();
                             } else {
@@ -2376,7 +2375,7 @@ public class Home extends ActivityWithMenu implements ActivityCompat.OnRequestPe
 
             final AlertDialog.Builder builder = new AlertDialog.Builder(this);
             builder.setTitle(R.string.collecting_initial_readings);
-            initial_status_binding = com.eveningoutpost.dexdrip.databinding.PopupInitialStatusHelperBinding.inflate(getLayoutInflater());
+            initial_status_binding = PopupInitialStatusHelperBinding.inflate(getLayoutInflater());
             initial_status_binding.setIdq(initialDataQuality);
             if (microStatus == null) microStatus = new MicroStatusImpl();
             initial_status_binding.setMs(microStatus);
@@ -2441,7 +2440,7 @@ public class Home extends ActivityWithMenu implements ActivityCompat.OnRequestPe
         }
 
         String receiverSn = Pref.getString("share_key", "SM00000000").toUpperCase();
-        if (receiverSn.compareTo("SM00000000") == 0 || receiverSn.length() == 0) {
+        if (receiverSn.compareTo("SM00000000") == 0 || receiverSn.isEmpty()) {
             notificationText.setText(R.string.please_set_dex_receiver_serial_number);
             return;
         }
@@ -2543,7 +2542,7 @@ public class Home extends ActivityWithMenu implements ActivityCompat.OnRequestPe
                     final double expires = JoH.tolerantParseDouble(Pref.getString("nfc_expiry_days", "14.5"), 14.5d) - ((double) sensor_age) / 1440;
                     sensorAge.setText(((expires >= 0) ? ("Expires: " + JoH.qs(expires, 1) + "d") : "EXPIRED! ") + age_problem);
                 } catch (Exception e) {
-                    Log.e(TAG, "expiry calculation: " + e);
+                    UserError.Log.e(TAG, "expiry calculation: " + e);
                     sensorAge.setText("Expires: " + "???");
                 }
             }
@@ -2676,7 +2675,7 @@ public class Home extends ActivityWithMenu implements ActivityCompat.OnRequestPe
                 String stringEstimate = bgGraphBuilder.unitized_string(estimate);
                 currentBgValueText.setText(stringEstimate + (itr == null ? " " + BgReading.activeSlopeArrow() : ""));
             }
-            if (extrastring.length() > 0)
+            if (!extrastring.isEmpty())
                 currentBgValueText.setText(extrastring + currentBgValueText.getText());
         }
         int minutes = (int) (System.currentTimeMillis() - lastBgReading.timestamp) / (60 * 1000);
@@ -2741,9 +2740,9 @@ public class Home extends ActivityWithMenu implements ActivityCompat.OnRequestPe
     private void HebrewAppendDisplayData() {
         // Do the append for the hebrew language
         String original_text = notificationText.getText().toString();
-        Log.d(TAG, "original_text = " + HexDump.dumpHexString(original_text.getBytes()));
+        UserError.Log.i(TAG, "original_text = " + HexDump.dumpHexString(original_text.getBytes()));
         if (original_text.length() >= 1 && original_text.charAt(0) == 0x0a) {
-            Log.d(TAG, "removing first and appending " + display_delta);
+            UserError.Log.i(TAG, "removing first and appending " + display_delta);
             notificationText.setText(display_delta + "  " + original_text.substring(1));
         } else {
             notificationText.setText(display_delta + "  " + original_text);
@@ -2895,7 +2894,7 @@ public class Home extends ActivityWithMenu implements ActivityCompat.OnRequestPe
 
                     //Log.d("xxy", Integer.toString(views.size()));
                     for (View view : views) {
-                        Log.d("jamhorham showcase", view.getClass().getSimpleName());
+                        UserError.Log.i("jamhorham showcase", view.getClass().getSimpleName());
 
                         if (view.getClass().getSimpleName().equals("OverflowMenuButton")) {
                             target = new ViewTarget(view);
@@ -2930,7 +2929,7 @@ public class Home extends ActivityWithMenu implements ActivityCompat.OnRequestPe
             }
 
         } catch (Exception e) {
-            Log.e(TAG, "Exception in showcase: " + e.toString());
+            UserError.Log.e(TAG, "Exception in showcase: " + e.toString());
         }
     }
 
@@ -2989,7 +2988,7 @@ public class Home extends ActivityWithMenu implements ActivityCompat.OnRequestPe
         Pref.setBoolean("default_to_voice_notes", !Pref.getBooleanDefaultFalse("default_to_voice_notes"));
     }
 
-    //TODO timestamp
+    //FIXME PP timestamp
     public void showNoteTextInputDialog(View myitem) {
         showNoteTextInputDialog(myitem, 0L, -1);
     }
@@ -2999,7 +2998,7 @@ public class Home extends ActivityWithMenu implements ActivityCompat.OnRequestPe
     }
 
     public void showNoteTextInputDialog(View myitem, final long timestamp, final double position) {
-        Log.d(TAG, "showNoteTextInputDialog: ts:" + timestamp + " pos:" + position);
+        UserError.Log.i(TAG, "showNoteTextInputDialog: ts:" + timestamp + " pos:" + position);
         androidx.appcompat.app.AlertDialog.Builder dialogBuilder = new androidx.appcompat.app.AlertDialog.Builder(this);
         LayoutInflater inflater = this.getLayoutInflater();
         final View dialogView = inflater.inflate(R.layout.note_dialog_phone, null);
@@ -3013,11 +3012,11 @@ public class Home extends ActivityWithMenu implements ActivityCompat.OnRequestPe
         //dialogBuilder.setMessage("Enter text below");
         dialogBuilder.setPositiveButton(R.string.done, (OnClickListener) (dialog, whichButton) -> {
             String treatment_text = edt.getText().toString().trim();
-            Log.d(TAG, "Got treatment note: " + treatment_text);
+            UserError.Log.i(TAG, "Got treatment note: " + treatment_text);
             Treatments.create_note(treatment_text, timestamp, position); // timestamp?
             Home.staticRefreshBGCharts();
 
-            if (treatment_text.length() > 0) {
+            if (!treatment_text.isEmpty()) {
                 // display snackbar of the snackbar
                 final View.OnClickListener mOnClickListener = v -> Home.startHomeWithExtra(getAppContext(), Home.CREATE_TREATMENT_NOTE, Long.toString(timestamp), Double.toString(position));
                 Home.snackBar(R.string.add_note, getString(R.string.added) + ":    " + treatment_text, mOnClickListener, mActivity);
@@ -3111,7 +3110,7 @@ public class Home extends ActivityWithMenu implements ActivityCompat.OnRequestPe
                 }
                 break;
         }
-        if (d) Log.d(TAG, "Keydown event: " + keyCode + " event: " + event.toString());
+        if (d) UserError.Log.i(TAG, "Keydown event: " + keyCode + " event: " + event.toString());
         return super.onKeyDown(keyCode, event);
     }
 
@@ -3431,8 +3430,8 @@ public class Home extends ActivityWithMenu implements ActivityCompat.OnRequestPe
 
     @Override
     public void onRequestPermissionsResult(int requestCode,
-                                           @androidx.annotation.NonNull @NonNull String[] permissions,
-                                           @androidx.annotation.NonNull @NonNull int[] grantResults) {
+                                           @NonNull String[] permissions,
+                                           @NonNull int[] grantResults) {
         // automatically restore settings backup if we just approved a request coming from that
         if (requestCode == SdcardImportExport.TRIGGER_RESTORE_PERMISSIONS_REQUEST_STORAGE
                 && permissions.length > 0 && grantResults.length > 0

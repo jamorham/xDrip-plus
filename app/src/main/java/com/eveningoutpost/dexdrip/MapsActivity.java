@@ -10,6 +10,7 @@ import android.view.*;
 
 import androidx.appcompat.app.*;
 
+import com.eveningoutpost.dexdrip.models.*;
 import com.eveningoutpost.dexdrip.utilitymodels.*;
 import com.google.android.gms.maps.*;
 import com.google.android.gms.maps.model.*;
@@ -31,7 +32,7 @@ public class MapsActivity extends /*FragmentActivity*/AppCompatActivity implemen
     public static void newMapLocation(String location, long when) {
         try {
             if ((location != null) && (location.length()>5)) {
-                Log.d(TAG,"New location: "+location);
+                UserError.Log.i(TAG,"New location: "+location);
                 try {
                     lastGeoLocation = location;
                     String[] splits = lastGeoLocation.split(",");
@@ -39,7 +40,7 @@ public class MapsActivity extends /*FragmentActivity*/AppCompatActivity implemen
                         Double thislat = Double.parseDouble(splits[0]);
                         Double thislong = Double.parseDouble(splits[1]);
                         if ((thislat != 0) && (thislong != 0)) {
-                            if (longs.size() > 0) {
+                            if (!longs.isEmpty()) {
                                 if ((longs.get(longs.size() - 1).equals(thislong))
                                         && (lats.get(lats.size() - 1).equals(thislat))) {
                                     return; // dupe
@@ -64,16 +65,16 @@ public class MapsActivity extends /*FragmentActivity*/AppCompatActivity implemen
                     }
                 } catch (Exception e)
                 {
-                    Log.e(TAG,"Got exception with new map location: "+e.toString());
+                    UserError.Log.e(TAG,"Got exception with new map location: "+e.toString());
                 }
             }
         } catch (Exception e) {
-            Log.e(TAG, "Got exception in newmaplocation: " + e.toString());
+            UserError.Log.e(TAG, "Got exception in newmaplocation: " + e.toString());
         }
     }
 
     private static void redrawmap() {
-        Log.d(TAG, "Attempting to redraw map: " + lastGeoLocation);
+        UserError.Log.i(TAG, "Attempting to redraw map: " + lastGeoLocation);
         if (mMap == null) return;
         mMap.clear();
 
@@ -83,10 +84,10 @@ public class MapsActivity extends /*FragmentActivity*/AppCompatActivity implemen
         try {
             mylocation = new LatLng(Double.parseDouble(splits[0]), Double.parseDouble(splits[1]));
         } catch (NumberFormatException e) {
-            Log.e(TAG, "Mylocation number exception: '" + lastGeoLocation + "'");
+            UserError.Log.e(TAG, "Mylocation number exception: '" + lastGeoLocation + "'");
             return;
         } catch (ArrayIndexOutOfBoundsException e) {
-            Log.e(TAG, "Mylocation array index exception: '" + lastGeoLocation + "'");
+            UserError.Log.e(TAG, "Mylocation array index exception: '" + lastGeoLocation + "'");
             return;
         }
             CircleOptions circleOptions = new CircleOptions()
@@ -104,7 +105,7 @@ public class MapsActivity extends /*FragmentActivity*/AppCompatActivity implemen
             mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(mylocation, 13));
         }
 
-        if (lats.size() > 0) {
+        if (!lats.isEmpty()) {
             PolylineOptions mylines = new PolylineOptions();
             for (int c = 0; c < lats.size(); c++) {
                 mylines.add(new LatLng(lats.get(c), longs.get(c)));

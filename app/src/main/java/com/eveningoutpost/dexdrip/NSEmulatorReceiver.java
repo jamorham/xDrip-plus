@@ -49,7 +49,7 @@ public class NSEmulatorReceiver extends BroadcastReceiver {
                 synchronized (lock) {
                     try {
 
-                        Log.d(TAG, "NSEmulator onReceiver: " + intent.getAction());
+                        UserError.Log.i(TAG, "NSEmulator onReceiver: " + intent.getAction());
                         JoH.benchmark(null);
                         // check source
                         if (prefs == null)
@@ -73,7 +73,7 @@ public class NSEmulatorReceiver extends BroadcastReceiver {
                                 // in future this could have its own data source perhaps instead of follower
                                 if (!Home.get_follower() && DexCollectionType.getDexCollectionType() != DexCollectionType.NSEmulator &&
                                         !Pref.getBooleanDefaultFalse("external_blukon_algorithm")) { //???DexCollectionType
-                                    Log.e(TAG, "Received NSEmulator data but we are not a follower or emulator receiver");
+                                    UserError.Log.e(TAG, "Received NSEmulator data but we are not a follower or emulator receiver");
                                     return;
                                 }
 
@@ -87,7 +87,7 @@ public class NSEmulatorReceiver extends BroadcastReceiver {
 
                                 if (bundle == null) break;
 
-                                Log.d(TAG, "Receiving NSEmulator broadcast");
+                                UserError.Log.i(TAG, "Receiving NSEmulator broadcast");
 
                                 final String collection = bundle.getString("collection");
                                 if (collection == null) return;
@@ -97,7 +97,7 @@ public class NSEmulatorReceiver extends BroadcastReceiver {
                                     case "entries":
                                         final String data = bundle.getString("data");
 
-                                        if ((data != null) && (data.length() > 0)) {
+                                        if ((data != null) && (!data.isEmpty())) {
                                             try {
                                                 final JSONArray json_array = new JSONArray(data);
                                                 // if this array is >1 in length then it is from OOP otherwise something like AAPS
@@ -119,13 +119,13 @@ public class NSEmulatorReceiver extends BroadcastReceiver {
 
                                                             break;
                                                         default:
-                                                            Log.e(TAG, "Unknown entries type: " + type);
+                                                            UserError.Log.e(TAG, "Unknown entries type: " + type);
                                                     }
                                                 }
 
 
                                             } catch (JSONException e) {
-                                                Log.e(TAG, "Got JSON exception: " + e);
+                                                UserError.Log.e(TAG, "Got JSON exception: " + e);
                                             }
 
                                         }
@@ -134,9 +134,9 @@ public class NSEmulatorReceiver extends BroadcastReceiver {
                                     case "devicestatus":
                                         final String ddata = bundle.getString("data");
 
-                                        if ((ddata != null) && (ddata.length() > 0)) {
+                                        if ((ddata != null) && (!ddata.isEmpty())) {
                                             try {
-                                                Log.d(TAG, "Got device status data: " + ddata);
+                                                UserError.Log.i(TAG, "Got device status data: " + ddata);
                                                 final JSONArray json_array = new JSONArray(ddata);
                                                 final JSONObject json_object = json_array.getJSONObject(0);
                                                 final JSONObject json_pump_object = json_object.getJSONObject("pump");
@@ -146,7 +146,7 @@ public class NSEmulatorReceiver extends BroadcastReceiver {
                                                     PumpStatus.setReservoir(reservoir);
 
                                                 } catch (JSONException e) {
-                                                    Log.d(TAG, "Got exception when processing reservoir: " + e);
+                                                    UserError.Log.i(TAG, "Got exception when processing reservoir: " + e);
                                                 }
 
                                                 try {
@@ -155,7 +155,7 @@ public class NSEmulatorReceiver extends BroadcastReceiver {
                                                     PumpStatus.setBattery(battery_percent);
 
                                                 } catch (JSONException e) {
-                                                    Log.d(TAG, "Got exception when processing battery: " + e);
+                                                    UserError.Log.i(TAG, "Got exception when processing battery: " + e);
                                                 }
 
                                                 try {
@@ -164,27 +164,27 @@ public class NSEmulatorReceiver extends BroadcastReceiver {
                                                     PumpStatus.setBolusIoB(bolus_iob);
 
                                                 } catch (JSONException e) {
-                                                    Log.d(TAG, "Got exception when processing iob: " + e);
+                                                    UserError.Log.i(TAG, "Got exception when processing iob: " + e);
                                                 }
 
                                             } catch (JSONException e) {
-                                                Log.e(TAG, "Got JSON exception: " + e);
+                                                UserError.Log.e(TAG, "Got JSON exception: " + e);
                                             } catch (Exception e) {
-                                                Log.e(TAG, "Got processing exception: " + e);
+                                                UserError.Log.e(TAG, "Got processing exception: " + e);
                                             }
                                             PumpStatus.syncUpdate();
                                         }
                                         break;
 
                                     default:
-                                        Log.d(TAG, "Unprocessed collection: " + collection);
+                                        UserError.Log.i(TAG, "Unprocessed collection: " + collection);
 
                                 }
 
                                 break;
 
                             default:
-                                Log.e(TAG, "Unknown action! " + action);
+                                UserError.Log.e(TAG, "Unknown action! " + action);
                                 break;
                         }
                     } finally {
@@ -197,7 +197,7 @@ public class NSEmulatorReceiver extends BroadcastReceiver {
     }
 
     public static BgReading bgReadingInsertFromData(long timestamp, double sgv, double slope, boolean do_notification) {
-        Log.d(TAG, "bgReadingInsertFromData called timestamp = " + timestamp + " bg = " + sgv + " time =" + JoH.dateTimeText(timestamp));
+        UserError.Log.i(TAG, "bgReadingInsertFromData called timestamp = " + timestamp + " bg = " + sgv + " time =" + JoH.dateTimeText(timestamp));
         final JSONObject faux_bgr = new JSONObject();
         try {
             faux_bgr.put("timestamp", timestamp);
@@ -217,7 +217,7 @@ public class NSEmulatorReceiver extends BroadcastReceiver {
             return null;
         }
 
-        Log.d(TAG, "Received NSEmulator SGV: " + faux_bgr);
+        UserError.Log.i(TAG, "Received NSEmulator SGV: " + faux_bgr);
         return bgReadingInsertFromJson(faux_bgr.toString(), do_notification, true); // notify and force sensor
     }
 }

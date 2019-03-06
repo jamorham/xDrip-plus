@@ -4,7 +4,7 @@
     <PreferenceCategory
         android:key="xdrip_plus_category"
         android:title="@string/xdrip_plus_extra_settings" />
-    <PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android"
+    <PreferenceScreen
         android:icon="@drawable/ic_chart_areaspline_grey600_48dp"
         android:key="xdrip_plus_display_settings"
         android:summary="@string/display_customisations"
@@ -13,8 +13,7 @@
         <PreferenceCategory
             android:key="xdrip_plus_display_category"
             android:title="@string/xdrip_plus_display_settings">
-            <PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android"
-                xmlns:app="http://schemas.android.com/apk/res-auto"
+            <PreferenceScreen xmlns:app="http://schemas.android.com/apk/res-auto"
 
                 android:icon="@drawable/ic_palette_grey600_48dp"
                 android:key="xdrip_plus_color_settings"
@@ -320,7 +319,7 @@
                 android:summary="@string/show_tips_hints"
                 android:title="@string/show_interface_hints" />
 
-            <PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android"
+            <PreferenceScreen
                 android:icon="@drawable/ic_chart_areaspline_grey600_48dp"
                 android:key="xdrip_plus_graph_display_settings"
                 android:summary="@string/summary_xdrip_plus_graph_display_settings"
@@ -571,7 +570,7 @@
         </PreferenceCategory>
     </PreferenceScreen>
 
-    <PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android"
+    <PreferenceScreen
         android:dependency="I_understand"
         android:icon="@drawable/ic_auto_fix_grey600_48dp"
         android:key="xdrip_plus_profile_settings"
@@ -634,7 +633,7 @@
             </Preference>
         </PreferenceCategory>
 
-        <PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android"
+        <PreferenceScreen
             android:dependency="I_understand"
             android:key="xdrip_plus_adv_predict"
             android:summary="@string/deel_settings_for_algs"
@@ -676,7 +675,7 @@
 
     </PreferenceScreen>
 
-    <PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android"
+    <PreferenceScreen
         android:dependency="I_understand"
         android:icon="@drawable/ic_google_circles_communities_grey600_48dp"
         android:key="xdrip_plus_sync_settings"
@@ -724,7 +723,7 @@
                 android:key="plus_follow_geolocation"
                 android:summary="@string/send_parakeet_map_location_to_followers"
                 android:title="@string/sync_parakeet_geolocation" />
-            <PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android"
+            <PreferenceScreen
                 android:key="xdrip_plus_remote_snooze_settings"
                 android:summary="@string/remote_snoozes"
                 android:title="@string/remote_snoozing">
@@ -751,7 +750,7 @@
                     android:summary="@string/only_accept_same_network"
                     android:title="@string/wifi_name_must_match" />
             </PreferenceScreen>
-            <PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android"
+            <PreferenceScreen
                 android:icon="@drawable/desert_sync"
                 android:key="xdrip_plus_desert_sync_settings"
                 android:summary="@string/summary_xdrip_plus_desert_sync_settings"
@@ -794,7 +793,7 @@
         </PreferenceCategory>
     </PreferenceScreen>
 
-    <PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android"
+    <PreferenceScreen
         android:icon="@drawable/ic_car_connected_grey600_48dp"
         android:key="xdrip_plus_motion_settings"
         android:summary="@string/movement_detection_and_vehicle_mode"
@@ -880,7 +879,7 @@
     </PreferenceScreen>
 
 
-    <PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android"
+    <PreferenceScreen
         android:icon="@drawable/ic_briefcase_download_grey600_48dp"
         android:key="xdrip_plus_update_settings"
         android:summary="@string/automatic_updates_crash_reports_and_feedback"
@@ -950,7 +949,7 @@
         android:key="xdrip_plus_experimental"
         android:title="@string/title_xdrip_plus_experimental">
 
-        <PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android"
+        <PreferenceScreen
             android:icon="@drawable/ic_mode_edit_grey_600_48dp"
             android:key="inpen_screen"
             android:summary="@string/summary_inpen_screen"
@@ -1009,7 +1008,7 @@
             </Preference>
         </PreferenceScreen>
 
-        <PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android"
+        <PreferenceScreen
             android:icon="@drawable/ic_mode_edit_grey_600_48dp"
             android:key="pendiq_screen"
             android:summary="@string/summary_pendiq_screen"

@@ -66,7 +66,7 @@ public class PersistentHighTest extends RobolectricTestWithConfig {
 
         // Extract all log messages for tag
         List<String> logMessages = ShadowLog.getLogsForTag("PersistentHigh").stream()
-                .map(log -> log.msg)
+                .map(log ->UserError.Log.msg)
                 .collect(Collectors.toList());
 
         // Assert on log output

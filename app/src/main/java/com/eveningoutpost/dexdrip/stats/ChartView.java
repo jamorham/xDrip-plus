@@ -7,6 +7,8 @@ import android.graphics.Color;
 import android.graphics.Paint;
 import android.graphics.RectF;
 import android.util.DisplayMetrics;
+
+import com.eveningoutpost.dexdrip.models.*;
 import com.eveningoutpost.dexdrip.models.UserError.Log;
 import android.view.View;
 
@@ -27,13 +29,13 @@ public class ChartView extends View {
 
     @Override
     protected void onDraw(Canvas canvas) {
-        Log.d("DrawStats", "onDraw - ChartView");
+        UserError.Log.i("DrawStats", "onDraw - ChartView");
         super.onDraw(canvas);
 
         RangeData rd = getMaybeRangeData();
 
         if (rd == null) {
-            Log.d("DrawStats", "ChartView - onDraw if");
+            UserError.Log.i("DrawStats", "ChartView - onDraw if");
 
             Paint myPaint = new Paint();
             myPaint.setColor(Color.WHITE);
@@ -42,7 +44,7 @@ public class ChartView extends View {
             myPaint.setTextSize(dp2px(15));
             canvas.drawText("Calculating...", dp2px(30), canvas.getHeight() / 2, myPaint);
         } else {
-            Log.d("DrawStats", "onDraw else");
+            UserError.Log.i("DrawStats", "onDraw else");
 
             if ((rd.aboveRange + rd.belowRange + rd.inRange) == 0) {
                 Paint myPaint = new Paint();
@@ -65,7 +67,7 @@ public class ChartView extends View {
             float lowDeg = rd.belowRange * 360f / (rd.inRange + rd.belowRange + rd.aboveRange);
             float highDeg = rd.aboveRange * 360f / (rd.inRange + rd.belowRange + rd.aboveRange);
 
-            Log.d("DrawStats", "in,low, high degree: " + inDeg + " " + lowDeg + " " + highDeg);
+            UserError.Log.i("DrawStats", "in,low, high degree: " + inDeg + " " + lowDeg + " " + highDeg);
 
             myPaint.setColor(android.graphics.Color.RED);
             canvas.drawArc(rect, -90, lowDeg, true, myPaint);

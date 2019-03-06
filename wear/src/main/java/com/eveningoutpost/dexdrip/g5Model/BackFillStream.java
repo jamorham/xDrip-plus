@@ -118,7 +118,7 @@ public class BackFillStream extends BaseMessage {
     }
 
     @Data
-    @AllArgsConstructor()
+    @AllArgsConstructor
     public class Backsie {
         private final int glucose;
         private final int trend;

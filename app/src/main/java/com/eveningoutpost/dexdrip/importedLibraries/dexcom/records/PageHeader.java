@@ -1,5 +1,6 @@
 package com.eveningoutpost.dexdrip.importedLibraries.dexcom.records;
 
+import com.eveningoutpost.dexdrip.models.*;
 import com.eveningoutpost.dexdrip.models.UserError.Log;
 
 import com.eveningoutpost.dexdrip.importedLibraries.dexcom.CRC16;
@@ -38,7 +39,7 @@ public class PageHeader {
 
 
     public PageHeader(byte[] packet) {
-        Log.d("ShareTest", "Header Packet Data Length: " + packet.length);
+        UserError.Log.i("ShareTest", "Header Packet Data Length: " + packet.length);
 
         firstRecordIndex = ByteBuffer.wrap(packet).order(ByteOrder.LITTLE_ENDIAN).getInt(FIRSTRECORDINDEX_OFFSET);
         numOfRecords = ByteBuffer.wrap(packet).order(ByteOrder.LITTLE_ENDIAN).getInt(NUMRECS_OFFSET);

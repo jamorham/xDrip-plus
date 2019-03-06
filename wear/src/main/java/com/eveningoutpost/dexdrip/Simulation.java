@@ -67,9 +67,9 @@ public class Simulation extends AppCompatActivity {
         try {
             AppCompatActivity activity = (AppCompatActivity) context;
             activity.runOnUiThread(() -> Toast.makeText(context, msg, length).show());
-            Log.d(TAG, "Toast msg: " + msg);
+           UserError.Log.d(TAG, "Toast msg: " + msg);
         } catch (Exception e) {
-            Log.e(TAG, "Couldn't display toast: " + msg + " e: " + e.toString());
+           UserError.Log.e(TAG, "Couldn't display toast: " + msg + " e: " + e.toString());
         }
     }
 
@@ -118,7 +118,7 @@ public class Simulation extends AppCompatActivity {
                     for (String key : bundle.keySet()) {
                         Object value = bundle.get(key);
                         if (value != null) {
-                            Log.d(TAG, String.format("%s %s (%s)", key,
+                           UserError.Log.d(TAG, String.format("%s %s (%s)", key,
                                     value.toString(), value.getClass().getName()));
                         }
                     }
@@ -127,7 +127,7 @@ public class Simulation extends AppCompatActivity {
             }
         });
 
-        Log.i(TAG, "triggered");
+       UserError.Log.i(TAG, "triggered");
         final Bundle bundle = intent.getExtras();
         if (bundle == null) promptSpeechInput();
     }
@@ -155,18 +155,18 @@ public class Simulation extends AppCompatActivity {
                 processIncomingIntent(intent);
             } else {
                 stackcounter++;
-                Log.d(TAG, "Waiting for inflation count:" + stackcounter);
+               UserError.Log.d(TAG, "Waiting for inflation count:" + stackcounter);
                 if (stackcounter < 30) processIncomingIntentWhenReady(intent);
             }
         }, 100);
     }
 
     private void processIncomingIntent(Intent intent) {
-        Log.d(TAG, "Processing incoming Intent");
+       UserError.Log.d(TAG, "Processing incoming Intent");
         final Bundle bundle = intent.getExtras();
         if (bundle == null) return;
         boolean hascontent = false;
-        Log.d(TAG, "Processing incoming bundle");
+       UserError.Log.d(TAG, "Processing incoming bundle");
 
 
         if (intent != null) {
@@ -223,7 +223,7 @@ public class Simulation extends AppCompatActivity {
                             }
                             String timestring = dataMap.getString("timestring", thistimetext);
                             timeoffset = dataMap.getDouble("timeoffset", thistimeoffset);
-                            if ((timeoffset > 0) && (timestring.length() > 0)) {
+                            if ((timeoffset > 0) && (!timestring.isEmpty())) {
                                 mTimeText.setText(timestring);
                                 mTimeText.setVisibility(View.VISIBLE);
                                 btnTime.setVisibility(View.VISIBLE);
@@ -250,7 +250,7 @@ public class Simulation extends AppCompatActivity {
                     }
 
                 } catch (Exception e) {
-                    Log.e(TAG, "Got exception processing treatment intent: " + e);
+                   UserError.Log.e(TAG, "Got exception processing treatment intent: " + e);
                 }
 
                 try {
@@ -267,7 +267,7 @@ public class Simulation extends AppCompatActivity {
                     if ((!hascontent) || (msg.contains("Treatment cancelled")) || (msg.contains("Treatment processed")))
                         finish();
                 } catch (Exception e) {
-                    Log.e(TAG, "Got exception processing toast intent: " + e);
+                   UserError.Log.e(TAG, "Got exception processing toast intent: " + e);
                 }
 
             }
@@ -362,16 +362,16 @@ public class Simulation extends AppCompatActivity {
             return;
         }
 
-        Log.d(TAG, "GOT WORD PAIR: " + thisnumber + " = " + thisword);
+       UserError.Log.d(TAG, "GOT WORD PAIR: " + thisnumber + " = " + thisword);
 
         switch (thisword) {
             case "watchkeypad":
                 if ((!watchkeypadset) && (thisnumber > 0)) {
                     watchkeypad = true;
                     watchkeypadset = true;
-                    Log.d(TAG, "Treatment entered on watchkeypad: " + thisnumber);
+                   UserError.Log.d(TAG, "Treatment entered on watchkeypad: " + thisnumber);
                 } else {
-                    Log.d(TAG, "watchkeypad already set");
+                   UserError.Log.d(TAG, "watchkeypad already set");
                 }
                 break;
 
@@ -379,10 +379,10 @@ public class Simulation extends AppCompatActivity {
             case "units":
                 if ((!insulinset) && (thisnumber > 0)) {
                     thisinsulinnumber = thisnumber;
-                    Log.d(TAG, "Rapid dose: " + thisnumber);
+                   UserError.Log.d(TAG, "Rapid dose: " + thisnumber);
                     insulinset = true;
                 } else {
-                    Log.d(TAG, "Rapid dose already set");
+                   UserError.Log.d(TAG, "Rapid dose already set");
                 }
                 break;
 
@@ -390,24 +390,24 @@ public class Simulation extends AppCompatActivity {
                 if ((!carbsset) && (thisnumber > 0)) {
                     thiscarbsnumber = thisnumber;
                     carbsset = true;
-                    Log.d(TAG, "Carbs eaten: " + thisnumber);
+                   UserError.Log.d(TAG, "Carbs eaten: " + thisnumber);
                 } else {
-                    Log.d(TAG, "Carbs already set");
+                   UserError.Log.d(TAG, "Carbs already set");
                 }
                 break;
 
             case "blood":
                 if ((!glucoseset) && (thisnumber > 0)) {
                     thisglucosenumber = thisnumber;
-                    Log.d(TAG, "Blood test: " + thisnumber);
+                   UserError.Log.d(TAG, "Blood test: " + thisnumber);
                     glucoseset = true;
                 } else {
-                    Log.d(TAG, "Blood glucose already set");
+                   UserError.Log.d(TAG, "Blood glucose already set");
                 }
                 break;
 
             case "time":
-                Log.d(TAG, "processing time keyword");
+               UserError.Log.d(TAG, "processing time keyword");
                 if ((!timeset) && (thisnumber >= 0)) {
 
                     final NumberFormat nf = NumberFormat.getNumberInstance(Locale.US);
@@ -426,7 +426,7 @@ public class Simulation extends AppCompatActivity {
                             new SimpleDateFormat("dd/M/yyyy HH.mm", Locale.US); // TODO double check 24 hour 12.00 etc
                     final String datenew = simpleDateFormat1.format(c.getTime()) + df.format(thisnumber);
 
-                    Log.d(TAG, "Time Timing data datenew: " + datenew);
+                   UserError.Log.d(TAG, "Time Timing data datenew: " + datenew);
 
                     final Date datethen;
                     final Date datenow = new Date();
@@ -443,16 +443,16 @@ public class Simulation extends AppCompatActivity {
                                 difference = difference - (86400 * 1000);
                         }
 
-                        Log.d(TAG, "Time Timing data: " + df.format(thisnumber) + " = difference ms: " + JoH.qs(difference));
+                       UserError.Log.d(TAG, "Time Timing data: " + df.format(thisnumber) + " = difference ms: " + JoH.qs(difference));
                         thistimetext = df.format(thisnumber);
                         timeset = true;
                         thistimeoffset = difference;
                     } catch (ParseException e) {
                         // toast to explain?
-                        Log.d(TAG, "Got exception parsing date time");
+                       UserError.Log.d(TAG, "Got exception parsing date time");
                     }
                 } else {
-                    Log.d(TAG, "Time data already set");
+                   UserError.Log.d(TAG, "Time data already set");
                 }
                 break;
         } // end switch
@@ -471,13 +471,13 @@ public class Simulation extends AppCompatActivity {
     }
 
     private void createTreatment(String allWords) {
-        Log.d(TAG, "createTreatment allWords=" + allWords);
+       UserError.Log.d(TAG, "createTreatment allWords=" + allWords);
         allWords = allWords.trim();
         allWords = allWords.replaceAll(":", "."); // fix real times
         allWords = allWords.replaceAll("(\\d)([a-zA-Z])", "$1 $2"); // fix like 22mm
         allWords = allWords.replaceAll("([0-9].[0-9])([0-9][0-9])", "$1 $2"); // fix multi number order like blood 3.622 grams
         allWords = allWords.toLowerCase();
-        Log.d(TAG, "createTreatment after regex allWords=" + allWords);
+       UserError.Log.d(TAG, "createTreatment after regex allWords=" + allWords);
         // reset parameters for new speech
         glucoseset = false;
         insulinset = false;
@@ -495,7 +495,7 @@ public class Simulation extends AppCompatActivity {
                 handleWordPair();
             } catch (NumberFormatException nfe) {
                 // detection of number or not
-                Log.d(TAG, "createTreatment NumberFormatException wordsArray[i]=" + word);
+               UserError.Log.d(TAG, "createTreatment NumberFormatException wordsArray[i]=" + word);
                 //String result = classifyWord(wordsArray[i]);
                 //if (result != null)
                 thisword = word;//result;

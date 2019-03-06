@@ -120,11 +120,7 @@ public class LocationHelper {
     // TODO probably can use application context here
     public static boolean isLocationPermissionOk(Context context) {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-            if (ContextCompat.checkSelfPermission(context,
-                    android.Manifest.permission.ACCESS_COARSE_LOCATION)
-                    != PackageManager.PERMISSION_GRANTED) {
-                return false;
-            }
+	        return ContextCompat.checkSelfPermission(context, permission.ACCESS_COARSE_LOCATION) == PackageManager.PERMISSION_GRANTED;
         }
         return true;
     }

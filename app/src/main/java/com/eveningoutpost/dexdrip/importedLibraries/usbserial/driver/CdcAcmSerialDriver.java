@@ -28,6 +28,8 @@ import android.hardware.usb.UsbEndpoint;
 import android.hardware.usb.UsbInterface;
 import android.hardware.usb.UsbRequest;
 import android.os.Build;
+
+import com.eveningoutpost.dexdrip.models.*;
 import com.eveningoutpost.dexdrip.models.UserError.Log;
 
 import java.io.IOException;
@@ -107,33 +109,33 @@ public class CdcAcmSerialDriver implements UsbSerialDriver {
             mConnection = connection;
             boolean opened = false;
             try {
-                Log.d(TAG, "claiming interfaces, count=" + mDevice.getInterfaceCount());
+                UserError.Log.i(TAG, "claiming interfaces, count=" + mDevice.getInterfaceCount());
                 mControlInterface = mDevice.getInterface(0);
-                Log.d(TAG, "Control iface=" + mControlInterface);
+                UserError.Log.i(TAG, "Control iface=" + mControlInterface);
                 // class should be USB_CLASS_COMM
 
                 if (!mConnection.claimInterface(mControlInterface, true)) {
                     throw new IOException("Could not claim control interface.");
                 }
                 mControlEndpoint = mControlInterface.getEndpoint(0);
-                Log.d(TAG, "Control endpoint direction: " + mControlEndpoint.getDirection());
+                UserError.Log.i(TAG, "Control endpoint direction: " + mControlEndpoint.getDirection());
 
-                Log.d(TAG, "Claiming data interface.");
+                UserError.Log.i(TAG, "Claiming data interface.");
                 mDataInterface = mDevice.getInterface(1);
-                Log.d(TAG, "data iface=" + mDataInterface);
+                UserError.Log.i(TAG, "data iface=" + mDataInterface);
                 // class should be USB_CLASS_CDC_DATA
 
                 if (!mConnection.claimInterface(mDataInterface, true)) {
                     throw new IOException("Could not claim data interface.");
                 }
                 mReadEndpoint = mDataInterface.getEndpoint(1);
-                Log.d(TAG, "Read endpoint direction: " + mReadEndpoint.getDirection());
+                UserError.Log.i(TAG, "Read endpoint direction: " + mReadEndpoint.getDirection());
                 mWriteEndpoint = mDataInterface.getEndpoint(0);
-                Log.d(TAG, "Write endpoint direction: " + mWriteEndpoint.getDirection());
+                UserError.Log.i(TAG, "Write endpoint direction: " + mWriteEndpoint.getDirection());
                 if (mEnableAsyncReads) {
-                  Log.d(TAG, "Async reads enabled");
+                  UserError.Log.i(TAG, "Async reads enabled");
                 } else {
-                  Log.d(TAG, "Async reads disabled.");
+                  UserError.Log.i(TAG, "Async reads disabled.");
                 }
                 opened = true;
             } finally {
@@ -238,7 +240,7 @@ public class CdcAcmSerialDriver implements UsbSerialDriver {
                             + " bytes at offset " + offset + " length=" + src.length);
                 }
 
-                Log.d(TAG, "Wrote amt=" + amtWritten + " attempted=" + writeLength);
+                UserError.Log.i(TAG, "Wrote amt=" + amtWritten + " attempted=" + writeLength);
                 offset += amtWritten;
             }
             return offset;

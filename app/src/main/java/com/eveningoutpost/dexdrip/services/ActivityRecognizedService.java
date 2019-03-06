@@ -68,28 +68,28 @@ public class ActivityRecognizedService extends IntentService implements GoogleAp
     }
 
     public static void startActivityRecogniser(Context context) {
-        if (d) Log.d(TAG, "Start Activity called");
+        if (d) UserError.Log.i(TAG, "Start Activity called");
         final Intent intent = new Intent(context, ActivityRecognizedService.class);
         intent.putExtra(ActivityRecognizedService.START_ACTIVITY_ACTION, ActivityRecognizedService.START_ACTIVITY_ACTION);
         context.startService(intent);
     }
 
     public static void reStartActivityRecogniser(Context context) {
-        if (d) Log.d(TAG, "Restart Activity called");
+        if (d) UserError.Log.i(TAG, "Restart Activity called");
         final Intent intent = new Intent(context, ActivityRecognizedService.class);
         intent.putExtra(ActivityRecognizedService.RESTART_ACTIVITY_ACTION, ActivityRecognizedService.RESTART_ACTIVITY_ACTION);
         context.startService(intent);
     }
 
     public static void stopActivityRecogniser(Context context) {
-        if (d) Log.d(TAG, "Stop Activity called");
+        if (d) UserError.Log.i(TAG, "Stop Activity called");
         final Intent intent = new Intent(context, ActivityRecognizedService.class);
         intent.putExtra(ActivityRecognizedService.STOP_ACTIVITY_ACTION, ActivityRecognizedService.STOP_ACTIVITY_ACTION);
         context.startService(intent);
     }
 
     public static void spoofActivityRecogniser(Context context, String data) {
-        if (d) Log.d(TAG, "Spoofing: " + data);
+        if (d) UserError.Log.i(TAG, "Spoofing: " + data);
         final Intent intent = new Intent(context, ActivityRecognizedService.class);
         intent.putExtra(ActivityRecognizedService.INCOMING_ACTIVITY_ACTION, data);
         context.startService(intent);
@@ -97,7 +97,7 @@ public class ActivityRecognizedService extends IntentService implements GoogleAp
 
     // TODO this is not used
     public static void reCheckVehicleMode(Context context) {
-        if (d) Log.d(TAG, "recheck Vehicle mode");
+        if (d) UserError.Log.i(TAG, "recheck Vehicle mode");
         if (is_in_vehicle_mode()) {
             final Intent intent = new Intent(context, ActivityRecognizedService.class);
             intent.putExtra(RECHECK_VEHICLE_MODE, RECHECK_VEHICLE_MODE);
@@ -112,7 +112,7 @@ public class ActivityRecognizedService extends IntentService implements GoogleAp
 
     public synchronized void start(boolean no_rate_limit) {
         if (Pref.getBoolean("use_remote_motion", false)) {
-            Log.d(TAG, "Not starting as we are expecting remote instead of local motion");
+            UserError.Log.i(TAG, "Not starting as we are expecting remote instead of local motion");
             return;
         }
         if ((no_rate_limit) || (JoH.ratelimit("recognizer-start", 60))) {
@@ -183,7 +183,7 @@ public class ActivityRecognizedService extends IntentService implements GoogleAp
         final long received = getInternalPrefsLong(RECEIVED);
 
         if (requested > 0) {
-            Log.d(TAG, "Requested: " + requested + " Received: " + received);
+            UserError.Log.i(TAG, "Requested: " + requested + " Received: " + received);
             if (requested == 10) {
                 if (received < 4) {
                     UserError.Log.ueh(TAG, "Issuing full screen wakeup as req: " + getInternalPrefsLong(REQUESTED) + " rec: " + getInternalPrefsLong(RECEIVED));
@@ -234,7 +234,7 @@ public class ActivityRecognizedService extends IntentService implements GoogleAp
 
         final double ratio = ((received_all_time * 100) / requested_all_time);
         if (d)
-            Log.d(TAG, "evaluteRequestReceived: " + requested_all_time + "/" + received_all_time + " " + JoH.qs(ratio, 2));
+            UserError.Log.i(TAG, "evaluteRequestReceived: " + requested_all_time + "/" + received_all_time + " " + JoH.qs(ratio, 2));
         /*
         disabled as was for early debug only
         if (JoH.ratelimit("evalute-request-received", 86400) || (disable)) {
@@ -251,7 +251,7 @@ public class ActivityRecognizedService extends IntentService implements GoogleAp
     }
 
     private static void resetRequestedReceivedCounters() {
-        if (d) Log.d(TAG, "Resetting Request/Received counters");
+        if (d) UserError.Log.i(TAG, "Resetting Request/Received counters");
         setInternalPrefsLong(REQUESTED, 0);
         setInternalPrefsLong(RECEIVED, 0);
     }
@@ -302,10 +302,10 @@ public class ActivityRecognizedService extends IntentService implements GoogleAp
 
     private static int getLastStoredActivity() {
         final motionDataWrapper motion_list = loadActivityTimeSeries();
-        if (motion_list.entries.size() > 0) {
+        if (!motion_list.entries.isEmpty()) {
             if (d) {
                 for (motionData item : motion_list.entries) {
-                    Log.d(TAG, "data item: " + JoH.dateTimeText(item.timestamp) + " = " + item.activity);
+                    UserError.Log.i(TAG, "data item: " + JoH.dateTimeText(item.timestamp) + " = " + item.activity);
                 }
             }
             // get last element assuming presorted
@@ -318,14 +318,14 @@ public class ActivityRecognizedService extends IntentService implements GoogleAp
     public static ArrayList<motionData> getForGraph(long start, long end) {
         final motionDataWrapper motion_list = loadActivityTimeSeries();
         final ArrayList<motionData> ret = new ArrayList<>();
-        Log.d(TAG, "Motion list original size: " + motion_list.entries.size() + " start: " + JoH.dateTimeText(start) + " end:" + JoH.dateTimeText(end));
+        UserError.Log.i(TAG, "Motion list original size: " + motion_list.entries.size() + " start: " + JoH.dateTimeText(start) + " end:" + JoH.dateTimeText(end));
 
         for (motionData item : motion_list.entries) {
             if ((item.timestamp >= start) && (item.timestamp <= end)) {
                 ret.add(item);
             }
         }
-        if (d) Log.d(TAG, "Motion list final size: " + ret.size());
+        if (d) UserError.Log.i(TAG, "Motion list final size: " + ret.size());
 
         return ret;
     }
@@ -343,7 +343,7 @@ public class ActivityRecognizedService extends IntentService implements GoogleAp
         final String stored = getInternalPrefsString(PREFS_MOTION_TIME_SERIES);
 
         final motionDataWrapper motion_list;
-        if (stored.length() > 0) {
+        if (!stored.isEmpty()) {
             final Gson gson = new Gson();
             motion_list = gson.fromJson(stored, motionDataWrapper.class);
         } else {
@@ -367,13 +367,13 @@ public class ActivityRecognizedService extends IntentService implements GoogleAp
             }
         }
 
-        final boolean out_of_order = (motion_list.entries.size() > 0) && timestamp < motion_list.entries.get(motion_list.entries.size() - 1).timestamp;
+        final boolean out_of_order = (!motion_list.entries.isEmpty()) && timestamp < motion_list.entries.get(motion_list.entries.size() - 1).timestamp;
 
         motion_list.entries.add(new motionData(timestamp, activityState.getType()));
 
         // sort if data was out of order
         if (out_of_order) {
-            if (d) Log.d(TAG, "Sorting data...");
+            if (d) UserError.Log.i(TAG, "Sorting data...");
             Collections.sort(motion_list.entries, (left, right) -> {
                 if (left.timestamp == right.timestamp) return 0;
                 return ((left.timestamp - right.timestamp) > 0) ? 1 : -1;
@@ -395,7 +395,7 @@ public class ActivityRecognizedService extends IntentService implements GoogleAp
         try {
             received = 0; // reset
             wl_global = JoH.getWakeLock("motion-wait", frequency * 5); // released later
-            if (d) Log.d(TAG, "requestUpdates called: " + frequency);
+            if (d) UserError.Log.i(TAG, "requestUpdates called: " + frequency);
             incrementInternalPrefsLong(REQUESTED);
             interpretRatio(this);
             ActivityRecognition.ActivityRecognitionApi.requestActivityUpdates(mApiClient, frequency, get_pending_intent());
@@ -406,10 +406,10 @@ public class ActivityRecognizedService extends IntentService implements GoogleAp
 
     private synchronized void stopUpdates() {
         try {
-            if (d) Log.d(TAG, "stopUpdates called");
+            if (d) UserError.Log.i(TAG, "stopUpdates called");
             ActivityRecognition.ActivityRecognitionApi.removeActivityUpdates(mApiClient, get_pending_intent());
             if (wl_global != null) {
-                if (d) Log.d(TAG, "release wl_global");
+                if (d) UserError.Log.i(TAG, "release wl_global");
                 JoH.releaseWakeLock(wl_global);
                 wl_global = null;
             }
@@ -420,7 +420,7 @@ public class ActivityRecognizedService extends IntentService implements GoogleAp
 
     private void restart(int frequency) {
         if (Pref.getBoolean("use_remote_motion", false)) {
-            if (d) Log.d(TAG, "Not re-starting as we are expecting remote instead of local motion");
+            if (d) UserError.Log.i(TAG, "Not re-starting as we are expecting remote instead of local motion");
             return;
         }
 
@@ -433,7 +433,7 @@ public class ActivityRecognizedService extends IntentService implements GoogleAp
 
     private synchronized void release_wl_start() {
         if (wl_start != null) {
-            if (d) Log.d(TAG, "release wl_start");
+            if (d) UserError.Log.i(TAG, "release wl_start");
             JoH.releaseWakeLock(wl_start);
             wl_start = null;
         }
@@ -501,7 +501,7 @@ public class ActivityRecognizedService extends IntentService implements GoogleAp
                     last_data = JoH.ts();
                     received++;
                     if (d)
-                        Log.d(TAG, JoH.hourMinuteString() + " :: Packets received: " + received + " Top confidence: " + topConfidence);
+                        UserError.Log.i(TAG, JoH.hourMinuteString() + " :: Packets received: " + received + " Top confidence: " + topConfidence);
                     if ((received > MAX_RECEIVED) || (topConfidence > 90))
                         stopUpdates(); // one hit only
                 } else {
@@ -522,7 +522,7 @@ public class ActivityRecognizedService extends IntentService implements GoogleAp
                         incoming_list.add(new DetectedActivity(activity, 101));
                         handleDetectedActivities(incoming_list, false, timestamp);
                     } catch (Exception e) {
-                        Log.wtf(TAG, "Exception processing incoming motion: " + e.toString());
+                        UserError.Log.wtf(TAG, "Exception processing incoming motion: " + e.toString());
                     }
                 }
             }
@@ -586,7 +586,7 @@ public class ActivityRecognizedService extends IntentService implements GoogleAp
                         }
 
                         if ((from_local) && Pref.getBoolean("motion_tracking_enabled", false) && (Pref.getBoolean("act_as_motion_master", false))) {
-                            if (d) Log.d(TAG, "Sending update: " + activityState.getType());
+                            if (d) UserError.Log.i(TAG, "Sending update: " + activityState.getType());
                             GcmActivity.sendMotionUpdate(JoH.tsl(), activityState.getType());
                         }
 
@@ -642,15 +642,15 @@ public class ActivityRecognizedService extends IntentService implements GoogleAp
 
     public static SharedPreferences.OnSharedPreferenceChangeListener prefListener = (prefs, key) -> {
 
-        //if (d) Log.d(TAG, "Preference change listener fired: "+key);
+        //if (d) UserError.Log.i(TAG, "Preference change listener fired: "+key);
         switch (key) {
             case "motion_tracking_enabled":
                 if (!prefs.getBoolean("motion_tracking_enabled", false)) {
-                    if (d) Log.d(TAG, "Shutting down on preference change");
+                    if (d) UserError.Log.i(TAG, "Shutting down on preference change");
                     stopActivityRecogniser(xdrip.getAppContext());
                     set_vehicle_mode(false);
                 } else {
-                    if (d) Log.d(TAG, "Starting on preference change");
+                    if (d) UserError.Log.i(TAG, "Starting on preference change");
                     resetRequestedReceivedCounters();
                     startActivityRecogniser(xdrip.getAppContext());
 
@@ -660,7 +660,7 @@ public class ActivityRecognizedService extends IntentService implements GoogleAp
             case "act_as_motion_master":
                 if (prefs.getBoolean("act_as_motion_master", false)
                         && prefs.getBoolean("use_remote_motion", false)) {
-                    if (d) Log.d(TAG, "Turning off remote motion");
+                    if (d) UserError.Log.i(TAG, "Turning off remote motion");
                     prefs.edit().putBoolean("use_remote_motion", false).apply();
                 }
                 reStartActivityRecogniser(xdrip.getAppContext());
@@ -668,7 +668,7 @@ public class ActivityRecognizedService extends IntentService implements GoogleAp
             case "use_remote_motion":
                 if (prefs.getBoolean("use_remote_motion", false)
                         && prefs.getBoolean("act_as_motion_master", false)) {
-                    if (d) Log.d(TAG, "Turning off motion master");
+                    if (d) UserError.Log.i(TAG, "Turning off motion master");
                     prefs.edit().putBoolean("act_as_motion_master", false).apply();
 
                 }

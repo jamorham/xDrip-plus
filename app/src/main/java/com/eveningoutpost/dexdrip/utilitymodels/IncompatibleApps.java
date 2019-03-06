@@ -57,7 +57,7 @@ public class IncompatibleApps {
     }
 
     private static int notify(String short_name, String package_string, String msg, int id) {
-        JoH.showNotification("Incompatible App " + short_name, "Please uninstall or disable " + package_string, null, id, true, true, null, null, ((msg.length() > 0) ? msg + "\n\n" : "") + "Another installed app may be incompatible with xDrip. The other app should be uninstalled or disabled to prevent conflicts with shared resources.\nThe package identifier is: " + package_string);
+        JoH.showNotification("Incompatible App " + short_name, "Please uninstall or disable " + package_string, null, id, true, true, null, null, ((!msg.isEmpty()) ? msg + "\n\n" : "") + "Another installed app may be incompatible with xDrip. The other app should be uninstalled or disabled to prevent conflicts with shared resources.\nThe package identifier is: " + package_string);
         return id + 1;
     }
 

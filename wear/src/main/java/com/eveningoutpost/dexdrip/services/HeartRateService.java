@@ -184,7 +184,7 @@ public class HeartRateService extends IntentService {
                     final ArrayList<DataMap> dataMaps = new ArrayList<>(logs.size());
                     for (HeartRate log : logs) {
                         dataMaps.add(dataMap(log));
-                        last_send_success = (long) log.timestamp;
+                        last_send_success = (long)UserError.Log.timestamp;
                     }
                     entries.putLong("time", JoH.tsl()); // MOST IMPORTANT LINE FOR TIMESTAMP
                     entries.putDataMapArrayList("entries", dataMaps);
@@ -203,7 +203,7 @@ public class HeartRateService extends IntentService {
     // this is pretty inefficient - maybe eventually replace with protobuf
     private static DataMap dataMap(HeartRate log) {
         final DataMap dataMap = new DataMap();
-        final String json = log.toS();
+        final String json =UserError.Log.toS();
         dataMap.putString("entry", json);
         return dataMap;
     }

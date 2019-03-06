@@ -113,7 +113,7 @@ public class UserNotification extends Model {
             userNotification.timestamp = JoH.tolerantParseDouble(timestamp, -1);
             if (userNotification.timestamp == -1) return null; // bad data
             userNotification.message = message;
-            Log.d(TAG, "Workaround for: " + type + " " + userNotification.message + " timestamp: " + userNotification.timestamp);
+            UserError.Log.i(TAG, "Workaround for: " + type + " " + userNotification.message + " timestamp: " + userNotification.timestamp);
             return userNotification;
         }
     }
@@ -132,7 +132,7 @@ public class UserNotification extends Model {
     public static void snoozeAlert(String type, long snoozeMinutes) {
         UserNotification userNotification = GetNotificationByType(type);
         if(userNotification == null) {
-            Log.e(TAG, "Error snoozeAlert did not find an alert for type " + type);
+            UserError.Log.e(TAG, "Error snoozeAlert did not find an alert for type " + type);
             return;
         }
         userNotification.timestamp = new Date().getTime() + snoozeMinutes * 60000;
@@ -170,7 +170,7 @@ public class UserNotification extends Model {
                 userNotification.bg_fall_alert = true;
                 break;
             default:
-                Log.d(TAG, "Saving workaround for: " + type + " " + message);
+                UserError.Log.i(TAG, "Saving workaround for: " + type + " " + message);
                 PersistentStore.setString("UserNotification:timestamp:" + type, String.format(Locale.US, "%d", (long) timestamp));
                 PersistentStore.setString("UserNotification:message:" + type, message);
                 return null;

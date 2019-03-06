@@ -64,7 +64,7 @@ public class InfluxDBUploader {
 
             for (BgReading record : glucoseDataSets) {
                 if (record == null) {
-                    Log.e(TAG, "InfluxDB glucose record is null");
+                    UserError.Log.e(TAG, "InfluxDB glucose record is null");
                     continue;
                 }
                 batchPoints.point(createGlucosePoint(record));
@@ -72,7 +72,7 @@ public class InfluxDBUploader {
 
             for (Calibration record : meterRecords) {
                 if (record == null) {
-                    Log.e(TAG, "InfluxDB meter record is null");
+                    UserError.Log.e(TAG, "InfluxDB meter record is null");
                     continue;
                 }
                 batchPoints.point(createMeterPoint(record));
@@ -80,7 +80,7 @@ public class InfluxDBUploader {
 
             for (Calibration record : calRecords) {
                 if (record == null) {
-                    Log.e(TAG, "InfluxDB calibration record is null");
+                    UserError.Log.e(TAG, "InfluxDB calibration record is null");
                     continue;
                 }
                 if (record.slope == 0d) continue;
@@ -88,26 +88,26 @@ public class InfluxDBUploader {
             }
 
             try {
-                Log.d(TAG, "Influx url: " + dbUri);
+                UserError.Log.i(TAG, "Influx url: " + dbUri);
                 InfluxDBFactory.connect(dbUri, dbUser, dbPassword, client).enableGzip().write(batchPoints);
                 last_error = null;
                 return true;
             } catch (java.lang.ExceptionInInitializerError e) {
-                Log.e(TAG, "InfluxDB failed: " + e.getCause());
+                UserError.Log.e(TAG, "InfluxDB failed: " + e.getCause());
                 return false;
             } catch (java.lang.NoClassDefFoundError e) {
-                Log.e(TAG, "InfluxDB failed more: " + e);
+                UserError.Log.e(TAG, "InfluxDB failed more: " + e);
                 return false;
             } catch (IllegalArgumentException e) {
-                Log.wtf(TAG, "InfluxDB problem: " + e);
+                UserError.Log.wtf(TAG, "InfluxDB problem: " + e);
                 return false;
             } catch (Exception e) {
-                Log.e(TAG, "Write to InfluxDB failed: " + e);
+                UserError.Log.e(TAG, "Write to InfluxDB failed: " + e);
                 last_error = e.getMessage();
                 return false;
             }
         } catch (Exception e) {
-            Log.wtf(TAG, "Exception during initialization: ", e);
+            UserError.Log.wtf(TAG, "Exception during initialization: ", e);
             return false;
         }
     }

@@ -10,6 +10,7 @@ import androidx.annotation.*;
 import androidx.fragment.app.*;
 
 import com.eveningoutpost.dexdrip.importedLibraries.dexcom.*;
+import com.eveningoutpost.dexdrip.models.*;
 import com.eveningoutpost.dexdrip.models.UserError.*;
 import com.eveningoutpost.dexdrip.*;
 
@@ -26,7 +27,7 @@ public class FirstPageFragment extends Fragment {
     @Nullable
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
-        Log.d("DrawStats", "FirstPageFragment onCreateView");
+        UserError.Log.i("DrawStats", "FirstPageFragment onCreateView");
 
         myView = inflater.inflate(
                 R.layout.stats_general, container, false);
@@ -57,13 +58,13 @@ public class FirstPageFragment extends Fragment {
         @Override
         public void run() {
             super.run();
-            Log.d("DrawStats", "FirstPageFragment CalculationThread started");
+            UserError.Log.i("DrawStats", "FirstPageFragment CalculationThread started");
 
             SharedPreferences settings = PreferenceManager.getDefaultSharedPreferences(context);
             boolean mgdl = "mgdl".equals(settings.getString("units", "mgdl"));
 
             if (context == null) {
-                Log.d("DrawStats", "FirstPageFragment context == null, do not calculate if fragment is not attached");
+                UserError.Log.i("DrawStats", "FirstPageFragment context == null, do not calculate if fragment is not attached");
                 return;
             }
 
@@ -163,11 +164,11 @@ public class FirstPageFragment extends Fragment {
                 double gviDelta = Math.abs(glucoseLast - glucoseFirst);//Math.floor(glucose_data[0].bgValue,glucose_data[glucose_data.length-1].bgValue);
                 double gviIdeal = Math.sqrt(Math.pow(usedRecords*5,2) + Math.pow(gviDelta,2));
                 double gvi = (gviTotal / gviIdeal * 100) / 100;
-                Log.d("DrawStats", "GVI=" + gvi + " GVIIdeal=" + gviIdeal + " GVITotal=" + gviTotal + " GVIDelta=" + gviDelta + " usedRecords=" + usedRecords);
+                UserError.Log.i("DrawStats", "GVI=" + gvi + " GVIIdeal=" + gviIdeal + " GVITotal=" + gviTotal + " GVIDelta=" + gviDelta + " usedRecords=" + usedRecords);
                 double glucoseMean = Math.floor(glucoseTotal / usedRecords);
                 double tirMultiplier = normalReadingspct / 100.0;
                 double PGS = (gvi * glucoseMean * (1-tirMultiplier) * 100) / 100;
-                Log.d("DrawStats", "NormalReadingspct=" + normalReadingspct + " glucoseMean=" + glucoseMean + " tirMultiplier=" + tirMultiplier + " PGS=" + PGS);
+                UserError.Log.i("DrawStats", "NormalReadingspct=" + normalReadingspct + " glucoseMean=" + glucoseMean + " tirMultiplier=" + tirMultiplier + " PGS=" + PGS);
                 TextView gviView = (TextView) localView.findViewById(R.id.textView_gvi);
                 DecimalFormat df = new DecimalFormat("#.00");
                 updateText(localView, gviView,  df.format(gvi) + "  PGS:  " + df.format(PGS));
@@ -176,7 +177,7 @@ public class FirstPageFragment extends Fragment {
         }
 
         private void updateText(final View localView, final TextView tv, final String s) {
-            Log.d("DrawStats", "updateText: " + s);
+            UserError.Log.i("DrawStats", "updateText: " + s);
             Thread thread = new Thread(() -> {
 
                 //Adrian: after screen rotation it might take some time to attach the view to the window
@@ -192,17 +193,17 @@ public class FirstPageFragment extends Fragment {
                 }
 
                 if (localView.getHandler() == null) {
-                    Log.d("DrawStats", "no Handler found - stopping to update view");
+                    UserError.Log.i("DrawStats", "no Handler found - stopping to update view");
                     return;
                 }
 
 
                 boolean success = localView.post(() -> {
 	                tv.setText(s);
-	                Log.d("DrawStats", "setText actually called: " + s);
+	                UserError.Log.i("DrawStats", "setText actually called: " + s);
 
                 });
-                Log.d("DrawStats", "updateText: " + s + " success: " + success);
+                UserError.Log.i("DrawStats", "updateText: " + s + " success: " + success);
             });
             thread.start();
 

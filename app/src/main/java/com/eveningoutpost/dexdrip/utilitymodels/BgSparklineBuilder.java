@@ -6,7 +6,7 @@ import android.graphics.Color;
 import android.graphics.Matrix;
 import android.view.View;
 
-import com.eveningoutpost.dexdrip.models.JoH;
+import com.eveningoutpost.dexdrip.models.*;
 import com.eveningoutpost.dexdrip.models.UserError.Log;
 
 import java.util.ArrayList;
@@ -253,7 +253,7 @@ public class BgSparklineBuilder {
             chart.setBottom(height*2);
         }
 
-            Log.d(TAG,"pebble debug: w:"+width+" h:"+height+" start:"+start+" end:"+end+" ");
+            UserError.Log.i(TAG,"pebble debug: w:"+width+" h:"+height+" start:"+start+" end:"+end+" ");
 
         if (height>SCALE_TRIGGER) {
             return getViewBitmap(chart);

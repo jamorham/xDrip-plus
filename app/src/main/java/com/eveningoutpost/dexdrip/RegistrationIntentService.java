@@ -41,11 +41,11 @@ public class RegistrationIntentService extends IntentService {
                 final JSONObject json = new JSONObject(token);
                 final String json_token = json.getString("token");
                 if (json_token.length() > 10) token = json_token;
-                Log.d(TAG, "Used json method");
+                UserError.Log.i(TAG, "Used json method");
             } catch (Exception e) {
                 //
             }
-            Log.i(TAG, "GCM Registration Token: " + token);
+            UserError.Log.i(TAG, "GCM Registration Token: " + token);
             GcmActivity.token = token;
             subscribeTpcs(token);
             sendRegistrationToServer(token);
@@ -53,7 +53,7 @@ public class RegistrationIntentService extends IntentService {
             final Intent registrationComplete = new Intent(PreferencesNames.REGISTRATION_COMPLETE);
             LocalBroadcastManager.getInstance(this).sendBroadcast(registrationComplete);
         } catch (Exception e) {
-            Log.e(TAG, "Failed to complete token refresh", e);
+            UserError.Log.e(TAG, "Failed to complete token refresh", e);
             sharedPreferences.edit().putBoolean(PreferencesNames.SENT_TOKEN_TO_SERVER, false).apply();
         } finally {
             JoH.releaseWakeLock(wl);
@@ -62,7 +62,7 @@ public class RegistrationIntentService extends IntentService {
 
     private void sendRegistrationToServer(String token) {
         try {
-            Log.d(TAG, "Scheduling tasks");
+            UserError.Log.i(TAG, "Scheduling tasks");
             PeriodicTask task = new PeriodicTask.Builder()
                     .setService(TaskService.class)
                     .setTag(GcmActivity.TASK_TAG_UNMETERED)
@@ -75,7 +75,7 @@ public class RegistrationIntentService extends IntentService {
             PlusSyncService.startSyncService(getApplicationContext(), "RegistrationToServer");
             GcmActivity.queueCheckOld(getApplicationContext());
         } catch (Exception e) {
-            Log.e(TAG, "Exception in sendRegistration: " + e.toString());
+            UserError.Log.e(TAG, "Exception in sendRegistration: " + e.toString());
         }
     }
 

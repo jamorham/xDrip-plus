@@ -59,11 +59,7 @@ public class LargeHome extends BaseWatchFace {
     }
 
     private boolean linearLayout(LinearLayout layout, int x, int y) {
-        if (x >=layout.getLeft() && x <= layout.getRight()&&
-                y >= layout.getTop() && y <= layout.getBottom()) {
-            return true;
-        }
-        return false;
+	    return x >= layout.getLeft() && x <= layout.getRight() && y >= layout.getTop() && y <= layout.getBottom();
     }
 
     @Override

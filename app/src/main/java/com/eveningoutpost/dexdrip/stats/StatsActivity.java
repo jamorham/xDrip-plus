@@ -320,7 +320,7 @@ public class StatsActivity extends ActivityWithMenu {
         }
         } catch (Exception e)
         {
-            Log.e(TAG,"Got exception sharing statistics: "+e);
+            UserError.Log.e(TAG,"Got exception sharing statistics: "+e);
             JoH.static_toast_long("Got an error: "+e);
         }
     }
@@ -371,7 +371,7 @@ public class StatsActivity extends ActivityWithMenu {
                 state = D90;
             }
 
-            Log.d("DrawStats", "button pressed, invalidating");
+            UserError.Log.i("DrawStats", "button pressed, invalidating");
             mStatisticsPageAdapter.notifyDataSetChanged();
             mViewPager.invalidate();
             setButtonColors();

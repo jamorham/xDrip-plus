@@ -27,6 +27,8 @@ import android.hardware.usb.UsbDeviceConnection;
 import android.hardware.usb.UsbEndpoint;
 import android.hardware.usb.UsbInterface;
 import android.hardware.usb.UsbRequest;
+
+import com.eveningoutpost.dexdrip.models.*;
 import com.eveningoutpost.dexdrip.models.UserError.Log;
 
 import java.io.IOException;
@@ -132,9 +134,9 @@ public class Cp21xxSerialDriver implements UsbSerialDriver {
                 for (int i = 0; i < mDevice.getInterfaceCount(); i++) {
                     UsbInterface usbIface = mDevice.getInterface(i);
                     if (mConnection.claimInterface(usbIface, true)) {
-                        Log.d(TAG, "claimInterface " + i + " SUCCESS");
+                        UserError.Log.i(TAG, "claimInterface " + i + " SUCCESS");
                     } else {
-                        Log.d(TAG, "claimInterface " + i + " FAIL");
+                        UserError.Log.i(TAG, "claimInterface " + i + " FAIL");
                     }
                 }
 
@@ -226,7 +228,7 @@ public class Cp21xxSerialDriver implements UsbSerialDriver {
                             + " bytes at offset " + offset + " length=" + src.length);
                 }
 
-                Log.d(TAG, "Wrote amt=" + amtWritten + " attempted=" + writeLength);
+                UserError.Log.i(TAG, "Wrote amt=" + amtWritten + " attempted=" + writeLength);
                 offset += amtWritten;
             }
             return offset;

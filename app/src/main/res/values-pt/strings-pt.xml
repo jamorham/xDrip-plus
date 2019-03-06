@@ -413,7 +413,7 @@
     <string name="display_delta_units">Mostrar unidades Delta</string>
     <string name="displays_the_slope_arrows">Mostra Setas de Inclinação</string>
     <string name="display_slope_arrows">Mostrar Setas de Inclinação</string>
-    <string name="vibrate_watch_to_alert_no_data">Vibrar relógio para alertar quando não não há recepção de dados de glicose</string>
+    <string name="vibrate_watch_to_alert_no_data">Vibrar relógio para alertar quando não há recepção de dados de glicose</string>
     <string name="vibrate_when_missed_signal">Vibrar quando há falha de leitura</string>
     <string name="vibrate_watch_to_alert_no_bluetooth">Vibrar o relógio para alertar quando o Bluetooth perde ligação</string>
     <string name="vibrate_when_no_bluetooth">Vibrar quando não há Bluetooth</string>
