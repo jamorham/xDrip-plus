@@ -42,7 +42,6 @@
     <string name="pref_share2_scan_barcode_summary">或者在共享接收器上扫描二维码</string>
     <!-- MongoDB Settings -->
     <string name="pref_title_mongodb">MongoDB</string>
-    <string name="pref_summary_mongodb_enabled">如果你正在使用的是 MongoLab 和 Azure, 应该启用此选项</string>
     <string name="pref_title_mongodb_uri">URI</string>
     <string name="pref_dialog_mongodb_uri">输入 MongoDB URI \"</string>
     <string name="pref_message_mongodb_uri">用正确的值替换 {} 中的示例值</string>
@@ -56,7 +55,6 @@
     <!-- API Settings -->
     <string name="pref_title_api">Nightscout 同步设置 (REST-API)</string>
     <string name="pref_title_api_enabled">启用</string>
-    <string name="pref_summary_api_enabled">REST API是直接上传mongodb的替代方法</string>
     <string name="pref_title_api_url">远程网址基本URL</string>
     <string name="pref_dialog_api_url">输入远程网址基本URL和 密钥API </string>
     <string name="pref_message_api_url">这只是基本URL，上传者会自动附加/输入POST。 服务器上的API_SECRET应该与此设置中的密钥匹配.</string>
@@ -84,9 +82,6 @@
     <string name="pref_amazfit_enable_summary">启用 Amazfit 数据支持</string>
     <string name="pref_amazfit_enable">启用</string>
     <string name="pref_amazfit_tile">Amazfit 服务</string>
-    <string name="pref_amazfit_alarm_enable_summary">向 Smartwatch 发送警报，并且使手机静音</string>
-    <string name="pref_amazfit_alarm_enable">启用</string>
-    <string name="pref_amazfit_alarm_tile">手表报警</string>
     <string name="toast_crash">发生了错误 :(一个错误报告被发送以修复这个问题.</string>
     <string name="taskerConfigInstruction">只需点击此处的Tick图标进行确认。 您不需要更改配置字符串.</string>
     <string name="taskerConfiguration">任务配置器</string>
@@ -274,7 +269,6 @@
     <string name="start_snoozed">开始延后</string>
     <string name="adjust_all_by_a_factor">调整所有因素</string>
     <string name="reset">重置</string>
-    <string name="pebble_and_android_wear_options">Pebble手表 和 Android Wear 选项</string>
     <string name="customize_colours">自定义颜色</string>
     <string name="xdrip_plus_color_settings">xDrip+ 颜色设置</string>
     <string name="glucose_values_and_lines">血糖值和线</string>
@@ -871,7 +865,6 @@
     <string name="bluereader_turnoff">安全关断</string>
     <string name="blueReader_turnoffvalue">值 (%)</string>
     <string name="blueReader_turnoffvalue_sum">蓝牙将会关掉的地方</string>
-    <string name="days">剩余天数</string>
     <string name="bluereaderoff">蓝牙将关闭, 因为电池电量是低的, 然后 </string>
     <string name="bluereader_position">检查传感器上的 blueReader 位置, 因为无法读取到数据!</string>
     <string name="bluereaderuglystate">The blueReader was found in an ugly state! It will be now turn off now, and you turn it back to on (short press of the button). After that the blueReader should work as expectet!</string>
@@ -1101,8 +1094,7 @@
     <string name="not_connected">未连接</string>
     <string name="no_data">没有数据</string>
     <string name="no_bluetooth">无蓝牙</string>
-    <string name="connection_status">连接状态:   </string>
-    <string name="please_allow_permission">请允许使用权限</string>
     <string name="without_location_scan_doesnt_work">没有放开位置权限，Xdrip的蓝牙扫描不起作用</string>
     <string name="without_location_permission_emergency_cannot_get_location">没有放开位置权限，紧急消息不能使用位置数据</string>
+    <string name="please_allow_permission">请允许使用权限</string>
 </resources>

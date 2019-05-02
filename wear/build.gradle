@@ -105,6 +105,7 @@ android {
         buildConfigField "int", "buildVersion", generateVersionNumberString()
         buildConfigField "String", "buildUUID", generateRandomUUID()
         buildConfigField "long", "buildTimestamp", generateTimestamp()
+        buildConfigField "int", "targetSDK", targetSdkVersion.mApiLevel.toString()
 
         applicationId = "com.eveningoutpost.dexdrip"
         resValue "string", "label_xdrip", "XDrip"
@@ -161,7 +162,8 @@ dependencies {
     implementation 'com.google.android.support:wearable:2.0.1'
     implementation 'com.android.support:appcompat-v7:23.1.1'
     // implementation 'com.google.android.support:wearable:1.4.0'
-    implementation 'com.google.android.gms:play-services-wearable:9.4.0'
+    //implementation 'com.google.android.gms:play-services-wearable:9.4.0'
+    implementation 'com.google.android.gms:play-services-wearable:10.2.1'
     implementation 'com.squareup.wire:wire-runtime:2.2.0'
     //implementation 'com.ustwo.android:clockwise-wearable:1.0.2'
     //implementation files('libs/hellocharts-library-1.5.5.jar')

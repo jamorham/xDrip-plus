@@ -40,7 +40,6 @@
     <string name="scan_share2_barcode">Сканирование штрих-кода Share</string>
     <string name="pref_share2_scan_barcode_summary">Или сканировать штрих-код на приемнике акций</string>
     <!-- MongoDB Settings -->
-    <string name="pref_summary_mongodb_enabled">Если вы используете MongoLab и Azure это должно быть включено</string>
     <string name="pref_dialog_mongodb_uri">Введите MongoDB URI\"</string>
     <string name="pref_message_mongodb_uri">Заменить примеры значений в {} \'s с правильными значениями</string>
     <string name="pref_default_mongodb_uri">MongoDB: // {пользователь}: {пароль} {@ хост} .mongolab.com: {11111} / {} базы данных</string>
@@ -53,7 +52,6 @@
     <!-- API Settings -->
     <string name="pref_title_api">API загрузки (REST)</string>
     <string name="pref_title_api_enabled">Включено</string>
-    <string name="pref_summary_api_enabled">REST API является альтернативой прямой MongoDB загрузки</string>
     <string name="pref_title_api_url">Базовый URL</string>
     <string name="pref_dialog_api_url">Введите URL API Base</string>
     <string name="pref_message_api_url">Это только базовый URL, то загрузчик будет автоматически добавлять / записи для POST. Api_secret на сервере должен соответствовать yourpassphrase в этой обстановке.</string>
@@ -246,7 +244,6 @@
     <string name="start_snoozed">Start Отложено</string>
     <string name="adjust_all_by_a_factor">Отрегулировать все на коэффициент</string>
     <string name="reset">Сброс</string>
-    <string name="pebble_and_android_wear_options">Галька и Android опции Wear</string>
     <string name="customize_colours">Настройка Цвета</string>
     <string name="xdrip_plus_color_settings">xDrip+ Настройки цвета</string>
     <string name="glucose_values_and_lines">Глюкоза ценности и линии</string>
