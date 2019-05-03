@@ -44,6 +44,7 @@ import com.eveningoutpost.dexdrip.UtilityModels.Inevitable;
 import com.eveningoutpost.dexdrip.UtilityModels.LowPriorityThread;
 import com.eveningoutpost.dexdrip.UtilityModels.PersistentStore;
 import com.eveningoutpost.dexdrip.UtilityModels.Pref;
+import com.eveningoutpost.dexdrip.UtilityModels.StatusLine;
 import com.eveningoutpost.dexdrip.UtilityModels.WearSyncBooleans;
 import com.eveningoutpost.dexdrip.UtilityModels.WearSyncPersistentStrings;
 import com.eveningoutpost.dexdrip.utils.CheckBridgeBattery;
@@ -895,15 +896,11 @@ public class WatchUpdaterService extends WearableListenerService implements
     }
 
     public static void startSelf() {
-        // TODO replace with inevitable task
-        new Thread(new Runnable() {
-            @Override
-            public void run() {
-                if (JoH.ratelimit("start-wear", 5)) {
-                    startServiceAndResendData(0);
-                }
+        Inevitable.task("wear-startself", 2000, () -> {
+            if (JoH.ratelimit("start-wear", 5)) {
+                startServiceAndResendData(0);
             }
-        }).start();
+        });
     }
 
     public static void startServiceAndResendData(long since) {
@@ -1605,7 +1602,7 @@ public class WatchUpdaterService extends WearableListenerService implements
                 entries.putLong("time", new Date().getTime()); // MOST IMPORTANT LINE FOR TIMESTAMP
                 entries.putDataMapArrayList("entries", dataMaps);
                 if (mPrefs.getBoolean("extra_status_line", false)) {
-                    entries.putString("extra_status_line", Home.extraStatusLine());
+                    entries.putString("extra_status_line", StatusLine.extraStatusLine());
                 }
 
                 new SendToDataLayerThread(WEARABLE_DATA_PATH, googleApiClient).executeOnExecutor(xdrip.executor, entries);

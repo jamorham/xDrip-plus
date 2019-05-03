@@ -1,7 +1,5 @@
 package com.eveningoutpost.dexdrip.Models;
 
-import android.content.SharedPreferences;
-import android.preference.PreferenceManager;
 import android.provider.BaseColumns;
 
 import com.activeandroid.Model;
@@ -21,6 +19,7 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.util.Date;
+import java.util.List;
 import java.util.UUID;
 
 /**
@@ -100,13 +99,16 @@ public class Sensor extends Model {
     }
 
     public synchronized static void stopSensor() {
-        Sensor sensor = currentSensor();
-        if(sensor == null) {
+        final Sensor sensor = currentSensor();
+        if (sensor == null) {
             return;
         }
-        sensor.stopped_at = new Date().getTime();
+        sensor.stopped_at = JoH.tsl();
         UserError.Log.ueh("SENSOR", "Sensor stopped at " + JoH.dateTimeText(sensor.stopped_at));
         sensor.save();
+        if (currentSensor() != null) {
+            UserError.Log.wtf(TAG, "Failed to update sensor stop in database");
+        }
         SensorSendQueue.addToQueue(sensor);
         JoH.clearCache();
 
@@ -269,5 +271,14 @@ public class Sensor extends Model {
         }
     }
 
+
+    public static void shutdownAllSensors() {
+        final List<Sensor> l = new Select().from(Sensor.class).execute();
+        for (final Sensor s : l) {
+            s.stopped_at = s.started_at;
+            s.save();
+            System.out.println(s.toJSON());
+        }
+    }
 }
 
