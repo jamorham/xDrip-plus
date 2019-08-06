@@ -502,7 +502,6 @@
     <string name="classic_simple">פשוט קלאסי</string>
     <string name="libre">ליברה</string>
     <string name="what_type_of_libre_bridge_device_do_you_use">באיזה סוג של מתאם אתה משמש עבור הליברה?</string>
-    <string name="bluetooth_bridge_device_blucon_limitter_bluereader_tomato_etc">מתאמי בלוטוס: בלוקון, limiTTer, Bluereader, מיומיו וכדומה</string>
     <string name="librealarm_app_using_sony_smartwatch">אפליקצית LibreAlarm: משתמש בשעון החכם של סוני</string>
     <string name="__data_source_disabled">\n Nקור הנתונים מושבת</string>
     <string name="data_source_is_set_to_">מקור הנתונים נקבל ל: </string>
