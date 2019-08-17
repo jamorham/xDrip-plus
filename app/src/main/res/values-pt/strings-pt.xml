@@ -1476,10 +1476,6 @@
     <string name="share_login_data_isnt_valid">Dados Login Partilhado não são válidos - verifique utilizador / palavra-passe</string>
     <string name="connectivity_problem_reaching_share_servers">Problema de ligação ao alcançar servidores de Partilha</string>
     <string name="ob1_session_restarted_title">Sessão do sensor reiniciada</string>
-    <string name="ob1_session_restarted_msg">A sessão do sensor foi reiniciada preventivamente e definida para 3 dias, por favor, verifique se as próximas leituras estão desligadas e calibre se necessário</string>
-    <string name="ob1_session_restarted_note">Sessão do transmissor foi reiniciada</string>
-    <string name="title_ob1_g5_defer_preemptive_restart_if_needed">Deferir reinício se necessário</string>
-    <string name="summary_ob1_g5_defer_preemptive_restart_if_needed">Deferir reiniciar uma sessão até 12 horas para evitar erros de sensor intermitentes devido a flutuações altas (experimental)</string>
     <string name="title_ob1_g5_preemptive_restart_extended_time_travel">Tempo prolongado</string>
     <string name="summary_ob1_g5_preemptive_restart_extended_time_travel">Reinicie a sessão para começar ao dia 3 para evitar causar saltos</string>
     <string name="title_ob1_g5_preemptive_restart_extended_time_travel_all_firmwares">Sempre permitir tempo prolongado</string>
