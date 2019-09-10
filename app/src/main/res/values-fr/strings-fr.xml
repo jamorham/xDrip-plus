@@ -380,7 +380,6 @@
     <string name="choose_sound_used_for_predicted_low_alarm">Choisir le son utilisé pour l\'alarme Basse prédit.</string>
     <string name="notify_when_parakeet_device_stops_checking_in">Notifier lorsque le dispositif Parakeet arrête le check-in</string>
     <string name="parakeet_related_alerts">Alertes liées à Parakeet</string>
-    <string name="raise_parakeet_notification_silently_when_charging">Déclencher la notification Parakeet silencieusement lors de la charge</string>
     <string name="silent_alert_when_charging">Alerte silencieuse lors de la charge</string>
     <string name="alerts_start_out_snoozed_and_must_persist_for_a_while">Les alertes commencent silencieuses et doivent persister pendant un certain temps pour se déclencher</string>
     <string name="alarms_silenced_during_telephone_calls">Alarmes silencieuses pendant les appels téléphoniques</string>
