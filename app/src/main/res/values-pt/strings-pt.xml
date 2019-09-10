@@ -412,7 +412,6 @@
     <string name="choose_sound_used_for_predicted_low_alarm">Escolha o som para previsão de Hipo.</string>
     <string name="notify_when_parakeet_device_stops_checking_in">Notificar quando o dispositivo parakeet pára o check-in</string>
     <string name="parakeet_related_alerts">Alertas relativos ao Parakeet</string>
-    <string name="raise_parakeet_notification_silently_when_charging">Aumentar notificação silenciosa Parakeet enquanto carrega</string>
     <string name="silent_alert_when_charging">Alerta silencioso enquanto carrega</string>
     <string name="alerts_start_out_snoozed_and_must_persist_for_a_while">Alerta inicia em silêncio e deverá persistir durante uns momentos até ser activado</string>
     <string name="alarms_silenced_during_telephone_calls">Alarmes silenciados durante chamadas</string>
