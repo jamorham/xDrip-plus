@@ -389,7 +389,6 @@
     <string name="choose_sound_used_for_predicted_low_alarm">Tahmin edilen düşük alarm için kullanılacak sesi seçin.</string>
     <string name="notify_when_parakeet_device_stops_checking_in">Parakeet cihazı kontrol etmeyi durdurduğunda bildir</string>
     <string name="parakeet_related_alerts">Parakeet ile ilgili uyarılar</string>
-    <string name="raise_parakeet_notification_silently_when_charging">Şarj ederken parakeet bildirimini sessize al</string>
     <string name="silent_alert_when_charging">Şarj olurken sessiz uyarı</string>
     <string name="alerts_start_out_snoozed_and_must_persist_for_a_while">Uyarılar sessizce başlar ve bir süre sonra etkinleştir</string>
     <string name="alarms_silenced_during_telephone_calls">Telefon görüşmeleri sırasında uyarıları sustur</string>
