@@ -840,6 +840,7 @@
     <string name="sidiary_date_title">Exportar a partir de?</string>
     <string name="blukon">Blucon</string>
     <string name="tomato">Tomato</string>
+    <string name="bubble">Bubble</string>
     <string name="use_gravity_sensor_to_rotate_items">Usar Sensor Gravidade para rodar</string>
     <string name="low_bridge_battery">Bridge bateria fraca</string>
     <string name="reminders">Lembretes</string>
@@ -1384,7 +1385,8 @@
     <string name="classic_simple">Clássico Simples</string>
     <string name="libre">Libre</string>
     <string name="what_type_of_libre_bridge_device_do_you_use">Que Tipo de Dispositivo de Ponte Libre?</string>
-    <string name="bluetooth_bridge_device_blucon_limitter_bluereader_tomato_etc">Dispositivo Ponte Bluetooth: Blucon, Bluereader, LimiTTer, Tomato etc</string>
+    <string name="bluetooth_bridge_device_blucon_limitter_bluereader_tomato_etc">Dispositivo Ponte Bluetooth: Blucon, Bubble, LimiTTer, Bluereader, Tomato etc</string>
+    <string name="libre_patched">Libre2 Modificado</string>
     <string name="librealarm_app_using_sony_smartwatch">App LibreAlarm: a usar Sony Smartwatch </string>
     <string name="__data_source_disabled">\n FONTE DE DADOS DESACTIVADA</string>
     <string name="data_source_is_set_to_">Fonte de Dados definida para: </string>
@@ -1473,4 +1475,14 @@
     <string name="authentication_failed_wrong_password">Autenticação falhou. Palavra-passe inválida?</string>
     <string name="share_login_data_isnt_valid">Dados Login Partilhado não são válidos - verifique utilizador / palavra-passe</string>
     <string name="connectivity_problem_reaching_share_servers">Problema de ligação ao alcançar servidores de Partilha</string>
+    <string name="ob1_session_restarted_title">Sessão do sensor reiniciada</string>
+    <string name="ob1_session_restarted_msg">A sessão do sensor foi reiniciada preventivamente. Verifique se as próximas leituras estão fora do padrão e calibre se necessário</string>
+    <string name="ob1_session_restarted_note">Sessão do sensor foi reiniciada</string>
+    <string name="title_ob1_g5_preemptive_restart_extended_time_travel">Tempo prolongado</string>
+    <string name="summary_ob1_g5_preemptive_restart_extended_time_travel">Reinicie a sessão para começar ao dia 3 para evitar causar saltos</string>
+    <string name="title_ob1_g5_preemptive_restart_extended_time_travel_all_firmwares">Sempre permitir tempo prolongado</string>
+    <string name="summary_ob1_g5_preemptive_restart_extended_time_travel_all_firmwares">Permitir tempo prolongado com todas as versões de firmware (apenas modo engenharia) </string>
+    <string name="collection_summary_ob1_g5_preemptive_restart">Reiniciar automaticamente um sensor antes que ele pare</string>
+    <string name="title_ob1_g5_preemptive_restart_alert">Alerta num reinício preventivo</string>
+    <string name="summary_ob1_g5_preemptive_restart_alert">Aumente um alerta quando reiniciar a sessão preventivamente</string>
 </resources>
