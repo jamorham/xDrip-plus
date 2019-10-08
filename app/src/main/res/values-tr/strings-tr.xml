@@ -325,7 +325,7 @@
     <string name="save_all_settings_to_sdcard">Tüm ayarları SD karta kaydet</string>
     <string name="load_all_settings_from_sdcard">SD karttan tüm ayarları yükle</string>
     <string name="delete_any_settings_on_sdcard">SD kartta tüm ayarları sil</string>
-    <string name="use_qr_codes_to_transfer_settings_using_settings_auto_configure_feature"><![CDATA[Ayarlar -> Otomatik Yapılandırma özelliği'ni kullanarak ayarları aktarmak için QR kodlarını kullanın]]></string>
+    <string name="use_qr_codes_to_transfer_settings_using_settings_auto_configure_feature"><![CDATA[Ayarlar -> Otomatik Yapılandırma özelliği\'ni kullanarak ayarları aktarmak için QR kodlarını kullanın]]></string>
     <string name="xdrip_plus_security_key_settings_only">xDrip+ yalnızca Güvenlik Tuş Ayarları</string>
     <string name="show_general_and_collection_settings">Genel ve Okuma ayarlarını göster</string>
     <string name="copy_all_settings">Tüm ayarları kopyala</string>
@@ -389,7 +389,6 @@
     <string name="choose_sound_used_for_predicted_low_alarm">Tahmin edilen düşük alarm için kullanılacak sesi seçin.</string>
     <string name="notify_when_parakeet_device_stops_checking_in">Parakeet cihazı kontrol etmeyi durdurduğunda bildir</string>
     <string name="parakeet_related_alerts">Parakeet ile ilgili uyarılar</string>
-    <string name="raise_parakeet_notification_silently_when_charging">Şarj ederken parakeet bildirimini sessize al</string>
     <string name="silent_alert_when_charging">Şarj olurken sessiz uyarı</string>
     <string name="alerts_start_out_snoozed_and_must_persist_for_a_while">Uyarılar sessizce başlar ve bir süre sonra etkinleştir</string>
     <string name="alarms_silenced_during_telephone_calls">Telefon görüşmeleri sırasında uyarıları sustur</string>
@@ -706,8 +705,8 @@
     <string name="meter_connect_sound_effect">Ses efekti göstergeleri</string>
     <string name="ask_for_calibration">Yeni bir kan şekeri sonucu alındığında, bunun kalibrasyon için kullanılmasının gerekip gerekmediğini sor</string>
     <string name="use_meter_for_calibrations">Kalibrasyonlar için glikometre\'yi kullan</string>
-    <string name="auto_calibration_good_conditions">"Koşullar onaylamadan doğru şekilde görünüyorsa, yeni kan şekeri 	
-ölçümlerini kullanarak kalibre edin (deneysel)"</string>
+    <string name="auto_calibration_good_conditions">Koşullar onaylamadan doğru şekilde görünüyorsa, yeni kan şekeri 	
+ölçümlerini kullanarak kalibre edin (deneysel)</string>
     <string name="automatic_calibration">Otomatik kalibrasyon</string>
     <string name="maximum_value">Hedef alanınızın üst sınırı.</string>
     <string name="minimum_value">Hedef alanınızın alt sınırı.</string>
@@ -747,7 +746,7 @@
     <string name="notify_on_low_battery_level">Pil seviyesi düştüğünde bildir</string>
     <string name="collector_battery_alerts">Toplayıcı pil uyarıları</string>
     <string name="low_battery_percentage">Düşük pil yüzdesi</string>
-    <string name="notify_data_arrives_master"><![CDATA[Master'dan ulaşan verinin aralığı >20 dakika ise bilgilendir.]]></string>
+    <string name="notify_data_arrives_master"><![CDATA[Master\'dan ulaşan verinin aralığı >20 dakika ise bilgilendir.]]></string>
     <string name="follower_chime_new">Yeni takipçi zil sesi</string>
     <string name="carb_ratio">Karbonhidrat oranı</string>
     <string name="insulin_sensitivity">İnsülin duyarlılığı</string>
