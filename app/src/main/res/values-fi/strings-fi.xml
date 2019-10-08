@@ -388,7 +388,6 @@
     <string name="choose_sound_used_for_predicted_low_alarm">Valitse ääni, jota käytetään ennustettu alhainen hälytyksen.</string>
     <string name="notify_when_parakeet_device_stops_checking_in">Ilmoita, kun papukaija laite pysähtyy tarkkailun</string>
     <string name="parakeet_related_alerts">Parakeet liittyvät hälytykset</string>
-    <string name="raise_parakeet_notification_silently_when_charging">Nosta parakeet tiedoksi antamisesta hiljaa ladattaessa</string>
     <string name="silent_alert_when_charging">Värinä ladattaessa</string>
     <string name="alerts_start_out_snoozed_and_must_persist_for_a_while">Hälytykset alkavat myöhemmäksi ja pitää kestää jonkin aikaa todella laukaista</string>
     <string name="alarms_silenced_during_telephone_calls">Hälytykset vaiennettu aikana puheluita</string>
