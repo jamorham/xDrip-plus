@@ -574,11 +574,19 @@ public class NightscoutUploader {
             json.put("dateString", format.format(record.timestamp));
             if(prefs.getBoolean("cloud_storage_api_use_best_glucose", false)){
                 json.put("sgv", (int) record.getDg_mgdl());
-                json.put("delta", new BigDecimal(record.getDg_slope() * 5 * 60 * 1000).setScale(3, BigDecimal.ROUND_HALF_UP));
+                try {
+                    json.put("delta", new BigDecimal(record.getDg_slope() * 5 * 60 * 1000).setScale(3, BigDecimal.ROUND_HALF_UP));
+                } catch (NumberFormatException e) {
+                        UserError.Log.e(TAG, "Problem calculating delta from getDg_slope() for Nightscout REST Upload, skipping");
+                }
                 json.put("direction", record.getDg_deltaName());
             } else {
                 json.put("sgv", (int) record.calculated_value);
-                json.put("delta", new BigDecimal(record.currentSlope() * 5 * 60 * 1000).setScale(3, BigDecimal.ROUND_HALF_UP)); // jamorham for automation
+                try {
+                    json.put("delta", new BigDecimal(record.currentSlope() * 5 * 60 * 1000).setScale(3, BigDecimal.ROUND_HALF_UP)); // jamorham for automation
+                } catch (NumberFormatException e) {
+                        UserError.Log.e(TAG, "Problem calculating delta from currentSlope() for Nightscout REST Upload, skipping");
+                }
                 json.put("direction", record.slopeName());
             }
             json.put("type", "sgv");
@@ -1182,7 +1190,12 @@ public class NightscoutUploader {
                             testData.put("SensorId", PersistentStore.getString("LibreSN"));
                             testData.put("CaptureDateTime", libreBlockEntry.timestamp);
                             testData.put("BlockBytes",Base64.encodeToString(libreBlockEntry.blockbytes, Base64.NO_WRAP));
-                            
+                            if(libreBlockEntry.patchUid != null && libreBlockEntry.patchUid.length != 0) {
+                                testData.put("patchUid",Base64.encodeToString(libreBlockEntry.patchUid, Base64.NO_WRAP));
+                            }
+                            if(libreBlockEntry.patchInfo != null && libreBlockEntry.patchInfo.length != 0) {
+                               testData.put("patchInfo",Base64.encodeToString(libreBlockEntry.patchInfo, Base64.NO_WRAP));
+                            }
                             testData.put("ChecksumOk",ChecksumOk ? 1 : 0);
                             testData.put("Uploaded", 1);
                             testData.put("UploaderBatteryLife",getBatteryLevel());

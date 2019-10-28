@@ -46,6 +46,7 @@ import com.eveningoutpost.dexdrip.Home;
 import com.eveningoutpost.dexdrip.Models.DesertSync;
 import com.eveningoutpost.dexdrip.Models.JoH;
 import com.eveningoutpost.dexdrip.Models.Profile;
+import com.eveningoutpost.dexdrip.Models.UserError;
 import com.eveningoutpost.dexdrip.Models.UserError.ExtraLogTags;
 import com.eveningoutpost.dexdrip.Models.UserError.Log;
 import com.eveningoutpost.dexdrip.Models.UserNotification;
@@ -85,6 +86,9 @@ import com.eveningoutpost.dexdrip.tidepool.UploadChunk;
 import com.eveningoutpost.dexdrip.ui.LockScreenWallPaper;
 import com.eveningoutpost.dexdrip.utils.framework.IncomingCallsReceiver;
 import com.eveningoutpost.dexdrip.watch.lefun.LeFunEntry;
+import com.eveningoutpost.dexdrip.watch.thinjam.BlueJay;
+import com.eveningoutpost.dexdrip.watch.thinjam.BlueJayAdapter;
+import com.eveningoutpost.dexdrip.watch.thinjam.BlueJayEntry;
 import com.eveningoutpost.dexdrip.wearintegration.Amazfitservice;
 import com.eveningoutpost.dexdrip.wearintegration.WatchUpdaterService;
 import com.eveningoutpost.dexdrip.webservices.XdripWebService;
@@ -96,12 +100,14 @@ import com.nightscout.core.barcode.NSBarcodeConfig;
 
 import net.tribe7.common.base.Joiner;
 
+import java.lang.reflect.Method;
 import java.net.URI;
 import java.text.DecimalFormat;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
+import lombok.RequiredArgsConstructor;
 import lombok.Setter;
 
 /**
@@ -134,7 +140,11 @@ public class Preferences extends BasePreferenceActivity implements SearchPrefere
 
 
     private void refreshFragments() {
-        this.preferenceFragment = new AllPrefsFragment();
+        refreshFragments(null);
+    }
+
+    private void refreshFragments(final String jumpTo) {
+        this.preferenceFragment = new AllPrefsFragment(jumpTo);
         this.preferenceFragment.setParent(this);
         pFragment = this.preferenceFragment;
         getFragmentManager().beginTransaction().replace(android.R.id.content,
@@ -295,6 +305,13 @@ public class Preferences extends BasePreferenceActivity implements SearchPrefere
                 return;
             }
 
+            try {
+                BlueJay.processQRCode(scanResult.getRawBytes());
+            } catch (Exception e) {
+                // meh
+            }
+
+
             final NSBarcodeConfig barcode = new NSBarcodeConfig(scanresults);
             if (barcode.hasMongoConfig()) {
                 if (barcode.getMongoUri().isPresent()) {
@@ -363,7 +380,7 @@ public class Preferences extends BasePreferenceActivity implements SearchPrefere
         }
         super.onCreate(savedInstanceState);
 
-        refreshFragments();
+        refreshFragments(getIntent() != null ? getIntent().getAction() : null);
         processExtraData();
 
         // cannot be in onResume as we display dialog to set
@@ -400,6 +417,7 @@ public class Preferences extends BasePreferenceActivity implements SearchPrefere
             LocationHelper.requestLocationForBluetooth(this); // double check!
         }
         PreferenceManager.getDefaultSharedPreferences(this).registerOnSharedPreferenceChangeListener(LeFunEntry.prefListener);
+        PreferenceManager.getDefaultSharedPreferences(this).registerOnSharedPreferenceChangeListener(BlueJayEntry.prefListener);
     }
 
     @Override
@@ -407,6 +425,7 @@ public class Preferences extends BasePreferenceActivity implements SearchPrefere
     {
         PreferenceManager.getDefaultSharedPreferences(this).unregisterOnSharedPreferenceChangeListener(ActivityRecognizedService.prefListener);
         PreferenceManager.getDefaultSharedPreferences(this).unregisterOnSharedPreferenceChangeListener(LeFunEntry.prefListener);
+        PreferenceManager.getDefaultSharedPreferences(this).unregisterOnSharedPreferenceChangeListener(BlueJayEntry.prefListener);
         pFragment = null;
         super.onPause();
     }
@@ -454,6 +473,13 @@ public class Preferences extends BasePreferenceActivity implements SearchPrefere
     @Override
     public void onNewIntent(Intent intent)
     {
+        if (intent.getAction() != null) {
+            try {
+                refreshFragments(getIntent() != null ? getIntent().getAction() : null);
+            } catch (Exception e) {
+                //
+            }
+        }
         setIntent(intent);
         if (!processExtraData()) {
             super.onNewIntent(intent);
@@ -724,8 +750,10 @@ public class Preferences extends BasePreferenceActivity implements SearchPrefere
     }
 
 
-
+    @RequiredArgsConstructor
     public static class AllPrefsFragment extends PreferenceFragment {
+
+        final String jumpTo;
 
         @Setter
         Preferences parent;
@@ -734,6 +762,11 @@ public class Preferences extends BasePreferenceActivity implements SearchPrefere
 
         public LockScreenWallPaper.PrefListener lockListener = new LockScreenWallPaper.PrefListener();
 
+
+        // default constructor is required in addition on some platforms
+        public AllPrefsFragment() {
+            this(null);
+        }
 
         private void setSummary(String pref_name) {
      /*       try {
@@ -870,6 +903,17 @@ public class Preferences extends BasePreferenceActivity implements SearchPrefere
                 //
             }
 
+            try {
+                final Activity activity = this.getActivity();
+                findPreference("bluejay_option_call_notifications").setOnPreferenceChangeListener((preference, newValue) -> {
+                    prefs.edit().putBoolean("bluejay_option_call_notifications", (Boolean) newValue).apply();
+                    IncomingCallsReceiver.checkPermission(activity);
+                    return true;
+                });
+            } catch (Exception e) {
+                //
+            }
+
             findPreference("use_ob1_g5_collector_service").setOnPreferenceChangeListener(new Preference.OnPreferenceChangeListener() {
                 @Override
                 public boolean onPreferenceChange(Preference preference, Object newValue) {
@@ -942,6 +986,7 @@ public class Preferences extends BasePreferenceActivity implements SearchPrefere
             final Preference bfappid = findPreference("bugfender_appid");
             final Preference nfcSettings = findPreference("xdrip_plus_nfc_settings");
             final Preference bluereadersettings = findPreference("xdrip_blueReader_advanced_settings");
+            final Preference libre2settings = findPreference("xdrip_libre2_advanced_settings");
             //DexCollectionType collectionType = DexCollectionType.getType(findPreference("dex_collection_method").)
 
             final ListPreference currentCalibrationPlugin = (ListPreference)findPreference("current_calibration_plugin");
@@ -1069,6 +1114,21 @@ public class Preferences extends BasePreferenceActivity implements SearchPrefere
             bindPreferenceSummaryToValue(findPreference("node_wearG5"));//KS
             bindPreferenceSummaryToValue(findPreference("wear_logs_prefix"));
             bindPreferenceSummaryToValue(findPreference("disable_wearG5_on_missedreadings_level"));
+
+            try {
+                final Preference blueJayScreenTimeout = findPreference("bluejay_screen_timeout");
+                BlueJayAdapter.sBindPreferenceTitleAppendToBlueJayTimeoutValueListener.onPreferenceChange(blueJayScreenTimeout,
+                        PreferenceManager
+                                .getDefaultSharedPreferences(blueJayScreenTimeout.getContext())
+                                .getInt(blueJayScreenTimeout.getKey(), -1));
+                blueJayScreenTimeout.setOnPreferenceChangeListener(BlueJayAdapter.sBindPreferenceTitleAppendToBlueJayTimeoutValueListener);
+                
+                findPreference("bluejay_run_as_phone_collector").setOnPreferenceChangeListener(BlueJayAdapter.changeToPhoneSlotListener);
+                findPreference("bluejay_run_phone_collector").setOnPreferenceChangeListener(BlueJayAdapter.changeToPhoneCollectorListener);
+
+            } catch (Exception e) {
+                //
+            }
 
             final Preference useCustomSyncKey = findPreference("use_custom_sync_key");
             final Preference CustomSyncKey = findPreference("custom_sync_key");
@@ -1452,7 +1512,16 @@ public class Preferences extends BasePreferenceActivity implements SearchPrefere
 
             }
 
+
             try {
+
+                try {
+                    if (DexCollectionType.getDexCollectionType() != DexCollectionType.LibreReceiver) {
+                        collectionCategory.removePreference(libre2settings);
+                    }
+                } catch (NullPointerException e) {
+                    Log.wtf(TAG, "Nullpointer Libre2Settings: ", e);
+                }
 
                 try {
                     if (!DexCollectionType.hasWifi()) {
@@ -2014,6 +2083,8 @@ public class Preferences extends BasePreferenceActivity implements SearchPrefere
                 }
             });
 
+           jumpToScreen(jumpTo);
+
         }
 
         private void showSearchFragment() {
@@ -2269,6 +2340,34 @@ public class Preferences extends BasePreferenceActivity implements SearchPrefere
                 }
             } catch (Exception e) {
                 Log.e(TAG, "Got exception in refresh extra: " + e.toString());
+            }
+        }
+
+        public void jumpToScreen(final String screenKey) {
+            if (screenKey == null) return;
+            UserError.Log.d(TAG, "jump to screen: " + screenKey);
+            PreferenceScreen subPreferenceScreen = (PreferenceScreen) findPreference(screenKey);
+            final AllPrefsFragment fragment = this;
+            JoH.runOnUiThread(new Runnable() {
+                @Override
+                public void run() {
+                    clickScreen(fragment, subPreferenceScreen);
+                }
+            });
+        }
+
+        private static void clickScreen(final PreferenceFragment fragment, final PreferenceScreen screen) {
+            if (screen == null) return;
+            if (fragment.getPreferenceScreen() != screen) {
+                try {
+                    final Method method = screen.getClass().getDeclaredMethod("onClick");
+                    method.setAccessible(true);
+                    method.invoke(screen);
+                } catch (Exception e) {
+                    android.util.Log.e(TAG, "" + e);
+                }
+            } else {
+                android.util.Log.d(TAG, "Already on that screen");
             }
         }
 
