@@ -346,6 +346,9 @@ public class AlertPlayer {
         streamType = forceSpeaker ? AudioManager.STREAM_ALARM : AudioManager.STREAM_MUSIC;
 
         try {
+            // Request exclusive audiofocus to stop any other currently playing app (eg music
+            // player), as we're modifying the volume, and that may make the music very loud.
+            manager.requestAudioFocus(i -> {}, streamType, AudioManager.AUDIOFOCUS_GAIN_TRANSIENT_EXCLUSIVE);
             mediaPlayer.setAudioStreamType(streamType);
             mediaPlayer.setOnPreparedListener(mp -> {
                 adjustCurrentVolumeForAlert(streamType, volumeFrac, overrideSilentMode);
@@ -366,6 +369,7 @@ public class AlertPlayer {
                 }
                 mediaPlayer = null;
                 revertCurrentVolume(streamType);
+                manager.abandonAudioFocus(i -> {});
             });
 
             mediaPlayer.prepareAsync();
