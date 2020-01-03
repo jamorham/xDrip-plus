@@ -774,6 +774,8 @@
     <string name="notify_data_arrives_master"><![CDATA[Notificar quando dados recebidos do Master se o o intervalo é > 20 mins.]]></string>
     <string name="follower_chime_new">Novo Tom Seguidor</string>
     <string name="carb_ratio">Rácio de Hidratos</string>
+    <string name="enable_dedicated_insulin_profiles">Configurar Perfis de Insulina</string>
+    <string name="desc_enable_dedicated_insulin_profiles">Aqui pode activar ou configurar vários perfis de insulina</string>
     <string name="insulin_sensitivity">Sensibilidade Insulina</string>
     <string name="secondary_plugin_glucose_value">Valor de Glicose Plugin Secundário</string>
     <string name="step_counter_1st_color">Contador Passos 1ª Cor</string>
@@ -1486,4 +1488,7 @@
     <string name="collection_summary_ob1_g5_preemptive_restart">Reiniciar automaticamente um sensor antes que ele pare</string>
     <string name="title_ob1_g5_preemptive_restart_alert">Alerta num reinício preventivo</string>
     <string name="summary_ob1_g5_preemptive_restart_alert">Aumente um alerta quando reiniciar a sessão preventivamente</string>
+    <string name="pref_enable_insulinprofiles">active pelo menos um máximo de três perfis</string>
+    <string name="pref_select_basal_insulinprofiles">escolha o perfil da insulina basal.</string>
+    <string name="pref_select_bolus_insulinprofiles">escolha o perfil de insulina de bólus. Também usado para bomba e caneta...</string>
 </resources>
