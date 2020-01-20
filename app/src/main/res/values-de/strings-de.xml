@@ -610,6 +610,8 @@
     <string name="use_external_blukon_algorithm">Externer Libre-Algorithmus.</string>
     <string name="calibrate_external_libre_algorithm_summary">Verwende xDrip-Kalibrierungsmethoden für OOP-Daten.</string>
     <string name="calibrate_external_libre_algorithm_title">OOP Kalibrierungsalgorithmus.</string>
+    <string name="libre_use_smoothed_data_summary">Verwende Durchschnittswerte von 5 Punkten, um geglättete Libre-Daten zu erhalten.</string>
+    <string name="libre_use_smoothed_data_title">Glättung Libre-Daten.</string>
     <string name="retrieve_blukon_history_title">Empfange historische Libre-Daten</string>
     <string name="retrieve_blukon_history_summary">Empfange verpasste Werte vom Bluekon-Empfänger wenn er sich wieder verbindet.</string>
     <string name="interpret_share_raw">Falls du Share benutzt, wird xDrip Werte anzeigen, die normalerweise auf dem Empfänger versteckt sind.</string>
@@ -845,6 +847,7 @@
     <string name="install_text_to_speech_data_question">Installieren der Text-zu-Sprache Daten?</string>
     <string name="after_installation_of_languages_you_might_have_to">(Nach der Installation von Sprachen musst Du möglicherweise im Systemstatus \"Datensammler neustarten\" drücken.)</string>
     <string name="stop_sensor">Sensor stoppen</string>
+    <string name="dont_stop_just_reset_all_calibrations">Nicht stoppen, nur alle Kalibrierungen löschen</string>
     <string name="initial_calibration">Initiale Kalibrierung</string>
     <string name="calibration_can_not_be_blank">Kalibrierung darf nicht leer sein</string>
     <string name="invalid_calibration_number">Ungültiger Kalibrierungswert!</string>
@@ -890,6 +893,7 @@
     <string name="bluereader_turnoff">Sicherheitsauschaltung</string>
     <string name="blueReader_turnoffvalue">Wert in %</string>
     <string name="blueReader_turnoffvalue_sum">unter dem der Bluereader ausgeschaltet wird</string>
+    <string name="days">tage</string>
     <string name="bluereaderoff">blueReader wird ausgeschaltet, da die Batterie folgenden Wert unterschreitet: </string>
     <string name="bluereader_position">Bitte Positionierung des BlueReaders auf dem Sensor prüfen!</string>
     <string name="bluereaderuglystate">Der blueReader hat sich aufgehängt! Er wird nun ausgeschaltet. Bitte schalte ihn in ein paar Sekunden wieder ein (Taste nur kurz drücken). Danach sollte der blueReader wieder funktionieren!</string>
@@ -1119,6 +1123,7 @@
     <string name="not_connected">Nicht verbunden</string>
     <string name="no_data">Keine Daten</string>
     <string name="no_bluetooth">Kein Bluetooth</string>
+    <string name="connection_status_long">Verbindungsstatus:   </string>
     <string name="without_location_scan_doesnt_work">Ohne die \"Location\"-Berechtigung wird der Bluetooth-Scan nicht funktionieren</string>
     <string name="without_location_permission_emergency_cannot_get_location">Ohne die \"Location\"-Berechtigung kann die Notfall-SMS keine Orts-Daten mitsenden</string>
     <string name="force_speaker_colon">Lautsprecher erzwingen</string>
@@ -1138,4 +1143,10 @@
     <string name="need_contacts_permission_to_select_message_recipients">Benötige Kontakte-Berechtigung um Nachrichtenempfänger auswählen zu können</string>
     <string name="need_storage_permission_to_access_all_ringtones">Benötige Speichermedium-Berechtigung um auf alle Klingeltöne zugreifen zu können</string>
     <string name="xdrip_needs_whitelisting_for_proper_performance">xDrip+ benötigt die Eintragung auf der \"Withelist\" damit es gut funktioniert</string>
+    <string name="overwrite_slope_engineering_only">Überschreibe Slope (nur Engineering-Modus!)</string>
+    <string name="manual_overwrite_not_possible">Manuelles Überschreiben nicht möglich!</string>
+    <string name="upload_even_when_using_mobile_data">Auch hochladen wenn mobile Daten verwendet werden</string>
+    <string name="use_mobile_data">Mobile Daten verwenden</string>
+    <string name="summary_cloud_storage_api_download_enable">Versuche Daten von Nightscout herunterzuladen</string>
+    <string name="title_cloud_storage_api_download_enable">Daten herunterladen</string>
 </resources>
