@@ -85,6 +85,8 @@
     <string name="pref_amazfit_enable">Aktivieren</string>
     <string name="pref_amazfit_tile">Amazfit Dienst</string>
     <string name="pref_amazfit_BG_alert_enable_summary">Sendet aktive BZ-Warnungen an Smartwatch</string>
+    <string name="pref_amazfit_BG_alert_enable">Aktivieren</string>
+    <string name="pref_amazfit_BG_alert_title">BZ-Warnungen</string>
     <string name="pref_amazfit_other_alert_enable_summary">Sendet andere Warnungen an Smartwatch</string>
     <string name="pref_amazfit_other_alert_enable">Aktivieren</string>
     <string name="pref_amazfit_other_alert_title">Andere Warnungen</string>
@@ -291,6 +293,7 @@
     <string name="start_snoozed">Start im Schlummer-Modus</string>
     <string name="adjust_all_by_a_factor">Mit globalem Faktor anpassen</string>
     <string name="reset">Zurücksetzen</string>
+    <string name="pebble_and_android_wear_options">Optionen für verschiedene Uhren</string>
     <string name="customize_colours">Farben anpassen</string>
     <string name="xdrip_plus_color_settings">xDrip+ Farbeinstellungen</string>
     <string name="glucose_values_and_lines">Grenzwerte und Linien</string>
@@ -409,6 +412,7 @@
     <string name="choose_sound_used_for_predicted_low_alarm">Sound für vorhergesagten Niedrig-Alarm verwenden.</string>
     <string name="notify_when_parakeet_device_stops_checking_in">Benachrichtigen, wenn Parakeet keine Checkins sendet</string>
     <string name="parakeet_related_alerts">Parakeet Warnungen</string>
+    <string name="raise_parakeet_notification_silently_when_charging">Beim Laden lautlose Parakeet Warnungen</string>
     <string name="silent_alert_when_charging">Alarme lautlos beim Laden</string>
     <string name="alerts_start_out_snoozed_and_must_persist_for_a_while">Warnungen starten lautlos und werden nach einer Zeitspanne aktiviert</string>
     <string name="alarms_silenced_during_telephone_calls">Alarme bei Telefonaten lautlos</string>
