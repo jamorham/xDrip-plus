@@ -1304,7 +1304,7 @@
     <string name="title_desert_use_https">Usar HTTPS</string>
     <string name="title_xdrip_plus_experimental">Secção Experimental</string>
     <string name="summary_inpen_screen">A Descarregar as Dosagens</string>
-    <string name="title_inpen_screen">Caneta Insulina InPen</string>
+    <string name="title_inpen_screen">Caneta InPen Smart Insulin</string>
     <string name="title_inpen_enabled">Suporte InPen</string>
     <string name="summary_inpen_detect_priming">Detetar e excluir doses de preparação</string>
     <string name="title_inpen_detect_priming">Detetar preparação</string>
@@ -1317,7 +1317,7 @@
     <string name="summary_inpen_reset">Redefinir e procurar uma nova caneta no modo de emparelhamento</string>
     <string name="title_inpen_reset">Procurar Nova Pen</string>
     <string name="summary_pendiq_screen">Leitura e Escrita de Dosagens</string>
-    <string name="title_pendiq_screen">Pendiq 2.0 Insulin Pen</string>
+    <string name="title_pendiq_screen">Caneta Pendiq 2.0</string>
     <string name="title_use_pendiq">Suporte Pendiq 2.0</string>
     <string name="summary_pendiq_send_treatments">Prepare a caneta com as unidades de insulina tratamento inseridas. Deve sempre verificar isto.</string>
     <string name="title_pendiq_send_treatments">Enviar Tratamentos para Pen</string>
