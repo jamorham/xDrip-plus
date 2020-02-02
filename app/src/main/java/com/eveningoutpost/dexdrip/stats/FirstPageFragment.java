@@ -84,7 +84,7 @@ public class FirstPageFragment extends Fragment {
             TextView rangespercent = (TextView) localView.findViewById(R.id.textView_ranges_percent);
             TextView rangesabsolute = (TextView) localView.findViewById(R.id.textView_ranges_absolute);
 
-            updateText(localView, rangespercent, inRange * 100 / total + "%/" + aboveRange * 100 / total + "%/" + belowRange * 100 / total + "%");
+            updateText(localView, rangespercent, Math.round(inRange * 100.0 / total) + "%/" + Math.round(aboveRange * 100.0 / total) + "%/" + Math.round(belowRange * 100.0 / total) + "%");
             updateText(localView, rangesabsolute, inRange + "/" + aboveRange + "/" + belowRange);
 
             List<BgReadingStats> bgList = DBSearchUtil.getReadings(true);
