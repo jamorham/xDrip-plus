@@ -153,9 +153,9 @@
     <string name="home_screen">Домашний экран</string>
     <string name="calibration_graph">Калибровочный график</string>
     <string name="glucose_units">Единицы измерения глюкозы</string>
-    <string name="mmol_or_mgdl_high_and_low">ммоль / л или мг / дл высокого и низкого</string>
+    <string name="mmol_or_mgdl_high_and_low">ммоль/л или мг/дл, пороговые значения</string>
     <string name="general_settings">Общие настройки</string>
-    <string name="high_value">Высокое значение</string>
+    <string name="high_value">Верхнее значение</string>
     <string name="low_value">Нижнее значение</string>
     <string name="end_user_license_agreement">Лицензионное соглашение</string>
     <string name="save">Сохранить</string>
