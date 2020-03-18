@@ -50,14 +50,14 @@
     <string name="pref_dialog_mongodb_collection">Введите название коллекции</string>
     <string name="pref_message_mongodb_collection">Это название коллекции, где будут храниться данные, полученные с вашей системы мониторинга</string>
     <string name="pref_title_mongodb_device_status_collection">Название коллекции данных состояния устройства</string>
-    <string name="pref_dialog_mongodb_device_status_collection">Введите имя коллекции для состояния устройства\"</string>
-    <string name="pref_message_mongodb_device_status_collection">Это название коллекции, где батареи и другие данные, которые будут сохранены</string>
+    <string name="pref_dialog_mongodb_device_status_collection">Введите название коллекции данных состояния устройства\"</string>
+    <string name="pref_message_mongodb_device_status_collection">Это название коллекции, где будут храниться данные о состоянии батареи и прочая информация о состоянии устройства</string>
     <!-- API Settings -->
-    <string name="pref_title_api">API загрузки (REST)</string>
+    <string name="pref_title_api">Синхронизация с Nightscout (REST-API)</string>
     <string name="pref_title_api_enabled">Включено</string>
     <string name="pref_summary_api_enabled">REST API - это стандартный способ подключения к Nightscout</string>
-    <string name="pref_title_api_url">Базовый URL</string>
-    <string name="pref_dialog_api_url">Введите URL API Base</string>
+    <string name="pref_title_api_url">Основной URL</string>
+    <string name="pref_dialog_api_url">Введите основной API URL</string>
     <string name="pref_message_api_url">Это только базовый URL, то загрузчик будет автоматически добавлять / записи для POST. Api_secret на сервере должен соответствовать yourpassphrase в этой обстановке.</string>
     <string name="pref_default_api_url">https: // yourpassphrase @ {YOUR-САЙТА} .azurewebsites.net / API / v1 /</string>
     <!-- wifi Settings -->
