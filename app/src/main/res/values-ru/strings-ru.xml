@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
+    <string name="title_activity_bluetooth_scan">Поиск Bluetooth-устройств</string>
     <string name="connected">Подключено</string>
     <string name="disconnected">Отключен</string>
     <string name="menu_scan">Сканирование</string>
@@ -39,6 +40,9 @@
     <string name="scan_share2_barcode">Сканирование штрих-кода Share</string>
     <string name="pref_share2_scan_barcode_summary">Или сканировать штрих-код на приемнике акций</string>
     <!-- MongoDB Settings -->
+    <string name="pref_title_mongodb">MongoDB</string>
+    <string name="pref_summary_mongodb_enabled">Прямая загрузка в базу данных Nightscout не рекомендуется</string>
+    <string name="pref_title_mongodb_uri">URI</string>
     <string name="pref_dialog_mongodb_uri">Введите MongoDB URI\"</string>
     <string name="pref_message_mongodb_uri">Заменить примеры значений в {} \'s с правильными значениями</string>
     <string name="pref_default_mongodb_uri">MongoDB: // {пользователь}: {пароль} {@ хост} .mongolab.com: {11111} / {} базы данных</string>
@@ -51,6 +55,7 @@
     <!-- API Settings -->
     <string name="pref_title_api">API загрузки (REST)</string>
     <string name="pref_title_api_enabled">Включено</string>
+    <string name="pref_summary_api_enabled">REST API - это стандартный способ подключения к Nightscout</string>
     <string name="pref_title_api_url">Базовый URL</string>
     <string name="pref_dialog_api_url">Введите URL API Base</string>
     <string name="pref_message_api_url">Это только базовый URL, то загрузчик будет автоматически добавлять / записи для POST. Api_secret на сервере должен соответствовать yourpassphrase в этой обстановке.</string>
@@ -74,6 +79,12 @@
     <string name="pref_pebble_display_high_line">Дисплей High Line</string>
     <string name="pref_pebble_display_low_line">Дисплей низкой линии</string>
     <!-- Amazfit Settings -->
+    <string name="amazfit_sync_service">Служба синхронизации AmazFit</string>
+    <string name="pref_amazfit_BG_alert_enable_summary">Отправлять активные оповещения о гликемии на часы</string>
+    <string name="pref_amazfit_other_alert_enable_summary">Отправлять прочие оповещения на часы</string>
+    <string name="pref_amazfit_other_alert_enable">Включить</string>
+    <string name="pref_amazfit_other_alert_title">Прочие оповещения</string>
+    <string name="pref_amazfit_widget_graph_dots_title">Формат точек графика (в виджете)</string>
     <string name="toast_crash">Что-то пошло не так :( отчет был отправлен, чтобы помочь решить проблему.</string>
     <string name="taskerConfigInstruction">Просто нажмите на иконку Tick здесь, чтобы подтвердить. Вам не нужно, чтобы изменить строку конфигурации.</string>
     <string name="taskerConfiguration">Конфигурация Tasker</string>
@@ -467,6 +478,7 @@
     <string name="alert">Уведомление</string>
     <string name="high_alert">Высокая оповещения</string>
     <string name="low_alert">низкий сигнал тревога</string>
+    <string name="battery">Батарея</string>
     <string name="xbridge_battery">Батарея xBridge</string>
     <string name="limitter_battery">Libre батареи</string>
     <string name="parakeet_battery">Батарея parakeet</string>
@@ -484,6 +496,7 @@
     <string name="glucose_number_from_filtered">Глюкоза число от Filtered</string>
     <string name="if_the_phone_has_text_to_speech">Если телефон имеет текста в речь возможности он будет говорить каждое новое чтение.</string>
     <string name="upload_logs">Загрузить журналы</string>
+    <string name="short_off_text_for_switches">ВЫКЛ</string>
     <string name="short_on_text_for_switches">НА</string>
     <string name="install_pebble_apps">Установить Pebble Apps</string>
     <string name="sliding_24_hour_window_summary">Используйте последние 24 часа вместо времени с полуночи по статистике.</string>
@@ -491,6 +504,14 @@
     <string name="split">Трещина</string>
     <string name="delete">Удалить</string>
     <string name="title_activity_btglucose_meter">Измеритель сканирования</string>
+    <string name="notify_when_wear_low_battery">Отключение принудительного использования службы сбора данных Wear при низком уровне заряда батареи Wear</string>
+    <string name="label_show_insulin">Ед:%1$su</string>
+    <string name="label_show_steps">Шаги:%1$d</string>
+    <string name="label_show_steps_km">км:%1$s</string>
+    <string name="label_show_steps_mi">мили:%1$s</string>
+    <string name="password">Пароль</string>
     <!-- trend arrow for speak -->
+    <string name="title_reminder_snooze_undo">Панель управления функцией Отложить напоминание - Отменить</string>
+    <string name="title_pendiq_send_treatments">Отправлять дозы инсулина на ручку</string>
     <string name="do_not_hit_start_long">Не нажимайте кнопку ЗАПУСТИТЬ СЕНСОР пока не убедитесь что сенсор установлен и передатчик подключен.</string>
 </resources>
