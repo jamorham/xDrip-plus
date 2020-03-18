@@ -178,8 +178,8 @@
     <string name="show_settings_qr_codes">Показать QR-коды настроек</string>
     <string name="load_save_settings_to_sdcard">Загрузить / Сохранить настройки на SD-карту</string>
     <string name="alarms_and_alerts">Сигналы и оповещения</string>
-    <string name="alerts_and_notifications">Предупреждения и уведомления</string>
-    <string name="glucose_level_alerts_list">Уровень глюкозы оповещения списка</string>
+    <string name="alerts_and_notifications">Оповещения и уведомления</string>
+    <string name="glucose_level_alerts_list">Журнал оповещений об уровне глюкозы</string>
     <string name="glucose_alerts_settings">Оповещения Глюкоза Настройки</string>
     <string name="smart_snoozing">Смарт Повтор</string>
     <string name="calibration_alerts">Уведомления калибровки</string>
