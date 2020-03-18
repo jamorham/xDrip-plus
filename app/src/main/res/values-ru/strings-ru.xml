@@ -58,26 +58,26 @@
     <string name="pref_summary_api_enabled">REST API - это стандартный способ подключения к Nightscout</string>
     <string name="pref_title_api_url">Основной URL</string>
     <string name="pref_dialog_api_url">Введите основной API URL</string>
-    <string name="pref_message_api_url">Это только базовый URL, то загрузчик будет автоматически добавлять / записи для POST. Api_secret на сервере должен соответствовать yourpassphrase в этой обстановке.</string>
-    <string name="pref_default_api_url">https: // yourpassphrase @ {YOUR-САЙТА} .azurewebsites.net / API / v1 /</string>
+    <string name="pref_message_api_url">Имейте в виду, что это лишь основной URL и загрузчик будет автоматически добавлять / записи для POST-запросов. Значение API-SECRET на сервере должно совпадать с вашим паролем (passphrase) в настройках.</string>
+    <string name="pref_default_api_url">https://вашпароль@{вашсайт}.azurewebsites.net/api/v1/</string>
     <!-- wifi Settings -->
-    <string name="wifi_recievers_dialog_message">Список разделенных запятыми IP: порт (например, 37.142.132.220:50005,37.142.132.220:50010,mongodb://user:pass@ds053958.mongolab.com:53958/db/collection)</string>
-    <string name="wifi_recievers_dialog_title">Введите IP-адреса и порты приемников (включая MongoDB адреса, если это необходимо)</string>
+    <string name="wifi_recievers_dialog_message">Разделенный запятыми список IP:порт (например, 37.142.132.220:50005,37.142.132.220:50010,mongodb://user:pass@ds053958.mongolab.com:53958/db/collection)</string>
+    <string name="wifi_recievers_dialog_title">Введите IP-адреса и порты ресиверов (включая MongoDB адреса, если потребуется)</string>
     <!-- Location Settings -->
-    <string name="location_not_found_title">Геопозиция не включена</string>
-    <string name="location_not_found_message">Для обнаружения Bluetooth для работы на новых устройствах, геопозиция должна быть включена. xDrip не отслеживает ваше местоположение, и она может быть отключена после успешного сопряжения.</string>
+    <string name="location_not_found_title">Геопозиционирование не включено</string>
+    <string name="location_not_found_message">Для корректной работы поиска Bluetooth устройств на новых смартфонах, отслеживание местоположения должно быть включено. xDrip не отслеживает ваше текущее местоположение, за исключением случаев, когда активирована опциональная функция экстренных оповещений</string>
     <string name="location_yes">Включить</string>
     <!-- broadcast settings -->
-    <string name="pref_title_broadcast_enabled">Вещание на местном уровне</string>
-    <string name="pref_summary_broadcast_enabled">Включить локальную трансляцию данных, чтобы другие приложения (например. NightWatch) может прослушивать новые значения</string>
-    <string name="title_activity_share_test">Доля Test</string>
+    <string name="pref_title_broadcast_enabled">Локальная трансляция данных</string>
+    <string name="pref_summary_broadcast_enabled">Включить локальную трансляцию данных, чтобы другие приложения (например, NightWatch) могли получать данные от xDrip+</string>
+    <string name="title_activity_share_test">Тест передачи данных</string>
     <!-- pebble settings -->
-    <string name="pref_pebble_trend_watchface">Использование Pebble Trend Watchface</string>
-    <string name="pref_summary_pebble_trend_watchface">Использование / установка Pebble Trend Watchface (экспериментальный)</string>
-    <string name="pref_pebble_display_trend">Дисплей Trend</string>
-    <string name="pref_summary_display_trend">Показать тенденцию BG на циферблате xDrip Pebble.</string>
-    <string name="pref_pebble_display_high_line">Дисплей High Line</string>
-    <string name="pref_pebble_display_low_line">Дисплей низкой линии</string>
+    <string name="pref_pebble_trend_watchface">Использовать циферблат Pebble Trend</string>
+    <string name="pref_summary_pebble_trend_watchface">Использовать/установить циферблат Pebble Trend (экспериментальная функция)</string>
+    <string name="pref_pebble_display_trend">Отображать тренд</string>
+    <string name="pref_summary_display_trend">Отображать тренд гликемии на циферблате Pebble.</string>
+    <string name="pref_pebble_display_high_line">Отображать порог гипергликемии</string>
+    <string name="pref_pebble_display_low_line">Отображать порог гипогликемии</string>
     <!-- Amazfit Settings -->
     <string name="amazfit_sync_service">Служба синхронизации AmazFit</string>
     <string name="pref_amazfit_BG_alert_enable_summary">Отправлять активные оповещения о гликемии на часы</string>
@@ -85,8 +85,8 @@
     <string name="pref_amazfit_other_alert_enable">Включить</string>
     <string name="pref_amazfit_other_alert_title">Прочие оповещения</string>
     <string name="pref_amazfit_widget_graph_dots_title">Формат точек графика (в виджете)</string>
-    <string name="toast_crash">Что-то пошло не так :( отчет был отправлен, чтобы помочь решить проблему.</string>
-    <string name="taskerConfigInstruction">Просто нажмите на иконку Tick здесь, чтобы подтвердить. Вам не нужно, чтобы изменить строку конфигурации.</string>
+    <string name="toast_crash">Что-то пошло не так :( Разработчикам был отправлен отчет об ошибке в целях поиска и решения проблемы.</string>
+    <string name="taskerConfigInstruction">Просто нажмите на галочку здесь, чтобы подтвердить действие. Вносить изменения в строку конфигурации не требуется.</string>
     <string name="taskerConfiguration">Конфигурация Tasker</string>
     <string name="add_widget">Добавить виджет</string>
     <string name="title_activity_alert_list">Список оповещения</string>
