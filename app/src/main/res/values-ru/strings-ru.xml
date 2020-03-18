@@ -2,9 +2,9 @@
 <resources>
     <string name="title_activity_bluetooth_scan">Поиск Bluetooth-устройств</string>
     <string name="connected">Подключено</string>
-    <string name="disconnected">Отключен</string>
-    <string name="menu_scan">Сканирование</string>
-    <string name="menu_stop">Стоп</string>
+    <string name="disconnected">Отключено</string>
+    <string name="menu_scan">Поиск</string>
+    <string name="menu_stop">Остановить</string>
     <string name="menu_refresh">Обновление</string>
     <string name="menu_export_database">Экспорт базы данных</string>
     <string name="menu_export_csv_sidiary">Экспорт CSV (формат SiDiary)</string>
