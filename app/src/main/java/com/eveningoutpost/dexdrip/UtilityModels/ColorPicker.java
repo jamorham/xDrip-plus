@@ -83,7 +83,7 @@ public class ColorPicker extends ColorPreference {
 
         // TODO probably should check whether data has actually changed before updating all the graphics
         Home.staticRefreshBGCharts(true);
-        WidgetUpdateService.staticRefreshWidgets();
+        WidgetUpdateService.updateCurrentBgInfo();
         Notifications.staticUpdateNotification();
     }
 

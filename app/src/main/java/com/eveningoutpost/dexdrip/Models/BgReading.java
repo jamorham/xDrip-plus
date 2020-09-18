@@ -711,22 +711,27 @@ public class BgReading extends Model implements ShareUploadableBg {
         return slopeToArrowSymbol(slope);
     }
 
-    public static String slopeToArrowSymbol(double slope) {
+    public static int slopeToArrowIndex(double slope) {
         if (slope <= (-3.5)) {
-            return "\u21ca";// ⇊
+            return 0;// ⇊
         } else if (slope <= (-2)) {
-            return "\u2193"; // ↓
+            return 1; // ↓
         } else if (slope <= (-1)) {
-            return "\u2198"; // ↘
+            return 2; // ↘
         } else if (slope <= (1)) {
-            return "\u2192"; // →
+            return 3; // →
         } else if (slope <= (2)) {
-            return "\u2197"; // ↗
+            return 4; // ↗
         } else if (slope <= (3.5)) {
-            return "\u2191"; // ↑
+            return 5; // ↑
         } else {
-            return "\u21c8"; // ⇈
+            return 6; // ⇈
         }
+    }
+
+    public static String slopeToArrowSymbol(double slope) {
+        String[] arrow = { "\u21ca", "\u2193", "\u2198", "\u2192", "\u2197", "\u2191", "\u21c8" };
+        return arrow[slopeToArrowIndex(slope)];
     }
 
     public String slopeArrow() {

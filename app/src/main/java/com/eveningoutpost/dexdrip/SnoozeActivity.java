@@ -52,9 +52,9 @@ public class SnoozeActivity extends ActivityWithMenu {
 
     static final long infiniteSnoozeValueInMinutes = 5256000;//10 years
     //static final int snoozeValues[] = new int []{5, 10, 15, 20, 25, 30, 35, 40, 45, 50, 55, 60, 75, 90, 105, 120, 150, 180, 240, 300, 360, 420, 480, 540, 600};
-    static final int snoozeValues[] = new int []{ 10, 15, 20, 30, 40, 50, 60, 75, 90, 120, 150, 180, 240, 300, 360, 420, 480, 540, 600};
+    static final int snoozeValues[] = new int []{ 1, 2, 5, 10, 15, 20, 30, 40, 50, 60, 75, 90, 120, 150, 180, 240, 300, 360, 420, 480, 540, 600};
 
-    static int getSnoozeLocatoin(int time) {
+    static int getSnoozeLocation(int time) {
         for (int i=0; i < snoozeValues.length; i++) {
             if(time == snoozeValues[i]) {
                 return i;
@@ -98,9 +98,9 @@ public class SnoozeActivity extends ActivityWithMenu {
         picker.setDisplayedValues(values);
         picker.setWrapSelectorWheel(false);
         if(default_snooze != 0) {
-            picker.setValue(getSnoozeLocatoin(default_snooze));
+            picker.setValue(getSnoozeLocation(default_snooze));
         } else {
-            picker.setValue(getSnoozeLocatoin(getDefaultSnooze(above)));
+            picker.setValue(getSnoozeLocation(getDefaultSnooze(above)));
         }
     }
 
@@ -228,7 +228,7 @@ public class SnoozeActivity extends ActivityWithMenu {
                 snoozeValue.setMinValue(0);
                 snoozeValue.setDisplayedValues(values);
                 snoozeValue.setWrapSelectorWheel(false);
-                snoozeValue.setValue(getSnoozeLocatoin(60));
+                snoozeValue.setValue(getSnoozeLocation(60));
 
                 b1.setOnClickListener(new View.OnClickListener() {
                     @Override

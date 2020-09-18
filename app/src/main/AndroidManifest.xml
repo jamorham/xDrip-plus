@@ -388,6 +388,16 @@
                 android:resource="@xml/x_drip_widget_info" />
         </receiver>
 
+        <receiver android:name=".gearWidget">
+            <intent-filter>
+                <action android:name="android.appwidget.action.APPWIDGET_UPDATE" />
+            </intent-filter>
+
+            <meta-data
+                android:name="android.appwidget.provider"
+                android:resource="@xml/gear_widget_info" />
+        </receiver>
+
         <service
             android:name=".WidgetUpdateService"
             android:enabled="true"
