@@ -53,7 +53,7 @@ Your data is yours and can be exported in many different ways. xDrip also interc
 * Increasing automation and data backup and sync options
 * More Nightscout and APS integration
 
-## Helpful Documents
+## Helpful Documents & Tips
  * Cyb-Netic xDrip-plus wiki  <a href="https://github.com/Atlas-Night-Out/xDrip-plus/wiki" target="_blank" title="Xdrip-Plus wiki documents">See Here</a> 
 
 ## Collaboration
