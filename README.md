@@ -1,6 +1,6 @@
 # Nightscout xDrip+
 > Enhanced personal research version of xDrip
-
+dave woz here
  <img align="right" src="Documentation/images/download-xdrip-plus-qr-code.png">
  Info page and APK download: https://jamorham.github.io/#xdrip-plus
 
