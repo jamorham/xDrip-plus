@@ -1,11 +1,13 @@
 # Nightscout xDrip+
 > Enhanced personal research version of xDrip
-dave woz here
+
  <img align="right" src="Documentation/images/download-xdrip-plus-qr-code.png">
  Info page and APK download: https://jamorham.github.io/#xdrip-plus
 
 <img align="right" src="https://travis-ci.org/jamorham/xDrip-plus.svg?branch=master"><a align="right" title="Crowdin" target="_blank" href="https://crowdin.com/project/xdrip"><img align="right" src="https://badges.crowdin.net/xdrip/localized.svg"></a>
-dgdgdgdgdgdgd
+
+
+
 ## Features
 * Voice, Keypad or Watch input of Treatments (Insulin/Carbs/Notes)
 * Visualization of Insulin and Carb action curves + Undo/Redo
@@ -14,7 +16,10 @@ dgdgdgdgdgdgd
 * Support for many different data sources
 * Published by the Nightscout Foundation
 
- <img align="middle" src="https://jamorham.github.io/images/jamorham-natural-language-treatments-two-web.png">
+ <img align="middle" src="https://jamorham.github.io/images/jamorham-natural-language-treatments-two-web.png"><br>
+ 
+ ## Helpful Documents
+ * Cyb-Netic xDrip-plus wiki  <a href="https://github.com/Atlas-Night-Out/xDrip-plus/wiki" target="_blank" title="Xdrip-Plus wiki documents">See Here</a> 
 
 ## What does it do?
 
