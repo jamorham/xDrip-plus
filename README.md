@@ -18,8 +18,7 @@
 
  <img align="middle" src="https://jamorham.github.io/images/jamorham-natural-language-treatments-two-web.png"><br>
  
- ## Helpful Documents
- * Cyb-Netic xDrip-plus wiki  <a href="https://github.com/Atlas-Night-Out/xDrip-plus/wiki" target="_blank" title="Xdrip-Plus wiki documents">See Here</a> 
+
 
 ## What does it do?
 
@@ -53,6 +52,9 @@ Your data is yours and can be exported in many different ways. xDrip also interc
 * Supporting the large family of devices
 * Increasing automation and data backup and sync options
 * More Nightscout and APS integration
+
+## Helpful Documents
+ * Cyb-Netic xDrip-plus wiki  <a href="https://github.com/Atlas-Night-Out/xDrip-plus/wiki" target="_blank" title="Xdrip-Plus wiki documents">See Here</a> 
 
 ## Collaboration
 We are very happy if people want to collaborate with this project. Please contact us at [Gitter](https://gitter.im/jamorham/xDrip-plus) if you want to get involved and study the [collaboration guidelines](CONTRIBUTING.md) before submitting any patches or pull requests.
