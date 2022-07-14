@@ -62,7 +62,7 @@ public class Blukon {
     private static long m_timeLastBg = 0;
     private static long m_persistentTimeLastBg;
     private static int m_blockNumber = 0;
-    private static byte[] m_full_data = new byte[344];
+    private static byte[] m_full_data = new byte[Constants.LIBRE_1_2_FRAM_SIZE];
     private static long m_timeLastCmdReceived = 0;
 
     public static String getPin() {
@@ -687,6 +687,9 @@ private static final String GET_TREND_HISTORY_BLOCK_COMMAND = READ_SINGLE_BLOCK_
 
             final String tagId = PersistentStore.getString("LibreSN");
             Log.i(TAG, "calling HandleGoodReading");
+
+            // Set the time of the current reading
+            PersistentStore.setLong("libre-reading-timestamp", JoH.tsl());
             NFCReaderX.HandleGoodReading(tagId, m_full_data, now, false, patchUID, patchInfo);
 
             PersistentStore.setLong("blukon-time-of-last-reading", now);

@@ -52,7 +52,7 @@ public class Sensor extends Model {
   @Column(name = "sensor_location")
   public String sensor_location;
 
-    public static Sensor create(long started_at) {
+    public synchronized static Sensor create(long started_at) {
         Sensor sensor = new Sensor();
         sensor.started_at = started_at;
         sensor.uuid = UUID.randomUUID().toString();
@@ -63,7 +63,7 @@ public class Sensor extends Model {
         return sensor;
     }
 
-    public static Sensor create(long started_at, String uuid) {//KS
+    public synchronized static Sensor create(long started_at, String uuid) {//KS
         Sensor sensor = new Sensor();
         sensor.started_at = started_at;
         sensor.uuid = uuid;
@@ -78,25 +78,9 @@ public class Sensor extends Model {
         final Sensor sensor = currentSensor();
         if (sensor == null) {
             Sensor.create(JoH.tsl());
+            UserError.Log.ueh(TAG, "Created new default sensor");
         }
         return currentSensor();
-    }
-
-    // Used by xDripViewer
-    public static void createUpdate(long started_at, long stopped_at,  int latest_battery_level, String uuid) {
-
-        Sensor sensor = getByTimestamp(started_at);
-        if (sensor != null) {
-            Log.d("SENSOR", "updatinga an existing sensor");
-        } else {
-            Log.d("SENSOR", "creating a new sensor");
-            sensor = new Sensor();
-        }
-        sensor.started_at = started_at;
-        sensor.stopped_at = stopped_at;
-        sensor.latest_battery_level = latest_battery_level;
-        sensor.uuid = uuid;
-        sensor.save();
     }
 
     public synchronized static void stopSensor() {

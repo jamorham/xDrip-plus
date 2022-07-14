@@ -9,6 +9,7 @@ import android.text.SpannableString;
 import com.eveningoutpost.dexdrip.Models.BgReading;
 import com.eveningoutpost.dexdrip.Models.JoH;
 import com.eveningoutpost.dexdrip.Models.UserError;
+import com.eveningoutpost.dexdrip.R;
 import com.eveningoutpost.dexdrip.UtilityModels.Constants;
 import com.eveningoutpost.dexdrip.UtilityModels.Inevitable;
 import com.eveningoutpost.dexdrip.UtilityModels.Pref;
@@ -30,6 +31,7 @@ import static com.eveningoutpost.dexdrip.cgm.sharefollow.ShareConstants.MAX_RECO
 import static com.eveningoutpost.dexdrip.cgm.sharefollow.ShareConstants.NON_US_SHARE_BASE_URL;
 import static com.eveningoutpost.dexdrip.cgm.sharefollow.ShareConstants.US_SHARE_BASE_URL;
 import static com.eveningoutpost.dexdrip.utils.DexCollectionType.SHFollow;
+import static com.eveningoutpost.dexdrip.xdrip.gs;
 
 /**
  * jamorham
@@ -206,7 +208,6 @@ public class ShareFollowService extends ForegroundService {
 
         megaStatus.add(new StatusItem("Latest BG", ageLastBg + (lastBg != null ? " ago" : ""), bgAgeHighlight));
         megaStatus.add(new StatusItem("BG receive delay", ageOfBgLastPoll, ageOfLastBgPollHighlight));
-        megaStatus.add(new StatusItem());
         megaStatus.add(new StatusItem("Last poll", lastPoll > 0 ? JoH.niceTimeScalar(JoH.msSince(lastPoll)) + " ago" : "n/a"));
         megaStatus.add(new StatusItem("Last wakeup", last_wakeup > 0 ? JoH.niceTimeScalar(JoH.msSince(last_wakeup)) + " ago" : "n/a"));
         megaStatus.add(new StatusItem("Next poll in", JoH.niceTimeScalar(wakeup_time - JoH.tsl())));
@@ -214,8 +215,7 @@ public class ShareFollowService extends ForegroundService {
             megaStatus.add(new StatusItem("Last BG time", JoH.dateTimeText(lastBg.timestamp)));
         }
         megaStatus.add(new StatusItem("Next poll time", JoH.dateTimeText(wakeup_time)));
-        megaStatus.add(new StatusItem());
-        megaStatus.add(new StatusItem("Buggy Samsung", JoH.buggy_samsung ? "Yes" : "No"));
+        megaStatus.add(new StatusItem("Buggy Samsung", JoH.buggy_samsung ? gs(R.string.yes) : gs(R.string.no)));
 
         return megaStatus;
     }

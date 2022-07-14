@@ -5,7 +5,6 @@ import android.app.PendingIntent;
 import android.bluetooth.BluetoothGattCharacteristic;
 import android.bluetooth.BluetoothGattService;
 import android.content.Intent;
-import android.media.MediaPlayer;
 import android.os.PowerManager;
 import android.util.Pair;
 
@@ -83,6 +82,7 @@ import static com.eveningoutpost.dexdrip.watch.miband.message.OperationCodes.AUT
 import static com.eveningoutpost.dexdrip.watch.miband.message.OperationCodes.AUTH_SUCCESS;
 import static com.eveningoutpost.dexdrip.watch.miband.message.OperationCodes.COMMAND_ACK_FIND_PHONE_IN_PROGRESS;
 import static com.eveningoutpost.dexdrip.watch.miband.message.OperationCodes.COMMAND_DISABLE_CALL;
+import static com.eveningoutpost.dexdrip.xdrip.gs;
 
 /**
  * <p>
@@ -115,7 +115,6 @@ public class MiBandService extends JamBaseBluetoothSequencer {
     static BatteryInfo batteryInfo = new BatteryInfo();
     private FirmwareOperations firmware;
     private Subscription watchfaceSubscription;
-    private MediaPlayer player;
 
     private PendingIntent bgServiceIntent;
     static private long bgWakeupTime;
@@ -449,13 +448,13 @@ public class MiBandService extends JamBaseBluetoothSequencer {
             case DeviceEvent.FIND_PHONE_START:
                 UserError.Log.d(TAG, "find phone started");
                 if ((JoH.ratelimit("band_find phone_sound", 3))) {
-                    player = JoH.playSoundUri(getResourceURI(R.raw.default_alert));
+                    JoH.playSoundUri(getResourceURI(R.raw.default_alert));
                 }
                 acknowledgeFindPhone();
                 break;
             case DeviceEvent.FIND_PHONE_STOP:
                 UserError.Log.d(TAG, "find phone stopped");
-                if (player != null && player.isPlaying()) player.stop();
+                JoH.stopSoundUri();
                 break;
             case DeviceEvent.MUSIC_CONTROL:
                 UserError.Log.d(TAG, "got music control");
@@ -561,10 +560,14 @@ public class MiBandService extends JamBaseBluetoothSequencer {
     private void getModelName() {
         I.connection.readCharacteristic(Const.UUID_CHAR_DEVICE_NAME).subscribe(
                 readValue -> {
-                    String name = new String(readValue);
-                    if (d)
-                        UserError.Log.d(TAG, "Got device name: " + name);
-                    MiBand.setModel(name, MiBand.getPersistentAuthMac());
+                    if (readValue != null) {
+                        String name = new String(readValue);
+                        if (d)
+                            UserError.Log.d(TAG, "Got device name: " + name);
+                        MiBand.setModel(name, MiBand.getPersistentAuthMac());
+                    } else {
+                        UserError.Log.e(TAG, "Got null device name");
+                    }
                     changeNextState();
                 }, throwable -> {
                     if (d)
@@ -1501,8 +1504,8 @@ public class MiBandService extends JamBaseBluetoothSequencer {
         l.add(new StatusItem("Software version", MiBand.getVersion()));
 
         l.add(new StatusItem("Mac address", MiBand.getMac()));
-        l.add(new StatusItem("Connected", II.isConnected ? "Yes" : "No"));
-        l.add(new StatusItem("Is authenticated", MiBand.isAuthenticated() ? "Yes" : "No"));
+        l.add(new StatusItem("Connected", II.isConnected ? gs(R.string.yes) : gs(R.string.no)));
+        l.add(new StatusItem("Is authenticated", MiBand.isAuthenticated() ? gs(R.string.yes) : gs(R.string.no)));
         if (II.isConnected) {
             int levelInPercent = batteryInfo.getLevelInPercent();
             String levelInPercentText;

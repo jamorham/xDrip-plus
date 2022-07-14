@@ -80,11 +80,26 @@ public class FirstPageFragment extends Fragment {
             if (total == 0) {
                 total = Long.MAX_VALUE;
             }
+            int abovePercent = (int) (aboveRange * 100.0 / total + 0.5);
+            int belowPercent = (int) (belowRange * 100.0 / total + 0.5);
+            int inPercent = 100 - abovePercent - belowPercent;
 
             TextView rangespercent = (TextView) localView.findViewById(R.id.textView_ranges_percent);
-            TextView rangesabsolute = (TextView) localView.findViewById(R.id.textView_ranges_absolute);
+            updateText(localView, rangespercent, inPercent + "%/" + abovePercent + "%/" + belowPercent + "%");
 
-            updateText(localView, rangespercent, inRange * 100 / total + "%/" + aboveRange * 100 / total + "%/" + belowRange * 100 / total + "%");
+            // Let's put the range settings on screen so that this becomes a self-contained page.
+            // Navid200
+            double stats_high = Double.parseDouble(settings.getString("highValue", "170"));
+            double stats_low = Double.parseDouble(settings.getString("lowValue", "70"));
+            TextView rangeView = (TextView) localView.findViewById(R.id.textView_stats_range_set);
+            //update stats_high/low
+            if (!mgdl) {
+                updateText(localView, rangeView, (Math.round(stats_low * 10) / 10d) + " - " + (Math.round(stats_high * 10) / 10d) + " mmol/l");
+            } else {
+                updateText(localView, rangeView, Math.round(stats_low) + " - " + (Math.round(stats_high)) + " mg/dl");
+            }
+
+            TextView rangesabsolute = (TextView) localView.findViewById(R.id.textView_ranges_absolute);
             updateText(localView, rangesabsolute, inRange + "/" + aboveRange + "/" + belowRange);
 
             List<BgReadingStats> bgList = DBSearchUtil.getReadings(true);
