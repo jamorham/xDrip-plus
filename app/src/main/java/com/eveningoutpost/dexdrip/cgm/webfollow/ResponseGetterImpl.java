@@ -1,7 +1,7 @@
 package com.eveningoutpost.dexdrip.cgm.webfollow;
 
-import com.eveningoutpost.dexdrip.Models.JoH;
-import com.eveningoutpost.dexdrip.Models.UserError;
+import com.eveningoutpost.dexdrip.models.JoH;
+import com.eveningoutpost.dexdrip.models.UserError;
 
 import java.io.IOException;
 import java.net.InetSocketAddress;
@@ -75,7 +75,7 @@ public class ResponseGetterImpl implements ResponseGetter {
                     UserError.Log.d(TAG, "RES: " + res);
                     return res;
                 } else {
-                    throw new RuntimeException("Got failure response code: " + response.code() + "\n" + (response.body() != null ? response.body().string() : ""));
+                    throw new RuntimeException(response.code() + " Got failure response code: " + response.code() + "\n" + (response.body() != null ? response.body().string() : ""));
                 }
             } catch (IOException | NullPointerException exception) {
                 val msg = "Error: " + exception + " " + c.url;
