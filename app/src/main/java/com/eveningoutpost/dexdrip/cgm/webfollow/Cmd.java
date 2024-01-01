@@ -1,10 +1,10 @@
 package com.eveningoutpost.dexdrip.cgm.webfollow;
 
-import static com.eveningoutpost.dexdrip.Models.JoH.emptyString;
+import static com.eveningoutpost.dexdrip.models.JoH.emptyString;
 import static com.eveningoutpost.dexdrip.cgm.webfollow.Agent.get;
 
-import com.eveningoutpost.dexdrip.Models.BgReading;
-import com.eveningoutpost.dexdrip.Models.JoH;
+import com.eveningoutpost.dexdrip.models.BgReading;
+import com.eveningoutpost.dexdrip.models.JoH;
 import com.eveningoutpost.dexdrip.cgm.medtrum.BackfillAssessor;
 import com.eveningoutpost.dexdrip.utils.DexCollectionType;
 
@@ -183,10 +183,19 @@ public class Cmd {
             m.loge("Unable to parse: @" + cmd.split("\\|")[0] + " " + e);
 
         } catch (IllegalArgumentException e) {
-            m.loge("Got exception: " + e);
+            m.loge("Got exception 1: " + e);
         } catch (Exception e) {
-            m.loge("Got exception: " + e);
-            e.printStackTrace();
+            m.loge("Got exception 2: " + e);
+            if (e instanceof RuntimeException) {
+                if (e.getMessage() != null && e.getMessage().startsWith("401")) {
+                    if (JoH.pratelimit("wf-response-401", 28800)) {
+                        m.loge("Automatically start with refresh due to 401");
+                        Cpref.startWithRefresh(true);
+                    }
+                }
+            } else {
+                e.printStackTrace();
+            }
         }
         return false;
     }
