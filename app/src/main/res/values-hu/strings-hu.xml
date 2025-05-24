@@ -232,6 +232,7 @@
     <string name="pref_was_less_than_min">%1$s a minimálisan megengedettnél kisebb értékre lett beállítva.  A minimális értékre lett növelve.</string>
     <string name="extrapolate_data_to_try_to_predict_lows">Megpróbálja kiszámolni az esetleges hypot</string>
     <string name="alarm_at_forecasted_low_mins">Riasztás várható hypo előtt X perccel</string>
+    <string name="title_forecast_low_threshold">Határérték</string>
     <string name="other_xdrip_plus_alerts">További xDrip+ riasztások</string>
     <string name="xdrip_plus_display_settings">xDrip+ kijelző</string>
     <string name="display_customisations">Képernyő testreszabása</string>
@@ -1466,6 +1467,8 @@
     <string name="summary_persistent_high_alert">Ha magas érték felett van sokáig és nem tart lefelé</string>
     <string name="summary_persistent_high_threshold_link">Bekapcsolva a Magas érték a hatérték.\nKikapcsolva, a határérték az alábbi:</string>
     <string name="title_persistent_high_threshold_link">Határérték: Magas érték</string>
+    <string name="summary_forecast_low_threshold_link">Bekapcsolva az Alacsony érték a hatérték.\nKikapcsolva, a határérték az alábbi:</string>
+    <string name="title_forecast_low_threshold_link">Határérték: Alacsony érték</string>
     <string name="note_search_button">KERESÉS</string>
     <string name="all_note_button">MIND</string>
     <string name="title_full_screen_mode">Teljes képernyős mód</string>
