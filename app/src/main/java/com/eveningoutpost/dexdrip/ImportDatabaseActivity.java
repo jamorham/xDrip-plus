@@ -282,9 +282,8 @@ public class ImportDatabaseActivity extends ListActivityWithMenu {
 
                 if (dbFile.getAbsolutePath().endsWith(".zip")) {
                     // uncompress first
-                    try {
-                        final FileInputStream fileInputStream = new FileInputStream(dbFile.getAbsolutePath());
-                        final ZipInputStream zip_stream = new ZipInputStream(new BufferedInputStream(fileInputStream));
+                    try (FileInputStream fileInputStream = new FileInputStream(dbFile.getAbsolutePath());
+                         ZipInputStream zip_stream = new ZipInputStream(new BufferedInputStream(fileInputStream))) {
                         ZipEntry zipEntry = zip_stream.getNextEntry();
                         if ((zipEntry != null) && zipEntry.isDirectory())
                             zipEntry = zip_stream.getNextEntry();
@@ -313,9 +312,6 @@ public class ImportDatabaseActivity extends ListActivityWithMenu {
                             JoH.static_toast_long(msg);
                             return msg;
                         }
-
-                            zip_stream.close();
-                            fileInputStream.close();
 
                     } catch (IOException e) {
                         String msg = "Could not open file";
@@ -359,7 +355,7 @@ public class ImportDatabaseActivity extends ListActivityWithMenu {
 
             String result = DatabaseUtil.loadSql(xdrip.getAppContext(), dbFile.getAbsolutePath());
             if (delete_file != null) delete_file.delete();
-            statusDialog.dismiss();;
+            statusDialog.dismiss();
             return result;
         }
 
