@@ -37,6 +37,9 @@
     <string name="pref_header_cloud_storage">Cloud-Speicher</string>
     <string name="auto_configure_title">Auto-Konfiguration</string>
     <string name="prefs_auto_config_summary">Auto-Konfiguration per Barcode</string>
+    <string name="auto_config_cam_title">Kamera</string>
+    <string name="auto_config_cam_summary">Scanne einen QR-Code mit deinem Handy (empfohlen)</string>
+    <string name="auto_config_image_title">Bilddatei</string>
     <string name="scan_share2_barcode">Barcode scannen</string>
     <string name="pref_share2_scan_barcode_summary">Oder Barcode auf dem Share Empfänger scannen</string>
     <!-- MongoDB Settings -->
@@ -218,6 +221,7 @@
     <string name="other_alerts">Weitere Benachrichtigungen</string>
     <string name="extra_alerts_xdrip_plus">Weitere Warnungen (xDrip+)</string>
     <string name="persistent_high_alert">Dauerhafter Hoch-Alarm</string>
+    <string name="persistent_high_alert_enable">Aktivieren</string>
     <string name="forecasted_low_alert">Vorhergesagter Niedrig-Alarm</string>
     <string name="extrapolate_data_to_try_to_predict_lows">Extrapolation, um niedrige Werte vorherzusagen</string>
     <string name="alarm_at_forecasted_low_mins">Alarm bei vorhergesagten Niedrig-Werten (in Minuten)</string>
@@ -287,7 +291,7 @@
     <string name="use_excessive_wakelocks">Übermäßige Wakelocks nutzen</string>
     <string name="speak_readings">Werte vorlesen</string>
     <string name="extra_status_line">Zusätzliche Statuszeile</string>
-    <string name="dexcom_share_server_upload">Dexcom Share Server Upload</string>
+    <string name="dexcom_share_server_upload">Dex Share</string>
     <string name="upload_data_to_dex_servers">Daten zum Dexcom-Server hochladen, damit Du Deine Daten mit den offiziellen Dexcom-Apps nutzen kannst</string>
     <string name="manage_followers">Follower verwalten</string>
     <string name="manage_existing_followers">Follower verwalten und neue hinzufügen.</string>
@@ -1270,6 +1274,7 @@
     <string name="summary_lefun_send_alarms">Sende Benachrichtigungen an das Band für Glukosealarme</string>
     <string name="title_lefun_send_alarms">Alarme senden</string>
     <string name="title_lefun_option_shake_snoozes">Zum Schlummern schütteln</string>
+    <string name="title_lefun_send_calls">Sende Anrufe</string>
     <string name="title_lefun_screens_features">Lefun Bildschirme / Funktionen</string>
     <string name="title_features">Funktionen</string>
     <string name="title_lefun_feature_lift_to_wak">Zum Aktivieren anheben</string>
@@ -1727,6 +1732,7 @@
     <string name="reduce_battery_and_network_overhead">Reduziere den Akkuverbrauch und die Netzwerkbelastung durch Stapelverarbeitung und den Ausschluss unnötiger Daten</string>
     <string name="simplify_graphs_by_smoothing_out_irregularities">Vereinfache die grafische Darstellung durch das Glätten von Unregelmäßigkeiten</string>
     <string name="graph_smoothing">Glättung der grafischen Darstellung</string>
+    <string name="enable_graph_smoothing">Aktivieren</string>
     <string name="last_reading">Letzte Werte</string>
     <string name="select_file_for_alert">Datei für Alarm wählen</string>
     <string name="cannot_choose_file_without_permission">Kann Datei nicht auswählen ohne Speichermedium-Berechtigungen</string>
@@ -1828,4 +1834,25 @@
     <string name="carelink_credential_status_access_expired">Zugang abgelaufen! Wird aktualisiert...</string>
     <string name="carelink_credential_status_refresh_expired">Login abgelaufen! Bitte anmelden!</string>
     <string name="data_source">Datenquelle:</string>
+    <string name="disable_collection">Erfassung stoppen</string>
+    <string name="insulin_pens">Insulin-Pens</string>
+    <string name="editing">Bearbeitung</string>
+    <string name="enable_missed_reading_alert">Bearbeite Benachrichtigung bei verpassten Werten</string>
+    <string name="alert_if_no_data_received_in_colon">Warnen, wenn keine Daten in den letzten:</string>
+    <string name="wait_before_raising_the_same_alert_after_snooze_colon">Wartezeit, bevor dieselbe Warnung nach Snooze wieder ausgelöst wird:</string>
+    <string name="reraise_alerts_before_snooze_time">Alarmiere erneut vor der Schlummer-Zeit</string>
+    <string name="alert_reraise_time_colon">Wiederholzeit für Warnung:</string>
+    <string name="select_start_time">Startzeit wählen</string>
+    <string name="select_end_time">Endzeit wählen</string>
+    <string name="accept_glucose">Glukose akzeptieren</string>
+    <string name="process_glucose_data_received">Von der NSClient-App empfangene Glukose-Daten verarbeiten</string>
+    <string name="use_health_connect">Health Connect verwenden</string>
+    <string name="audio_focus">Audio-Fokus</string>
+    <string name="audio_focus_summary">Auswirkung auf andere Apps beim Abspielen von Warnungen und bei Lautstärkeänderungen</string>
+    <string name="audio_focus_dont_adjust_other_app_sounds">Töne anderer Apps nicht anpassen</string>
+    <string name="audio_focus_lower_volume_of_other_apps">Töne anderer Apps leiser stellen</string>
+    <string name="audio_focus_pause_other_apps_playing_audio">Andere Audio abspielende Apps pausieren</string>
+    <string name="audio_focus_pause_all_other_sounds">Alle anderen Töne pausieren</string>
+    <string name="use_camera_light">Kamera-Licht verwenden</string>
+    <string name="use_camera_light_summary">Kamera-Licht bei Warnungen aufblitzen lassen (nur am Ladegerät)</string>
 </resources>

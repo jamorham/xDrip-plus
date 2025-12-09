@@ -1,5 +1,6 @@
 package com.eveningoutpost.dexdrip.models;
 
+import static com.eveningoutpost.dexdrip.evaluators.PersistentHigh.persistentHighThreshold;
 import static com.eveningoutpost.dexdrip.g5model.Ob1G5StateMachine.shortTxId;
 import static com.eveningoutpost.dexdrip.importedlibraries.dexcom.Dex_Constants.TREND_ARROW_VALUES.NOT_COMPUTABLE;
 import static com.eveningoutpost.dexdrip.importedlibraries.dexcom.Dex_Constants.TREND_ARROW_VALUES.getTrend;
@@ -483,6 +484,10 @@ public class BgReading extends Model implements ShareUploadableBg {
     }
 
     public static BgReading create(double raw_data, double filtered_data, Context context, Long timestamp, boolean quick) {
+        return create(raw_data, filtered_data, context, timestamp, quick, null);
+    }
+
+    public static BgReading create(double raw_data, double filtered_data, Context context, Long timestamp, boolean quick, String source_info) {
         if (context == null) context = xdrip.getAppContext();
         BgReading bgReading = new BgReading();
         final Sensor sensor = Sensor.currentSensor();
@@ -508,6 +513,7 @@ public class BgReading extends Model implements ShareUploadableBg {
             bgReading.calibration_flag = false;
 
             bgReading.calculateAgeAdjustedRawValue();
+            bgReading.source_info = source_info;
 
             bgReading.save();
             bgReading.perform_calculations();
@@ -515,6 +521,7 @@ public class BgReading extends Model implements ShareUploadableBg {
         } else {
             Log.d(TAG, "Calibrations, so doing everything: " + calibration.uuid);
             bgReading = createFromRawNoSave(sensor, calibration, raw_data, filtered_data, timestamp);
+            bgReading.source_info = source_info;
 
             bgReading.save();
 
@@ -1073,6 +1080,10 @@ public class BgReading extends Model implements ShareUploadableBg {
     }
 
     public BgReading appendSourceInfo(String info) {
+        return appendSourceInfo(info, false);
+    }
+
+    public BgReading appendSourceInfo(String info, final boolean autoSave) {
         if ((source_info == null) || (source_info.length() == 0)) {
             source_info = info;
         } else {
@@ -1081,6 +1092,9 @@ public class BgReading extends Model implements ShareUploadableBg {
             } else {
                 UserError.Log.e(TAG, "Ignoring duplicate source info " + source_info + " -> " + info);
             }
+        }
+        if (autoSave) {
+            save();
         }
         return this;
     }
@@ -1323,12 +1337,16 @@ public class BgReading extends Model implements ShareUploadableBg {
         return bgr;
     }
 
-    // TODO this method shares some code with above.. merge
     public static void bgReadingInsertFromInt(int value, long timestamp, long margin, boolean do_notification) {
+        bgReadingInsertFromInt(value, timestamp, margin, do_notification, "");
+    }
+
+    // TODO this method shares some code with above.. merge
+    public static void bgReadingInsertFromInt(int value, long timestamp, long margin, boolean do_notification, String source_info) {
         // TODO sanity check data!
 
         if ((value <= 0) || (timestamp <= 0)) {
-            Log.e(TAG, "Invalid data fed to InsertFromInt");
+            Log.e(TAG, "Invalid data fed to InsertFromInt " + value + " " + JoH.dateTimeText(timestamp));
             return;
         }
 
@@ -1346,6 +1364,8 @@ public class BgReading extends Model implements ShareUploadableBg {
             bgr.raw_data = value;
             bgr.age_adjusted_raw_value = value;
             bgr.filtered_data = value;
+
+            bgr.source_info = source_info;
 
             final Sensor forced_sensor = Sensor.currentSensor();
             if (forced_sensor != null) {
@@ -1834,10 +1854,8 @@ public class BgReading extends Model implements ShareUploadableBg {
             final long since = now - last.get(0).timestamp;
             // only process if last reading <10 mins
             if (since < 600000) {
-                // check if exceeding high
-                if (last.get(0).calculated_value >
-                        Home.convertToMgDlIfMmol(
-                                JoH.tolerantParseDouble(Pref.getString("highValue", "170")))) {
+                // check if exceeding persistent high threshold
+                if (last.get(0).calculated_value > persistentHighThreshold) {
 
                     final double this_slope = last.get(0).calculated_value_slope * 60000;
                     //Log.d(TAG, "CheckForPersistentHigh: Slope: " + JoH.qs(this_slope));
@@ -2040,6 +2058,7 @@ public class BgReading extends Model implements ShareUploadableBg {
             return false;
         }
 
+        // TODO: Should we add documentation to address possible misbehavior in case of 1-minute readings?
         if(above == false) {
             // This is a low alert, we should be going up
             if((latest.get(0).calculated_value - latest.get(1).calculated_value > 4) ||
@@ -2049,8 +2068,8 @@ public class BgReading extends Model implements ShareUploadableBg {
             }
         } else {
             // This is a high alert we should be heading down
-            if((latest.get(1).calculated_value - latest.get(0).calculated_value > 4) ||
-               (latest.get(2).calculated_value - latest.get(0).calculated_value > 10)) {
+            if((latest.get(1).calculated_value - latest.get(0).calculated_value > 1) ||
+               (latest.get(2).calculated_value - latest.get(0).calculated_value > 2)) {
                 Log.d(TAG_ALERT, "trendingToAlertEnd returning true for high alert");
                 return true;
             }
@@ -2146,7 +2165,7 @@ public class BgReading extends Model implements ShareUploadableBg {
     public static Long getTimeSinceLastReading() {
         BgReading bgReading = BgReading.last();
         if (bgReading != null) {
-            return (new Date().getTime() - bgReading.timestamp);
+            return (new Date().getTime() - bgReading.timestamp); // TODO should be tsl
         }
         return (long) 0;
     }

@@ -19,13 +19,13 @@ import com.eveningoutpost.dexdrip.services.BluetoothGlucoseMeter;
 import com.eveningoutpost.dexdrip.services.MissedReadingService;
 import com.eveningoutpost.dexdrip.services.PlusSyncService;
 import com.eveningoutpost.dexdrip.utilitymodels.CollectionServiceStarter;
+import com.eveningoutpost.dexdrip.utilitymodels.ColorCache;
 import com.eveningoutpost.dexdrip.utilitymodels.IdempotentMigrations;
 import com.eveningoutpost.dexdrip.utilitymodels.PlusAsyncExecutor;
 import com.eveningoutpost.dexdrip.utilitymodels.Pref;
 import com.eveningoutpost.dexdrip.utilitymodels.VersionTracker;
 import com.eveningoutpost.dexdrip.calibrations.PluggableCalibration;
-import com.eveningoutpost.dexdrip.utils.AppCenterCrashReporting;
-import com.eveningoutpost.dexdrip.utils.NewRelicCrashReporting;
+import com.eveningoutpost.dexdrip.utils.SentryCrashReporting;
 import com.eveningoutpost.dexdrip.utils.jobs.DailyJob;
 import com.eveningoutpost.dexdrip.utils.jobs.XDripJobCreator;
 import com.eveningoutpost.dexdrip.watch.lefun.LeFunEntry;
@@ -49,13 +49,27 @@ public class xdrip extends Application {
 
     private static final String TAG = "xdrip.java";
     @SuppressLint("StaticFieldLeak")
-    private static Context context;
+    private static volatile Context context;
     private static boolean fabricInited = false;
     private static boolean bfInited = false;
     private static Locale LOCALE;
     public static PlusAsyncExecutor executor;
     public static boolean useBF = false;
     private static Boolean isRunningTestCache;
+
+    public static void setContext(final Context context) {
+        if (context == null) return;
+        if (xdrip.context == null) {
+            xdrip.context = context.getApplicationContext();
+        }
+    }
+
+    public static void setContextAlways(final Context context) {
+        if (context == null) return;
+        Log.d(TAG, "Set context: " + context.getResources().getConfiguration().getLocales().get(0).getLanguage()
+                + " was: " + xdrip.context.getResources().getConfiguration().getLocales().get(0).getLanguage());
+        xdrip.context = context;
+    }
 
 
     @Override
@@ -65,8 +79,7 @@ public class xdrip extends Application {
         JodaTimeAndroid.init(this);
         try {
             if (PreferenceManager.getDefaultSharedPreferences(xdrip.context).getBoolean("enable_crashlytics", true)) {
-                //NewRelicCrashReporting.start();
-                AppCenterCrashReporting.start(this);
+                SentryCrashReporting.start(this);
             }
         } catch (Exception e) {
             Log.e(TAG, e.toString());
@@ -82,6 +95,7 @@ public class xdrip extends Application {
         PreferenceManager.setDefaultValues(this, R.xml.pref_data_source, true);
         PreferenceManager.setDefaultValues(this, R.xml.xdrip_plus_defaults, true);
         PreferenceManager.setDefaultValues(this, R.xml.xdrip_plus_prefs, true);
+        ColorCache.setDefaultsLoaded();
 
         checkForcedEnglish(xdrip.context);
 
