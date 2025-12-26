@@ -19,6 +19,7 @@
         <item>Dex Share Follower</item>
         <item>Web Follower</item>
         <item>Companion App</item>
+        <item>SmartGuide</item>
         <item>GlucoRx/Aidex App</item>
         <item>CareLink Follower</item>
         <item>@string/disable_collection</item>
@@ -43,6 +44,7 @@
         <item>SHFollower</item>
         <item>WebFollower</item>
         <item>UiBased</item>
+        <item>GluPro</item>
         <item>AidexReceiver</item>
         <item>CLFollower</item>
         <item>Disabled</item>
@@ -544,6 +546,20 @@
         <item>90</item>
         <item>120</item>
         <item>180</item>
+    </string-array>
+
+    <!-- Bluetooth watchdog timer -->
+    <string-array name="bluetooth_watchdog_timer_entries">
+        <item>20 min ></item>
+        <item>15 min</item>
+        <item>10 min</item>
+        <item>5 min</item>
+    </string-array>
+    <string-array name="bluetooth_watchdog_timer_values">
+        <item>20</item>
+        <item>15</item>
+        <item>10</item>
+        <item>5</item>
     </string-array>
 
 </resources>
