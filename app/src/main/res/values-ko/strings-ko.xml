@@ -821,7 +821,7 @@
     <string name="use_flair_colors">제목/탐색 바 사용자 지정</string>
     <string name="upper_title_bar_flair">상단 제목 바</string>
     <string name="lower_button_bar_falir">하단 탐색 바</string>
-    <string name="force_english_text">영어 텍스트 강제 사용</string>
+    <string name="force_english_text">영어 강제 사용</string>
     <string name="using_local_language">현재 기기의 로컬 언어 사용 중</string>
     <string name="forcing_alternate_language">현재 대체 언어 강제 사용 중</string>
     <string name="need_alternate_language">Xdrip+ 내에서 다른 언어 번역이 필요한 경우</string>
@@ -1202,7 +1202,7 @@
     <string name="summary_cloud_storage_api_download_from_xdrip">Xdrip이 업로드한 항목은 다시 다운로드하지 않습니다</string>
     <string name="summary_bluetooth_meter_for_calibrations_auto">조건이 적절한 경우 확인 절차 없이 새로운 혈당 측정값으로 자동 보정합니다. (실험적 기능)</string>
     <string name="title_bluetooth_meter_for_calibrations_auto">자동 보정</string>
-    <string name="title_rest_api_extra_options">추가 옵션</string>
+    <string name="title_rest_api_extra_options">추가 설정</string>
     <string name="summary_send_bridge_battery_to_nightscout">브리지 배터리 잔량을 Nightscout으로 전송합니다. 배터리 센서가 고장 난 경우 체크를 해제하세요.</string>
     <string name="title_send_bridge_battery_to_nightscout">브리지 배터리 업로드</string>
     <string name="summary_send_dexcom_transmitter_battery_to_nightscout">Dexcom 송신기 배터리 통계를 Nightscout으로 전송합니다. 수집기 상태 화면에 표시되는 모든 데이터를 포함합니다.</string>
@@ -1412,7 +1412,7 @@
     <string name="title_do_number_wall_configuration">번호 월 구성</string>
     <string name="summary_number_wall_on_lockscreen">잠금 화면에 표시합니다. 안드로이드 7 이상 전용!</string>
     <string name="title_number_wall_on_lockscreen">잠금 화면에서 사용</string>
-    <string name="title_color_number_wall">월 텍스트 색상</string>
+    <string name="title_color_number_wall">패드 문자 색상</string>
     <string name="title_color_number_wall_shadow">월 그림자 색상</string>
     <string name="summary_pick_numberwall_start">표시 시작 시간을 선택하세요</string>
     <string name="title_pick_numberwall_start">켜지는 시간</string>
