@@ -172,11 +172,18 @@ public class PebbleDisplayTrend extends PebbleDisplayAbstract {
             Log.d(TAG, "receiveData: pebble_sync_value=" + pebble_sync_value + ", pebble_platform=" + pebble_platform + ", pebble_app_version=" + pebble_app_version);
 
                 switch ((int) pebble_platform) {
-                    case 0:
-                        if (PebbleUtil.pebbleDisplayType != PebbleDisplayType.TrendClassic) {
-                            PebbleUtil.pebbleDisplayType = PebbleDisplayType.TrendClassic;
+                    case 6:
+                        if (PebbleUtil.pebbleDisplayType != PebbleDisplayType.TrendClayClassic) {
+                            PebbleUtil.pebbleDisplayType = PebbleDisplayType.TrendClayClassic;
                             //JoH.static_toast_short("Switching to Pebble Classic Trend");
-                            Log.d(TAG, "Changing to Classic Trend due to platform id");
+                            Log.d(TAG, "Changing to Classic Trend due to platform id" + pebble_platform);
+                        }
+                        break;
+                    case 5:
+                        if (PebbleUtil.pebbleDisplayType != PebbleDisplayType.TrendClay) {
+                            PebbleUtil.pebbleDisplayType = PebbleDisplayType.TrendClay;
+                            //JoH.static_toast_short("Switching to Pebble Classic Trend");
+                            Log.d(TAG, "Changing to Clay Trend due to platform id " + pebble_platform);
                         }
                         break;
                 }
@@ -307,6 +314,10 @@ public class PebbleDisplayTrend extends PebbleDisplayAbstract {
     }
 
     private synchronized void sendTrendToPebble(boolean clearTrend) {
+        int width;
+        int height;
+        short resolution;
+        boolean colour;
         //create a sparkline bitmap to send to the pebble
 
         final Bitmap blankTrend;
@@ -344,13 +355,28 @@ public class PebbleDisplayTrend extends PebbleDisplayAbstract {
                 }
 
 
-                Log.d(TAG, "sendTrendToPebble: highLine is " + highLine + ", lowLine is " + lowLine + ",trendPeriod is " + trendPeriod);
+                Log.d(TAG, "sendTrendToPebble: highLine is " + highLine + ", lowLine is " + lowLine + ",trendPeriod is " + trendPeriod + ", pebbleDisplayType is " + PebbleUtil.pebbleDisplayType);
+                if(PebbleUtil.pebbleDisplayType == PebbleDisplayType.TrendClayClassic)
+                {
+                    width = 100;
+                    height = 40;
+                    resolution = 2;
+                    colour = false;
+                }
+                else
+                {
+                    width = 144;
+                    height = 84;
+                    resolution = 16;
+                    colour = true;
+                }
+                Log.d(TAG, "sendTrendToPebble: width is "+ width +", height is "+ height +", resolution is "+resolution + ", pebbleDisplayType is " +PebbleUtil.pebbleDisplayType);
                 Bitmap bgTrend = new BgSparklineBuilder(this.context)
                         .setBgGraphBuilder(this.bgGraphBuilder)
                             .setStart(System.currentTimeMillis() - 60000 * 60 * trendPeriod)
                             .setEnd(System.currentTimeMillis())
-                        .setHeightPx(PebbleUtil.pebbleDisplayType == PebbleDisplayType.TrendClassic ? 63 : 84) // 84
-                        .setWidthPx(PebbleUtil.pebbleDisplayType == PebbleDisplayType.TrendClassic ? 84 : 144) // 144
+                            .setHeightPx(height) // 84
+                            .setWidthPx(width) // 144
                             .showHighLine(highLine)
                             .showLowLine(lowLine)
                             .setTinyDots(Pref.getBoolean("pebble_tiny_dots", false))
@@ -359,7 +385,7 @@ public class PebbleDisplayTrend extends PebbleDisplayAbstract {
 
                 //encode the trend bitmap as a PNG
 
-                final byte[] img = SimpleImageEncoder.encodeBitmapAsPNG(clearTrend ? blankTrend : bgTrend, true, PebbleUtil.pebbleDisplayType == PebbleDisplayType.TrendClassic ? 2 : 16, true);
+                final byte[] img = SimpleImageEncoder.encodeBitmapAsPNG(clearTrend ? blankTrend : bgTrend, colour, resolution, true);
 
                 if (debugPNG) {
                     try {
