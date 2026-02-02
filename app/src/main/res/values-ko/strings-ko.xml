@@ -91,7 +91,7 @@
     <string name="pref_amazfit_BG_alert_enable_summary">스마트워치에 활성화된 혈당 알림 보내기</string>
     <string name="pref_amazfit_BG_alert_enable">활성화</string>
     <string name="pref_amazfit_BG_alert_title">혈당 알림</string>
-    <string name="pref_amazfit_other_alert_enable_summary">기타 알림을 스마트와치로 전송합니다</string>
+    <string name="pref_amazfit_other_alert_enable_summary">기타 알림을 스마트워치로 전송합니다</string>
     <string name="pref_amazfit_other_alert_enable">활성화</string>
     <string name="pref_amazfit_other_alert_title">기타 알림</string>
     <string name="pref_amazfit_watchface_graph_dots_title">워치페이스 그래프 점</string>
@@ -613,7 +613,7 @@
     <string name="accept_treatments">처치 수락</string>
     <string name="process_broadcasted_calibrations">다른 앱에서 수신한 보정값 처리</string>
     <string name="spoken_readings_locale">음성으로 읽어주기용 사용자 지정 언어, 예: de 또는 en_IN</string>
-    <string name="speak_glucose_twice">혈당 수치를 매번 두 번씩 읽기</string>
+    <string name="speak_glucose_twice">혈당 수치를 매번 두 번씩 읽어주기</string>
     <string name="short_speak_readings_shortcut">☰ 메뉴에 \'수치 읽어주기\' 토글 단축키 표시</string>
     <string name="speak_readings_shortcut">수치 읽어주기 단축키</string>
     <string name="battery_optimization_off">안드로이드 6 이상에서는 배터리 최적화를 꺼야 합니다(권장).</string>
@@ -700,7 +700,7 @@
     <string name="main_glucose_plugin">메인 혈당 표시값을 플러그인에서 가져옵니다!</string>
     <string name="plugin_override_all">플러그인 전체 덮어쓰기</string>
     <string name="all_new_glucose_data_plugin">모든 새로운 혈당 데이터가 xDrip 표준 알고리즘이 아닌 선택된 플러그인에서 계산되고 저장됩니다. 검증되지 않았으며 부정확하거나 버그가 있을 수 있습니다. 각별히 주의하여 사용하세요.</string>
-    <string name="old_school_calibrations">Xdrip 클래식 보정 알고리즘의 좁은 허용 기울기 범위를 사용합니다(2017년 이전). 기본 기울기가 더 자주 적용될 수 있습니다! (엔지니어링 모드 전용)</string>
+    <string name="old_school_calibrations">Xdrip 클래식 보정 알고리즘의 좁은 허용 기울기 범위를 사용합니다(2017년 이전). 기본 기울기가 더 자주 적용될 수 있습니다! (개발자 모드 전용)</string>
     <string name="old_school_calibration_mode">구형 보정 모드</string>
     <string name="how_receive_data">Dexcom/송신기에서 데이터를 어떻게 수신하시겠습니까?</string>
     <string name="nfc_options">휴대폰으로 NFC 기반 센서 스캔 설정</string>
@@ -779,23 +779,23 @@
     <string name="suppress_alerts_missed_readings">일정 시간 데이터 수신 실패 시 스누즈 및 활성 알림을 억제합니다</string>
     <string name="suppress_alerts_after">다음 시간 후 알림 억제 (최소 10분)</string>
     <string name="alert_calibration_request">보정 요청 시 알림</string>
-    <string name="calibrations_request_time_time_difference">보정 요청 간격 시간</string>
-    <string name="hours_between_calibrations">보정 간격 시간</string>
+    <string name="calibrations_request_time_time_difference">보정 요청 간격(시간)</string>
+    <string name="hours_between_calibrations">보정 간격(시간)</string>
     <string name="calibrations_sound">보정 요청 알림음을 선택하세요.</string>
     <string name="override_silent_mode">무음 모드 무시</string>
     <string name="even_when_charging">충전 중에도 허용</string>
     <string name="no_calibration_requests_charging">충전 중 보정 요청을 받지 않으려면 체크를 해제하세요</string>
     <string name="keep_alert_no_calibration">보정을 수행하지 않으면 계속 알림</string>
     <string name="repeat_alerts">알림 반복</string>
-    <string name="calibration_minutes_reraise">보정 요청 재알림 간격 분.</string>
-    <string name="alert_repeat_minutes">알림 반복 간격 분</string>
+    <string name="calibration_minutes_reraise">보정 요청 재알림 간격(분)</string>
+    <string name="alert_repeat_minutes">알림 반복 간격(분)</string>
     <string name="alert_noisy_values">X분 후 노이즈 값 지속 시 알림</string>
     <string name="alert_snooze">알림 스누즈</string>
-    <string name="alert_minutes_reraise">스누즈 후 재알림 대기 시간 분.</string>
+    <string name="alert_minutes_reraise">스누즈 후 재알림 대기 시간(분)</string>
     <string name="reraise_before_snooze">스누즈 시간 전 재알림</string>
     <string name="reraise_not_snoozed_sooner">스누즈되지 않았다면 더 일찍 재알림</string>
     <string name="alert_reraise_time">알림 재발생 시간</string>
-    <string name="alert_seconds_reraise">동일 알림 재발생 대기 시간 초.</string>
+    <string name="alert_seconds_reraise">동일 알림 재발생 대기 시간(초)</string>
     <string name="bg_falling_fast">혈당 급하강</string>
     <string name="bg_rising_fast">혈당 급상승</string>
     <string name="falling_threshold">하강 속도 임계값</string>
@@ -821,7 +821,7 @@
     <string name="use_flair_colors">제목/탐색 바 사용자 지정</string>
     <string name="upper_title_bar_flair">상단 제목 바</string>
     <string name="lower_button_bar_falir">하단 탐색 바</string>
-    <string name="force_english_text">영어 텍스트 강제 사용</string>
+    <string name="force_english_text">영어 강제 사용</string>
     <string name="using_local_language">현재 기기의 로컬 언어 사용 중</string>
     <string name="forcing_alternate_language">현재 대체 언어 강제 사용 중</string>
     <string name="need_alternate_language">Xdrip+ 내에서 다른 언어 번역이 필요한 경우</string>
@@ -875,7 +875,7 @@
     <string name="repeat_sound">소리 반복</string>
     <string name="enable_telemetry">텔레메트리 활성화</string>
     <string name="send_data_to_developers">기기별 성공률에 대한 데이터를 익명으로 개발자에게 전송합니다</string>
-    <string name="try_to_work_around_noisy_readings_ultrasensitive">매우 낮은 노이즈 레벨에서도 노이즈 보정을 시작합니다. (엔지니어링 모드 전용)</string>
+    <string name="try_to_work_around_noisy_readings_ultrasensitive">매우 낮은 노이즈 레벨에서도 노이즈 보정을 시작합니다. (개발자 모드 전용)</string>
     <string name="sidiary_date_title">언제부터 내보내시겠습니까?</string>
     <string name="blukon">BluCon</string>
     <string name="tomato">Tomato</string>
@@ -920,8 +920,8 @@
     <string name="FortyFiveUp">완만한 상승</string>
     <string name="SingleUp">상승</string>
     <string name="DoubleUp">급격한 상승</string>
-    <string name="Speak_trend_arrow_name">추세 화살표 이름 말하기</string>
-    <string name="Speak_everything_twice">모든 내용 두 번 말하기</string>
+    <string name="Speak_trend_arrow_name">추세 화살표 이름 읽어주기</string>
+    <string name="Speak_everything_twice">모든 내용 두 번 읽어주기</string>
     <string name="Speech_speed">음성 속도</string>
     <string name="Speech_pitch">음성 톤</string>
     <string name="Speak_Alerts">알림 내용 읽어주기</string>
@@ -942,7 +942,7 @@
     <string name="aggressive_power_manager">기기에 강력한 배터리 관리 앱이 감지되었습니다. xDrip이 백그라운드 제한에서 제외되었는지 시스템 설정에서 확인하세요.</string>
     <string name="use_conflict_msg">송신기 장치에 동시에 접근을 시도하여 두 앱 모두에 문제를 일으킬 수 있습니다</string>
     <string name="use_confict_msg_glimp">Glimp 설정을 조정하세요: 옵션 -&gt; 장치 -&gt; 블루투스 옵션 선택 해제</string>
-    <string name="eng_mode_is_on">엔지니어링 모드가 활성화되었습니다. 예상치 못한 동작을 유발할 수 있으므로 꼭 필요한 경우가 아니라면 비활성화해 주세요.</string>
+    <string name="eng_mode_is_on">개발자 모드가 활성화되었습니다. 예상치 못한 동작을 유발할 수 있으므로 꼭 필요한 경우가 아니라면 비활성화해 주세요.</string>
     <string name="yes">예</string>
     <string name="xdrip_compatible_features">xDrip+ %s 기능</string>
     <string name="garmin">Garmin</string>
@@ -1072,7 +1072,7 @@
     <string name="summary_write_Battery_Information_for_additional_analytic">추가 분석을 위해 배터리 정보를 파일에 기록합니다. 개발자가 요청한 경우에만 사용하세요!</string>
     <string name="title_Batterylog">배터리 로그</string>
     <string name="summary_Choose_to_display_the_bridge_battery_level">브리지 배터리 잔량을 표시하도록 선택합니다</string>
-    <string name="title_Glucose_Retention">혈당 데이터 보존</string>
+    <string name="title_Glucose_Retention">혈당 데이터 보존 (일)</string>
     <string name="summary_Erase_data_older_than_this_many_days">설정된 일수보다 오래된 데이터를 삭제합니다. 0 = 삭제 안 함</string>
     <string name="title_Other_misc_options">기타 잡다한 옵션</string>
     <string name="summary_allow_testing_with_dead_sensor">수명이 다한 센서로 테스트 허용</string>
@@ -1188,8 +1188,8 @@
     <string name="need_contacts_permission_to_select_message_recipients">메시지 수신자를 선택하려면 연락처 권한이 필요합니다</string>
     <string name="need_storage_permission_to_access_all_ringtones">모든 벨소리에 접근하려면 저장소 권한이 필요합니다</string>
     <string name="xdrip_needs_whitelisting_for_proper_performance">xDrip+의 원활한 성능을 위해 배터리 최적화 제외가 필요합니다</string>
-    <string name="overwrite_slope_engineering_only">기울기 덮어쓰기 (엔지니어링 전용!)</string>
-    <string name="overwrite_intercept_engineering_only">절편 덮어쓰기 (엔지니어링 전용!)</string>
+    <string name="overwrite_slope_engineering_only">기울기 덮어쓰기 (개발자 전용!)</string>
+    <string name="overwrite_intercept_engineering_only">절편 덮어쓰기 (개발자 전용!)</string>
     <string name="manual_overwrite_not_possible">수동 덮어쓰기 불가!</string>
     <string name="upload_even_when_using_mobile_data">모바일 데이터 사용 중에도 업로드</string>
     <string name="daily_backup_even_mobile">모바일 데이터에서도 일일 백업 수행</string>
@@ -1202,7 +1202,7 @@
     <string name="summary_cloud_storage_api_download_from_xdrip">Xdrip이 업로드한 항목은 다시 다운로드하지 않습니다</string>
     <string name="summary_bluetooth_meter_for_calibrations_auto">조건이 적절한 경우 확인 절차 없이 새로운 혈당 측정값으로 자동 보정합니다. (실험적 기능)</string>
     <string name="title_bluetooth_meter_for_calibrations_auto">자동 보정</string>
-    <string name="title_rest_api_extra_options">추가 옵션</string>
+    <string name="title_rest_api_extra_options">추가 설정</string>
     <string name="summary_send_bridge_battery_to_nightscout">브리지 배터리 잔량을 Nightscout으로 전송합니다. 배터리 센서가 고장 난 경우 체크를 해제하세요.</string>
     <string name="title_send_bridge_battery_to_nightscout">브리지 배터리 업로드</string>
     <string name="summary_send_dexcom_transmitter_battery_to_nightscout">Dexcom 송신기 배터리 통계를 Nightscout으로 전송합니다. 수집기 상태 화면에 표시되는 모든 데이터를 포함합니다.</string>
@@ -1350,7 +1350,7 @@
     <string name="title_clfollow_grace_period">유예 기간</string>
     <string name="summary_clfollow_grace_period">데이터 요청 유예 기간 초</string>
     <string name="title_clfollow_missed_poll_interval">누락 데이터 폴링 간격</string>
-    <string name="summary_clfollow_missed_poll_interval">데이터 누락 시 폴링 간격 분</string>
+    <string name="summary_clfollow_missed_poll_interval">데이터 누락 시 폴링 간격(분)</string>
     <string name="title_clfollow_download_finger_bgs">채혈 혈당값</string>
     <string name="summary_clfollow_download_finger_bgs">CareLink에서 채혈 혈당값 다운로드</string>
     <string name="title_clfollow_download_boluses">볼루스</string>
@@ -1412,7 +1412,7 @@
     <string name="title_do_number_wall_configuration">번호 월 구성</string>
     <string name="summary_number_wall_on_lockscreen">잠금 화면에 표시합니다. 안드로이드 7 이상 전용!</string>
     <string name="title_number_wall_on_lockscreen">잠금 화면에서 사용</string>
-    <string name="title_color_number_wall">월 텍스트 색상</string>
+    <string name="title_color_number_wall">패드 문자 색상</string>
     <string name="title_color_number_wall_shadow">월 그림자 색상</string>
     <string name="summary_pick_numberwall_start">표시 시작 시간을 선택하세요</string>
     <string name="title_pick_numberwall_start">켜지는 시간</string>
@@ -1657,7 +1657,7 @@
     <string name="title_ob1_g5_preemptive_restart_extended_time_travel">확장된 시간 여행</string>
     <string name="summary_ob1_g5_preemptive_restart_extended_time_travel">값 점프 현상을 피하기 위해 세션을 3일 차부터 시작하도록 재시작합니다</string>
     <string name="title_ob1_g5_preemptive_restart_extended_time_travel_all_firmwares">항상 확장된 시간 여행 허용</string>
-    <string name="summary_ob1_g5_preemptive_restart_extended_time_travel_all_firmwares">모든 펌웨어 버전에서 확장된 시간 여행을 허용합니다. (엔지니어링 모드 전용)</string>
+    <string name="summary_ob1_g5_preemptive_restart_extended_time_travel_all_firmwares">모든 펌웨어 버전에서 확장된 시간 여행을 허용합니다. (개발자 모드 전용)</string>
     <string name="collection_summary_ob1_g5_preemptive_restart">센서가 멈추기 전에 자동으로 다시 시작합니다</string>
     <string name="title_ob1_g5_preemptive_restart_alert">선제적 재시작 시 알림</string>
     <string name="summary_ob1_g5_preemptive_restart_alert">세션을 선제적으로 재시작할 때 알림을 띄웁니다</string>
@@ -1917,7 +1917,7 @@
     <string name="set_home_network_to">홈 네트워크 설정: %s</string>
     <string name="not_connected_to_wifi">WiFi에 연결되지 않음</string>
     <string name="at_home_only">집에서만</string>
-    <string name="speak">말하기</string>
+    <string name="speak">읽어주기</string>
     <string name="graph_note">그래프 메모</string>
     <string name="reminder_alternate_title">리마인더 대체 제목</string>
     <string name="default_xdrip_reminder_sound">기본 xDrip+ 리마인더 소리</string>
