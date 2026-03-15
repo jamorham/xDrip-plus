@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="menu_scan">Skeniraj</string>
+    <string name="menu_stop">Ustavi</string>
+    <string name="menu_refresh">Osveži</string>
+    <string name="menu_export_database">Izvozi bazo podatkov</string>
+    <string name="menu_export_csv_sidiary">Izvozi podatke (CSV, SiDiary format)</string>
+    <string name="menu_import_db">Uvozi bazo podatkov</string>
+    <!-- MongoDB Settings -->
+    <!-- API Settings -->
+    <!-- wifi Settings -->
+    <!-- Location Settings -->
+    <!-- broadcast settings -->
+    <!-- pebble settings -->
+    <!-- Amazfit Settings -->
+    <!-- trend arrow for speak -->
+    <!-- Maybe we can use them later?
+    <string name="title_clfollow_user">CareLink Username</string>
+    <string name="summary_clfollow_user">CareLink login username</string>
+    <string name="title_clfollow_pass">CareLink Password</string>
+    <string name="summary_clfollow_pass">CareLink login password</string>
+    !-->
+    <!-- Maybe we can use them later?
+    <string name="title_clfollow_lang">CareLink Language</string>
+    <string name="summary_clfollow_lang">CareLink language code</string>
+    -->
+</resources>
