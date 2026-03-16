@@ -184,6 +184,8 @@
     <string name="share_config_via_qr_code">QR 코드를 통한 공유 구성</string>
     <string name="check_for_updated_version">업데이트 된 버전 확인</string>
     <string name="current_version_is_up_to_date">선택한 채널에 새로운 업데이트가 없습니다</string>
+    <string name="title_dialog_check_for_update">%1$s 채널에 업데이트가 없습니다</string>
+    <string name="message_dialog_check_for_update">다른 채널에 최신 버전이 존재할 수 있습니다.</string>
     <string name="send_feedback_to_developer">개발자에게 피드백 보내기</string>
     <string name="home_screen">홈 화면</string>
     <string name="event_logs">이벤트 로그</string>
@@ -286,6 +288,8 @@
     <string name="pref_summary_show_treatments">그래프에 인슐린/탄수화물 처치 지점을 표시합니다</string>
     <string name="pref_use_wear_health">Wear 건강 데이터 사용</string>
     <string name="pref_summary_use_wear_health">가능한 경우 만보기 걸음 수 데이터를 수집하고 표시합니다</string>
+    <string name="summary_enable_wear_auto_update">활성화 시, 휴대전화 버전과 일치하도록 워치의 xDrip을 자동 업데이트합니다.</string>
+    <string name="title_enable_wear_auto_update">워치 자동 업데이트</string>
     <string name="pebble_integration">Pebble 연동</string>
     <string name="send_data_to_pebble_watchface">Pebble 와치 페이스에 데이터를 전송합니다.</string>
     <string name="pebble_watch_integration">Pebble 와치 연동</string>
@@ -648,6 +652,8 @@
     <string name="libre_use_smoothed_data_summary">5개 지점의 평균을 사용하여 더 부드러운 리브레 데이터를 얻습니다.</string>
     <string name="libre_use_smoothed_data_title">리브레 데이터 매끄럽게 처리.</string>
     <string name="retrieve_blukon_history_title">리브레 기록 가져오기</string>
+    <string name="summary_libre_one_minute_interval">리브레로부터 1분 간격으로 데이터를 수신합니다. 변경 사항을 적용하려면 휴대전화를 재부팅하세요.</string>
+    <string name="title_libre_one_minute_interval">리브레 1분 간격</string>
     <string name="retrieve_blukon_history_summary">센서에 다시 연결할 때 BluCon 장치에서 누락된 기록을 가져옵니다.</string>
     <string name="interpret_share_raw">Share 사용 시, 일반적으로 수신기에서 숨겨진 값을 xDrip에 표시합니다.</string>
     <string name="interpret_raw">원시값 해석</string>
@@ -903,6 +909,9 @@
     <string name="only_stop_your_sensor_when_you_actually_plan">실제로 센서를 제거할 때만 센서를 중지하세요. 그렇지 않으면 계속 실행해 두세요!</string>
     <string name="restart_collector">수집기 다시 시작</string>
     <string name="forget_device">장치 지우기</string>
+    <string name="re_read_transmitter">트랜스미터 재인식</string>
+    <string name="tx_reread_confirmation_title">트랜스미터 정보 새로고침</string>
+    <string name="tx_reread_confirmation_message">xDrip이 트랜스미터의 특성 정보를 강제로 다시 읽도록 합니다. 트랜스미터가 교체되지 않은 경우에는 이점이 없으며, 상태 페이지에 일시적인 변화가 나타날 수 있습니다. 센서 세션 사이에 사용하는 것이 가장 권장됩니다.</string>
     <string name="other_notes">기타 메모:</string>
     <string name="delete_future_data">미래 데이터 삭제</string>
     <string name="show_only_untranslated">번역되지 않은 항목만 표시</string>
@@ -1419,6 +1428,8 @@
     <string name="title_pick_numberwall_start">켜지는 시간</string>
     <string name="summary_pick_numberwall_stop">중지 시간을 선택하세요. 시작 시간과 같게 설정하면 항상 켜짐</string>
     <string name="title_pick_numberwall_stop">꺼지는 시간</string>
+    <string name="summary_force_lockscreen_text_color"><b>Enable:</b> 항상 선택한 텍스트 색상을 사용합니다.\n<b>Disable:</b> 메인 화면의 혈당 색상(저혈당 / 정상 범위 / 고혈당)을 사용합니다.</string>
+    <string name="title_force_lockscreen_text_color">텍스트 색상 강제 지정</string>
     <string name="title_xdrip_plus_number_icon">알림 영역 번호 아이콘</string>
     <string name="summary_do_number_icon_test">번호 아이콘은 일부 휴대폰을 충돌시킬 수 있습니다! 기능을 활성화하기 전에 탭하여 테스트를 실행하세요!</string>
     <string name="title_do_number_icon_test">번호 아이콘 테스트 실행</string>
@@ -1461,17 +1472,28 @@
     <string name="summary_desert_use_https">공용 WiFi 등 공유 네트워크를 위해 추가 암호화 계층을 사용합니다</string>
     <string name="title_desert_use_https">HTTPS 사용</string>
     <string name="title_xdrip_plus_experimental">실험적 기능 섹션</string>
+    <string name="title_novopen_insulin_pen">노보펜 인슐린 펜</string>
+    <string name="summary_inpen_open_nov_support">노보펜 6 및 에코 플러스 모델의 NFC 투여량 다운로드</string>
+    <string name="title_inpen_open_nov_support">OpenNov 지원</string>
     <string name="summary_inpen_screen">투여량 다운로드 중</string>
     <string name="title_inpen_screen">InPen 인슐린 펜</string>
     <string name="title_inpen_enabled">InPen 지원</string>
     <string name="summary_inpen_detect_priming">프라이밍 투여를 감지하고 제외합니다</string>
     <string name="title_inpen_detect_priming">프라이밍 감지</string>
+    <string name="summary_inpen_prime_units">해당 단위 이하의 투여량은 프라이밍(기구 점검) 투여로 간주합니다.</string>
     <string name="title_inpen_prime_units">프라이밍 단위</string>
+    <string name="summary_inpen_prime_minutes">해당 시간(분) 이내의 투여는 프라이밍(기구 점검) 투여로 간주합니다.</string>
     <string name="title_inpen_prime_minutes">프라이밍 시간 윈도우</string>
+    <string name="summary_inpen_additional_debug_logs">디버깅을 위해 추가 데이터를 기록합니다. 속도가 느려질 수 있습니다.</string>
+    <string name="title_inpen_additional_debug_logs">추가 디버그 로그</string>
     <string name="summary_inpen_orphan_primes_ignored">체크 시, 후속 투여가 없는 프라이밍은 무시됩니다. 투여로 처리하려면 체크 해제하세요</string>
     <string name="title_inpen_orphan_primes_ignored">고립된 프라이밍 무시</string>
     <string name="summary_inpen_sounds">펜과 데이터 전송 시 소리로 알려줍니다</string>
     <string name="title_inpen_sounds">소리 재생</string>
+    <string name="summary_inpen_remove_priming_doses">다음 투여 전, 설정된 프라이밍 시간(분) 이내에 발생한 설정 단위 이하의 투여량을 프라이밍(기구 점검)으로 간주하여 자동으로 삭제합니다.</string>
+    <string name="title_inpen_remove_priming_doses">프라이밍(기구 점검) 투여 삭제</string>
+    <string name="summary_inpen_hide_priming_doses">그래프에서 프라이밍(기구 점검) 투여 메모 항목을 숨깁니다.</string>
+    <string name="title_inpen_hide_priming_doses">프라이밍(기구 점검) 투여 숨기기</string>
     <string name="summary_inpen_reset">초기화하고 페어링 모드인 새 펜을 검색합니다</string>
     <string name="title_inpen_reset">새 펜 찾기</string>
     <string name="summary_pendiq_screen">투여량 읽기 및 쓰기</string>
@@ -2014,4 +2036,5 @@
     <string name="glupro_reconnect_attempt">재연결 시도</string>
     <string name="glupro_reading_frequency">측정 주기</string>
     <string name="need_bluetooth_permission">블루투스 권한 필요</string>
+    <string name="ob1_sensor_stopped">센서 중지됨</string>
 </resources>
