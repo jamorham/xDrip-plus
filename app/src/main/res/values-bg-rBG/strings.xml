@@ -184,6 +184,8 @@
     <string name="share_config_via_qr_code">Сподели настройки чрез QR код</string>
     <string name="check_for_updated_version">Проверка за нова версия</string>
     <string name="current_version_is_up_to_date">Няма актуализация в избрания канал</string>
+    <string name="title_dialog_check_for_update">Няма актуализация в канала %1$s</string>
+    <string name="message_dialog_check_for_update">В други канали може да съществува по-нова версия.</string>
     <string name="send_feedback_to_developer">Изпращане на отзиви към разработчика</string>
     <string name="home_screen">Началния екран</string>
     <string name="event_logs">Журнали със събития</string>
@@ -286,6 +288,8 @@
     <string name="pref_summary_show_treatments">Покажи точките/моментите на лечение на графиката</string>
     <string name="pref_use_wear_health">Използвай Wear здравни данни</string>
     <string name="pref_summary_use_wear_health">Събирай и показвай крачкомер, когато е възможно</string>
+    <string name="summary_enable_wear_auto_update">Когато е активирано, xDrip на часовника се актуализира автоматично, за да съответства на версията на телефона.</string>
+    <string name="title_enable_wear_auto_update">Автоматична актуализация на Wear</string>
     <string name="pebble_integration">Pebble Интеграция</string>
     <string name="send_data_to_pebble_watchface">Изпрати данни към Pebble часовника.</string>
     <string name="pebble_watch_integration">Pebble Интеграция</string>
@@ -648,6 +652,8 @@
     <string name="libre_use_smoothed_data_summary">Използвай средна стойност от 5 точки, за да получите по-гладки Libre данни.</string>
     <string name="libre_use_smoothed_data_title">Плавни Libre данни.</string>
     <string name="retrieve_blukon_history_title">Извличане на историята на Libre</string>
+    <string name="summary_libre_one_minute_interval">Приемане на данни на интервали от една минута от Libre. Рестартирайте телефона си, за да влязат в сила промените.</string>
+    <string name="title_libre_one_minute_interval">Libre 1 минута</string>
     <string name="retrieve_blukon_history_summary">Извличане на пропусната история от BluCon устройство при повторно свързване към сензора.</string>
     <string name="interpret_share_raw">Ако използвате Споделяне, xDrip ще покаже стойности, когато те обикновено са скрити на приемника.</string>
     <string name="interpret_raw">Интерпретиране на необработени стойности</string>
@@ -903,6 +909,9 @@
     <string name="only_stop_your_sensor_when_you_actually_plan">Спрете сензора само когато наистина планирате да го премахнете, в противен случай го оставете да работи!</string>
     <string name="restart_collector">Рестартирай колекционера</string>
     <string name="forget_device">Забрави устройство</string>
+    <string name="re_read_transmitter">Препрочети предавателя</string>
+    <string name="tx_reread_confirmation_title">Обновяване данните на предавателя</string>
+    <string name="tx_reread_confirmation_message">Накарай xDrip да препрочете характеристиките на предавателя. Няма полза, ако предавателят не се е променил; може да възникнат промени във страницата със състоянието. Най-добре да се използва между сесиите на сензора.</string>
     <string name="other_notes">Други бележки:</string>
     <string name="delete_future_data">Изтриване на бъдещи данни</string>
     <string name="show_only_untranslated">Показване само на непреведени</string>
@@ -1420,6 +1429,8 @@
     <string name="title_pick_numberwall_start">Включи</string>
     <string name="summary_pick_numberwall_stop">Изберете време за спиране - задайте същото като началото за винаги включено</string>
     <string name="title_pick_numberwall_stop">Време за изключване</string>
+    <string name="summary_force_lockscreen_text_color"><b>Активиране:</b> Винаги използвайте избрания цвят на текста.\n<b>Деактивиране:</b> Използвайте цветовете за глюкоза от главния екран (ниско / в обхват / високо).</string>
+    <string name="title_force_lockscreen_text_color">Принудително зададен цвят на текста</string>
     <string name="title_xdrip_plus_number_icon">Икона с номер в областта за уведомяване</string>
     <string name="summary_do_number_icon_test">Иконите с числа счупват някои телефони! Докоснете, за да стартирате теста, преди да активирате функцията!</string>
     <string name="title_do_number_icon_test">Изпълни тест с икона с число</string>
@@ -1462,17 +1473,28 @@
     <string name="summary_desert_use_https">Добавете друг слой на криптиране за споделени мрежи, напр. обществен WiFi</string>
     <string name="title_desert_use_https">Използване на HTTPS</string>
     <string name="title_xdrip_plus_experimental">Експериментални услуги</string>
+    <string name="title_novopen_insulin_pen">Инсулинова писалка NovoPen</string>
+    <string name="summary_inpen_open_nov_support">Изтегляне на доза от NFC за модели 6 и Echo Plus</string>
+    <string name="title_inpen_open_nov_support">Поддръжка на OpenNov</string>
     <string name="summary_inpen_screen">Изтегляне на дози</string>
     <string name="title_inpen_screen">InPen Инсулинова писалка</string>
     <string name="title_inpen_enabled">InPen Поддръжка</string>
     <string name="summary_inpen_detect_priming">Открийте и игнорирайте почистващите дози</string>
     <string name="title_inpen_detect_priming">Почистване на иглата и въздуха</string>
+    <string name="summary_inpen_prime_units">Дозите трябва да са по-малки или равни на тoзи брой единици, за да се считат за начална доза.</string>
     <string name="title_inpen_prime_units">Единици за почистване на иглата</string>
+    <string name="summary_inpen_prime_minutes">Колко близо в минути трябва да бъде една доза, за да се счита за начална доза.</string>
     <string name="title_inpen_prime_minutes">Времеви прозорец за почистване на иглата</string>
+    <string name="summary_inpen_additional_debug_logs">Записване на допълнителни данни, за подпомогнане на отстраняването на грешки. Може да забави нещата.</string>
+    <string name="title_inpen_additional_debug_logs">Допълнителни debug логове</string>
     <string name="summary_inpen_orphan_primes_ignored">Почистване на иглата без да се третира като доза, ако е отметнато. Премахнете отметката, за да третирате като дози</string>
     <string name="title_inpen_orphan_primes_ignored">Игнориране на дози за почистване на иглата</string>
     <string name="summary_inpen_sounds">Използвайте звуци при прехвърлянето на данни от писалката</string>
     <string name="title_inpen_sounds">Възпроизвеждане на звук</string>
+    <string name="summary_inpen_remove_priming_doses">Автоматично премахване на дозите за почистване на иглата, които са равни или по-малки от стойността на единиците за почистване на иглата и се случват в рамките на минутите за начална доза.</string>
+    <string name="title_inpen_remove_priming_doses">Премахване на дозите за почистване на иглата</string>
+    <string name="summary_inpen_hide_priming_doses">Скриване на записите за дозата за почистване на иглата от графиката.</string>
+    <string name="title_inpen_hide_priming_doses">Скриване на дозите за почистване на иглата</string>
     <string name="summary_inpen_reset">Нулиране и търсене на нова писалка в режим на сдвояване</string>
     <string name="title_inpen_reset">Намери нова писалка</string>
     <string name="summary_pendiq_screen">Дози за четене и писане</string>
@@ -2013,4 +2035,5 @@
     <string name="glupro_reconnect_attempt">Опит за повторно свързване</string>
     <string name="glupro_reading_frequency">Честота на четене</string>
     <string name="need_bluetooth_permission">Необходимо е разрешение за Bluetooth</string>
+    <string name="ob1_sensor_stopped">Сензорът е спрял</string>
 </resources>
