@@ -184,6 +184,8 @@
     <string name="share_config_via_qr_code">Jaga seadeid QR koodiga</string>
     <string name="check_for_updated_version">Otsi uuendatud versiooni</string>
     <string name="current_version_is_up_to_date">Valitud kanalis ei ole värskendust</string>
+    <string name="title_dialog_check_for_update">Kanalis %1$s pole uuendusi</string>
+    <string name="message_dialog_check_for_update">Uuem versioon võib eksisteerida teistes kanalites.</string>
     <string name="send_feedback_to_developer">Saada arendajale tagasiside</string>
     <string name="home_screen">Avakuva</string>
     <string name="event_logs">Sündmuste logid</string>
@@ -1462,17 +1464,23 @@
     <string name="summary_desert_use_https">Lisa jagatud võrkude (nt. avalik WiFi) jaoks veel üks krüpteerimiskiht</string>
     <string name="title_desert_use_https">Kasuta HTTPSi</string>
     <string name="title_xdrip_plus_experimental">Eksperimentaalne osa</string>
+    <string name="title_inpen_open_nov_support">OpenNov tugi</string>
     <string name="summary_inpen_screen">Annuste allalaadimine</string>
     <string name="title_inpen_screen">InPen insuliini-pen</string>
     <string name="title_inpen_enabled">InPen tugi</string>
     <string name="summary_inpen_detect_priming">Tuvasta ja välista täitedoosid</string>
     <string name="title_inpen_detect_priming">Tuvasta kasutamine</string>
+    <string name="summary_inpen_prime_units">Doosid peavad olema nii mitu ühikut või vähem, et neid loetaks täitedoosiks.</string>
     <string name="title_inpen_prime_units">Täitmise ühikud</string>
+    <string name="summary_inpen_prime_minutes">Kui lähedal, minutites, peab doos olema, et see loetaks täitedoosiks.</string>
     <string name="title_inpen_prime_minutes">Täitmise aja-aken</string>
     <string name="summary_inpen_orphan_primes_ignored">Kui märgitud, siis täitmine, millele ei järgne doosi, jäetakse tähelepanuta. Tühjenda märge, et käsitleda annusena</string>
     <string name="title_inpen_orphan_primes_ignored">Ignoreeri üksikut täitmist</string>
     <string name="summary_inpen_sounds">Kasuta helisignaale, et teavitada andmevahetusest pen-iga</string>
     <string name="title_inpen_sounds">Kasuta heli</string>
+    <string name="title_inpen_remove_priming_doses">Eemalda täitedoosid</string>
+    <string name="summary_inpen_hide_priming_doses">Peida graafikul täitedooside sissekanded.</string>
+    <string name="title_inpen_hide_priming_doses">Peida täitedoosid</string>
     <string name="summary_inpen_reset">Lähtesta ja otsi sidumisrežiimis uut pen-süstalt</string>
     <string name="title_inpen_reset">Otsi uus pen-süstal</string>
     <string name="summary_pendiq_screen">Annuste lugemine ja kirjutamine</string>
@@ -2017,4 +2025,5 @@
     <string name="glupro_reconnect_attempt">Taasühendamise katse</string>
     <string name="glupro_reading_frequency">Lugemissagedus</string>
     <string name="need_bluetooth_permission">Vaja Bluetoothi luba</string>
+    <string name="ob1_sensor_stopped">Sensor peatatud</string>
 </resources>
