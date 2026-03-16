@@ -184,6 +184,8 @@
     <string name="share_config_via_qr_code">Udostepnij konfiguracje poprzez kod QR</string>
     <string name="check_for_updated_version">Sprawdź czy jest nowa wersja</string>
     <string name="current_version_is_up_to_date">Brak aktualizacji dla wybranego kanału</string>
+    <string name="title_dialog_check_for_update">Brak aktualizacji na kanale %1$s</string>
+    <string name="message_dialog_check_for_update">Na innych kanałach może istnieć nowsza wersja.</string>
     <string name="send_feedback_to_developer">Prześlij uwagi do programisty</string>
     <string name="home_screen">Ekran główny</string>
     <string name="event_logs">Dzienniki zdarzeń</string>
@@ -1953,4 +1955,5 @@
     <string name="glupro_sensor_serial">Numer seryjny czujnika</string>
     <string name="glupro_device">Urządzenie</string>
     <string name="need_bluetooth_permission">Potrzebne uprawnienia do korzystania z Bluetooth</string>
+    <string name="ob1_sensor_stopped">Czujnik zatrzymany</string>
 </resources>
