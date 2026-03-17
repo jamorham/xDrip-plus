@@ -579,8 +579,8 @@
     <string name="glucose_number_from_filtered">필터링된 혈당 갯수</string>
     <string name="if_the_phone_has_text_to_speech">폰에 문자 음성 변환기능(TTS)이 있으면 매번 새로운 혈당이 들어오면 말해줄 것입니다.</string>
     <string name="upload_logs">업로드 로그</string>
-    <string name="short_off_text_for_switches">떨어져서</string>
-    <string name="short_on_text_for_switches">에</string>
+    <string name="short_off_text_for_switches">꺼짐</string>
+    <string name="short_on_text_for_switches">켜짐</string>
     <string name="install_pebble_apps">Pebble 앱 설치</string>
     <string name="sliding_24_hour_window_summary">통계 계산 시 자정부터가 아닌 지난 24시간 데이터를 사용합니다.</string>
     <string name="sliding_24_hour_window">슬라이딩 윈도우</string>
