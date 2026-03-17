@@ -184,6 +184,8 @@
     <string name="share_config_via_qr_code">Configura via codice QR</string>
     <string name="check_for_updated_version">Verifica versione aggiornata</string>
     <string name="current_version_is_up_to_date">Nessun aggiornamento nel canale selezionato</string>
+    <string name="title_dialog_check_for_update">Nessun aggiornamento nel canale %1$s</string>
+    <string name="message_dialog_check_for_update">Può esserci una versione più recente in altri canali.</string>
     <string name="send_feedback_to_developer">Invia Feedback agli  sviluppatori</string>
     <string name="home_screen">Schermata Home</string>
     <string name="event_logs">Registro eventi</string>
@@ -286,6 +288,8 @@
     <string name="pref_summary_show_treatments">Visualizzare trattamenti nel grafico</string>
     <string name="pref_use_wear_health">Usa dati sensori salute di Wear</string>
     <string name="pref_summary_use_wear_health">Raccogli e visualizza il contatore di passi quando disponibile</string>
+    <string name="summary_enable_wear_auto_update">Se abilitato, aggiorna automaticamente xDrip sull\'orologio per corrispondere alla versione del telefono.</string>
+    <string name="title_enable_wear_auto_update">Aggiornamento automatico Wear</string>
     <string name="pebble_integration">Integrazione Pebble</string>
     <string name="send_data_to_pebble_watchface">Inviare dati a Pebble Watchface.</string>
     <string name="pebble_watch_integration">Integrazione Pebble Watch</string>
@@ -648,6 +652,8 @@
     <string name="libre_use_smoothed_data_summary">Usa una media di 5 punti per ottenere risultati Libre meno rumorosi.</string>
     <string name="libre_use_smoothed_data_title">Liscia dati Libre.</string>
     <string name="retrieve_blukon_history_title">Recupera cronologia Libre</string>
+    <string name="summary_libre_one_minute_interval">Accetta i dati ad intervalli di un minuto da Libre. Riavvia il telefono per attivare la modifica.</string>
+    <string name="title_libre_one_minute_interval">Libre 1-minuto</string>
     <string name="retrieve_blukon_history_summary">Recupera la cronologia dal dispositivo Blukon quando si ricollega al sensore.</string>
     <string name="interpret_share_raw">Se usi Condividi, xDrip mostrerà i valori quando sono normalmente nascosti sul ricevitore.</string>
     <string name="interpret_raw">Interpreta Valori Grezzi</string>
