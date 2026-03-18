@@ -1987,7 +1987,7 @@ môže spôsobovať pády alebo zamrznutia telefónu! Klepnutím otestujte predt
     <string name="glupro_scan_again">Skenovat znovu</string>
     <string name="smartguide_pairing">SmartGuide párování</string>
     <string name="glupro_pairing_pin">Párovací PIN</string>
-    <string name="glupro_operational">V provozu</string>
+    <string name="glupro_operational">Funkční</string>
     <string name="glupro_sensor_malfunction">Porucha senzoru</string>
     <string name="glupro_battery_low">Slabá baterie</string>
     <string name="glupro_session_stopped">Relace ukončena</string>
