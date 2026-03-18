@@ -184,6 +184,8 @@
     <string name="share_config_via_qr_code">透過 QR Code 分享組態</string>
     <string name="check_for_updated_version">檢查是否有更新版本</string>
     <string name="current_version_is_up_to_date">所選頻道沒有更新</string>
+    <string name="title_dialog_check_for_update">在 %1$s 頻道中沒有更新</string>
+    <string name="message_dialog_check_for_update">其他頻道可能有較新的版本。</string>
     <string name="send_feedback_to_developer">傳送回饋給開發者</string>
     <string name="home_screen">主畫面</string>
     <string name="event_logs">事件記錄</string>
@@ -286,6 +288,8 @@
     <string name="pref_summary_show_treatments">在圖表上顯示治療點</string>
     <string name="pref_use_wear_health">使用 Wear 健康資料</string>
     <string name="pref_summary_use_wear_health">在可用時收集並顯示步數</string>
+    <string name="summary_enable_wear_auto_update">啟用後，會自動將手錶上的 xDrip 更新為與手機版本相同。</string>
+    <string name="title_enable_wear_auto_update">Wear 自動更新</string>
     <string name="pebble_integration">Pebble 整合</string>
     <string name="send_data_to_pebble_watchface">將資料傳送到 Pebble 錶盤。</string>
     <string name="pebble_watch_integration">Pebble 手錶整合</string>
@@ -648,6 +652,8 @@
     <string name="libre_use_smoothed_data_summary">使用 5 個點的平均值以取得更平滑的 Libre 資料。</string>
     <string name="libre_use_smoothed_data_title">平滑 Libre 資料。</string>
     <string name="retrieve_blukon_history_title">取得 Libre 歷史資料</string>
+    <string name="summary_libre_one_minute_interval">接受來自 Libre 的每 1 分鐘資料。請重新啟動手機以使變更生效。</string>
+    <string name="title_libre_one_minute_interval">Libre 1 分鐘</string>
     <string name="retrieve_blukon_history_summary">在重新連線到傳感器時，從 BluCon 裝置取回遺失的歷史紀錄。</string>
     <string name="interpret_share_raw">若使用 Share，xDrip 會顯示接收器上通常會被隱藏的數值。</string>
     <string name="interpret_raw">解析原始數值</string>
@@ -903,6 +909,9 @@
     <string name="only_stop_your_sensor_when_you_actually_plan">只有在您確實打算移除傳感器時才停止它，否則請讓它持續運作！</string>
     <string name="restart_collector">重新啟動資料收集器</string>
     <string name="forget_device">忘記裝置</string>
+    <string name="re_read_transmitter">重新讀取發射器</string>
+    <string name="tx_reread_confirmation_title">重新整理發射器詳細資料</string>
+    <string name="tx_reread_confirmation_message">強制 xDrip 重新讀取發射器特性。若發射器未變更則沒有好處；狀態頁面可能會暫時改變。最適合在感測器工作階段之間使用。</string>
     <string name="other_notes">其他備註：</string>
     <string name="delete_future_data">刪除未來資料</string>
     <string name="show_only_untranslated">僅顯示未翻譯</string>
@@ -1420,6 +1429,8 @@
     <string name="title_pick_numberwall_start">開啟</string>
     <string name="summary_pick_numberwall_stop">選擇停止時間；若與開始時間相同則為永遠顯示</string>
     <string name="title_pick_numberwall_stop">關閉時間</string>
+    <string name="summary_force_lockscreen_text_color"><b>啟用：</b> 一律使用選取的文字顏色。\n<b>停用：</b> 使用主螢幕的血糖顏色（低/在範圍內/高）。</string>
+    <string name="title_force_lockscreen_text_color">強制文字顏色</string>
     <string name="title_xdrip_plus_number_icon">通知區的數字圖示</string>
     <string name="summary_do_number_icon_test">數字圖示可能讓某些手機當機！啟用此功能前請點選以執行測試！</string>
     <string name="title_do_number_icon_test">執行數字圖示測試</string>
@@ -1462,17 +1473,28 @@
     <string name="summary_desert_use_https">為共用網路（例如公共 Wi‑Fi）新增一層加密</string>
     <string name="title_desert_use_https">使用 HTTPS</string>
     <string name="title_xdrip_plus_experimental">實驗部分</string>
+    <string name="title_novopen_insulin_pen">NovoPen 胰島素筆</string>
+    <string name="summary_inpen_open_nov_support">NFC 下載 NovoPen 6 與 Echo Plus 的劑量</string>
+    <string name="title_inpen_open_nov_support">OpenNov 支援</string>
     <string name="summary_inpen_screen">下載劑量</string>
     <string name="title_inpen_screen">InPen 胰島素注射筆</string>
     <string name="title_inpen_enabled">InPen 支援</string>
     <string name="summary_inpen_detect_priming">偵測並排除排氣劑量</string>
     <string name="title_inpen_detect_priming">偵測排氣</string>
+    <string name="summary_inpen_prime_units">劑量必須小於或等於此單位數，才會被視為排氣劑量。</string>
     <string name="title_inpen_prime_units">排氣單位</string>
+    <string name="summary_inpen_prime_minutes">被視為排氣劑量所需與下一次注射的時間接近程度（分鐘）。</string>
     <string name="title_inpen_prime_minutes">排氣時間視窗</string>
+    <string name="summary_inpen_additional_debug_logs">記錄額外資料以協助除錯。可能會變慢。</string>
+    <string name="title_inpen_additional_debug_logs">額外除錯記錄</string>
     <string name="summary_inpen_orphan_primes_ignored">勾選後，若排氣之後沒有後續注射，將忽略該排氣。取消勾選則視為注射劑量</string>
     <string name="title_inpen_orphan_primes_ignored">忽略無後續注射的排氣</string>
     <string name="summary_inpen_sounds">使用聲音提示與注射筆之間的資料傳輸</string>
     <string name="title_inpen_sounds">播放聲音</string>
+    <string name="summary_inpen_remove_priming_doses">自動移除符合以下條件的排氣劑量：劑量小於或等於排氣單位數，且在下一次注射前的排氣分鐘數內發生。</string>
+    <string name="title_inpen_remove_priming_doses">移除排氣劑量</string>
+    <string name="summary_inpen_hide_priming_doses">在圖表中隱藏排氣劑量的備註項目。</string>
+    <string name="title_inpen_hide_priming_doses">隱藏排氣劑量</string>
     <string name="summary_inpen_reset">重設並搜尋處於配對模式的新注射筆</string>
     <string name="title_inpen_reset">尋找新注射筆</string>
     <string name="summary_pendiq_screen">讀取與寫入劑量</string>
@@ -2015,4 +2037,5 @@
     <string name="glupro_reconnect_attempt">嘗試重新連線</string>
     <string name="glupro_reading_frequency">讀取頻率</string>
     <string name="need_bluetooth_permission">需要藍牙權限</string>
+    <string name="ob1_sensor_stopped">傳感器已停止</string>
 </resources>
