@@ -184,6 +184,8 @@
     <string name="share_config_via_qr_code">Partajează configurarea printr-un cod QR</string>
     <string name="check_for_updated_version">Verifică dacă există actualizări</string>
     <string name="current_version_is_up_to_date">Nicio actualizare în canalul selectat</string>
+    <string name="title_dialog_check_for_update">Nicio actualizare în canalul %1$s</string>
+    <string name="message_dialog_check_for_update">O versiune mai nouă poate exista în alte canale.</string>
     <string name="send_feedback_to_developer">Trimite feedback la dezvoltator</string>
     <string name="home_screen">Ecranul principal</string>
     <string name="event_logs">Jurnale de evenimente</string>
