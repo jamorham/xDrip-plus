@@ -142,7 +142,7 @@
     <string name="first_use_menu_to_scan">Първо използвайте менюто да сканирате за вашето Bluetooth устройство или променете \"Източник на данни\" в настройките!</string>
     <string name="first_configure_ip_address">Първо конфигурирайте вашия WiFi Wixel четец IP адреси или Parakeet URL</string>
     <string name="now_start_your_sensor">Сега стартирайте сенсора или проверете Настройките</string>
-    <string name="please_wait_while_sensor_warms_up">Моля изчакайте докато сенозра загрее! (</string>
+    <string name="please_wait_while_sensor_warms_up">Моля изчакайте докато сензора загрее! (</string>
     <string name="minutes_with_bracket">" минути)"</string>
     <string name="possible_bad_calibration">Възможност за грешен калибриращ наклон, моля изпиите чаша с вода, измиите си ръцете, и рекалибрирайте отново след малко!</string>
     <string name="please_wait_need_two_readings_first">Моля изчакайте, имаме нужда от 2 отчитания от трансмитера.</string>
