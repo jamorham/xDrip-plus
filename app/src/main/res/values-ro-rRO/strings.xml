@@ -288,6 +288,8 @@
     <string name="pref_summary_show_treatments">Arată punctele de tratament pe grafic</string>
     <string name="pref_use_wear_health">Utilizează datele de sănătate din Wear</string>
     <string name="pref_summary_use_wear_health">Colectează și afișează contorul de pași când este disponibil</string>
+    <string name="summary_enable_wear_auto_update">Când este activată, se actualizează automat xDrip pe ceas pentru a se potrivi cu versiunea telefonului.</string>
+    <string name="title_enable_wear_auto_update">Actualizare automată Wear</string>
     <string name="pebble_integration">Integrare Pebble</string>
     <string name="send_data_to_pebble_watchface">Trimite date la cadranul Pebble</string>
     <string name="pebble_watch_integration">Integrare ceas Pebble</string>
@@ -650,6 +652,8 @@
     <string name="libre_use_smoothed_data_summary">Utilizați media din 5 puncte pentru a obține date mai aplatizate.</string>
     <string name="libre_use_smoothed_data_title">Aplatizare date libre.</string>
     <string name="retrieve_blukon_history_title">Recuperează istoric Libre</string>
+    <string name="summary_libre_one_minute_interval">Acceptați date la intervale de un minut din Libre. Reporniți telefonul pentru ca modificările să aibă efect.</string>
+    <string name="title_libre_one_minute_interval">Libre 1 minut</string>
     <string name="retrieve_blukon_history_summary">Recuperează din dispozitivul Blukon istoricul pierdut atunci când se reconectează la senzor.</string>
     <string name="interpret_share_raw">Dacă se utilizează Share, xDrip va afișa valorile când acestea sunt în mod normal ascunse pe receptor.</string>
     <string name="interpret_raw">Interpretează valorile primare</string>
@@ -905,6 +909,7 @@
     <string name="only_stop_your_sensor_when_you_actually_plan">Oprește senzorul doar când plănuiești să îl dai jos, altfel lasă-l să ruleze!</string>
     <string name="restart_collector">Repornire Colector</string>
     <string name="forget_device">Elimina dispozitivul</string>
+    <string name="re_read_transmitter">Transmițător recitit</string>
     <string name="other_notes">Alte note:</string>
     <string name="delete_future_data">Șterge datele din viitor</string>
     <string name="show_only_untranslated">Arată doar netradus</string>
