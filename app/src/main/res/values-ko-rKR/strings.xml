@@ -795,7 +795,7 @@
     <string name="repeat_alerts">알림 반복</string>
     <string name="calibration_minutes_reraise">보정 요청 재알림 간격(분)</string>
     <string name="alert_repeat_minutes">알림 반복 간격(분)</string>
-    <string name="alert_noisy_values">X분 후 노이즈 값 지속 시 알림</string>
+    <string name="alert_noisy_values">노이즈 값 지속 시 알림(분)</string>
     <string name="alert_snooze">알림 스누즈</string>
     <string name="alert_minutes_reraise">스누즈 후 재알림 대기 시간(분)</string>
     <string name="reraise_before_snooze">스누즈 시간 전 재알림</string>
@@ -1045,7 +1045,7 @@
     <string name="title_Heart_Rate_Sensor">심박수 센서</string>
     <string name="summary_Smooth_heart_rate_graph">심박수 그래프 부드럽게 표시</string>
     <string name="title_When_changes_by">변화량 기준</string>
-    <string name="title_Or_per_number_of_minutes">또는 시간 분 기준</string>
+    <string name="title_Or_per_number_of_minutes">시간(분) 기준</string>
     <string name="title_Identify_receiver">수신기 식별</string>
     <string name="summary_Only_send_to_named_package">지정된 패키지로만 전송</string>
     <string name="title_Accept_Calibrations">보정값 수락</string>
@@ -1472,7 +1472,7 @@
     <string name="summary_desert_use_https">공용 WiFi 등 공유 네트워크를 위해 추가 암호화 계층을 사용합니다</string>
     <string name="title_desert_use_https">HTTPS 사용</string>
     <string name="title_xdrip_plus_experimental">실험적 기능 섹션</string>
-    <string name="title_novopen_insulin_pen">노보펜 인슐린 펜</string>
+    <string name="title_novopen_insulin_pen">NovoPen 인슐린 펜</string>
     <string name="summary_inpen_open_nov_support">노보펜 6 및 에코 플러스 모델의 NFC 투여량 다운로드</string>
     <string name="title_inpen_open_nov_support">OpenNov 지원</string>
     <string name="summary_inpen_screen">투여량 다운로드 중</string>
