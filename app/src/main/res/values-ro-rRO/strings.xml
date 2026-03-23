@@ -910,6 +910,8 @@
     <string name="restart_collector">Repornire Colector</string>
     <string name="forget_device">Elimina dispozitivul</string>
     <string name="re_read_transmitter">Transmițător recitit</string>
+    <string name="tx_reread_confirmation_title">Reîmprospătează detaliile transmițătorului</string>
+    <string name="tx_reread_confirmation_message">Forțează xDrip să recitească caracteristicile transmițătorului. Nu există beneficiu dacă transmițătorul nu s-a schimbat; pot avea loc schimbări temporare ale paginii de stare. Cel mai bine folosit între sesiunile senzorului.</string>
     <string name="other_notes">Alte note:</string>
     <string name="delete_future_data">Șterge datele din viitor</string>
     <string name="show_only_untranslated">Arată doar netradus</string>
@@ -1427,6 +1429,8 @@
     <string name="title_pick_numberwall_start">Activare</string>
     <string name="summary_pick_numberwall_stop">Alegeţi timpul pentru stop - setaţi la fel ca pornire pentru a afișa întotdeauna</string>
     <string name="title_pick_numberwall_stop">Timpul pentru oprire</string>
+    <string name="summary_force_lockscreen_text_color"><b>Activează:</b> Utilizați întotdeauna culoarea textului selectat.\n<b>Dezactivează:</b> Utilizați culoarea glicemiei pe ecranul principal (mică / în interval / mare).</string>
+    <string name="title_force_lockscreen_text_color">Forțează culoarea textului</string>
     <string name="title_xdrip_plus_number_icon">Icoană cu valoarea de glicemie în Zona de Notificări</string>
     <string name="summary_do_number_icon_test">Icoana cu valoarea de glicemie blochează unele telefoane! Atingeți pentru a rula testul înainte de a activa funcția!</string>
     <string name="title_do_number_icon_test">Pornește testul pentru icoana cu valoarea de glicemie</string>
@@ -1469,17 +1473,28 @@
     <string name="summary_desert_use_https">Adăugă un alt nivel de criptare pentru rețelele partajate, de exemplu un wifi public</string>
     <string name="title_desert_use_https">Utilizați HTTPS</string>
     <string name="title_xdrip_plus_experimental">Secțiune experimentală</string>
+    <string name="title_novopen_insulin_pen">NovoPen stilou injector</string>
+    <string name="summary_inpen_open_nov_support">NFC descărcarea dozelor de pe modele 6 și Echo Plus</string>
+    <string name="title_inpen_open_nov_support">Suport OpenNov</string>
     <string name="summary_inpen_screen">Descărcarea dozelor</string>
     <string name="title_inpen_screen">InPen stilou injector (pen)</string>
     <string name="title_inpen_enabled">Suport InPen</string>
     <string name="summary_inpen_detect_priming">Detectaţi şi excludeţi dozele de amorsare</string>
     <string name="title_inpen_detect_priming">Detectează amorsarea</string>
+    <string name="summary_inpen_prime_units">Dozele trebuie să fie mai mici sau egale cu acest număr de unități pentru a fi considerate o doză de amorsare.</string>
     <string name="title_inpen_prime_units">Unități de amorsare</string>
+    <string name="summary_inpen_prime_minutes">Cât de aproape în minute trebuie ca o doză să fie considerată doză de amorsare.</string>
     <string name="title_inpen_prime_minutes">Fereastra timpului de amorsare</string>
+    <string name="summary_inpen_additional_debug_logs">Înregistrează date suplimentare pentru a ajuta la depanare. Poate încetini lucrurile.</string>
+    <string name="title_inpen_additional_debug_logs">Jurnale de depanare suplimentare</string>
     <string name="summary_inpen_orphan_primes_ignored">Amorsările care nu sunt urmate de doze sunt ignorate dacă este bifat. Debifaţi pentru a le trata ca doze</string>
     <string name="title_inpen_orphan_primes_ignored">Ignoră amorsările</string>
     <string name="summary_inpen_sounds">Utilizaţi sunete pentru a indica transferul de date cu stiloul injector (pen-ul)</string>
     <string name="title_inpen_sounds">Redă sunete</string>
+    <string name="summary_inpen_remove_priming_doses">Îndepărtați automat dozele de amorsare care sunt egale sau mai mici decât valoarea de amorsare și care se întâmplă în decurs de câteva minute înainte de administrarea dozei următoare.</string>
+    <string name="title_inpen_remove_priming_doses">Îndepărtați dozele de amorsare</string>
+    <string name="summary_inpen_hide_priming_doses">Ascunde intrările notelor de dozare din grafic.</string>
+    <string name="title_inpen_hide_priming_doses">Ascunde dozele de amorsare</string>
     <string name="summary_inpen_reset">Resetați și căutați un stilou nou în modul de împerechere</string>
     <string name="title_inpen_reset">Găsiţi un nou stilou injector</string>
     <string name="summary_pendiq_screen">Citirea şi scrierea dozelor</string>
@@ -2026,4 +2041,5 @@
     <string name="glupro_reconnect_attempt">Încercare de reconectare</string>
     <string name="glupro_reading_frequency">Frecvența de citire</string>
     <string name="need_bluetooth_permission">Este necesară permisiunea Bluetooth</string>
+    <string name="ob1_sensor_stopped">Senzor oprit</string>
 </resources>
