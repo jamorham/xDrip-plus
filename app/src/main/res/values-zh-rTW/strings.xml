@@ -654,6 +654,8 @@
     <string name="retrieve_blukon_history_title">取得 Libre 歷史資料</string>
     <string name="summary_libre_one_minute_interval">接受來自 Libre 的每 1 分鐘資料。請重新啟動手機以使變更生效。</string>
     <string name="title_libre_one_minute_interval">Libre 1 分鐘</string>
+    <string name="summary_nsfollow_sample_period">預設：5 分鐘\n目前：%s</string>
+    <string name="title_sample_period">採樣間隔</string>
     <string name="retrieve_blukon_history_summary">在重新連線到傳感器時，從 BluCon 裝置取回遺失的歷史紀錄。</string>
     <string name="interpret_share_raw">若使用 Share，xDrip 會顯示接收器上通常會被隱藏的數值。</string>
     <string name="interpret_raw">解析原始數值</string>
@@ -1341,6 +1343,7 @@
     <string name="title_nsfollow_url">Nightscout 追蹤 URL</string>
     <string name="summary_nsfollow_download_treatments">同時以追蹤者身分從 Nightscout 下載治療紀錄</string>
     <string name="title_nsfollow_download_treatments">下載治療紀錄</string>
+    <string name="summary_nsfollow_lag">預設: 0\n目前: %s</string>
     <string name="title_nsfollow_lag">Nightscout 追蹤延遲</string>
     <!-- Maybe we can use them later?
     <string name="title_clfollow_user">CareLink Username</string>
