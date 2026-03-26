@@ -654,6 +654,8 @@
     <string name="retrieve_blukon_history_title">Hent Libre-historikk</string>
     <string name="summary_libre_one_minute_interval">Godta data med ett-minutts intervaller fra Libre. Start telefonen på nytt for at endringene skal tre i kraft.</string>
     <string name="title_libre_one_minute_interval">Libre 1-minutt</string>
+    <string name="summary_nsfollow_sample_period">Standard: 5 min\nNåværende: %s</string>
+    <string name="title_sample_period">Prøveperiode</string>
     <string name="retrieve_blukon_history_summary">Hente manglende historie fra BluCon-enhet når du kobler til sensoren på nytt.</string>
     <string name="interpret_share_raw">xDrip vil vise verdiene når de normalt er skjult på mottakeren dersom du bruker Share.</string>
     <string name="interpret_raw">Tolk rådata</string>
@@ -1341,6 +1343,7 @@
     <string name="title_nsfollow_url">Nightscout følger-URL</string>
     <string name="summary_nsfollow_download_treatments">Last også ned behandlinger fra Nightscout som følger</string>
     <string name="title_nsfollow_download_treatments">Last ned behandlinger</string>
+    <string name="summary_nsfollow_lag">Standard: 0\nNåværende: %s</string>
     <string name="title_nsfollow_lag">Nightscout følgerforsinkelse</string>
     <!-- Maybe we can use them later?
     <string name="title_clfollow_user">CareLink Username</string>
