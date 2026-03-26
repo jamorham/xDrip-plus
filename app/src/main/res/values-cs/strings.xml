@@ -654,6 +654,8 @@
     <string name="retrieve_blukon_history_title">Načíst historii z Libre</string>
     <string name="summary_libre_one_minute_interval">Přijímat data v jednominutových intervalech z Libre. Restartujte telefon, aby se změny projevily.</string>
     <string name="title_libre_one_minute_interval">Libre 1 minuta</string>
+    <string name="summary_nsfollow_sample_period">Výchozí: 5 min\nAktuální: %s</string>
+    <string name="title_sample_period">Časový interval</string>
     <string name="retrieve_blukon_history_summary">Načíst chybějící hodnoty z Blukonu při připojení senzoru</string>
     <string name="interpret_share_raw">Při použití Share, xDrip bude zobrazovat hodnoty na příjímači běžně skryté</string>
     <string name="interpret_raw">Interpretovat raw hodnoty</string>
@@ -1340,6 +1342,7 @@
     <string name="title_nsfollow_url">Nightscout URL pro sledování</string>
     <string name="summary_nsfollow_download_treatments">Pokusit se také pro sledující stáhnout ošetření z Nightscoutu</string>
     <string name="title_nsfollow_download_treatments">Stáhnout ošetření</string>
+    <string name="summary_nsfollow_lag">Výchozí:  min\nAktuální: %s</string>
     <string name="title_nsfollow_lag">Zpozdění pro Nightscout sledování</string>
     <!-- Maybe we can use them later?
     <string name="title_clfollow_user">CareLink Username</string>
