@@ -654,6 +654,8 @@
     <string name="retrieve_blukon_history_title">Recuperează istoric Libre</string>
     <string name="summary_libre_one_minute_interval">Acceptați date la intervale de un minut din Libre. Reporniți telefonul pentru ca modificările să aibă efect.</string>
     <string name="title_libre_one_minute_interval">Libre 1 minut</string>
+    <string name="summary_nsfollow_sample_period">Implicit: 5 min\nActual: %s</string>
+    <string name="title_sample_period">Perioada de probă</string>
     <string name="retrieve_blukon_history_summary">Recuperează din dispozitivul Blukon istoricul pierdut atunci când se reconectează la senzor.</string>
     <string name="interpret_share_raw">Dacă se utilizează Share, xDrip va afișa valorile când acestea sunt în mod normal ascunse pe receptor.</string>
     <string name="interpret_raw">Interpretează valorile primare</string>
@@ -1341,6 +1343,7 @@
     <string name="title_nsfollow_url">URL-ul de urmărire Nightscout</string>
     <string name="summary_nsfollow_download_treatments">De asemenea, descarcă tratamentele de la Nightscout ca urmăritor</string>
     <string name="title_nsfollow_download_treatments">Descarcă Tratamente</string>
+    <string name="summary_nsfollow_lag">Implicit: 0\nActual: %s</string>
     <string name="title_nsfollow_lag">Întârziere urmărire prin Nightscout</string>
     <!-- Maybe we can use them later?
     <string name="title_clfollow_user">CareLink Username</string>
