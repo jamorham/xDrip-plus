@@ -379,7 +379,7 @@
     <string name="enter_first_bg_value">Введите первое показание глюкометра</string>
     <string name="enter_second_bg_value">Введите второе показание глюкометра</string>
     <string name="language_editor">Языковой редактор</string>
-    <string name="configure_missed_readings">Настройки при пропусках данных</string>
+    <string name="configure_missed_readings">Настройка пропущенных показаний</string>
     <string name="install_pebble_snooze_control_app">Установить приложение Pebble Snooze Control</string>
     <string name="install_pebble_classic_trend_watchface">Установить циферблат Pebble Classic Trend</string>
     <string name="install_pebble_trend_watchface">Установить циферблат Pebble Trend</string>
@@ -543,7 +543,7 @@
     <string name="snooze_alert_before_it_fires">отложить тревогу до срабатывания</string>
     <string name="create_low_alert">Создать оповещение о гипо</string>
     <string name="create_high_alert">Создать оповещение о гипер</string>
-    <string name="long_press_an_existing_alert_to_edit">(Удерживайте палец на существующем оповещении, чтобы отредактировать)</string>
+    <string name="long_press_an_existing_alert_to_edit">(Удерживайте существующую тревогу для изменения)</string>
     <string name="adding">Добавление</string>
     <string name="high">высокая</string>
     <string name="alert">оповещение</string>
@@ -936,6 +936,7 @@
     <string name="use_confict_msg_glimp">Вы можете настроить Glimp: Опции -&gt; Устройства -&gt; отключите настройки Bluetooth</string>
     <string name="eng_mode_is_on">Инженерный режим включен. Пожалуйста, выключите его, если вы не уверены, что он нужен, так как он может вызывать неожиданное поведение.</string>
     <string name="yes">Да</string>
+    <string name="enable">Включить</string>
     <string name="xdrip_compatible_features">Функции %s xDrip+</string>
     <string name="garmin">Garmin</string>
     <string name="fitbit">Fitbit</string>
@@ -1065,7 +1066,7 @@
     <string name="title_Batterylog">История батареи</string>
     <string name="summary_Choose_to_display_the_bridge_battery_level">Выберите для отображения уровня заряда батареи моста</string>
     <string name="title_Glucose_Retention">Хранить значения глюкозы</string>
-    <string name="summary_Erase_data_older_than_this_many_days">Удалять историю значений глюкозы старше заданного количества дней. 0 = не удалять ничего</string>
+    <string name="summary_Erase_data_older_than_this_many_days">Стирать данные старше чем это количество дней. 0 = не стирать ничего</string>
     <string name="title_Other_misc_options">Другие разные настройки</string>
     <string name="summary_allow_testing_with_dead_sensor">разрешить тестирование с использованным сенсором</string>
     <string name="title_NOT_FOR_PRODUCTION_USE">НЕ ДЛЯ ПРОМЫШЛЕННОГО ИСПОЛЬЗОВАНИЯ</string>
@@ -1394,17 +1395,17 @@
     <string name="title_high_priority_notifications">Приоритетные оповещения</string>
     <string name="summary_public_notifications">Показывать содержимое оповещений на экране блокировки</string>
     <string name="title_public_notifications">Публичные оповещения</string>
-    <string name="title_xdrip_plus_number_wall">Отображать виджет на экране блокировки</string>
+    <string name="title_xdrip_plus_number_wall">Число на экране блокировки</string>
     <string name="summary_do_number_wall_configuration">Настройка внешнего вида и предпросмотр виджета</string>
-    <string name="title_do_number_wall_configuration">Настройки виджета</string>
+    <string name="title_do_number_wall_configuration">Настроить стену числа</string>
     <string name="summary_number_wall_on_lockscreen">Отображать виджет на экране блокировки. Только Android 7 и выше!</string>
     <string name="title_number_wall_on_lockscreen">Отображать на экране блокировки</string>
-    <string name="title_color_number_wall">Цвет текста</string>
-    <string name="title_color_number_wall_shadow">Цвет контура текста</string>
-    <string name="summary_pick_numberwall_start">Выберите время начала отображения виджета</string>
-    <string name="title_pick_numberwall_start">Время начала отображения</string>
-    <string name="summary_pick_numberwall_stop">Выберите время прекращения отображения виджета. Установите равным времени начала чтобы виджет всегда присутствовал на экране блокировки</string>
-    <string name="title_pick_numberwall_stop">Время прекращения отображения</string>
+    <string name="title_color_number_wall">Цвет текста стены</string>
+    <string name="title_color_number_wall_shadow">Цвет тени стены</string>
+    <string name="summary_pick_numberwall_start">Выберите время для запуска отображения</string>
+    <string name="title_pick_numberwall_start">Включить</string>
+    <string name="summary_pick_numberwall_stop">Выберите время остановки - задайте то же, что для запуска, чтобы было всегда включено</string>
+    <string name="title_pick_numberwall_stop">Время выключения</string>
     <string name="title_xdrip_plus_number_icon">Значение глюкозы в области уведомлений</string>
     <string name="summary_do_number_icon_test">Данная функция может вызывать сбои на некоторых устройства! Нажмите, чтобы запустить тест совместимости перед активацией функции!</string>
     <string name="title_do_number_icon_test">Запустить тест</string>
@@ -1895,4 +1896,5 @@
     <string name="volume_profile_high">Высокие значения глюкозы</string>
     <string name="glupro_disconnected">Отключено</string>
     <string name="glupro_connected">Подключено</string>
+    <string name="glupro_start_time">Включить</string>
 </resources>
