@@ -944,6 +944,7 @@
     <string name="use_confict_msg_glimp">Du kan justera Glips inställningar: alternativ -&gt; enheter -&gt; avmarkera blåtandsvalet</string>
     <string name="eng_mode_is_on">Ingenjörsläge är påslaget. Stäng av det om du inte är helt säker på att du behöver det eftersom det kan leda till oväntade beteenden.</string>
     <string name="yes">Ja</string>
+    <string name="enable">Aktivera</string>
     <string name="xdrip_compatible_features">xDrip+ %s funktioner</string>
     <string name="garmin">Garmin</string>
     <string name="fitbit">Fitbit</string>
@@ -1301,6 +1302,7 @@
     <string name="summary_lefun_enable">Synkronisera data med Lefun träningsband</string>
     <string name="title_lefun_enable">Använd Lefun Band</string>
     <string name="title_lefun_mac">Mac-adress</string>
+    <string name="summary_lefun_send_readings">Lämplig klockdatum för att representera glukosvärden. Bättre med mmol/l - se dokumentation</string>
     <string name="title_lefun_send_readings">Skicka avläsningar</string>
     <string name="summary_lefun_send_alarms">Skicka notifieringar till bandet för glukoslarm</string>
     <string name="title_lefun_send_alarms">Skicka alarm</string>
@@ -1320,11 +1322,17 @@
     <string name="title_lefun_screen_heart_pressure">Visa blodtryck</string>
     <string name="title_lefun_screen_find_phone">Visa Sök telefon / Snooze</string>
     <string name="title_lefun_screen_mac_address">Visa MAC-adress</string>
+    <string name="summary_allow_samsung_workaround">Använd alternativa lösningar för att undvika beteende hos vissa klockor som avviker från standarden. Utan detta kan vissa mottagare misslyckas med att få data.</string>
+    <string name="title_allow_samsung_workaround">Lösningar för väckning</string>
     <string name="summary_medtrum_use_native">Använd sändarens kalibrering istället för xDrip:s för primär</string>
+    <string name="title_medtrum_use_native">Medtrum standard</string>
+    <string name="summary_medtrum_a_hex">Diagnostiskt testvärde i hex-format</string>
+    <string name="title_medtrum_a_hex">Medtrum felsökning</string>
     <string name="summary_nsfollow_url">Webbadress för att följa</string>
     <string name="title_nsfollow_url">Nightscout Follow-länk</string>
     <string name="summary_nsfollow_download_treatments">Ladda också ned behandlingar från Nightscout som följare</string>
     <string name="title_nsfollow_download_treatments">Ladda ner behandlingar</string>
+    <string name="title_nsfollow_lag">Nightscout follow fördröjning</string>
     <!-- Maybe we can use them later?
     <string name="title_clfollow_user">CareLink Username</string>
     <string name="summary_clfollow_user">CareLink login username</string>
@@ -1332,6 +1340,9 @@
     <string name="summary_clfollow_pass">CareLink login password</string>
     !-->
     <string name="title_clfollow_country">Land för CareLink</string>
+    <string name="summary_clfollow_country">Välj ditt land för carelink.</string>
+    <string name="title_clfollow_patient">CareLink Patient Användarnamn</string>
+    <string name="summary_clfollow_patient">CareLink patientanvändarnamn (valfritt)</string>
     <!-- Maybe we can use them later?
     <string name="title_clfollow_lang">CareLink Language</string>
     <string name="summary_clfollow_lang">CareLink language code</string>
@@ -1881,5 +1892,6 @@
     <string name="turn_feature_off_on">Slå av/på funktionen</string>
     <string name="glupro_disconnected">Frånkopplad</string>
     <string name="glupro_connected">Ansluten</string>
+    <string name="glupro_start_time">Slå på</string>
     <string name="need_bluetooth_permission">Behöver bluetooth-behörighet</string>
 </resources>
