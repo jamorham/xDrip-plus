@@ -527,7 +527,7 @@
     <string name="snooze_alert_before_it_fires">Silenciar o alerta antes de ser iniciado</string>
     <string name="create_low_alert">Criar alerta Hipo</string>
     <string name="create_high_alert">Criar alerta Hiper</string>
-    <string name="long_press_an_existing_alert_to_edit">(Pressionar longamente num alerta existente para editar)</string>
+    <string name="long_press_an_existing_alert_to_edit">(Carregue num alerta existente para editar)</string>
     <string name="adding">A adicionar</string>
     <string name="high">hiper</string>
     <string name="alert">alerta</string>
@@ -917,6 +917,7 @@
     <string name="use_confict_msg_glimp">Ajustar Configurações do Glimp: opções -&gt; dispositivos -&gt; desseleccionar opção Bluetooth</string>
     <string name="eng_mode_is_on">O modo de engenharia está ativado. Desative-o, a menos que tenha a certeza que precisa, pois pode causar um comportamento inesperado.</string>
     <string name="yes">Sim</string>
+    <string name="enable">Activar</string>
     <string name="xdrip_compatible_features">xDrip+ %s Funções</string>
     <string name="garmin">Garmin</string>
     <string name="fitbit">Fitbit</string>
@@ -1713,4 +1714,5 @@
     <string name="volume_profile_high">Valores Hiperglicemia</string>
     <string name="glupro_disconnected">Desconectado</string>
     <string name="glupro_connected">Conectado</string>
+    <string name="glupro_start_time">Ligar</string>
 </resources>
