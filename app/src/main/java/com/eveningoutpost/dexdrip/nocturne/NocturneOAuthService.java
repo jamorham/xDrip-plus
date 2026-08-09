@@ -77,8 +77,7 @@ public class NocturneOAuthService {
     public String getBaseUrl() {
         String url = Pref.getString("nocturne_instance_url", "").trim();
         if (!url.isEmpty() && url.startsWith("http://")) {
-            final String host = url.substring(7).split("[:/]")[0];
-            if (!isLocalHost(host)) {
+            if (!isLocalHost(extractHost(url.substring(7)))) {
                 url = "https://" + url.substring(7);
             }
         }
@@ -88,7 +87,34 @@ public class NocturneOAuthService {
         return url;
     }
 
+    /** Extracts the host from a URL remainder, keeping IPv6 brackets intact. */
+    private static String extractHost(final String rest) {
+        if (rest.startsWith("[")) {
+            final int close = rest.indexOf(']');
+            return close > 0 ? rest.substring(0, close + 1) : rest;
+        }
+        return rest.split("[:/]")[0];
+    }
+
     private static boolean isLocalHost(final String host) {
+        if (host.startsWith("[")) {
+            // IPv6 loopback, unique-local (fc00::/7) and link-local stay local
+            return host.startsWith("[::1")
+                    || host.startsWith("[fc")
+                    || host.startsWith("[fd")
+                    || host.startsWith("[fe80");
+        }
+        if (host.startsWith("172.")) {
+            // RFC 1918 172.16.0.0/12
+            try {
+                final int secondOctet = Integer.parseInt(host.split("\\.")[1]);
+                if (secondOctet >= 16 && secondOctet <= 31) {
+                    return true;
+                }
+            } catch (Exception e) {
+                // not a numeric address — fall through
+            }
+        }
         return host.equals("localhost")
                 || host.equals("127.0.0.1")
                 || host.startsWith("192.168.")
@@ -187,7 +213,9 @@ public class NocturneOAuthService {
                     response.getUserCode(),
                     response.getVerificationUri(),
                     response.getVerificationUriComplete() != null ? response.getVerificationUriComplete() : "",
-                    response.getExpiresIn() != null ? response.getExpiresIn() : 0,
+                    // A missing/zero expires_in would make the poll deadline "now"
+                    // and instantly report a timeout; fall back to a sane window
+                    response.getExpiresIn() != null && response.getExpiresIn() > 0 ? response.getExpiresIn() : 300,
                     response.getInterval() != null ? response.getInterval() : 5
             );
         } catch (ApiException e) {
@@ -372,7 +400,13 @@ public class NocturneOAuthService {
 
     private void storeTokens(final OAuthTokenResponse response) {
         PersistentStore.setString(KEY_ACCESS_TOKEN, response.getAccessToken());
-        PersistentStore.setString(KEY_REFRESH_TOKEN, response.getRefreshToken());
+        // RFC 6749 §6: a refresh-grant response may omit refresh_token when the
+        // server doesn't rotate them. setString(key, null) would delete the
+        // stored one, killing uploads at the next expiry — keep the old token.
+        final String newRefreshToken = response.getRefreshToken();
+        if (newRefreshToken != null && !newRefreshToken.isEmpty()) {
+            PersistentStore.setString(KEY_REFRESH_TOKEN, newRefreshToken);
+        }
         final int expiresIn = response.getExpiresIn() != null ? response.getExpiresIn() : 0;
         PersistentStore.setLong(KEY_TOKEN_EXPIRY, JoH.tsl() + (expiresIn * 1000L));
     }

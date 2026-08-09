@@ -6,6 +6,7 @@ import android.content.Intent;
 
 import com.eveningoutpost.dexdrip.models.JoH;
 import com.eveningoutpost.dexdrip.models.UserError.Log;
+import com.eveningoutpost.dexdrip.nocturne.NocturneUploader;
 import com.eveningoutpost.dexdrip.utilitymodels.Constants;
 import com.eveningoutpost.dexdrip.utilitymodels.Pref;
 import com.eveningoutpost.dexdrip.utilitymodels.UploaderTask;
@@ -31,7 +32,10 @@ public class SyncService extends IntentService {
                 || Pref.getBooleanDefaultFalse("wear_sync")
                 || Pref.getBooleanDefaultFalse("cloud_storage_mongodb_enable")
                 || Pref.getBooleanDefaultFalse("cloud_storage_influxdb_enable")
-                || Pref.getBooleanDefaultFalse("nocturne_upload_enable")) {
+                // isSupported() gate stops unsupported devices (e.g. settings
+                // imported from another phone) rescheduling sync forever for a
+                // circuit that can never run
+                || (Pref.getBooleanDefaultFalse("nocturne_upload_enable") && NocturneUploader.isSupported())) {
             synctoCloudDatabases(); // attempt to sync queues
             startSyncService(6 * Constants.MINUTE_IN_MS); // set retry timer
         }

@@ -335,6 +335,19 @@ public class NocturneUploaderTest extends RobolectricTestWithConfig {
         assertThat(NocturneUploader.directionFromSlopeName(null)).isNull();
     }
 
+    // ---- Sync identifier suffixing ----
+
+    @Test
+    public void suffixedSyncId_firstRecordKeepsBareUuid() {
+        assertThat(NocturneUploader.suffixedSyncId("uuid-1234", 0)).isEqualTo("uuid-1234");
+    }
+
+    @Test
+    public void suffixedSyncId_laterRecordsGetNumericSuffix() {
+        assertThat(NocturneUploader.suffixedSyncId("uuid-1234", 1)).isEqualTo("uuid-1234-2");
+        assertThat(NocturneUploader.suffixedSyncId("uuid-1234", 2)).isEqualTo("uuid-1234-3");
+    }
+
     // ---- Delete outcome merging ----
 
     @Test

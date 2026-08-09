@@ -1321,6 +1321,7 @@
     <string name="nocturne_connect_switch_title">Switch Nocturne Instance?</string>
     <string name="nocturne_connect_switch_message">You\'re connected to:\n%1$s\n\nSwitch to:\n%2$s?</string>
     <string name="nocturne_connect_switch_positive">Switch</string>
+    <string name="nocturne_connect_unknown_instance">(unknown)</string>
     <string name="nocturne_connect_confirm_title">Connect to Nocturne?</string>
     <string name="nocturne_connect_confirm_message">Connect xDrip+ to:\n\n%1$s</string>
     <string name="nocturne_connect_confirm_positive">Connect</string>

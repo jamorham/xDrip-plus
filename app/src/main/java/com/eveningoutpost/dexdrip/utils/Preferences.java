@@ -1168,6 +1168,10 @@ public class Preferences extends BasePreferenceActivity implements SearchPrefere
                     return true;
                 });
             }
+            final Preference nocturneUrlPref = findPreference("nocturne_instance_url");
+            if (nocturneUrlPref != null) {
+                bindPreferenceSummaryToValue(nocturneUrlPref);
+            }
 
             addPreferencesFromResource(R.xml.pref_advanced_settings);
             addPreferencesFromResource(R.xml.xdrip_plus_prefs);

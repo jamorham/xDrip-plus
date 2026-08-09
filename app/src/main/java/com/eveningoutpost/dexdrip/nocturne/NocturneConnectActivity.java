@@ -30,6 +30,14 @@ public class NocturneConnectActivity extends Activity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
+        if (!NocturneUploader.isSupported()) {
+            // Bail before touching any preferences so an unsupported device
+            // can't end up with nocturne_upload_enable set.
+            Toast.makeText(this, R.string.nocturne_requires_android_8, Toast.LENGTH_LONG).show();
+            finish();
+            return;
+        }
+
         final Uri data = getIntent().getData();
         if (data == null) {
             UserError.Log.e(TAG, "No intent data");
@@ -87,32 +95,34 @@ public class NocturneConnectActivity extends Activity {
             return;
         }
 
-        if (!existingUrl.isEmpty() && !existingUrl.equals(trimmedUrl)) {
-            new AlertDialog.Builder(this)
-                    .setTitle(R.string.nocturne_connect_switch_title)
-                    .setMessage(getString(R.string.nocturne_connect_switch_message, existingUrl, trimmedUrl))
-                    .setPositiveButton(R.string.nocturne_connect_switch_positive, (dialog, which) -> {
-                        new Thread(() -> {
-                            // Always reach connectToInstance — a failed revoke must
-                            // not leave the user stuck with no feedback after
-                            // confirming the switch.
-                            try {
-                                new NocturneOAuthService().revokeToken();
-                            } catch (Exception e) {
-                                UserError.Log.e(TAG, "revokeToken failed during switch: " + e);
-                            }
-                            runOnUiThread(() -> {
-                                if (isFinishing() || isDestroyed()) return;
-                                connectToInstance(trimmedUrl);
-                            });
-                        }).start();
-                    })
-                    .setNegativeButton(android.R.string.cancel, (dialog, which) -> finish())
-                    .setCancelable(false)
-                    .show();
-        } else {
-            connectToInstance(trimmedUrl);
-        }
+        // Still connected but the URL differs — or was cleared in settings while
+        // tokens survived. Always confirm and revoke first: this activity is
+        // exported, so it must never silently repoint the instance URL while
+        // stored tokens could then be sent to the new host.
+        new AlertDialog.Builder(this)
+                .setTitle(R.string.nocturne_connect_switch_title)
+                .setMessage(getString(R.string.nocturne_connect_switch_message,
+                        existingUrl.isEmpty() ? getString(R.string.nocturne_connect_unknown_instance) : existingUrl,
+                        trimmedUrl))
+                .setPositiveButton(R.string.nocturne_connect_switch_positive, (dialog, which) -> {
+                    new Thread(() -> {
+                        // Always reach connectToInstance — a failed revoke must
+                        // not leave the user stuck with no feedback after
+                        // confirming the switch.
+                        try {
+                            new NocturneOAuthService().revokeToken();
+                        } catch (Exception e) {
+                            UserError.Log.e(TAG, "revokeToken failed during switch: " + e);
+                        }
+                        runOnUiThread(() -> {
+                            if (isFinishing() || isDestroyed()) return;
+                            connectToInstance(trimmedUrl);
+                        });
+                    }).start();
+                })
+                .setNegativeButton(android.R.string.cancel, (dialog, which) -> finish())
+                .setCancelable(false)
+                .show();
     }
 
     private void connectToInstance(final String url) {

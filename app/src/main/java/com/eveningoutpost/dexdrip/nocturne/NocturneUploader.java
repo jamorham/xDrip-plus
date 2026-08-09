@@ -246,19 +246,42 @@ public class NocturneUploader {
                         deviceEventApi.deviceEventCreate(mapDeviceEvent(t.timestamp, t.eventType, t.notes, t.uuid));
                         break;
                     case MEAL:
-                        nutritionApi.nutritionCreateMeal(mapMeal(t.timestamp, t.insulin, t.carbs, t.uuid));
+                        // Split out any long-acting component so basal doses aren't
+                        // mis-filed as prandial meal insulin (e.g. a bedtime snack
+                        // logged together with a Tresiba dose).
+                        final List<InsulinInjection> mealInjections = t.getInsulinInjections();
+                        double basalUnits = 0;
+                        int mealBasalCount = 0;
+                        if (mealInjections != null) {
+                            for (final InsulinInjection inj : mealInjections) {
+                                if (inj.getUnits() > 0 && isBasal(inj)) {
+                                    basalInjectionApi.basalInjectionCreate(
+                                            mapBasalInjection(t.timestamp, inj.getUnits(), inj.getInsulin(), suffixedSyncId(t.uuid, mealBasalCount++)));
+                                    basalUnits += inj.getUnits();
+                                }
+                            }
+                        }
+                        final double mealInsulin = t.insulin - basalUnits;
+                        if (mealInsulin > 0) {
+                            nutritionApi.nutritionCreateMeal(mapMeal(t.timestamp, mealInsulin, t.carbs, t.uuid));
+                        } else {
+                            // All the insulin was basal — the carbs stand alone.
+                            nutritionApi.nutritionCreateCarbIntake(mapCarbIntake(t.timestamp, t.carbs, t.uuid));
+                        }
                         break;
                     case BOLUS:
                         final List<InsulinInjection> injections = t.getInsulinInjections();
                         if (injections != null && !injections.isEmpty()) {
+                            int bolusCount = 0;
+                            int basalCount = 0;
                             for (final InsulinInjection inj : injections) {
                                 if (inj.getUnits() > 0) {
                                     // Long-acting doses belong to a separate Nocturne resource
                                     if (isBasal(inj)) {
                                         basalInjectionApi.basalInjectionCreate(
-                                                mapBasalInjection(t.timestamp, inj.getUnits(), inj.getInsulin(), t.uuid));
+                                                mapBasalInjection(t.timestamp, inj.getUnits(), inj.getInsulin(), suffixedSyncId(t.uuid, basalCount++)));
                                     } else {
-                                        bolusApi.bolusCreate(mapBolus(t.timestamp, inj.getUnits(), inj.getInsulin(), t.uuid));
+                                        bolusApi.bolusCreate(mapBolus(t.timestamp, inj.getUnits(), inj.getInsulin(), suffixedSyncId(t.uuid, bolusCount++)));
                                     }
                                 }
                             }
@@ -644,6 +667,17 @@ public class NocturneUploader {
      */
     private static boolean isBasal(final InsulinInjection injection) {
         return injection.getProfile() != null && injection.isBasal();
+    }
+
+    /**
+     * Sync identifiers must be unique within a resource, so when one treatment
+     * produces several records of the same kind (e.g. two rapid-acting
+     * injections) the second and later ones get a numeric suffix. The first
+     * keeps the bare uuid so by-sync-identifier deletion still finds it;
+     * suffixed extras are a documented deletion gap alongside basal.
+     */
+    static String suffixedSyncId(final String uuid, final int index) {
+        return index == 0 ? uuid : uuid + "-" + (index + 1);
     }
 
     static TreatmentRoute routeTreatment(final Treatments t) {
