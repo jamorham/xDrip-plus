@@ -7,6 +7,7 @@ import com.eveningoutpost.dexdrip.nocturne.NocturneUploader.TreatmentRoute;
 
 import org.junit.Test;
 import org.nightscoutfoundation.nocturne.model.BolusKind;
+import org.nightscoutfoundation.nocturne.model.CreateBasalInjectionRequest;
 import org.nightscoutfoundation.nocturne.model.CreateBolusRequest;
 import org.nightscoutfoundation.nocturne.model.CreateCarbIntakeRequest;
 import org.nightscoutfoundation.nocturne.model.CreateMealRequest;
@@ -236,6 +237,33 @@ public class NocturneUploaderTest extends RobolectricTestWithConfig {
         final CreateBolusRequest request = NocturneUploader.mapBolus(TEST_TIMESTAMP, 3.0, null, "sync-456");
         assertThat(request.getInsulinType()).isNull();
         assertThat(request.getInsulin()).isEqualTo(3.0);
+    }
+
+    @Test
+    public void mapBasalInjection_containsExpectedFields() {
+        final CreateBasalInjectionRequest request = NocturneUploader.mapBasalInjection(TEST_TIMESTAMP, 12.0, "Tresiba", "sync-basal");
+        assertThat(request.getUnits()).isEqualTo(12.0);
+        assertThat(request.getSyncIdentifier()).isEqualTo("sync-basal");
+        assertThat(request.getApp()).isEqualTo("xDrip+");
+        assertThat(request.getDataSource()).isEqualTo("xdrip");
+        assertThat(request.getTimestamp()).isNotNull();
+        assertThat(request.getTimestamp().toInstant().toEpochMilli()).isEqualTo(TEST_TIMESTAMP);
+        assertThat(request.getUtcOffset()).isEqualTo(
+                TimeZone.getDefault().getOffset(TEST_TIMESTAMP) / 60000);
+    }
+
+    @Test
+    public void mapBasalInjection_insulinName_keptInNotes() {
+        // The basal injection API has no insulin type field, so the name lands in the notes
+        final CreateBasalInjectionRequest request = NocturneUploader.mapBasalInjection(TEST_TIMESTAMP, 12.0, "Tresiba", "sync-basal");
+        assertThat(request.getNotes()).isEqualTo("Tresiba");
+    }
+
+    @Test
+    public void mapBasalInjection_unknownOrMissingInsulinName_notesAbsent() {
+        assertThat(NocturneUploader.mapBasalInjection(TEST_TIMESTAMP, 12.0, null, "sync-b1").getNotes()).isNull();
+        assertThat(NocturneUploader.mapBasalInjection(TEST_TIMESTAMP, 12.0, "", "sync-b2").getNotes()).isNull();
+        assertThat(NocturneUploader.mapBasalInjection(TEST_TIMESTAMP, 12.0, "unknown", "sync-b3").getNotes()).isNull();
     }
 
     @Test

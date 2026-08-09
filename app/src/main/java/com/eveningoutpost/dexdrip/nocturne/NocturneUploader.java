@@ -22,6 +22,7 @@ import com.eveningoutpost.dexdrip.utils.PowerStateReceiver;
 import org.nightscoutfoundation.nocturne.ApiClient;
 import org.nightscoutfoundation.nocturne.ApiException;
 import org.nightscoutfoundation.nocturne.api.ActivityApi;
+import org.nightscoutfoundation.nocturne.api.BasalInjectionApi;
 import org.nightscoutfoundation.nocturne.api.BolusApi;
 import org.nightscoutfoundation.nocturne.api.CalibrationApi;
 import org.nightscoutfoundation.nocturne.api.DeviceEventApi;
@@ -33,6 +34,7 @@ import org.nightscoutfoundation.nocturne.api.SensorGlucoseApi;
 import org.nightscoutfoundation.nocturne.api.StepCountApi;
 import org.nightscoutfoundation.nocturne.api.UploaderSnapshotApi;
 import org.nightscoutfoundation.nocturne.model.BolusKind;
+import org.nightscoutfoundation.nocturne.model.CreateBasalInjectionRequest;
 import org.nightscoutfoundation.nocturne.model.CreateBolusRequest;
 import org.nightscoutfoundation.nocturne.model.CreateCarbIntakeRequest;
 import org.nightscoutfoundation.nocturne.model.CreateMealRequest;
@@ -232,6 +234,7 @@ public class NocturneUploader {
         boolean allOk = true;
 
         final BolusApi bolusApi = new BolusApi(apiClient);
+        final BasalInjectionApi basalInjectionApi = new BasalInjectionApi(apiClient);
         final NutritionApi nutritionApi = new NutritionApi(apiClient);
         final NoteApi noteApi = new NoteApi(apiClient);
         final DeviceEventApi deviceEventApi = new DeviceEventApi(apiClient);
@@ -250,10 +253,18 @@ public class NocturneUploader {
                         if (injections != null && !injections.isEmpty()) {
                             for (final InsulinInjection inj : injections) {
                                 if (inj.getUnits() > 0) {
-                                    bolusApi.bolusCreate(mapBolus(t.timestamp, inj.getUnits(), inj.getInsulin(), t.uuid));
+                                    // Long-acting doses belong to a separate Nocturne resource
+                                    if (isBasal(inj)) {
+                                        basalInjectionApi.basalInjectionCreate(
+                                                mapBasalInjection(t.timestamp, inj.getUnits(), inj.getInsulin(), t.uuid));
+                                    } else {
+                                        bolusApi.bolusCreate(mapBolus(t.timestamp, inj.getUnits(), inj.getInsulin(), t.uuid));
+                                    }
                                 }
                             }
                         } else {
+                            // No per-injection detail, so nothing identifies the insulin
+                            // profile: the treatment total can only be sent as a bolus.
                             bolusApi.bolusCreate(mapBolus(t.timestamp, t.insulin, null, t.uuid));
                         }
                         break;
@@ -289,6 +300,9 @@ public class NocturneUploader {
         // their own because the server stores a meal as a correlated bolus +
         // carb intake pair sharing the meal's sync identifier, so the bolus
         // and carb intake deletes below cover meal deletion too.
+        // Basal injections cannot be deleted here: the SDK/server has no
+        // basalInjectionDeleteBySyncIdentifier endpoint yet (pending upstream),
+        // so deleting a basal-only treatment reports "not found" and completes.
         for (final String uuid : uuids) {
             DeleteOutcome outcome = DeleteOutcome.NOT_FOUND;
             outcome = outcome.merge(deleteBySyncId(() -> bolusApi.bolusDeleteBySyncIdentifier(DATA_SOURCE, uuid), "bolus", uuid));
@@ -485,6 +499,21 @@ public class NocturneUploader {
         return request;
     }
 
+    static CreateBasalInjectionRequest mapBasalInjection(final long timestamp, final double units, final String insulinName, final String syncIdentifier) {
+        final CreateBasalInjectionRequest request = new CreateBasalInjectionRequest()
+                .timestamp(toOffsetDateTime(timestamp))
+                .utcOffset(utcOffsetMinutes(timestamp))
+                .units(units)
+                .syncIdentifier(syncIdentifier)
+                .app("xDrip+")
+                .dataSource(DATA_SOURCE);
+        // The API has no insulin type field, so keep the name (e.g. "Tresiba") in the notes
+        if (insulinName != null && !insulinName.isEmpty() && !insulinName.equals("unknown")) {
+            request.notes(insulinName);
+        }
+        return request;
+    }
+
     static CreateCarbIntakeRequest mapCarbIntake(final long timestamp, final double carbs, final String syncIdentifier) {
         return new CreateCarbIntakeRequest()
                 .timestamp(toOffsetDateTime(timestamp))
@@ -606,6 +635,15 @@ public class NocturneUploader {
         m.put("Cannula Change", DeviceEventType.CANNULA_CHANGE);
         m.put("Transmitter Sensor Insert", DeviceEventType.TRANSMITTER_SENSOR_INSERT);
         DEVICE_EVENT_TYPE_MAP = Collections.unmodifiableMap(m);
+    }
+
+    /**
+     * Whether an injection is long-acting, per xDrip's insulin profile heuristic.
+     * An unrecognised insulin name has no profile, in which case we keep the
+     * historic behaviour and treat the dose as a bolus.
+     */
+    private static boolean isBasal(final InsulinInjection injection) {
+        return injection.getProfile() != null && injection.isBasal();
     }
 
     static TreatmentRoute routeTreatment(final Treatments t) {
