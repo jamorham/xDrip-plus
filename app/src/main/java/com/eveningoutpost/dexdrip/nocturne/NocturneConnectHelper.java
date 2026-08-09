@@ -12,13 +12,15 @@ import com.eveningoutpost.dexdrip.models.UserError;
 import com.eveningoutpost.dexdrip.services.SyncService;
 import com.eveningoutpost.dexdrip.utilitymodels.Pref;
 
+import java.util.concurrent.atomic.AtomicBoolean;
+
 /**
  * Handles the UI flow for connecting xDrip+ to a Nocturne instance
  * via the OAuth 2.0 Device Authorization flow.
  */
 public class NocturneConnectHelper {
 
-    private static final String TAG = "NocturneConnect";
+    private static final String TAG = NocturneConnectHelper.class.getSimpleName();
 
     /**
      * Existing entry point from settings UI. Shows the "already connected?"
@@ -58,7 +60,11 @@ public class NocturneConnectHelper {
                     .setMessage(R.string.nocturne_already_connected_disconnect)
                     .setPositiveButton(R.string.nocturne_disconnect, (dialog, which) -> {
                         new Thread(() -> {
-                            new NocturneOAuthService().revokeToken();
+                            try {
+                                new NocturneOAuthService().revokeToken();
+                            } catch (Exception e) {
+                                UserError.Log.e(TAG, "revokeToken failed during disconnect: " + e);
+                            }
                             activity.runOnUiThread(() -> {
                                 Toast.makeText(activity, R.string.nocturne_disconnected, Toast.LENGTH_SHORT).show();
                                 runOnUiThreadSafely(activity, onFinish);
@@ -111,6 +117,11 @@ public class NocturneConnectHelper {
                 response.userCode,
                 expiryMinutes);
 
+        // Set when the user cancels the dialog so the polling thread exits
+        // instead of running until the device-code deadline (which can be many
+        // minutes) while holding references to a possibly-dead activity.
+        final AtomicBoolean cancelled = new AtomicBoolean(false);
+
         final AlertDialog.Builder builder = new AlertDialog.Builder(activity)
                 .setTitle(R.string.nocturne_authorize_title)
                 .setMessage(message)
@@ -124,12 +135,18 @@ public class NocturneConnectHelper {
                             : response.verificationUri;
                     activity.startActivity(new Intent(Intent.ACTION_VIEW, Uri.parse(url)));
                 } catch (Exception e) {
-                    UserError.Log.e(TAG, "Could not open browser: " + e.getMessage());
+                    UserError.Log.e(TAG, "Could not open browser: " + e);
                 }
             });
-            builder.setNegativeButton(android.R.string.cancel, (d, w) -> runOnUiThreadSafely(activity, onFinish));
+            builder.setNegativeButton(android.R.string.cancel, (d, w) -> {
+                cancelled.set(true);
+                runOnUiThreadSafely(activity, onFinish);
+            });
         } else {
-            builder.setPositiveButton(android.R.string.cancel, (d, w) -> runOnUiThreadSafely(activity, onFinish));
+            builder.setPositiveButton(android.R.string.cancel, (d, w) -> {
+                cancelled.set(true);
+                runOnUiThreadSafely(activity, onFinish);
+            });
         }
 
         final AlertDialog dialog = builder.create();
@@ -145,8 +162,14 @@ public class NocturneConnectHelper {
                 } catch (InterruptedException e) {
                     return;
                 }
+                if (cancelled.get()) {
+                    return;
+                }
 
                 final NocturneOAuthService.TokenPollResult result = oauthService.pollForToken(response.deviceCode);
+                if (cancelled.get()) {
+                    return;
+                }
 
                 switch (result) {
                     case SUCCESS:
@@ -156,13 +179,9 @@ public class NocturneConnectHelper {
                         try {
                             SyncService.startSyncService(0);
                         } catch (Exception e) {
-                            UserError.Log.e(TAG, "Immediate upload trigger failed: " + e.getMessage());
+                            UserError.Log.e(TAG, "Immediate upload trigger failed: " + e);
                         }
-                        activity.runOnUiThread(() -> {
-                            dialog.dismiss();
-                            Toast.makeText(activity, R.string.nocturne_connected, Toast.LENGTH_LONG).show();
-                            runOnUiThreadSafely(activity, onFinish);
-                        });
+                        finishPoll(activity, dialog, R.string.nocturne_connected, onFinish);
                         return;
 
                     case SLOW_DOWN:
@@ -173,29 +192,38 @@ public class NocturneConnectHelper {
                         break;
 
                     case EXPIRED:
-                        activity.runOnUiThread(() -> {
-                            dialog.dismiss();
-                            Toast.makeText(activity, R.string.nocturne_auth_expired, Toast.LENGTH_LONG).show();
-                            runOnUiThreadSafely(activity, onFinish);
-                        });
+                        finishPoll(activity, dialog, R.string.nocturne_auth_expired, onFinish);
                         return;
 
                     case DENIED:
-                        activity.runOnUiThread(() -> {
-                            dialog.dismiss();
-                            Toast.makeText(activity, R.string.nocturne_auth_denied, Toast.LENGTH_SHORT).show();
-                            runOnUiThreadSafely(activity, onFinish);
-                        });
+                        finishPoll(activity, dialog, R.string.nocturne_auth_denied, onFinish);
                         return;
                 }
             }
 
-            activity.runOnUiThread(() -> {
-                dialog.dismiss();
-                Toast.makeText(activity, R.string.nocturne_auth_timed_out, Toast.LENGTH_LONG).show();
-                runOnUiThreadSafely(activity, onFinish);
-            });
+            finishPoll(activity, dialog, R.string.nocturne_auth_timed_out, onFinish);
         }).start();
+    }
+
+    /**
+     * Ends the device-flow poll from the polling thread: dismisses the dialog,
+     * shows the outcome toast and runs the onFinish callback — but only when
+     * the activity is still alive, since dismissing a dialog whose window is
+     * gone throws.
+     */
+    private static void finishPoll(final Activity activity, final AlertDialog dialog,
+                                   final int toastResId, final Runnable onFinish) {
+        if (activity == null || activity.isFinishing() || activity.isDestroyed()) {
+            return;
+        }
+        activity.runOnUiThread(() -> {
+            if (activity.isFinishing() || activity.isDestroyed()) {
+                return;
+            }
+            dialog.dismiss();
+            Toast.makeText(activity, toastResId, Toast.LENGTH_LONG).show();
+            runOnUiThreadSafely(activity, onFinish);
+        });
     }
 
     /**

@@ -28,7 +28,7 @@ import java.util.concurrent.TimeUnit;
  */
 public class NocturneOAuthService {
 
-    private static final String TAG = "NocturneOAuth";
+    private static final String TAG = NocturneOAuthService.class.getSimpleName();
     private static final String SOFTWARE_ID = "org.nightscoutfoundation.xdrip";
     private static final String REQUESTED_SCOPES = "glucose.readwrite heartrate.readwrite stepcount.readwrite treatments.readwrite devices.readwrite";
     private static final String GRANT_DEVICE_CODE = "urn:ietf:params:oauth:grant-type:device_code";
@@ -154,7 +154,7 @@ public class NocturneOAuthService {
             UserError.Log.e(TAG, "registerClient: HTTP " + e.getCode() + " body=" + e.getResponseBody());
             return null;
         } catch (Exception e) {
-            UserError.Log.e(TAG, "registerClient failed: " + e.getMessage());
+            UserError.Log.e(TAG, "registerClient failed: " + e);
             return null;
         }
     }
@@ -194,7 +194,7 @@ public class NocturneOAuthService {
             UserError.Log.e(TAG, "startDeviceFlow: HTTP " + e.getCode() + " body=" + e.getResponseBody());
             return null;
         } catch (Exception e) {
-            UserError.Log.e(TAG, "startDeviceFlow failed: " + e.getMessage());
+            UserError.Log.e(TAG, "startDeviceFlow failed: " + e);
             return null;
         }
     }
@@ -224,6 +224,15 @@ public class NocturneOAuthService {
             storeTokens(response);
             return TokenPollResult.SUCCESS;
         } catch (ApiException e) {
+            // Network failures (SDK wraps IOException with code 0) and server/
+            // proxy errors are transient: the user may have just approved the
+            // flow in their browser, so keep polling rather than reporting
+            // "denied" over a momentary connectivity blip. The poll loop's
+            // expiry deadline bounds how long this can go on.
+            if (e.getCode() == 0 || e.getCode() >= 500) {
+                UserError.Log.e(TAG, "pollForToken transient error, will retry: HTTP " + e.getCode() + " " + e);
+                return TokenPollResult.PENDING;
+            }
             // RFC 8628: pending/slow_down/expired arrive as HTTP 400 with an
             // OAuth error code in the JSON body — normal protocol flow.
             final String error = oauthErrorCode(e.getResponseBody());
@@ -241,7 +250,7 @@ public class NocturneOAuthService {
                     return TokenPollResult.DENIED;
             }
         } catch (Exception e) {
-            UserError.Log.e(TAG, "pollForToken failed: " + e.getMessage());
+            UserError.Log.e(TAG, "pollForToken failed: " + e);
             return TokenPollResult.DENIED;
         }
     }
@@ -279,11 +288,14 @@ public class NocturneOAuthService {
             // Cloudflare/proxy 403s return plain text and must not nuke credentials.
             if (e.getCode() >= 400 && e.getCode() < 500 && isOAuthErrorResponse(e.getResponseBody())) {
                 clearTokens();
+                // wtf() surfaces in the Event Log so the user finds out now
+                // rather than discovering a gap in their data days later.
+                UserError.Log.wtf(TAG, "Nocturne authorization is no longer valid - uploads are stopped. Please reconnect via Settings > Cloud Upload > Nocturne");
             }
             return false;
         } catch (Exception e) {
             // Network errors are transient — don't clear tokens
-            UserError.Log.e(TAG, "refreshAccessToken failed: " + e.getMessage());
+            UserError.Log.e(TAG, "refreshAccessToken failed: " + e);
             return false;
         }
     }
@@ -306,7 +318,7 @@ public class NocturneOAuthService {
         } catch (ApiException e) {
             UserError.Log.e(TAG, "revokeToken: HTTP " + e.getCode());
         } catch (Exception e) {
-            UserError.Log.e(TAG, "revokeToken failed: " + e.getMessage());
+            UserError.Log.e(TAG, "revokeToken failed: " + e);
         } finally {
             clearAll();
         }
@@ -341,7 +353,7 @@ public class NocturneOAuthService {
             }
             return PersistentStore.getString(KEY_ACCESS_TOKEN);
         } catch (Exception e) {
-            UserError.Log.e(TAG, "getValidAccessToken failed: " + e.getMessage());
+            UserError.Log.e(TAG, "getValidAccessToken failed: " + e);
             return null;
         }
     }

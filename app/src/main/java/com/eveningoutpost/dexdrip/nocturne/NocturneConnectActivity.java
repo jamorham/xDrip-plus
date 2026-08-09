@@ -24,7 +24,7 @@ import com.eveningoutpost.dexdrip.utilitymodels.Pref;
  */
 public class NocturneConnectActivity extends Activity {
 
-    private static final String TAG = "NocturneConnectAct";
+    private static final String TAG = NocturneConnectActivity.class.getSimpleName();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -93,7 +93,14 @@ public class NocturneConnectActivity extends Activity {
                     .setMessage(getString(R.string.nocturne_connect_switch_message, existingUrl, trimmedUrl))
                     .setPositiveButton(R.string.nocturne_connect_switch_positive, (dialog, which) -> {
                         new Thread(() -> {
-                            new NocturneOAuthService().revokeToken();
+                            // Always reach connectToInstance — a failed revoke must
+                            // not leave the user stuck with no feedback after
+                            // confirming the switch.
+                            try {
+                                new NocturneOAuthService().revokeToken();
+                            } catch (Exception e) {
+                                UserError.Log.e(TAG, "revokeToken failed during switch: " + e);
+                            }
                             runOnUiThread(() -> {
                                 if (isFinishing() || isDestroyed()) return;
                                 connectToInstance(trimmedUrl);

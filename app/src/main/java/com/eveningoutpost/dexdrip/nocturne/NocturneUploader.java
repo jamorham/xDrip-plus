@@ -71,7 +71,7 @@ import java.util.concurrent.TimeUnit;
  */
 public class NocturneUploader {
 
-    private static final String TAG = "NocturneUploader";
+    private static final String TAG = NocturneUploader.class.getSimpleName();
     private static final String DATA_SOURCE = "xdrip";
     private static final String HR_WATERMARK_KEY = "nocturne-heartrate-synced-time";
     private static final String STEPS_WATERMARK_KEY = "nocturne-steps-synced-time";
@@ -131,23 +131,30 @@ public class NocturneUploader {
                           final List<String> treatmentsDel) {
         if (!ready) return false;
 
-        boolean sgvSuccess = true;
+        // The return value tells UploaderTask whether to mark the queue entries
+        // complete, so it must reflect every queue-driven stream (SGV,
+        // calibrations, blood tests, treatments) — otherwise a failed stream's
+        // records would be dropped without retry. The watermark-driven streams
+        // below (heart rate, steps, device status, motion) are not queue
+        // entries; their failures retry via their own watermarks and must not
+        // block queue completion.
+        boolean queueSuccess = true;
 
         if (Pref.getBooleanDefaultFalse("nocturne_upload_sgv")) {
-            sgvSuccess = uploadSgv(bgReadings);
+            queueSuccess &= uploadSgv(bgReadings);
         }
 
         if (Pref.getBooleanDefaultFalse("nocturne_upload_calibrations")) {
-            uploadCalibrations(calibrations);
+            queueSuccess &= uploadCalibrations(calibrations);
         }
 
         if (Pref.getBooleanDefaultFalse("nocturne_upload_bloodtests")) {
-            uploadBloodTests(bloodTests);
+            queueSuccess &= uploadBloodTests(bloodTests);
         }
 
         if (Pref.getBooleanDefaultFalse("nocturne_upload_treatments")) {
-            uploadTreatments(treatmentsAdd);
-            deleteTreatments(treatmentsDel);
+            queueSuccess &= uploadTreatments(treatmentsAdd);
+            queueSuccess &= deleteTreatments(treatmentsDel);
         }
 
         if (Pref.getBooleanDefaultFalse("nocturne_upload_heartrate")) {
@@ -158,7 +165,7 @@ public class NocturneUploader {
             uploadStepCounts();
         }
 
-        if (Pref.getBoolean("nocturne_upload_devicestatus", true)) {
+        if (Pref.getBooleanDefaultFalse("nocturne_upload_devicestatus")) {
             uploadDeviceStatus();
         }
 
@@ -166,7 +173,7 @@ public class NocturneUploader {
             uploadMotionTracking();
         }
 
-        return sgvSuccess;
+        return queueSuccess;
     }
 
     // --- Upload methods ---
@@ -189,8 +196,9 @@ public class NocturneUploader {
         }
     }
 
-    private void uploadCalibrations(final List<com.eveningoutpost.dexdrip.models.Calibration> calibrations) {
-        if (calibrations == null || calibrations.isEmpty()) return;
+    private boolean uploadCalibrations(final List<com.eveningoutpost.dexdrip.models.Calibration> calibrations) {
+        if (calibrations == null || calibrations.isEmpty()) return true;
+        boolean allOk = true;
         final CalibrationApi api = new CalibrationApi(apiClient);
         for (final com.eveningoutpost.dexdrip.models.Calibration cal : calibrations) {
             if (cal.slope == 0) continue; // skip invalid calibrations
@@ -198,24 +206,30 @@ public class NocturneUploader {
                 api.calibrationCreate(mapCalibration(cal.timestamp, cal.slope, cal.intercept, cal.first_scale));
             } catch (Exception e) {
                 logFailure("Calibration upload", e);
+                allOk = false;
             }
         }
+        return allOk;
     }
 
-    private void uploadBloodTests(final List<BloodTest> bloodTests) {
-        if (bloodTests == null || bloodTests.isEmpty()) return;
+    private boolean uploadBloodTests(final List<BloodTest> bloodTests) {
+        if (bloodTests == null || bloodTests.isEmpty()) return true;
+        boolean allOk = true;
         final MeterGlucoseApi api = new MeterGlucoseApi(apiClient);
         for (final BloodTest bt : bloodTests) {
             try {
                 api.meterGlucoseCreate(mapBloodTest(bt.mgdl, bt.timestamp, bt.source));
             } catch (Exception e) {
                 logFailure("Blood test upload", e);
+                allOk = false;
             }
         }
+        return allOk;
     }
 
-    private void uploadTreatments(final List<Treatments> treatments) {
-        if (treatments == null || treatments.isEmpty()) return;
+    private boolean uploadTreatments(final List<Treatments> treatments) {
+        if (treatments == null || treatments.isEmpty()) return true;
+        boolean allOk = true;
 
         final BolusApi bolusApi = new BolusApi(apiClient);
         final NutritionApi nutritionApi = new NutritionApi(apiClient);
@@ -255,48 +269,71 @@ public class NocturneUploader {
                 }
             } catch (Exception e) {
                 logFailure("Treatment upload (" + t.uuid + ")", e);
+                allOk = false;
             }
         }
+        return allOk;
     }
 
-    private void deleteTreatments(final List<String> uuids) {
-        if (uuids == null || uuids.isEmpty()) return;
+    private boolean deleteTreatments(final List<String> uuids) {
+        if (uuids == null || uuids.isEmpty()) return true;
+        boolean allOk = true;
 
         final BolusApi bolusApi = new BolusApi(apiClient);
         final NutritionApi nutritionApi = new NutritionApi(apiClient);
         final NoteApi noteApi = new NoteApi(apiClient);
         final DeviceEventApi deviceEventApi = new DeviceEventApi(apiClient);
 
-        // A treatment's uuid may exist in any (or, for meals, several) of these
-        // resources; try each and treat 404 as "not stored there".
+        // A treatment's uuid may exist in any of these resources; try each and
+        // treat 404 as "not stored there". Meals have no delete endpoint of
+        // their own because the server stores a meal as a correlated bolus +
+        // carb intake pair sharing the meal's sync identifier, so the bolus
+        // and carb intake deletes below cover meal deletion too.
         for (final String uuid : uuids) {
-            boolean deleted = false;
-            deleted |= deleteBySyncId(() -> bolusApi.bolusDeleteBySyncIdentifier(DATA_SOURCE, uuid), "bolus", uuid);
-            deleted |= deleteBySyncId(() -> nutritionApi.nutritionDeleteCarbIntakeBySyncIdentifier(DATA_SOURCE, uuid), "carbs", uuid);
-            deleted |= deleteBySyncId(() -> noteApi.noteDeleteBySyncIdentifier(DATA_SOURCE, uuid), "note", uuid);
-            deleted |= deleteBySyncId(() -> deviceEventApi.deviceEventDeleteBySyncIdentifier(DATA_SOURCE, uuid), "device event", uuid);
-            if (!deleted) {
+            DeleteOutcome outcome = DeleteOutcome.NOT_FOUND;
+            outcome = outcome.merge(deleteBySyncId(() -> bolusApi.bolusDeleteBySyncIdentifier(DATA_SOURCE, uuid), "bolus", uuid));
+            outcome = outcome.merge(deleteBySyncId(() -> nutritionApi.nutritionDeleteCarbIntakeBySyncIdentifier(DATA_SOURCE, uuid), "carbs", uuid));
+            outcome = outcome.merge(deleteBySyncId(() -> noteApi.noteDeleteBySyncIdentifier(DATA_SOURCE, uuid), "note", uuid));
+            outcome = outcome.merge(deleteBySyncId(() -> deviceEventApi.deviceEventDeleteBySyncIdentifier(DATA_SOURCE, uuid), "device event", uuid));
+            if (outcome == DeleteOutcome.NOT_FOUND) {
+                // Legitimately absent (e.g. never uploaded) — done, don't retry.
                 UserError.Log.d(TAG, "Treatment " + uuid + " not found in any Nocturne resource for deletion");
+            } else if (outcome == DeleteOutcome.ERROR) {
+                allOk = false;
             }
         }
+        return allOk;
     }
 
     private interface DeleteCall {
         void run() throws ApiException;
     }
 
-    private boolean deleteBySyncId(final DeleteCall call, final String what, final String uuid) {
+    enum DeleteOutcome {
+        DELETED, NOT_FOUND, ERROR;
+
+        // ERROR wins over anything so the queue entry is retried; otherwise
+        // one successful delete is enough to consider the uuid handled.
+        DeleteOutcome merge(final DeleteOutcome other) {
+            if (this == ERROR || other == ERROR) return ERROR;
+            if (this == DELETED || other == DELETED) return DELETED;
+            return NOT_FOUND;
+        }
+    }
+
+    private DeleteOutcome deleteBySyncId(final DeleteCall call, final String what, final String uuid) {
         try {
             call.run();
-            return true;
+            return DeleteOutcome.DELETED;
         } catch (ApiException e) {
-            if (e.getCode() != 404) {
-                UserError.Log.e(TAG, "Error deleting " + what + " " + uuid + ": HTTP " + e.getCode());
+            if (e.getCode() == 404) {
+                return DeleteOutcome.NOT_FOUND;
             }
-            return false;
+            UserError.Log.e(TAG, "Error deleting " + what + " " + uuid + ": HTTP " + e.getCode() + " body=" + e.getResponseBody());
+            return DeleteOutcome.ERROR;
         } catch (Exception e) {
-            UserError.Log.e(TAG, "Error deleting " + what + " " + uuid + ": " + e.getMessage());
-            return false;
+            UserError.Log.e(TAG, "Error deleting " + what + " " + uuid + ": " + e);
+            return DeleteOutcome.ERROR;
         }
     }
 
@@ -387,7 +424,7 @@ public class NocturneUploader {
             final ApiException ae = (ApiException) e;
             UserError.Log.e(TAG, what + " failed: HTTP " + ae.getCode() + " body=" + ae.getResponseBody());
         } else {
-            UserError.Log.e(TAG, what + " failed: " + e.getMessage());
+            UserError.Log.e(TAG, what + " failed: " + e);
         }
     }
 
@@ -572,7 +609,8 @@ public class NocturneUploader {
     }
 
     static TreatmentRoute routeTreatment(final Treatments t) {
-        // Loop prevention
+        // Loop prevention: skip treatments that originated from Nightscout to
+        // avoid round-trip cycles (xDrip -> Nocturne -> Nightscout -> xDrip)
         if (t.enteredBy != null
                 && (t.enteredBy.contains("via Nightscout") || t.enteredBy.contains("Nightscout Loader"))) {
             return TreatmentRoute.SKIP;

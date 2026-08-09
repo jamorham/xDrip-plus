@@ -2,6 +2,7 @@ package com.eveningoutpost.dexdrip.nocturne;
 
 import com.eveningoutpost.dexdrip.RobolectricTestWithConfig;
 import com.eveningoutpost.dexdrip.models.Treatments;
+import com.eveningoutpost.dexdrip.nocturne.NocturneUploader.DeleteOutcome;
 import com.eveningoutpost.dexdrip.nocturne.NocturneUploader.TreatmentRoute;
 
 import org.junit.Test;
@@ -304,5 +305,25 @@ public class NocturneUploaderTest extends RobolectricTestWithConfig {
         assertThat(NocturneUploader.directionFromSlopeName("SomethingElse")).isNull();
         assertThat(NocturneUploader.directionFromSlopeName("")).isNull();
         assertThat(NocturneUploader.directionFromSlopeName(null)).isNull();
+    }
+
+    // ---- Delete outcome merging ----
+
+    @Test
+    public void deleteOutcome_errorWinsOverEverything() {
+        assertThat(DeleteOutcome.ERROR.merge(DeleteOutcome.DELETED)).isEqualTo(DeleteOutcome.ERROR);
+        assertThat(DeleteOutcome.DELETED.merge(DeleteOutcome.ERROR)).isEqualTo(DeleteOutcome.ERROR);
+        assertThat(DeleteOutcome.NOT_FOUND.merge(DeleteOutcome.ERROR)).isEqualTo(DeleteOutcome.ERROR);
+    }
+
+    @Test
+    public void deleteOutcome_deletedWinsOverNotFound() {
+        assertThat(DeleteOutcome.DELETED.merge(DeleteOutcome.NOT_FOUND)).isEqualTo(DeleteOutcome.DELETED);
+        assertThat(DeleteOutcome.NOT_FOUND.merge(DeleteOutcome.DELETED)).isEqualTo(DeleteOutcome.DELETED);
+    }
+
+    @Test
+    public void deleteOutcome_notFoundOnlyWhenAllNotFound() {
+        assertThat(DeleteOutcome.NOT_FOUND.merge(DeleteOutcome.NOT_FOUND)).isEqualTo(DeleteOutcome.NOT_FOUND);
     }
 }

@@ -1161,13 +1161,12 @@ public class Preferences extends BasePreferenceActivity implements SearchPrefere
             bindPreferenceSummaryToValue(findPreference("cloud_storage_mongodb_collection"));
             bindPreferenceSummaryToValue(findPreference("cloud_storage_mongodb_device_status_collection"));
 
-            try {
-                findPreference("nocturne_connect").setOnPreferenceClickListener(preference -> {
+            final Preference nocturneConnectPref = findPreference("nocturne_connect");
+            if (nocturneConnectPref != null) {
+                nocturneConnectPref.setOnPreferenceClickListener(preference -> {
                     NocturneConnectHelper.startConnectFlow(getActivity());
                     return true;
                 });
-            } catch (Exception e) {
-                // Preference may not exist in all configurations
             }
 
             addPreferencesFromResource(R.xml.pref_advanced_settings);
