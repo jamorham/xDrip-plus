@@ -142,7 +142,10 @@ public class NocturneUploader {
         // block queue completion.
         boolean queueSuccess = true;
 
-        if (Pref.getBooleanDefaultFalse("nocturne_upload_sgv")) {
+        // SGV defaults on: glucose is the point of the uploader, so enabling
+        // Nocturne in settings should start it flowing without a second toggle.
+        // Everything else stays opt-in.
+        if (Pref.getBoolean("nocturne_upload_sgv", true)) {
             queueSuccess &= uploadSgv(bgReadings);
         }
 

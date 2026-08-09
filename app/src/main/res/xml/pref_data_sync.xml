@@ -439,7 +439,7 @@
                     android:summary="@string/nocturne_connect_pref_summary" />
 
                 <CheckBoxPreference
-                    android:defaultValue="false"
+                    android:defaultValue="true"
                     android:dependency="nocturne_upload_enable"
                     android:key="nocturne_upload_sgv"
                     android:summary="@string/summary_nocturne_upload_sgv"
