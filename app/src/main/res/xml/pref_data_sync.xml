@@ -413,58 +413,93 @@
 
             <PreferenceScreen
                 android:key="nocturne_settings"
-                android:summary="Upload to Nocturne V4 API"
-                android:title="Nocturne">
+                android:summary="@string/nocturne_settings_summary"
+                android:title="@string/nocturne">
 
                 <SwitchPreference
                     android:defaultValue="false"
                     android:key="nocturne_upload_enable"
-                    android:switchTextOff="OFF"
-                    android:switchTextOn="ON"
-                    android:title="Enable Nocturne Upload" />
+                    android:switchTextOff="@string/short_off_text_for_switches"
+                    android:switchTextOn="@string/short_on_text_for_switches"
+                    android:title="@string/title_nocturne_upload_enable" />
 
                 <EditTextPreference
                     android:defaultValue=""
                     android:dependency="nocturne_upload_enable"
-                    android:dialogMessage="Enter the URL of your Nocturne instance (e.g. https://mynocturne.example.com)"
-                    android:dialogTitle="Nocturne Instance URL"
+                    android:dialogMessage="@string/nocturne_instance_url_dialog_message"
+                    android:dialogTitle="@string/title_nocturne_instance_url"
                     android:inputType="textUri"
                     android:key="nocturne_instance_url"
-                    android:title="Nocturne Instance URL" />
+                    android:title="@string/title_nocturne_instance_url" />
 
                 <Preference
                     android:dependency="nocturne_upload_enable"
                     android:key="nocturne_connect"
-                    android:title="Connect to Nocturne"
-                    android:summary="Authorize xDrip+ with your Nocturne instance" />
+                    android:title="@string/nocturne_connect_activity_label"
+                    android:summary="@string/nocturne_connect_pref_summary" />
 
                 <CheckBoxPreference
-                    android:defaultValue="true"
+                    android:defaultValue="false"
                     android:dependency="nocturne_upload_enable"
                     android:key="nocturne_upload_sgv"
-                    android:summary="Upload CGM sensor glucose readings"
-                    android:title="Upload SGV" />
+                    android:summary="@string/summary_nocturne_upload_sgv"
+                    android:title="@string/title_nocturne_upload_sgv" />
 
                 <CheckBoxPreference
-                    android:defaultValue="true"
+                    android:defaultValue="false"
+                    android:dependency="nocturne_upload_enable"
+                    android:key="nocturne_upload_treatments"
+                    android:summary="@string/summary_nocturne_upload_treatments"
+                    android:title="@string/title_nocturne_upload_treatments" />
+
+                <CheckBoxPreference
+                    android:defaultValue="false"
+                    android:dependency="nocturne_upload_enable"
+                    android:key="nocturne_upload_calibrations"
+                    android:summary="@string/summary_nocturne_upload_calibrations"
+                    android:title="@string/title_nocturne_upload_calibrations" />
+
+                <CheckBoxPreference
+                    android:defaultValue="false"
+                    android:dependency="nocturne_upload_enable"
+                    android:key="nocturne_upload_bloodtests"
+                    android:summary="@string/summary_nocturne_upload_bloodtests"
+                    android:title="@string/title_nocturne_upload_bloodtests" />
+
+                <CheckBoxPreference
+                    android:defaultValue="false"
                     android:dependency="nocturne_upload_enable"
                     android:key="nocturne_upload_heartrate"
-                    android:summary="Upload heart rate data"
-                    android:title="Upload Heart Rate" />
+                    android:summary="@string/summary_nocturne_upload_heartrate"
+                    android:title="@string/title_nocturne_upload_heartrate" />
 
                 <CheckBoxPreference
-                    android:defaultValue="true"
+                    android:defaultValue="false"
                     android:dependency="nocturne_upload_enable"
                     android:key="nocturne_upload_stepcount"
-                    android:summary="Upload step count data"
-                    android:title="Upload Step Count" />
+                    android:summary="@string/summary_nocturne_upload_stepcount"
+                    android:title="@string/title_nocturne_upload_stepcount" />
+
+                <CheckBoxPreference
+                    android:defaultValue="false"
+                    android:dependency="nocturne_upload_enable"
+                    android:key="nocturne_upload_devicestatus"
+                    android:summary="@string/summary_nocturne_upload_devicestatus"
+                    android:title="@string/title_nocturne_upload_devicestatus" />
+
+                <CheckBoxPreference
+                    android:defaultValue="false"
+                    android:dependency="nocturne_upload_enable"
+                    android:key="nocturne_upload_motion"
+                    android:summary="@string/summary_nocturne_upload_motion"
+                    android:title="@string/title_nocturne_upload_motion" />
 
                 <CheckBoxPreference
                     android:defaultValue="true"
                     android:dependency="nocturne_upload_enable"
                     android:key="nocturne_use_mobile"
-                    android:summary="Allow uploads over mobile data"
-                    android:title="Use Mobile Data" />
+                    android:summary="@string/summary_nocturne_use_mobile"
+                    android:title="@string/title_nocturne_use_mobile" />
 
             </PreferenceScreen>
 
