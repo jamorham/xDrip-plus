@@ -1360,7 +1360,15 @@ public class JoH {
     }
 
     public static void startService(Class c) {
-        xdrip.getAppContext().startService(new Intent(xdrip.getAppContext(), c));
+        final Intent intent = new Intent(xdrip.getAppContext(), c);
+        try {
+            xdrip.getAppContext().startService(intent);
+        } catch (Exception e) {
+            // from target sdk 26 this throws if we are in the background, eg started only for a broadcast
+            if (ratelimit("service-start-refused", 3600)) {
+                UserError.Log.e(TAG, "Could not start service: " + c.getSimpleName() + " " + e);
+            }
+        }
     }
 
     public static void startService(final Class c, final String... args) {
@@ -1378,7 +1386,14 @@ public class JoH {
         for (int i = 0; i < args.length; i += 2) {
             intent.putExtra(args[i], args[i + 1]);
         }
-        xdrip.getAppContext().startService(intent);
+        try {
+            xdrip.getAppContext().startService(intent);
+        } catch (Exception e) {
+            // from target sdk 26 this throws if we are in the background, eg started only for a broadcast
+            if (ratelimit("service-start-refused", 3600)) {
+                UserError.Log.e(TAG, "Could not start service: " + c.getSimpleName() + " " + e);
+            }
+        }
     }
 
 
