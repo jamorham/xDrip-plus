@@ -1,7 +1,6 @@
 package com.eveningoutpost.dexdrip.nocturne;
 
 import android.content.Context;
-import android.os.Build;
 
 import com.eveningoutpost.dexdrip.models.BgReading;
 import com.eveningoutpost.dexdrip.models.BloodTest;
@@ -68,8 +67,8 @@ import java.util.concurrent.TimeUnit;
  * Uploads xDrip+ data (SGV, treatments, heart rate, step count, ...) to a
  * Nocturne instance via the official nocturne-java SDK.
  * <p>
- * Requires Android 8.0+ (API 26) because the SDK models use java.time;
- * callers gate on {@link #isSupported()}.
+ * The SDK models use java.time (API 26+), which is safe without desugaring
+ * because the app's minSdkVersion is 26.
  */
 public class NocturneUploader {
 
@@ -82,24 +81,13 @@ public class NocturneUploader {
     private final boolean ready;
     private final ApiClient apiClient;
 
-    /**
-     * Whether this device can run the Nocturne uploader at all.
-     * The SDK's generated models use java.time (API 26+); xDrip does not
-     * enable core library desugaring, matching its convention of runtime gates.
-     */
-    public static boolean isSupported() {
-        return Build.VERSION.SDK_INT >= Build.VERSION_CODES.O;
-    }
-
     public NocturneUploader(final Context context) {
         final NocturneOAuthService oauthService = new NocturneOAuthService();
         final String baseUrl = oauthService.getBaseUrl();
-        final String accessToken = isSupported() ? oauthService.getValidAccessToken() : null;
+        final String accessToken = oauthService.getValidAccessToken();
 
-        if (!isSupported() || accessToken == null || baseUrl.isEmpty()) {
-            if (!isSupported()) {
-                UserError.Log.e(TAG, "Nocturne requires Android 8.0 or newer");
-            } else if (accessToken == null) {
+        if (accessToken == null || baseUrl.isEmpty()) {
+            if (accessToken == null) {
                 UserError.Log.e(TAG, "No valid access token available");
             } else {
                 UserError.Log.e(TAG, "No Nocturne instance URL configured");
@@ -121,6 +109,15 @@ public class NocturneUploader {
                 .addDefaultHeader("Origin", basePath);
         apiClient.setAccessToken(accessToken);
         ready = true;
+    }
+
+    /**
+     * Test seam: skips preference and token wiring so tests can drive
+     * {@link #upload} with the stream methods overridden.
+     */
+    NocturneUploader(final boolean ready) {
+        this.ready = ready;
+        this.apiClient = null;
     }
 
     /**
@@ -183,7 +180,7 @@ public class NocturneUploader {
 
     // --- Upload methods ---
 
-    private boolean uploadSgv(final List<BgReading> bgReadings) {
+    boolean uploadSgv(final List<BgReading> bgReadings) {
         if (bgReadings == null || bgReadings.isEmpty()) {
             return true;
         }
@@ -201,7 +198,7 @@ public class NocturneUploader {
         }
     }
 
-    private boolean uploadCalibrations(final List<com.eveningoutpost.dexdrip.models.Calibration> calibrations) {
+    boolean uploadCalibrations(final List<com.eveningoutpost.dexdrip.models.Calibration> calibrations) {
         if (calibrations == null || calibrations.isEmpty()) return true;
         boolean allOk = true;
         final CalibrationApi api = new CalibrationApi(apiClient);
@@ -217,7 +214,7 @@ public class NocturneUploader {
         return allOk;
     }
 
-    private boolean uploadBloodTests(final List<BloodTest> bloodTests) {
+    boolean uploadBloodTests(final List<BloodTest> bloodTests) {
         if (bloodTests == null || bloodTests.isEmpty()) return true;
         boolean allOk = true;
         final MeterGlucoseApi api = new MeterGlucoseApi(apiClient);
@@ -232,7 +229,7 @@ public class NocturneUploader {
         return allOk;
     }
 
-    private boolean uploadTreatments(final List<Treatments> treatments) {
+    boolean uploadTreatments(final List<Treatments> treatments) {
         if (treatments == null || treatments.isEmpty()) return true;
         boolean allOk = true;
 
@@ -312,7 +309,7 @@ public class NocturneUploader {
         return allOk;
     }
 
-    private boolean deleteTreatments(final List<String> uuids) {
+    boolean deleteTreatments(final List<String> uuids) {
         if (uuids == null || uuids.isEmpty()) return true;
         boolean allOk = true;
 
@@ -329,6 +326,10 @@ public class NocturneUploader {
         // Basal injections cannot be deleted here: the SDK/server has no
         // basalInjectionDeleteBySyncIdentifier endpoint yet (pending upstream),
         // so deleting a basal-only treatment reports "not found" and completes.
+        // When that endpoint lands, note that multi-record treatments upload
+        // with suffixed sync identifiers (uuid, uuid-2, ... — see
+        // suffixedSyncId), so deletion must match by prefix or correlation id,
+        // not just the bare uuid tried below.
         for (final String uuid : uuids) {
             DeleteOutcome outcome = DeleteOutcome.NOT_FOUND;
             outcome = outcome.merge(deleteBySyncId(() -> bolusApi.bolusDeleteBySyncIdentifier(DATA_SOURCE, uuid), "bolus", uuid));
@@ -377,7 +378,7 @@ public class NocturneUploader {
         }
     }
 
-    private void uploadHeartRates() {
+    void uploadHeartRates() {
         final long watermark = PersistentStore.getLong(HR_WATERMARK_KEY);
         final List<HeartRate> readings = HeartRate.latestForGraph(1000, watermark, JoH.tsl());
         if (readings == null || readings.isEmpty()) return;
@@ -395,7 +396,7 @@ public class NocturneUploader {
         }
     }
 
-    private void uploadStepCounts() {
+    void uploadStepCounts() {
         final long watermark = PersistentStore.getLong(STEPS_WATERMARK_KEY);
         final List<StepCounter> readings = StepCounter.latestForGraph(1000, watermark, JoH.tsl());
         if (readings == null || readings.isEmpty()) return;
@@ -413,7 +414,7 @@ public class NocturneUploader {
         }
     }
 
-    private void uploadDeviceStatus() {
+    void uploadDeviceStatus() {
         try {
             final long now = JoH.tsl();
             final UpsertUploaderSnapshotRequest snapshot = new UpsertUploaderSnapshotRequest()
@@ -432,7 +433,7 @@ public class NocturneUploader {
         }
     }
 
-    private void uploadMotionTracking() {
+    void uploadMotionTracking() {
         try {
             final long watermark = Math.max(PersistentStore.getLong(MOTION_WATERMARK_KEY),
                     JoH.tsl() - Constants.DAY_IN_MS * 7);

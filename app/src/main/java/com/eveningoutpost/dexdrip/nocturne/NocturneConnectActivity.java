@@ -30,14 +30,6 @@ public class NocturneConnectActivity extends Activity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        if (!NocturneUploader.isSupported()) {
-            // Bail before touching any preferences so an unsupported device
-            // can't end up with nocturne_upload_enable set.
-            Toast.makeText(this, R.string.nocturne_requires_android_8, Toast.LENGTH_LONG).show();
-            finish();
-            return;
-        }
-
         final Uri data = getIntent().getData();
         if (data == null) {
             UserError.Log.e(TAG, "No intent data");

@@ -63,7 +63,7 @@ public class UploaderTask extends AsyncTask<String, Void, Void> {
             if (Pref.getBooleanDefaultFalse("cloud_storage_influxdb_enable")) {
                 circuits.add(UploaderQueue.INFLUXDB_RESTAPI);
             }
-            if (Pref.getBooleanDefaultFalse("nocturne_upload_enable") && NocturneUploader.isSupported()) {
+            if (Pref.getBooleanDefaultFalse("nocturne_upload_enable")) {
                 if (Pref.getBoolean("nocturne_use_mobile", true) || JoH.isLANConnected()) {
                     circuits.add(UploaderQueue.NOCTURNE_RESTAPI);
                 }

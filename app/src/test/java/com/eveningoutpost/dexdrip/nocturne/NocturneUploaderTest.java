@@ -1,6 +1,8 @@
 package com.eveningoutpost.dexdrip.nocturne;
 
 import com.eveningoutpost.dexdrip.RobolectricTestWithConfig;
+import com.eveningoutpost.dexdrip.models.BgReading;
+import com.eveningoutpost.dexdrip.models.BloodTest;
 import com.eveningoutpost.dexdrip.models.Treatments;
 import com.eveningoutpost.dexdrip.nocturne.NocturneUploader.DeleteOutcome;
 import com.eveningoutpost.dexdrip.nocturne.NocturneUploader.TreatmentRoute;
@@ -17,7 +19,11 @@ import org.nightscoutfoundation.nocturne.model.UpsertCalibrationRequest;
 import org.nightscoutfoundation.nocturne.model.UpsertDeviceEventRequest;
 import org.nightscoutfoundation.nocturne.model.UpsertMeterGlucoseRequest;
 import org.nightscoutfoundation.nocturne.model.UpsertNoteRequest;
+import org.nightscoutfoundation.nocturne.model.UpsertSensorGlucoseRequest;
 
+import com.eveningoutpost.dexdrip.utilitymodels.Pref;
+
+import java.util.List;
 import java.util.TimeZone;
 
 import static com.google.common.truth.Truth.assertThat;
@@ -333,6 +339,165 @@ public class NocturneUploaderTest extends RobolectricTestWithConfig {
         assertThat(NocturneUploader.directionFromSlopeName("SomethingElse")).isNull();
         assertThat(NocturneUploader.directionFromSlopeName("")).isNull();
         assertThat(NocturneUploader.directionFromSlopeName(null)).isNull();
+    }
+
+    // ---- upload() success aggregation ----
+
+    /**
+     * Stubs every stream so tests can drive {@link NocturneUploader#upload}
+     * and pin which streams feed the return value.
+     */
+    private static class StubUploader extends NocturneUploader {
+        boolean sgvResult = true;
+        boolean calibrationsResult = true;
+        boolean bloodTestsResult = true;
+        boolean treatmentsResult = true;
+        boolean deletesResult = true;
+        boolean sgvCalled = false;
+        boolean heartRatesCalled = false;
+
+        StubUploader() {
+            super(true);
+        }
+
+        @Override
+        boolean uploadSgv(final List<BgReading> bgReadings) {
+            sgvCalled = true;
+            return sgvResult;
+        }
+
+        @Override
+        boolean uploadCalibrations(final List<com.eveningoutpost.dexdrip.models.Calibration> calibrations) {
+            return calibrationsResult;
+        }
+
+        @Override
+        boolean uploadBloodTests(final List<BloodTest> bloodTests) {
+            return bloodTestsResult;
+        }
+
+        @Override
+        boolean uploadTreatments(final List<Treatments> treatments) {
+            return treatmentsResult;
+        }
+
+        @Override
+        boolean deleteTreatments(final List<String> uuids) {
+            return deletesResult;
+        }
+
+        // Watermark-driven streams: production swallows their failures
+        // internally, so a stub that does nothing models a failed run.
+        @Override
+        void uploadHeartRates() {
+            heartRatesCalled = true;
+        }
+
+        @Override
+        void uploadStepCounts() {
+        }
+
+        @Override
+        void uploadDeviceStatus() {
+        }
+
+        @Override
+        void uploadMotionTracking() {
+        }
+    }
+
+    @Test
+    public void upload_sgvUploadsByDefaultAndFailureReturnsFalse() {
+        // No prefs set: SGV must be on by default and drive the return value
+        final StubUploader uploader = new StubUploader();
+        uploader.sgvResult = false;
+        assertThat(uploader.upload(null, null, null, null, null)).isFalse();
+        assertThat(uploader.sgvCalled).isTrue();
+    }
+
+    @Test
+    public void upload_failingCalibrationStream_returnsFalse() {
+        Pref.setBoolean("nocturne_upload_calibrations", true);
+        final StubUploader uploader = new StubUploader();
+        uploader.calibrationsResult = false;
+        assertThat(uploader.upload(null, null, null, null, null)).isFalse();
+    }
+
+    @Test
+    public void upload_failingBloodTestStream_returnsFalse() {
+        Pref.setBoolean("nocturne_upload_bloodtests", true);
+        final StubUploader uploader = new StubUploader();
+        uploader.bloodTestsResult = false;
+        assertThat(uploader.upload(null, null, null, null, null)).isFalse();
+    }
+
+    @Test
+    public void upload_failingTreatmentStream_returnsFalse() {
+        Pref.setBoolean("nocturne_upload_treatments", true);
+        final StubUploader uploader = new StubUploader();
+        uploader.treatmentsResult = false;
+        assertThat(uploader.upload(null, null, null, null, null)).isFalse();
+    }
+
+    @Test
+    public void upload_failingTreatmentDeletion_returnsFalse() {
+        Pref.setBoolean("nocturne_upload_treatments", true);
+        final StubUploader uploader = new StubUploader();
+        uploader.deletesResult = false;
+        assertThat(uploader.upload(null, null, null, null, null)).isFalse();
+    }
+
+    @Test
+    public void upload_allQueueStreamsSucceeding_returnsTrue() {
+        Pref.setBoolean("nocturne_upload_calibrations", true);
+        Pref.setBoolean("nocturne_upload_bloodtests", true);
+        Pref.setBoolean("nocturne_upload_treatments", true);
+        final StubUploader uploader = new StubUploader();
+        assertThat(uploader.upload(null, null, null, null, null)).isTrue();
+    }
+
+    @Test
+    public void upload_watermarkStreamFailure_doesNotAffectReturnValue() {
+        // Heart rate is watermark-driven: it retries via its own watermark and
+        // must never block queue completion, even when its upload failed.
+        Pref.setBoolean("nocturne_upload_heartrate", true);
+        final StubUploader uploader = new StubUploader();
+        assertThat(uploader.upload(null, null, null, null, null)).isTrue();
+        assertThat(uploader.heartRatesCalled).isTrue();
+    }
+
+    @Test
+    public void upload_notReady_returnsFalse() {
+        assertThat(new NocturneUploader(false).upload(null, null, null, null, null)).isFalse();
+    }
+
+    // ---- mapBgReading scaling ----
+
+    @Test
+    public void mapBgReading_scalesTrendDeltaAndRawValues() {
+        final BgReading reading = new BgReading();
+        reading.timestamp = TEST_TIMESTAMP;
+        reading.calculated_value = 120.5;
+        reading.calculated_value_slope = 0.0005; // per ms
+        reading.raw_data = 100;
+        reading.age_adjusted_raw_value = 100;
+        reading.filtered_data = 98;
+        reading.noise = "3";
+
+        final UpsertSensorGlucoseRequest request = NocturneUploader.mapBgReading(reading);
+
+        assertThat(request.getMgdl()).isEqualTo(120.5);
+        // calculated_value_slope is per ms; trendRate is per minute
+        assertThat(request.getTrendRate()).isEqualTo(0.0005 * 60000);
+        // delta is slope per 5 minutes
+        assertThat(request.getDelta()).isEqualTo(0.0005 * 5 * 60000);
+        // filtered/unfiltered are scaled by 1000 like the Nightscout uploader
+        assertThat(request.getFiltered()).isEqualTo(98 * 1000.0);
+        assertThat(request.getUnfiltered()).isEqualTo(100 * 1000.0);
+        assertThat(request.getNoise()).isEqualTo(3);
+        assertThat(request.getTimestamp().toInstant().toEpochMilli()).isEqualTo(TEST_TIMESTAMP);
+        assertThat(request.getUtcOffset()).isEqualTo(
+                TimeZone.getDefault().getOffset(TEST_TIMESTAMP) / 60000);
     }
 
     // ---- Sync identifier suffixing ----

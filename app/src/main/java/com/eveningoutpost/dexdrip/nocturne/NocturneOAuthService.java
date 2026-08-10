@@ -88,7 +88,7 @@ public class NocturneOAuthService {
     }
 
     /** Extracts the host from a URL remainder, keeping IPv6 brackets intact. */
-    private static String extractHost(final String rest) {
+    static String extractHost(final String rest) {
         if (rest.startsWith("[")) {
             final int close = rest.indexOf(']');
             return close > 0 ? rest.substring(0, close + 1) : rest;
@@ -96,7 +96,7 @@ public class NocturneOAuthService {
         return rest.split("[:/]")[0];
     }
 
-    private static boolean isLocalHost(final String host) {
+    static boolean isLocalHost(final String host) {
         if (host.startsWith("[")) {
             // IPv6 loopback, unique-local (fc00::/7) and link-local stay local
             return host.startsWith("[::1")
@@ -398,7 +398,7 @@ public class NocturneOAuthService {
 
     // --- Private helpers ---
 
-    private void storeTokens(final OAuthTokenResponse response) {
+    void storeTokens(final OAuthTokenResponse response) {
         PersistentStore.setString(KEY_ACCESS_TOKEN, response.getAccessToken());
         // RFC 6749 §6: a refresh-grant response may omit refresh_token when the
         // server doesn't rotate them. setString(key, null) would delete the
@@ -432,7 +432,7 @@ public class NocturneOAuthService {
      * Extracts the OAuth "error" code from an error response body, or ""
      * when the body is not an OAuth error (e.g. a proxy/CDN error page).
      */
-    private static String oauthErrorCode(final String body) {
+    static String oauthErrorCode(final String body) {
         if (body == null || body.isEmpty()) {
             return "";
         }
@@ -448,7 +448,7 @@ public class NocturneOAuthService {
      * Distinguishes real OAuth rejections (e.g. invalid_grant) from proxy/CDN errors
      * like Cloudflare's plain-text "Cross-site POST form submissions are forbidden".
      */
-    private static boolean isOAuthErrorResponse(final String body) {
+    static boolean isOAuthErrorResponse(final String body) {
         return !oauthErrorCode(body).isEmpty();
     }
 }
