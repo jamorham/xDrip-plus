@@ -288,6 +288,7 @@
     <string name="pref_summary_show_treatments">Kuva ravipunktid graafikul</string>
     <string name="pref_use_wear_health">Kasuta kella poolt kogutud terviseandmeid</string>
     <string name="pref_summary_use_wear_health">Loe ja näita kõnnitud samme kui on saadaval</string>
+    <string name="title_enable_wear_auto_update">Automaatne Wear uuendus</string>
     <string name="pebble_integration">Integreerimine Pebble\'ga</string>
     <string name="send_data_to_pebble_watchface">Saada andmed Pebble kella avakuvale.</string>
     <string name="pebble_watch_integration">Pebble kellaga integreerimine</string>
