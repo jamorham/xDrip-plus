@@ -1247,6 +1247,11 @@
     <string name="summary_tidepool_upload_no_treatment">Nahrát pouze data z telefonu (CGM), aby se zabránilo duplicitám s manuálním nahrávání z pumpy</string>
     <string name="title_tidepool_upload_no_treatment">Nenahrávat ošetření</string>
     <string name="title_tidepool">Tidepool</string>
+    <!-- Nocturne connect flow -->
+    <string name="title_nocturne_upload_treatments">Nahrát ošetření</string>
+    <string name="title_nocturne_use_mobile">Použít mobilní data</string>
+    <!-- NocturneConnectActivity (deep link receiver) -->
+    <!-- NocturneConnectHelper (device flow UI) -->
     <string name="show_help">Zobrazit nápovědu</string>
     <string name="load_save_settings_on_sdcard">Načíst / uložit nastavení</string>
     <string name="delete_all_bg_readings">Smazat všechny hodnoty glykémie</string>
