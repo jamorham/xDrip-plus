@@ -1240,6 +1240,11 @@
     <string name="summary_tidepool_upload_no_treatment">Laadi üles ainult CGM-i andmed, et vältida konflikte käsitsi üleslaaditud pumba andmetega</string>
     <string name="title_tidepool_upload_no_treatment">Ära laadi raviandmeid üles</string>
     <string name="title_tidepool">Tidepool</string>
+    <!-- Nocturne connect flow -->
+    <string name="title_nocturne_upload_treatments">Laadi üles raviandmed</string>
+    <string name="title_nocturne_use_mobile">Kasuta mobiilside andmeid</string>
+    <!-- NocturneConnectActivity (deep link receiver) -->
+    <!-- NocturneConnectHelper (device flow UI) -->
     <string name="show_help">Näita juhendit</string>
     <string name="load_save_settings_on_sdcard">Lae/salvesta seaded</string>
     <string name="delete_all_bg_readings">Kustuta kõik VS näidud</string>
