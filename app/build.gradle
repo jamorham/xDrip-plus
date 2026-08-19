@@ -305,6 +305,13 @@ dependencies {
     implementation 'com.squareup.wire:wire-runtime:2.2.0'
     implementation 'com.squareup.okhttp3:okhttp:4.12.0'
     implementation 'com.squareup.okhttp3:logging-interceptor:4.12.0'
+    // Nocturne SDK: targets OkHttp 4.12, matching xDrip's pinned version. We exclude
+    // its gson transitive to keep xDrip's own pinned gson. Jackson is only a
+    // transitive of jackson-databind-nullable and unused at runtime on the gson path.
+    implementation('org.nightscoutfoundation:nocturne-java:0.2.4') {
+        exclude group: 'com.google.code.gson'
+        exclude group: 'com.fasterxml.jackson.core'
+    }
     //implementation 'com.jakewharton.retrofit:retrofit1-okhttp3-client:1.1.0'
     implementation 'com.squareup.retrofit2:retrofit:2.9.0'
     implementation 'com.squareup.retrofit2:converter-gson:2.9.0'
