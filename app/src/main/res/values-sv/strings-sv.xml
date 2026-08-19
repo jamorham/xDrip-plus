@@ -1247,6 +1247,11 @@
     <string name="summary_tidepool_upload_no_treatment">Ladda upp endast CGM-data för att undvika dubbletter med manuell pumpuppladdning</string>
     <string name="title_tidepool_upload_no_treatment">Ladda inte upp behandlingar</string>
     <string name="title_tidepool">Tidepool</string>
+    <!-- Nocturne connect flow -->
+    <string name="title_nocturne_upload_treatments">Ladda upp behandlingar</string>
+    <string name="title_nocturne_use_mobile">Använd mobildata</string>
+    <!-- NocturneConnectActivity (deep link receiver) -->
+    <!-- NocturneConnectHelper (device flow UI) -->
     <string name="show_help">Visa hjälp</string>
     <string name="load_save_settings_on_sdcard">Ladda / Spara inställningar</string>
     <string name="delete_all_bg_readings">Radera alla BG-avläsningar</string>
@@ -1863,6 +1868,8 @@
     <string name="this_backup_looks_like_came_from_different_format_string">Denna säkerhetskopia ser ut att komma från en annan enhet:\n%s\nÄr du säker på att du vill återställa från denna säkerhetskopia?</string>
     <string name="megabyte_format_string">%.1f MB</string>
     <string name="manual_selection_google_drive_file_warning">Du har valt en fil från Google Drive, men detta hanteras inte automatiskt av xDrip så det kan endast användas för manuell säkerhetskopiering och återställning.\n\nIngen automatisk säkerhetskopiering kommer att ske med denna fil.\n\nFortsätt?</string>
+    <string name="alternate_file_selected_warning">Du har valt en alternativ fil. Vanligtvis innebär detta att återställa från en lokalt lagrad säkerhetskopia.\n\nIngen automatisk säkerhetskopiering kommer att ske med denna fil.\n\nFortsätt?</string>
+    <string name="backup_file_security_error_advice">Säkerhetskopieringsfilen rapporterar säkerhetsfel. Normalt innebär detta att du måste välja om den för ge xDrip åtkomst.</string>
     <string name="invalid_time">Ogiltig tid</string>
     <string name="none">inget</string>
     <string name="format_string_ago">%s sedan</string>
@@ -1870,8 +1877,11 @@
     <string name="android_8_background_scanning">Använd funktioner i Android 8+ för bakgrundsavläsningar</string>
     <string name="title_yRange">Anpassa y-axelns räckvidd</string>
     <string name="titleInside_yRange">Aktivera</string>
+    <string name="summaryInside_yRange">Ange minsta och högsta glukosvärden för Y-axeln.\nGrafen kan tillfälligt åsidosätta dessa gränser för att visa mätningarna utanför intervallet.</string>
     <string name="title_ymin">Justera y-axelns minimum</string>
     <string name="title_ymax">Justera y-axelns maximum</string>
+    <string name="summary_ymin">Välj yMin lägsta visade värden.</string>
+    <string name="summary_ymax">Välj yMax för högsta önskade värden.</string>
     <string name="wait_to_connect">Verifiera inställningar och vänta på anslutning.</string>
     <string name="title_sens_expiry_notify">Sensorutgång</string>
     <string name="close">Stäng</string>
