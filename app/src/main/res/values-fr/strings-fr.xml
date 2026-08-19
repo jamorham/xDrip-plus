@@ -1245,6 +1245,11 @@
     <string name="summary_tidepool_upload_no_treatment">Télécharger uniquement les données MGC pour éviter les doublons avec l\'envoi manuel de la pompe</string>
     <string name="title_tidepool_upload_no_treatment">Ne pas télécharger les traitements</string>
     <string name="title_tidepool">Tidepool</string>
+    <!-- Nocturne connect flow -->
+    <string name="title_nocturne_upload_treatments">Charger les traitements</string>
+    <string name="title_nocturne_use_mobile">Utiliser les données mobiles</string>
+    <!-- NocturneConnectActivity (deep link receiver) -->
+    <!-- NocturneConnectHelper (device flow UI) -->
     <string name="show_help">Afficher l\'aide</string>
     <string name="load_save_settings_on_sdcard">Charger / Enregistrer les paramètres</string>
     <string name="delete_all_bg_readings">Supprimer toutes les lectures BG</string>
