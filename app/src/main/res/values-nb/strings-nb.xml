@@ -1247,6 +1247,11 @@
     <string name="summary_tidepool_upload_no_treatment">Last opp bare CGM-data for å unngå duplikater ved manuell opplasting av pumpedata</string>
     <string name="title_tidepool_upload_no_treatment">Ikke last opp behandlinger</string>
     <string name="title_tidepool">Tidepool</string>
+    <!-- Nocturne connect flow -->
+    <string name="title_nocturne_upload_treatments">Last opp behandlinger</string>
+    <string name="title_nocturne_use_mobile">Bruk mobildata</string>
+    <!-- NocturneConnectActivity (deep link receiver) -->
+    <!-- NocturneConnectHelper (device flow UI) -->
     <string name="show_help">Vis hjelp</string>
     <string name="load_save_settings_on_sdcard">Last inn / Lagre innstillinger</string>
     <string name="delete_all_bg_readings">Slett alle BS-avlesninger</string>
