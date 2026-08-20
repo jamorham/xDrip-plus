@@ -1249,6 +1249,7 @@
     <string name="title_tidepool">Tidepool</string>
     <!-- Nocturne connect flow -->
     <string name="title_nocturne_upload_treatments">Subir tratamientos</string>
+    <string name="summary_nocturne_upload_treatments">Subir bolos, carbohidratos, notas y eventos del dispositivo</string>
     <string name="title_nocturne_use_mobile">Usar datos móviles</string>
     <!-- NocturneConnectActivity (deep link receiver) -->
     <!-- NocturneConnectHelper (device flow UI) -->
