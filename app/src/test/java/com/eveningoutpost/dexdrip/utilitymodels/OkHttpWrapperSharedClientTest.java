@@ -97,7 +97,9 @@ public class OkHttpWrapperSharedClientTest extends RobolectricTestWithConfig {
                 .build();
 
         // :: Act
-        custom.newCall(new Request.Builder().url(server.url("/")).build()).execute();
+        // The body is not the subject here, but an unclosed response leaks the connection and
+        // okhttp then logs the leak against whichever test happens to be running at the next GC.
+        custom.newCall(new Request.Builder().url(server.url("/")).build()).execute().close();
         RecordedRequest recorded = server.takeRequest();
 
         // :: Verify
