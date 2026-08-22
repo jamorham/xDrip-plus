@@ -106,8 +106,11 @@ public class NocturneUploader {
                 .build())
                 .setBasePath(basePath)
                 // Cloudflare-fronted instances reject POSTs whose Origin looks cross-site
-                .addDefaultHeader("Origin", basePath);
-        apiClient.setAccessToken(accessToken);
+                .addDefaultHeader("Origin", basePath)
+                // nocturne-java 0.2.4 registers no authentication scheme: setAccessToken() is an
+                // unconditional throw and getAuthentications() is unmodifiable. The generated APIs
+                // pass an empty authNames array, so nothing consults or overwrites this header.
+                .addDefaultHeader("Authorization", "Bearer " + accessToken);
         ready = true;
     }
 
