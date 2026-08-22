@@ -181,4 +181,30 @@ public class NocturneUploaderAuthTest extends RobolectricTestWithConfig {
         assertThat(nextRequest().getHeader("Origin"))
                 .isEqualTo("http://127.0.0.1:" + server.getPort());
     }
+
+    // ===== Token currency across runs ============================================================
+
+    /**
+     * A second upload run sends the token that is stored at that moment, not the earlier one.
+     * <p>
+     * The header is baked in at construction, so it is only ever as fresh as the object. This pins
+     * the half of that which is testable from outside: each new uploader re-reads the store. The
+     * other half — that {@code UploaderTask} really does build a new one per run — is a property of
+     * the caller and is not observable here, so it is not what this test claims.
+     */
+    @Test
+    public void upload_afterATokenChange_sendsTheNewToken() throws Exception {
+        // :: Setup
+        server.enqueue(jsonResponse());
+        server.enqueue(jsonResponse());
+        uploadOneReading();
+        nextRequest();
+
+        // :: Act
+        seedAccessToken("a-refreshed-token");
+        uploadOneReading();
+
+        // :: Verify
+        assertThat(nextRequest().getHeader("Authorization")).isEqualTo("Bearer a-refreshed-token");
+    }
 }
