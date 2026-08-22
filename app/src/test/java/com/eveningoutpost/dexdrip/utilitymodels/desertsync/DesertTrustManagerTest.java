@@ -33,10 +33,11 @@ import static org.junit.Assert.fail;
  * certificate hash. What is asserted here is that trust accepts the untrusted peer, and that the
  * verifier refuses to let an unpinned peer's response through.
  * <p>
- * Neither branch of the hash comparison itself is reachable from a JVM test, and the third test
- * below says why and keeps that from going unnoticed. The accept branch is unreachable for a second
- * reason as well: it compares against a hardcoded SHA-256 of a certificate whose private key this
- * repository does not hold.
+ * Neither branch of the hash comparison itself is reachable from a JVM test, and the third case
+ * below says why and keeps that from going unnoticed. Serving the pinned certificate would not
+ * open the accept branch either: the repository does ship it, with its key, in
+ * {@code res/raw/localhost_cert.bks}, but the peer chain the verifier reads it back out of cannot
+ * be read at all on this JVM.
  *
  * @author Asbjørn Aarrestad - 2026.08
  */
@@ -74,7 +75,7 @@ public class DesertTrustManagerTest extends RobolectricTestWithConfig {
                 .build();
     }
 
-    // ===== naive trust manager ===================================================================
+    // ===== Naive trust manager ===================================================================
 
     /**
      * The naive trust manager lets a client reach a peer holding an untrusted self-signed cert.
@@ -97,7 +98,7 @@ public class DesertTrustManagerTest extends RobolectricTestWithConfig {
         assertThat(response.body().string()).isEqualTo("desert-ok");
     }
 
-    // ===== certificate pin =======================================================================
+    // ===== Certificate pin =======================================================================
 
     /**
      * The full Desert Sync client shape delivers nothing from a peer the verifier refuses.

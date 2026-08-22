@@ -58,7 +58,7 @@ public class EditableCookieJarTest extends RobolectricTestWithConfig {
                 .build();
     }
 
-    // ===== session handoff =======================================================================
+    // ===== Session handoff =======================================================================
 
     /** A cookie set by the server is stored by the jar and replayed on the next request. */
     @Test
@@ -89,7 +89,7 @@ public class EditableCookieJarTest extends RobolectricTestWithConfig {
      * okhttp's bridge interceptor during {@code execute()} — not in this test's setup.
      */
     @Test
-    public void jar_replaysParentDomainCookieAcrossHosts() throws Exception {
+    public void cookiePolicy_replaysParentDomainCookieAcrossHosts() throws Exception {
         // :: Setup
         server.enqueue(new MockResponse()
                 .addHeader("Set-Cookie", AUTH_COOKIE + "=abc123; Domain=minimed.eu; Path=/")
@@ -124,7 +124,7 @@ public class EditableCookieJarTest extends RobolectricTestWithConfig {
      * still be green and this one would go red.
      */
     @Test
-    public void jar_refusesACookieScopedToAPublicSuffix() throws Exception {
+    public void cookiePolicy_refusesACookieScopedToAPublicSuffix() throws Exception {
         // :: Setup
         server.enqueue(new MockResponse()
                 .addHeader("Set-Cookie", AUTH_COOKIE + "=abc123; Domain=eu; Path=/")
@@ -147,7 +147,7 @@ public class EditableCookieJarTest extends RobolectricTestWithConfig {
         assertThat(cookieJar.getAllCookies()).isEmpty();
     }
 
-    // ===== jar bookkeeping =======================================================================
+    // ===== Jar bookkeeping =======================================================================
 
     /** Re-issuing a cookie replaces the stored one instead of accumulating a duplicate. */
     @Test

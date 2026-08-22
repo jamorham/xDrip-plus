@@ -56,7 +56,7 @@ public class NocturneApiClientTest extends RobolectricTestWithConfig {
         PersistentStore.setString("nocturne_client_id", "");
     }
 
-    // ===== the SDK on the shared client ==========================================================
+    // ===== The SDK on the shared client ==========================================================
 
     /**
      * Registering leaves the phone as a POST the Nocturne API would recognise.
