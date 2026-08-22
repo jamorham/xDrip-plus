@@ -1283,7 +1283,23 @@
     <string name="nocturne_connect_switch_positive">Cambia</string>
     <string name="nocturne_connect_unknown_instance">(sconosciuto)</string>
     <string name="nocturne_connect_confirm_title">Connetti a Nocturne?</string>
+    <string name="nocturne_connect_confirm_message">Collega xDrip+ a:\n\n%1$s</string>
+    <string name="nocturne_connect_confirm_positive">Collega</string>
     <!-- NocturneConnectHelper (device flow UI) -->
+    <string name="nocturne_already_connected_disconnect">Sei già connesso a Nocturne. Disconnetti prima?</string>
+    <string name="nocturne_disconnect">Scollega</string>
+    <string name="nocturne_disconnected">Disconnesso da Nocturne</string>
+    <string name="nocturne_set_url_first">Imposta prima l\'URL dell\'istanza di Nocturne</string>
+    <string name="nocturne_connecting">Connessione a Nocturne...</string>
+    <string name="nocturne_start_auth_failed">Impossibile avviare l\'autorizzazione. Controlla il tuo URL Nocturne.</string>
+    <string name="nocturne_device_code_body_auto">Inserisci questo codice sulla tua istanza Nocturne:\n\n%1$s\n\nIl codice scade in %2$d minuti.\n\nTocca \'Apri browser\' per andare alla pagina di approvazione.</string>
+    <string name="nocturne_device_code_body_manual">Inserisci questo codice sulla tua istanza Nocturne:\n\n%1$s\n\nIl codice scade in %2$d minuti.\n\nApri la tua istanza Nocturne nel tuo browser per inserire il codice.</string>
+    <string name="nocturne_authorize_title">Autorizza xDrip+</string>
+    <string name="nocturne_open_browser">Apri il browser</string>
+    <string name="nocturne_connected">Connesso a Nocturne!</string>
+    <string name="nocturne_auth_expired">Autorizzazione scaduta. Riprova.</string>
+    <string name="nocturne_auth_denied">Autorizzazione negata.</string>
+    <string name="nocturne_auth_timed_out">Autorizzazione scaduta. Riprova.</string>
     <string name="show_help">Visualizza la guida</string>
     <string name="load_save_settings_on_sdcard">Carica / Salva impostazioni su memoria SD</string>
     <string name="delete_all_bg_readings">Cancella TUTTI i valori di glicemia</string>
