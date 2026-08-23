@@ -118,7 +118,7 @@ public class ShareRestTest extends RobolectricTestWithConfig {
         assertThat(client).isInstanceOf(OkHttpClient.class);
     }
 
-    // ===== Account region selects the Share host ======================================================
+    // ===== Account region selects the Share host =================================================
 
     /** A US account addresses share2.dexcom.com. */
     @Test
@@ -146,7 +146,7 @@ public class ShareRestTest extends RobolectricTestWithConfig {
         assertThat(firstRequestedHost()).isEqualTo("shareous1.dexcom.com");
     }
 
-    // ===== Helpers ====================================================================================
+    // ===== Helpers ===============================================================================
 
     private OkHttpClient recordingClient() {
         return new OkHttpClient.Builder().addInterceptor(chain -> {

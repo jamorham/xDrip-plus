@@ -25,7 +25,7 @@ import static com.google.common.truth.Truth.assertThat;
  */
 public class AlertListTest extends RobolectricTestWithConfig {
 
-    // --- Setup ---
+    // ===== Setup =================================================================================
 
     @Before
     @Override
@@ -38,7 +38,7 @@ public class AlertListTest extends RobolectricTestWithConfig {
                 0, 0, true, true, 20, true, true);
     }
 
-    // --- Units preference drives the rendered threshold ---
+    // ===== Units preference drives the rendered threshold ========================================
 
     /**
      * A 100 mg/dL alert renders as "100" under mgdl and as its mmol equivalent under mmol. Both
@@ -67,7 +67,7 @@ public class AlertListTest extends RobolectricTestWithConfig {
         assertThat(mmolText).contains("5"); // 100 mg/dL is 5.6 mmol/L
     }
 
-    // --- Helpers ---
+    // ===== Helpers ===============================================================================
 
     @SuppressWarnings("unchecked")
     private String firstLowThreshold() {

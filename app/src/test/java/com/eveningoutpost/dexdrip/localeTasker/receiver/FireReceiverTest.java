@@ -31,7 +31,7 @@ public class FireReceiverTest extends RobolectricTestWithConfig {
     private static final String LOW_SNOOZE_KEY = SnoozeActivity.SnoozeType.LOW_ALERTS.getPrefKey();
     private static final String HIGH_SNOOZE_KEY = SnoozeActivity.SnoozeType.HIGH_ALERTS.getPrefKey();
 
-    // --- Setup ---
+    // ===== Setup =================================================================================
 
     @Before
     @Override
@@ -42,7 +42,7 @@ public class FireReceiverTest extends RobolectricTestWithConfig {
                 .edit().clear().putLong(LOW_SNOOZE_KEY, 0).putLong(HIGH_SNOOZE_KEY, 0).commit();
     }
 
-    // --- Tasker snooze messages ---
+    // ===== Tasker snooze messages ================================================================
 
     /** SNOOZE_LOW 30 sets a low-alert deadline roughly thirty minutes out and leaves high alerts alone. */
     @Test
@@ -93,7 +93,7 @@ public class FireReceiverTest extends RobolectricTestWithConfig {
         assertThat(storedDeadline(HIGH_SNOOZE_KEY)).isEqualTo(0);
     }
 
-    // --- Helpers ---
+    // ===== Helpers ===============================================================================
 
     private Intent taskerIntent(String message) {
         Bundle bundle = new Bundle();

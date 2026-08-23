@@ -66,7 +66,7 @@ public class IdempotentMigrationsTest extends RobolectricTestWithConfig {
 
     }
 
-    // ===== Legacy REST URI migration ==================================================================
+    // ===== Legacy REST URI migration =============================================================
 
     /** A credential-prefixed legacy URL is folded into the URI authority and gains a trailing slash. */
     @Test
@@ -94,7 +94,7 @@ public class IdempotentMigrationsTest extends RobolectricTestWithConfig {
         assertThat(storedBaseUrl()).isEqualTo("http://user:pass@ns.example.com/api/v1/");
     }
 
-    // ===== Helpers ====================================================================================
+    // ===== Helpers ===============================================================================
 
     private void storeBaseUrl(String value) {
         PreferenceManager.getDefaultSharedPreferences(xdrip.getAppContext())
