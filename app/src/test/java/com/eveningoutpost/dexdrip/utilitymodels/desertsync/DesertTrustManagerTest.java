@@ -23,7 +23,7 @@ import okhttp3.tls.HandshakeCertificates;
 import okhttp3.tls.HeldCertificate;
 
 import static com.google.common.truth.Truth.assertThat;
-import static org.junit.Assert.fail;
+import static org.junit.Assert.assertThrows;
 
 /**
  * The custom TLS trust and hostname verification behind Desert Sync.
@@ -116,14 +116,10 @@ public class DesertTrustManagerTest extends RobolectricTestWithConfig {
         Request request = new Request.Builder().url(server.url("/joh")).build();
 
         // :: Act
-        try {
-            client.newCall(request).execute();
-            fail("Expected the certificate pin to reject an unpinned peer");
-        } catch (SSLPeerUnverifiedException expected) {
+        assertThrows(SSLPeerUnverifiedException.class, () -> client.newCall(request).execute());
 
-            // :: Verify — the client refused to transmit
-            assertThat(server.getRequestCount()).isEqualTo(0);
-        }
+        // :: Verify — the client refused to transmit
+        assertThat(server.getRequestCount()).isEqualTo(0);
     }
 
     /**
