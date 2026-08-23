@@ -40,31 +40,35 @@ public class AlertListTest extends RobolectricTestWithConfig {
 
     // ===== Units preference drives the rendered threshold ========================================
 
-    /**
-     * A 100 mg/dL alert renders as "100" under mgdl and as its mmol equivalent under mmol. Both
-     * halves are asserted together: a single-unit assertion would still pass if the preference read
-     * were deleted, because mgdl is also the default.
-     */
+    /** A 100 mg/dL alert renders as "100" when the units preference says mgdl. */
     @Test
-    public void thresholdTextFollowsUnitsPreference() {
+    public void thresholdIsRenderedInMgdlWhenUnitsAreMgdl() {
         // :: Setup
         storeUnits("mgdl");
 
         // :: Act
-        String mgdlText = firstLowThreshold();
+        String text = firstLowThreshold();
 
         // :: Verify
-        assertThat(mgdlText).contains("100");
+        assertThat(text).contains("100");
+    }
 
+    /**
+     * The same alert renders as its mmol equivalent when the units preference says mmol. This is the
+     * half that proves the preference is read at all: mgdl is also the default, so the mgdl test
+     * above would still pass if the read were deleted.
+     */
+    @Test
+    public void thresholdIsRenderedInMmolWhenUnitsAreMmol() {
         // :: Setup
         storeUnits("mmol");
 
         // :: Act
-        String mmolText = firstLowThreshold();
+        String text = firstLowThreshold();
 
         // :: Verify
-        assertThat(mmolText).doesNotContain("100");
-        assertThat(mmolText).contains("5"); // 100 mg/dL is 5.6 mmol/L
+        assertThat(text).doesNotContain("100");
+        assertThat(text).contains("5"); // 100 mg/dL is 5.6 mmol/L
     }
 
     // ===== Helpers ===============================================================================

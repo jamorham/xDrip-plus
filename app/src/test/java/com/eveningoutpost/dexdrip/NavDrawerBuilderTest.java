@@ -74,7 +74,7 @@ public class NavDrawerBuilderTest extends RobolectricTestWithConfig {
 
     // ===== Feature flags add their own entries ===================================================
 
-    /** The data-tables flag adds both table screens, and removing it takes both away again. */
+    /** The data-tables flag adds both table screens. */
     @Test
     public void dataTablesFlagAddsTheTableScreens() {
         // :: Setup
@@ -82,24 +82,29 @@ public class NavDrawerBuilderTest extends RobolectricTestWithConfig {
         storeBoolean("show_data_tables", true);
 
         // :: Act
-        List<String> withTables = targetClasses(new NavDrawerBuilder(xdrip.getAppContext()));
+        List<String> targets = targetClasses(new NavDrawerBuilder(xdrip.getAppContext()));
 
         // :: Verify
-        assertThat(withTables).contains(BgReadingTable.class.getName());
-        assertThat(withTables).contains(CalibrationDataTable.class.getName());
+        assertThat(targets).contains(BgReadingTable.class.getName());
+        assertThat(targets).contains(CalibrationDataTable.class.getName());
+    }
 
+    /** Clearing the data-tables flag takes both table screens away again. */
+    @Test
+    public void clearedDataTablesFlagRemovesTheTableScreens() {
         // :: Setup
+        storeBoolean("I_understand", true);
         storeBoolean("show_data_tables", false);
 
         // :: Act
-        List<String> withoutTables = targetClasses(new NavDrawerBuilder(xdrip.getAppContext()));
+        List<String> targets = targetClasses(new NavDrawerBuilder(xdrip.getAppContext()));
 
         // :: Verify
-        assertThat(withoutTables).doesNotContain(BgReadingTable.class.getName());
-        assertThat(withoutTables).doesNotContain(CalibrationDataTable.class.getName());
+        assertThat(targets).doesNotContain(BgReadingTable.class.getName());
+        assertThat(targets).doesNotContain(CalibrationDataTable.class.getName());
     }
 
-    /** The alerts-in-menu flag adds the alert list, and removing it takes it away again. */
+    /** The alerts-in-menu flag adds the alert list. */
     @Test
     public void alertsFromMainMenuFlagAddsTheAlertList() {
         // :: Setup
@@ -107,19 +112,24 @@ public class NavDrawerBuilderTest extends RobolectricTestWithConfig {
         storeBoolean("bg_alerts_from_main_menu", true);
 
         // :: Act
-        List<String> withAlerts = targetClasses(new NavDrawerBuilder(xdrip.getAppContext()));
+        List<String> targets = targetClasses(new NavDrawerBuilder(xdrip.getAppContext()));
 
         // :: Verify
-        assertThat(withAlerts).contains(AlertList.class.getName());
+        assertThat(targets).contains(AlertList.class.getName());
+    }
 
+    /** Clearing the alerts-in-menu flag takes the alert list away again. */
+    @Test
+    public void clearedAlertsFromMainMenuFlagRemovesTheAlertList() {
         // :: Setup
+        storeBoolean("I_understand", true);
         storeBoolean("bg_alerts_from_main_menu", false);
 
         // :: Act
-        List<String> withoutAlerts = targetClasses(new NavDrawerBuilder(xdrip.getAppContext()));
+        List<String> targets = targetClasses(new NavDrawerBuilder(xdrip.getAppContext()));
 
         // :: Verify
-        assertThat(withoutAlerts).doesNotContain(AlertList.class.getName());
+        assertThat(targets).doesNotContain(AlertList.class.getName());
     }
 
     // ===== Structural invariant, not a preference branch =========================================

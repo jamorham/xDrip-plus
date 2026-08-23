@@ -44,13 +44,9 @@ public class MissedReadingActivityTest extends RobolectricTestWithConfig {
 
     // ===== Stored settings drive the form ========================================================
 
-    /**
-     * Each of the four stored flags ticks its own checkbox. They are asserted in one test with all
-     * four set and all four clear, because a single-state assertion would also pass if the read were
-     * dropped and the views were simply left at their layout defaults.
-     */
+    /** Each of the four stored flags ticks its own checkbox when it is set. */
     @Test
-    public void checkboxesFollowStoredSettings() {
+    public void setFlagsTickTheirCheckboxes() {
         // :: Setup
         storeBoolean(ENABLED_KEY, true);
         storeBoolean(ALL_DAY_KEY, true);
@@ -58,14 +54,22 @@ public class MissedReadingActivityTest extends RobolectricTestWithConfig {
         storeBoolean(OVERRIDE_SILENT_KEY, true);
 
         // :: Act
-        MissedReadingActivity allOn = openActivity().get();
+        MissedReadingActivity activity = openActivity().get();
 
         // :: Verify
-        assertThat(checkBox(allOn, R.id.missed_reading_enable_alert).isChecked()).isTrue();
-        assertThat(checkBox(allOn, R.id.missed_reading_all_day).isChecked()).isTrue();
-        assertThat(checkBox(allOn, R.id.missed_reading_enable_alerts_reraise).isChecked()).isTrue();
-        assertThat(checkBox(allOn, R.id.bg_missed_alerts_override_silent).isChecked()).isTrue();
+        assertThat(checkBox(activity, R.id.missed_reading_enable_alert).isChecked()).isTrue();
+        assertThat(checkBox(activity, R.id.missed_reading_all_day).isChecked()).isTrue();
+        assertThat(checkBox(activity, R.id.missed_reading_enable_alerts_reraise).isChecked()).isTrue();
+        assertThat(checkBox(activity, R.id.bg_missed_alerts_override_silent).isChecked()).isTrue();
+    }
 
+    /**
+     * The same four flags leave their checkboxes clear when they are stored false. Needed alongside
+     * the set case: clear is also the layout default, so on its own it would pass even if the read
+     * were dropped — it is the pair that pins the read.
+     */
+    @Test
+    public void clearedFlagsLeaveTheirCheckboxesUnticked() {
         // :: Setup
         storeBoolean(ENABLED_KEY, false);
         storeBoolean(ALL_DAY_KEY, false);
@@ -73,13 +77,13 @@ public class MissedReadingActivityTest extends RobolectricTestWithConfig {
         storeBoolean(OVERRIDE_SILENT_KEY, false);
 
         // :: Act
-        MissedReadingActivity allOff = openActivity().get();
+        MissedReadingActivity activity = openActivity().get();
 
         // :: Verify
-        assertThat(checkBox(allOff, R.id.missed_reading_enable_alert).isChecked()).isFalse();
-        assertThat(checkBox(allOff, R.id.missed_reading_all_day).isChecked()).isFalse();
-        assertThat(checkBox(allOff, R.id.missed_reading_enable_alerts_reraise).isChecked()).isFalse();
-        assertThat(checkBox(allOff, R.id.bg_missed_alerts_override_silent).isChecked()).isFalse();
+        assertThat(checkBox(activity, R.id.missed_reading_enable_alert).isChecked()).isFalse();
+        assertThat(checkBox(activity, R.id.missed_reading_all_day).isChecked()).isFalse();
+        assertThat(checkBox(activity, R.id.missed_reading_enable_alerts_reraise).isChecked()).isFalse();
+        assertThat(checkBox(activity, R.id.bg_missed_alerts_override_silent).isChecked()).isFalse();
     }
 
     /** The stored missed-reading threshold is what the form shows, rather than the "30" default. */
