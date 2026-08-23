@@ -7,7 +7,7 @@ import static com.eveningoutpost.dexdrip.utils.Preferences.MIN_GLUCOSE_INPUT;
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.net.Uri;
-import android.preference.PreferenceManager;
+import androidx.preference.PreferenceManager;
 import android.util.Log;
 
 import com.eveningoutpost.dexdrip.models.APStatus;
