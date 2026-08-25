@@ -4,6 +4,7 @@ import androidx.preference.PreferenceManager;
 
 import com.eveningoutpost.dexdrip.models.JoH;
 
+import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 import org.robolectric.RuntimeEnvironment;
@@ -26,6 +27,8 @@ public class ParakeetHelperTest extends RobolectricTestWithConfig {
     private static final String FIRST_RUN_KEY = "parakeet_first_run_done";
     private static final String PARAKEET_URL = "http://parakeet.example.com/json.get";
 
+    private boolean notCheckingInBefore;
+
     // ===== Setup =================================================================================
 
     @Before
@@ -33,8 +36,21 @@ public class ParakeetHelperTest extends RobolectricTestWithConfig {
     public void setUp() {
         super.setUp();
         xdrip.setContextAlways(RuntimeEnvironment.application); // force re-bind to current Robolectric app
+        notCheckingInBefore = ParakeetHelper.parakeet_not_checking_in;
         PreferenceManager.getDefaultSharedPreferences(xdrip.getAppContext()).edit().clear().commit();
         disarm();
+    }
+
+    /**
+     * The helper's state lives in statics that outlive the test class, so restore what the public
+     * API exposes: {@code parakeet_not_checking_in} directly, and the arming flag via the same
+     * handshake setUp uses. The timestamps behind it are private and are deliberately left alone —
+     * reaching them would mean reflecting into the class under test.
+     */
+    @After
+    public void tearDown() {
+        disarm();
+        ParakeetHelper.parakeet_not_checking_in = notCheckingInBefore;
     }
 
     // ===== Receiver address parsing ==============================================================
@@ -105,7 +121,9 @@ public class ParakeetHelperTest extends RobolectricTestWithConfig {
 
     /**
      * Arming the notification while first-run is still pending, then reporting a later check-in,
-     * marks first-run as done. Both calls are needed: the arm reads the flag, the check-in writes it.
+     * marks first-run as done. Both calls are needed to reach the write, but note that pending is
+     * also the default, so the arm's read is not pinned here —
+     * {@link #armingIsRefusedOnceFirstRunIsDone()} is the one that pins it.
      */
     @Test
     public void checkinAfterArmingMarksFirstRunDone() {
@@ -123,7 +141,8 @@ public class ParakeetHelperTest extends RobolectricTestWithConfig {
     /**
      * With first-run already done, a plain arming request is refused — that is the whole point of
      * the flag. Clearing the flag afterwards and firing a check-in must therefore leave it clear,
-     * because nothing was ever armed. This is the assertion that pins the read at line 145.
+     * because nothing was ever armed. This is the assertion that pins the read in
+     * {@code notifyOnNextCheckin} — first-run-done is the only state the default does not produce.
      */
     @Test
     public void armingIsRefusedOnceFirstRunIsDone() {

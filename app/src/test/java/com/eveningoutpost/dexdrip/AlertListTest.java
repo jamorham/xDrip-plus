@@ -6,6 +6,7 @@ import androidx.preference.PreferenceManager;
 
 import com.eveningoutpost.dexdrip.models.AlertType;
 
+import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 import org.robolectric.Robolectric;
@@ -38,6 +39,15 @@ public class AlertListTest extends RobolectricTestWithConfig {
                 0, 0, true, true, 20, true, true);
     }
 
+    /**
+     * The whole :app: suite shares one JVM and one ActiveAndroid database, so the seeded alert would
+     * otherwise outlive this class and be visible to anything that reads the table afterwards.
+     */
+    @After
+    public void tearDown() {
+        AlertType.remove_all();
+    }
+
     // ===== Units preference drives the rendered threshold ========================================
 
     /** A 100 mg/dL alert renders as "100" when the units preference says mgdl. */
@@ -68,7 +78,8 @@ public class AlertListTest extends RobolectricTestWithConfig {
 
         // :: Verify
         assertThat(text).doesNotContain("100");
-        assertThat(text).contains("5"); // 100 mg/dL is 5.6 mmol/L
+        // 100 mg/dL is 5.6 mmol/L; the decimal separator is locale-dependent
+        assertThat(text).containsMatch("5[.,]6");
     }
 
     // ===== Helpers ===============================================================================

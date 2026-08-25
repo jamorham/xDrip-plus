@@ -64,9 +64,9 @@ public class MissedReadingActivityTest extends RobolectricTestWithConfig {
     }
 
     /**
-     * The same four flags leave their checkboxes clear when they are stored false. Needed alongside
-     * the set case: clear is also the layout default, so on its own it would pass even if the read
-     * were dropped — it is the pair that pins the read.
+     * The same four flags leave their checkboxes clear when they are stored false. Three of the four
+     * default to false, but {@code missed_readings_all_day} defaults to <em>true</em>, so this case
+     * pins the read on its own — it goes red the moment the activity stops consulting the store.
      */
     @Test
     public void clearedFlagsLeaveTheirCheckboxesUnticked() {

@@ -120,7 +120,11 @@ public class ShareRestTest extends RobolectricTestWithConfig {
 
     // ===== Account region selects the Share host =================================================
 
-    /** A US account addresses share2.dexcom.com. */
+    /**
+     * A US account addresses share2.dexcom.com. Note that US is also the production default, so
+     * this half alone would still pass with the read deleted —
+     * {@link #nonUsAccountUsesOutsideUsShareHost()} is the one that pins it.
+     */
     @Test
     public void usAccountUsesUsShareHost() throws Exception {
         // :: Setup
@@ -133,7 +137,10 @@ public class ShareRestTest extends RobolectricTestWithConfig {
         assertThat(firstRequestedHost()).isEqualTo("share2.dexcom.com");
     }
 
-    /** A non-US account addresses shareous1.dexcom.com. */
+    /**
+     * A non-US account addresses shareous1.dexcom.com. This is the assertion that pins the
+     * preference read: the non-US host is the only one the default does not already produce.
+     */
     @Test
     public void nonUsAccountUsesOutsideUsShareHost() throws Exception {
         // :: Setup

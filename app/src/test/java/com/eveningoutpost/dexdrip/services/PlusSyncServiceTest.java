@@ -6,6 +6,7 @@ import com.eveningoutpost.dexdrip.GcmActivity;
 import com.eveningoutpost.dexdrip.RobolectricTestWithConfig;
 import com.eveningoutpost.dexdrip.xdrip;
 
+import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 import org.robolectric.RuntimeEnvironment;
@@ -25,6 +26,9 @@ public class PlusSyncServiceTest extends RobolectricTestWithConfig {
 
     private static final String DISABLE_KEY = "disable_all_sync";
 
+    private boolean createdBefore;
+    private boolean ceaseBefore;
+
     // ===== Setup =================================================================================
 
     @Before
@@ -32,9 +36,22 @@ public class PlusSyncServiceTest extends RobolectricTestWithConfig {
     public void setUp() {
         super.setUp();
         xdrip.setContextAlways(RuntimeEnvironment.application); // force re-bind to current Robolectric app
+        createdBefore = PlusSyncService.created;
+        ceaseBefore = GcmActivity.cease_all_activity;
         PreferenceManager.getDefaultSharedPreferences(xdrip.getAppContext()).edit().clear().commit();
         PlusSyncService.created = false;        // static guard; nothing else resets it between tests
         GcmActivity.cease_all_activity = false; // static flag under assertion; likewise
+    }
+
+    /**
+     * Both statics outlive the test class, and disabledSyncCeasesAllActivity deliberately raises the
+     * kill switch. Save and restore them the way PlusSyncServiceBackgroundStartTest does in the same
+     * package, so this class cannot hand its residue to whatever runs next in the shared JVM.
+     */
+    @After
+    public void tearDown() {
+        PlusSyncService.created = createdBefore;
+        GcmActivity.cease_all_activity = ceaseBefore;
     }
 
     // ===== The sync kill switch ==================================================================

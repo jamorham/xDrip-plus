@@ -42,8 +42,9 @@ public class NavDrawerBuilderTest extends RobolectricTestWithConfig {
 
     /**
      * Until the agreement is accepted the drawer offers settings and nothing else — the builder
-     * returns early. This is the strongest single assertion on the preference read: any other
-     * outcome means the flag was not seen.
+     * returns early. Note that {@code false} is also the production default, so this half alone
+     * would still pass with the read deleted; {@link #acceptedLicenceOpensTheFullDrawer()} is the
+     * one that pins it.
      */
     @Test
     public void unacceptedLicenceLeavesOnlySettings() {
@@ -57,7 +58,11 @@ public class NavDrawerBuilderTest extends RobolectricTestWithConfig {
         assertThat(targets).containsExactly(Preferences.class.getName());
     }
 
-    /** Once accepted, the drawer opens with the home screen and still ends with settings. */
+    /**
+     * Once accepted, the drawer opens with the home screen and still ends with settings. This is the
+     * assertion that pins the preference read: the accepted state is the only one the default does
+     * not already produce.
+     */
     @Test
     public void acceptedLicenceOpensTheFullDrawer() {
         // :: Setup
