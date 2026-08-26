@@ -7,7 +7,7 @@ import android.content.Intent;
 import android.graphics.BitmapFactory;
 import android.media.RingtoneManager;
 import android.net.Uri;
-import androidx.preference.PreferenceManager;
+import android.preference.PreferenceManager;
 import androidx.core.app.NotificationCompat;
 import android.util.Log;
 import android.widget.Toast;
