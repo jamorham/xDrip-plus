@@ -2,6 +2,7 @@ package com.eveningoutpost.dexdrip;
 
 import static com.eveningoutpost.dexdrip.Home.startHomeWithExtra;
 
+import android.app.AlertDialog;
 import android.graphics.Color;
 import android.os.Bundle;
 import android.util.DisplayMetrics;
@@ -377,7 +378,11 @@ public class PhoneKeypadInputActivity extends BaseActivity {
         }
 
         if (isInvalidTime()) {
-            Log.d(TAG, "Time value is invalid - not processing button click");
+            new AlertDialog.Builder(this)
+                    .setTitle("Invalid time")
+                    .setMessage("Please enter a valid time or clear the time tab.")
+                    .setPositiveButton(android.R.string.ok, null)
+                    .show();
             return;
         }
 
@@ -518,18 +523,15 @@ public class PhoneKeypadInputActivity extends BaseActivity {
         }
         String value = getValue(currenttab);
         mDialTextView.setText(value + append);
-        // show green tick
-        boolean showSubmitButton;
+        // show green tick if any treatment tab has data
+        boolean showSubmitButton = isNonzeroValueInTab("bloodtest")
+                || isNonzeroValueInTab("carbs")
+                || isNonzeroValueInTab("insulin-1")
+                || isNonzeroValueInTab("insulin-2")
+                || isNonzeroValueInTab("insulin-3");
 
-        if (isInvalidTime())
-            showSubmitButton = false;
-
-        else if (currenttab.equals("time"))
-            showSubmitButton = value.length() > 0 && ( isNonzeroValueInTab("bloodtest") || isNonzeroValueInTab("carbs") || isNonzeroValueInTab("insulin-1") || isNonzeroValueInTab("insulin-2") || isNonzeroValueInTab("insulin-3"));
-        else
-            showSubmitButton = isNonzeroValueInTab(currenttab);
-
-        mDialTextView.getBackground().setAlpha(showSubmitButton ? 255 : 0);    }
+        mDialTextView.getBackground().setAlpha(showSubmitButton ? 255 : 0);
+    }
 
 
     @Override
