@@ -382,6 +382,9 @@
     <string name="all_alerts_disabled_until">"All alerts disabled until "</string>
     <string name="low_alerts_disabled_until">"Low alerts disabled until "</string>
     <string name="high_alerts_disabled_until">"High alerts disabled until "</string>
+    <string name="you_reenable">you re-enable</string>
+    <string name="active_alert_rerise_at">Active alert exists named \"%1$s\" Alert will rerise at %2$s (%3$s minutes left)</string>
+    <string name="active_alert_snoozed_until">Active alert exists named \"%1$s\" Alert snoozed until %2$s (%3$s minutes left)</string>
     <string name="default_snooze">Default Snooze</string>
     <string name="until_you_reenable">Until you re-enable</string>
     <string name="set">Set</string>
