@@ -8,6 +8,7 @@ import com.eveningoutpost.dexdrip.RobolectricTestWithConfig;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
+import org.robolectric.RuntimeEnvironment;
 
 public class IdempotentMigrationsTest extends RobolectricTestWithConfig {
 
@@ -57,6 +58,29 @@ public class IdempotentMigrationsTest extends RobolectricTestWithConfig {
         assertWithMessage("set new 5").that(Pref.isPreferenceSet(newPref)).isTrue();
         assertWithMessage("as expected 3").that(Pref.getString(newPref, "error")).isEqualTo("no_calibration");
 
+    }
+
+    // ===== legacySettingsFix ============================================================================================
+
+    /**
+     * The migration must keep forcing bridge battery alerts off. The preference is not
+     * Parakeet-specific — it also gates the alerts for every other bridge — so removing that line
+     * along with the Parakeet ones would switch low battery alerts back on for every user.
+     */
+    @Test
+    public void performAllForcesBridgeBatteryAlertsOff() {
+        // :: Setup
+        Pref.setBoolean("bridge_battery_alerts", true);
+        Pref.setString("bridge_battery_alert_level", "5");
+
+        // :: Act
+        new IdempotentMigrations(RuntimeEnvironment.getApplication().getApplicationContext()).performAll();
+
+        // :: Verify
+        assertWithMessage("bridge battery alerts stay forced off")
+                .that(Pref.getBooleanDefaultFalse("bridge_battery_alerts")).isFalse();
+        assertWithMessage("the alert level stays pinned to its migrated default")
+                .that(Pref.getString("bridge_battery_alert_level", "")).isEqualTo("30");
     }
 
 }
