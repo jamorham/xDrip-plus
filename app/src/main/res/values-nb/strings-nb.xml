@@ -362,6 +362,9 @@
     <string name="all_alerts_disabled_until">"Alle varsler deaktivert inntil "</string>
     <string name="low_alerts_disabled_until">"Lave varsler deaktivert inntil "</string>
     <string name="high_alerts_disabled_until">"Høye varsler deaktivert inntil "</string>
+    <string name="you_reenable">du reaktiverer</string>
+    <string name="active_alert_rerise_at">Det finnes allerede et aktivt varsel med navnet \"%1$s\". Varslet vil utløses på nytt kl. %2$s (%3$s minutter igjen)</string>
+    <string name="active_alert_snoozed_until">Det finnes allerede et aktivt varsel med navnet \"%1$s\". Varslet er utsatt til kl. %2$s (%3$s minutter igjen)</string>
     <string name="default_snooze">Standard slumring</string>
     <string name="until_you_reenable">Inntil du reaktiverer</string>
     <string name="set">Angi</string>
