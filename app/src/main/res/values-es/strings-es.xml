@@ -362,6 +362,8 @@
     <string name="all_alerts_disabled_until">"Todas las alertas desactivadas hasta "</string>
     <string name="low_alerts_disabled_until">"Alertas de hipo desactivadas hasta "</string>
     <string name="high_alerts_disabled_until">"Alertas de hiper desactivadas hasta "</string>
+    <string name="active_alert_rerise_at">Existe una alerta activa llamada \"%1$s\" se reactivará en %2$s (%3$s minutos restantes)</string>
+    <string name="active_alert_snoozed_until">Existe una alerta activa llamada \"%1$s\" silenciada hasta %2$s (%3$s minutos restantes)</string>
     <string name="default_snooze">Repetir por defecto</string>
     <string name="until_you_reenable">Hasta que vuelva a activar</string>
     <string name="set">Establecer</string>
