@@ -23,7 +23,6 @@ public class CheckBridgeBattery {
     private static final String PREFS_ITEM = "bridge_battery";
     private static final int NOTIFICATION_ITEM = 541;
     private static final int repeat_seconds = 1200;
-    private static final boolean d = false;
     private static int last_level = -1;
     private static boolean notification_showing = false;
     private static int threshold = 20;

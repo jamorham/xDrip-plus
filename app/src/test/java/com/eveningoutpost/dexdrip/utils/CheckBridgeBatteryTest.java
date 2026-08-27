@@ -89,14 +89,14 @@ public class CheckBridgeBatteryTest extends RobolectricTestWithConfig {
         Pref.setString(LEVEL, "30");
 
         // :: Act
-        Pref.setInt(BATTERY, 10);
+        Pref.setInt(BATTERY, 24);
         final boolean below = CheckBridgeBattery.checkForceWearBridgeBattery();
 
-        Pref.setInt(BATTERY, 90);
+        Pref.setInt(BATTERY, 26);
         final boolean above = CheckBridgeBattery.checkForceWearBridgeBattery();
 
         // :: Verify
-        assertWithMessage("10% is below the 25% effective threshold").that(below).isTrue();
-        assertWithMessage("90% is above the 25% effective threshold").that(above).isFalse();
+        assertWithMessage("24% is below the 25% effective threshold").that(below).isTrue();
+        assertWithMessage("26% is above the 25% effective threshold").that(above).isFalse();
     }
 }

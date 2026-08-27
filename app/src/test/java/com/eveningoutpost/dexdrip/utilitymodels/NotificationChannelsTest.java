@@ -29,8 +29,9 @@ public class NotificationChannelsTest extends RobolectricTestWithConfig {
     // ===== channel name map =============================================================================================
 
     /**
-     * Every channel that still has a name-map entry resolves to a display name rather than falling
-     * back to its raw channel id.
+     * Each of these channels resolves to a display name rather than falling back to its raw channel
+     * id. {@code PARAKEET_STATUS_CHANNEL} is deliberately left out although it is currently mapped:
+     * it is removed later in this series, and listing it here would make this test fail that change.
      */
     @Test
     public void mappedChannelsResolveToDisplayNames() {

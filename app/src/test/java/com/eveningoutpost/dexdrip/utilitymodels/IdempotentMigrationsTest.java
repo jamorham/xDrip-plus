@@ -2,6 +2,8 @@ package com.eveningoutpost.dexdrip.utilitymodels;
 
 import static com.google.common.truth.Truth.assertWithMessage;
 
+import android.content.SharedPreferences;
+
 import com.eveningoutpost.dexdrip.RobolectricTestWithConfig;
 
 
@@ -10,24 +12,61 @@ import org.junit.Before;
 import org.junit.Test;
 import org.robolectric.RuntimeEnvironment;
 
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Map;
+
 public class IdempotentMigrationsTest extends RobolectricTestWithConfig {
 
     private static final String oldPref = "calibrate_external_libre_2_algorithm";
     private static final String newPref = "calibrate_external_libre_2_algorithm_type";
 
+    private Map<String, ?> preferencesBefore;
+
     @Before
     public void before() {
+        preferencesBefore = new HashMap<>(Pref.getInstance().getAll());
         cleanup();
     }
 
     @After
     public void after() {
-        cleanup();
+        restorePreferences();
     }
 
     private void cleanup() {
         Pref.removeItem(oldPref);
         Pref.removeItem(newPref);
+    }
+
+    /**
+     * performAll() writes around three dozen preferences that have nothing to do with what is
+     * asserted here, and the whole module shares one preference store for the lifetime of the JVM,
+     * so anything left behind is visible to every later test class. This puts the store back
+     * exactly as it was found. The two AlertType rows performAll() inserts are not undone.
+     */
+    private void restorePreferences() {
+        final SharedPreferences.Editor editor = Pref.getInstance().edit();
+        for (final String key : new HashSet<>(Pref.getInstance().getAll().keySet())) {
+            if (!preferencesBefore.containsKey(key)) {
+                editor.remove(key);
+            }
+        }
+        for (final Map.Entry<String, ?> entry : preferencesBefore.entrySet()) {
+            final Object value = entry.getValue();
+            if (value instanceof Boolean) {
+                editor.putBoolean(entry.getKey(), (Boolean) value);
+            } else if (value instanceof String) {
+                editor.putString(entry.getKey(), (String) value);
+            } else if (value instanceof Integer) {
+                editor.putInt(entry.getKey(), (Integer) value);
+            } else if (value instanceof Long) {
+                editor.putLong(entry.getKey(), (Long) value);
+            } else if (value instanceof Float) {
+                editor.putFloat(entry.getKey(), (Float) value);
+            }
+        }
+        editor.commit();
     }
 
     @Test
