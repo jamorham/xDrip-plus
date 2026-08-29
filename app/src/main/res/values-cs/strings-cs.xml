@@ -362,6 +362,9 @@
     <string name="all_alerts_disabled_until">"Všechny výstrahy zakázané do "</string>
     <string name="low_alerts_disabled_until">"Výstraha nízké glykémie zakázána do "</string>
     <string name="high_alerts_disabled_until">"Výstrahy vysoké glykémie zakázány do "</string>
+    <string name="you_reenable">té doby, než je znovu povolíte</string>
+    <string name="active_alert_rerise_at">Je aktivní výstraha s názvem \"%1$s\". Tato výstraha bude znovu spuštěna v %2$s (zbývá%3$s minut)</string>
+    <string name="active_alert_snoozed_until">Je aktivní výstraha s názvem \"%1$s\". Tato výstraha byla odložena do %2$s (zbývá%3$s minut)</string>
     <string name="default_snooze">Výchozí potvrzení</string>
     <string name="until_you_reenable">Dokud není znovu povoleno</string>
     <string name="set">Nastavit</string>

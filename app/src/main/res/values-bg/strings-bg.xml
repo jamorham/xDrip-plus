@@ -362,6 +362,9 @@
     <string name="all_alerts_disabled_until">"Всички аларми спряни до "</string>
     <string name="low_alerts_disabled_until">"Всички аларми спряни до "</string>
     <string name="high_alerts_disabled_until">"Всички известия спряни до "</string>
+    <string name="you_reenable">активиране отново</string>
+    <string name="active_alert_rerise_at">Съществува активно предупреждение с име „%1$s“. Предупреждението ще се задейства в %2$s (остават %3$s минути)</string>
+    <string name="active_alert_snoozed_until">Съществува активно предупреждение с име „%1$s“. Предупреждението е отложено до %2$s (остават %3$s минути)</string>
     <string name="default_snooze">Отлагане по подразбиране</string>
     <string name="until_you_reenable">Докато не го вкл.</string>
     <string name="set">Приложи</string>
