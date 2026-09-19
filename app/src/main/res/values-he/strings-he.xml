@@ -552,7 +552,6 @@
     <string name="battery">סוללה</string>
     <string name="xbridge_battery">xBridge סוללת</string>
     <string name="limitter_battery">Libre סוללת</string>
-    <string name="parakeet_battery">Parakeet סוללת</string>
     <string name="after_calibration_rewrite_history">לאחר כיול, כוונן את הגרף הגולמי בהתאם לכיול החדש</string>
     <string name="rewrite_history">שכתב את ההיסטוריה</string>
     <string name="grid_time_lines_visible">קווי הרשת בציר הזמן גלויים</string>
