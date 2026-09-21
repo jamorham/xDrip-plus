@@ -382,8 +382,7 @@ public class AlertPlayer {
         });
 
         boolean setDataSourceSucceeded = false;
-        final boolean systemDefaultSound = fileName != null && fileName.startsWith("content://settings/system/");
-        if (fileName != null && fileName.length() > 0 && !fileName.equals("default") && !fileName.equals("default_notification") && !systemDefaultSound) {
+        if (fileName != null && fileName.length() > 0 && !fileName.equals("default") && !fileName.equals("default_notification") && !fileName.startsWith("content://settings/system/")) {
             setDataSourceSucceeded = setMediaDataSource(ctx, mediaPlayer, Uri.parse(fileName));
             if (!setDataSourceSucceeded) {
                 UserError.Log.uel(TAG, "Custom URI failed. Path: " + fileName);
@@ -392,7 +391,7 @@ public class AlertPlayer {
         if (!setDataSourceSucceeded) {
             // This means "default", "default_notification", or "content://settings/system/" is the value we have received.
             // If it's a low-priority event (P < 80) or explicitly requested, use the soft default notification sound.
-            if ("default_notification".equals(fileName) || (priority < 80 && ("default".equals(fileName) || systemDefaultSound))) {
+            if ("default_notification".equals(fileName) || (priority < 80 && ("default".equals(fileName) || (fileName != null && fileName.startsWith("content://settings/system/"))))) {
                 setDataSourceSucceeded = setMediaDataSource(ctx, mediaPlayer, R.raw.default_notification);
             }
 

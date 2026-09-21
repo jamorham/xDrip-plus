@@ -93,7 +93,7 @@ public class AlertPlayerSystemSoundTest extends RobolectricTestWithConfig {
                 .containsExactly("default_alert");
     }
 
-    /** A glucose-level alert with the same URI keeps the bundled alarm: its legacy rows carry it as an old default. */
+    /** Above the boundary the bundled alarm is kept too, here at the priority of the high-glucose alert. */
     @Test
     public void glucoseLevelAlertKeepsTheBundledAlarmForASystemDefaultSound() {
         // :: Act
@@ -117,8 +117,20 @@ public class AlertPlayerSystemSoundTest extends RobolectricTestWithConfig {
                 .containsExactly("default_notification");
     }
 
+    /** A missing sound name at low priority still falls back to the bundled alarm, as it always has. */
+    @Test
+    public void lowPriorityAlertWithoutASoundNameKeepsTheBundledAlarm() {
+        // :: Act
+        triggerSound(null, REMINDER);
+
+        // :: Verify
+        assertWithMessage("sounds requested for a reminder without a sound name")
+                .that(requestedSounds)
+                .containsExactly("default_alert");
+    }
+
     /**
-     * Triggers the sound as an alert that overrides silent mode, so the player neither consults the
+     * Triggers the sound as an alert that overrides silent mode, so the player neither acts on the
      * ringer mode nor refuses to play at a volume of zero. The volume it reads comes from the
      * {@code AudioManager} it took when it was first constructed, which belongs to whichever test class
      * created it and is not one this test can set.
