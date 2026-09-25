@@ -116,7 +116,6 @@
     <string name="title_activity_update">xDrip+ k dispozici je aktualizácia</string>
     <string name="title_activity_display_qrcode">Zdieľaj nastavenia pomocou QR kódu</string>
     <string name="title_activity_send_feed_back">Poslať spätnú väzbu Jamorhamovi (autorovi)</string>
-    <string name="title_activity_maps">Mapa Parakeetov</string>
     <string name="title_activity_display_preferences">Zobraziť možnosti</string>
     <string name="export_submenu">Možnosti importu/exportu</string>
     <string name="action_resend_to_watch">Odoslať opakovane glykémiu do hodiniek</string>
@@ -153,9 +152,6 @@
     <string name="till">do</string>
     <string name="low_predicted">Predpoveď nízkej glykémie</string>
     <string name="in">za</string>
-    <string name="yes_enter_setup_mode">Áno, spustiť mód nastavovania</string>
-    <string name="nokeep_parakeet_as_it_is">Ponechať Parakeet ako je</string>
-    <string name="are_you_sure_you_want_switch_parakeet_to_setup">Skutočne prepnúť zariadenie Parakeet do režimu nastavovania?\n\nToto sa bežne používa len pre zaslaní iných textových správ na Parakeet na rekonfiguráciu vysielača, ktorý sleduje.</string>
     <string name="split_delete_or_do_nothing">Rozdeliť, zmazať, alebo nespraviť nič</string>
     <string name="split_this_block_in_two">Rozdeliť blok na dva</string>
     <string name="delete_this_time_block">Zmazať tento časový blok</string>
@@ -170,8 +166,6 @@
     <string name="in_libre_all_house_mode_no_readings_collected_yet">"V režime \"Libre v celom dome\": zatiaľ nebolo nič namerané."</string>
     <string name="in_libre_all_house_mode_last_data_collected">"V režime \"Libre v celom dome\": Posledná nameraná hodnota "</string>
     <string name="space_minute_ago">" pred minútou"</string>
-    <string name="show_parakeet_map">Zobraziť mapu zariadení Parakeet</string>
-    <string name="switch_parakeet_to_setup_mode">Prepnúť Parakeet do módu nastavovania</string>
     <string name="view_events_log">Zobraziť log udalostí</string>
     <string name="show_libre_trend">Zobrazovať trend z Libre</string>
     <string name="libre_15_minutes_graph">15 minútový graf Libre</string>
@@ -385,8 +379,6 @@
     <string name="web_feedback_form_for_sending_messages">Zasielanie správ a hodnotenia aplikácie xDrip+ vývojárom cez web</string>
     <string name="be_master_for_followers">Byť veliacim zariadením pre nasledovníkov</string>
     <string name="this_device_will_send_data_to_followers">Toto zariadenie bude odosielať dáta nasledovníkom</string>
-    <string name="send_parakeet_map_location_to_followers">Odoslať polohu Parakeetu nasledovníkom</string>
-    <string name="sync_parakeet_geolocation">Synchronizovať geografickú polohu Parakeetu</string>
     <string name="disable_all_sync_features">Zakázať všetky synchronizačné funkcie</string>
     <string name="temporary_work_around_disable_all_sync_detail">Dočasné riešenie, ktoré zastaví všetky synchronizácie. Možno bude nutný reštart pri znovu aktivácii. Používaj opatrne!</string>
     <string name="automatic_updates_crash_reports_and_feedback">Automatické aktualizácie, odosielanie chýb a spätnej väzby vývojárom</string>
@@ -418,9 +410,6 @@
     <string name="notify_when_predicted_low_time_reaches_threshold">Upozorniť, keď predpoveď nízkej glykémie dosiahne prahovú hodnotu</string>
     <string name="predicted_low_sound">Zvuk predpovedi nízkej glykémie</string>
     <string name="choose_sound_used_for_predicted_low_alarm">Vybrať zvuk pre predpokladanú nízku glykémiu.</string>
-    <string name="notify_when_parakeet_device_stops_checking_in">Upozorniť, keď sa Parakeet prestane hlásiť</string>
-    <string name="parakeet_related_alerts">Výstrahy Parakeetu</string>
-    <string name="raise_parakeet_notification_silently_when_charging">Stíšiť oznamy z Parakeetu počas nabíjania</string>
     <string name="silent_alert_when_charging">Umlčanie výstrah počas nabíjania</string>
     <string name="alerts_start_out_snoozed_and_must_persist_for_a_while">Výstrahy sú spočiatku odložené a ich okolnosti musia určitý čas pretrvávať pre ich aktiváciu</string>
     <string name="alarms_silenced_during_telephone_calls">Umlčanie výstrah počas telefonického hovoru</string>
@@ -502,7 +491,6 @@
     <string name="show_graph_total_average">Zobraz graf celkového priemeru</string>
     <string name="show_momentum_working_curve">Zobraziť dynamickú krivku</string>
     <string name="show_noise_workings">Zobraz odstraňovanie šumu</string>
-    <string name="parakeet_and_extra_features">Parakeet a špeciálne testovacie voľby</string>
     <string name="insulin_duration_hours">Aktivita inzulínu v hodinách</string>
     <string name="default_liver_sensitivity_ratio">Východzia hodnota koeficientu citlivosti pečene</string>
     <string name="key_is_used_instead_of_google_account">Miesto Google účtu je použitý bezpečnostný kľúč</string>
@@ -881,7 +869,6 @@
     <string name="are_you_sure">Si si istý?</string>
     <string name="g4_share_receiver">G4 Share prijímač</string>
     <string name="bluetooth_wixel">Bluetooth Wixel</string>
-    <string name="parakeet_wifi">Parakeet / Wifi</string>
     <string name="other">Iné</string>
     <string name="which_software_is_the_wixel_running">Akú verziu softvéru má Wixel?</string>
     <string name="start_source_setup_wizard">Spustiť sprievodcu nastavením zdroju dát</string>
@@ -895,7 +882,6 @@
     <string name="use_librealarm">Použiť aplikáciu LibreAlarm ako zdroj údajov?</string>
     <string name="noise_blocking">Blokovanie šumu</string>
     <string name="level_at_which_noisy_data_should_not_be_broadcast">Úroveň pri ktorej zašumené údaje nebudú vysielané, pretože môžu zmiasť prijímajúce aplikácie</string>
-    <string name="low_parakeet_battery">Nízka úroveň batérie Parkeet-u</string>
     <string name="glucose_units_mmol_or_mgdl">Jednotka merania glukózy (mmol/L alebo mg/dL)</string>
     <string name="is_your_typical_glucose_value">Vyber hodnotu, ktorá sa podobá typickej hodnote tvojej glykémie: 5.5 (mmol/L) alebo 100 (mg/dL)</string>
     <string name="settings_updated_to_mmol">Nastavenia zmenené na mmol/L</string>
